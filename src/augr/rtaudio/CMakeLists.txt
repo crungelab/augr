@@ -13,7 +13,7 @@ add_library(${PROJECT_NAME} STATIC
 target_include_directories(${THIS} PRIVATE ${AUGR_RTAUDIO_ROOT}/include)
 
 include(${AUGR_CMAKE}/AugrCore.cmake)
-LINKS_AUGR_CORE(${THIS})
+INTERNAL_AUGR_CORE(${THIS})
 
 add_subdirectory(src/rack)
 

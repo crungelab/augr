@@ -38,6 +38,6 @@ target_sources(${THIS}
 #target_compile_definitions(${THIS} PRIVATE _HAS_STD_BYTE=0)
 #target_include_directories(${THIS} PRIVATE ${THIS_DIR})
 
-USES_AUGR_RTAUDIO(${THIS})
+INTERNAL_AUGR_RTAUDIO(${THIS})
 
 #add_subdirectory(format/exe)

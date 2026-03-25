@@ -15,6 +15,6 @@ include(${AUGR_CMAKE}/Library.cmake)
 include(${THIS_DIR}/../../cmake/Common.cmake)
 
 USES_EXE_APP(${THIS})
-LINKS_AUGR_RTAUDIO(${THIS})
+USES_AUGR_RTAUDIO(${THIS})
 USES_LIBRARY(${THIS})
 USES_COMMON(${THIS})
