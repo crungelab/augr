@@ -4,7 +4,7 @@ cmake_minimum_required(VERSION 3.14)
 #set(THIS ${PROJECT_NAME})
 #set(THIS_DIR ${CMAKE_CURRENT_SOURCE_DIR})
 
-include(${AUGR_CMAKE}/AugrCore.cmake)
+include(${AUGR_CMAKE}/AugrRtAudio.cmake)
 
 file(GLOB RACK_SRC ${CMAKE_CURRENT_SOURCE_DIR}/*.cpp)
 file(GLOB RACK_INCLUDE ${CMAKE_CURRENT_SOURCE_DIR}/*.h)
@@ -38,6 +38,6 @@ target_sources(${THIS}
 #target_compile_definitions(${THIS} PRIVATE _HAS_STD_BYTE=0)
 #target_include_directories(${THIS} PRIVATE ${THIS_DIR})
 
-USES_AUGR_CORE(${THIS})
+USES_AUGR_RTAUDIO(${THIS})
 
 #add_subdirectory(format/exe)

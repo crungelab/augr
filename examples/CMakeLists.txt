@@ -3,7 +3,6 @@ cmake_minimum_required(VERSION 3.15)
 include(${AUGR_CMAKE}/RtAudio.cmake)
 
 include(${AUGR_CMAKE}/AugrCore.cmake)
-include(${AUGR_CMAKE}/Rack.cmake)
 include(${AUGR_CMAKE}/ExeApp.cmake)
 include(${AUGR_CMAKE}/ImNodes.cmake)
 
@@ -16,7 +15,7 @@ USES_AUGR_CORE(xtbuffer)
 
 add_executable(ports ports.cpp ${AUGR_HEADERS})
 USES_RTAUDIO(ports)
-USES_RACK(ports)
+USES_AUGR_CORE(ports)
 
 add_executable(app app.cpp ${AUGR_HEADERS})
 USES_EXE_APP(app)

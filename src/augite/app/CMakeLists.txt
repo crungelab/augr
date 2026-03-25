@@ -4,7 +4,6 @@ project(AugiteApp LANGUAGES CXX)
 set(THIS ${PROJECT_NAME})
 
 include(${AUGR_CMAKE}/Shell.cmake)
-include(${AUGR_CMAKE}/Rack.cmake)
 include(${AUGR_CMAKE}/Widget.cmake)
 include(${AUGR_CMAKE}/View.cmake)
 include(${AUGR_CMAKE}/System.cmake)
@@ -18,7 +17,6 @@ add_library(${PROJECT_NAME} STATIC
 )
 
 USES_SHELL(${THIS})
-USES_RACK(${THIS})
 USES_WIDGET(${THIS})
 USES_VIEW(${THIS})
 USES_SYSTEM(${THIS})

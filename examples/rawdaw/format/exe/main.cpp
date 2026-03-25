@@ -1,6 +1,6 @@
 #include <augr/core/rack/model_manufacturer.h>
 
-#include <augr/core/rack/format/exe/exe_rack.h>
+#include <augr/rtaudio/rack/rtaudio_rack.h>
 #include <augr/core/rack/module/faust_dsp.h>
 #include <augr/core/rack/module/faust_dsp_ui.h>
 #include <augr/core/rack/module/module.h>

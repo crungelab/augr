@@ -65,8 +65,11 @@ set(SDL_RENDER OFF CACHE BOOL "Use render subsystem" FORCE)
 add_subdirectory(depot/sdl)
 
 
-#Augr
+#AugrCore
 add_subdirectory(src/augr/core)
+
+#AugrRtAudio
+add_subdirectory(src/augr/rtaudio)
 
 #Augite
 add_subdirectory(src/augite)
