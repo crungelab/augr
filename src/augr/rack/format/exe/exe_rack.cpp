@@ -20,13 +20,6 @@ static int AudioCallback(void *outputBuffer, void *inputBuffer,
         streamTime, inputBuffer, outputBuffer, nBufferFrames);
 }
 
-/*int ExeRack::ProcessAudio(double streamTime, void* inbuf, void* outbuf,
-unsigned long frames) { Audio input((fy_real*)inbuf, devNumInChans_); Audio
-output = modules_[0]->ProcessAudio(input);
-  output.WritePlanar((fy_buffer_t)outbuf, SCALE);
-  return 0;
-}*/
-
 int ExeRack::ProcessAudio(double streamTime, void *inbuf, void *outbuf,
                           unsigned long frames) {
     const Audio input(static_cast<fy_real *>(inbuf), devNumInChans_);
