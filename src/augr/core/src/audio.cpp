@@ -6,47 +6,47 @@ unsigned int Audio::frames_ = 512;
 unsigned int Audio::sampleRate_ = 44100;
 
 Audio::Audio(const Audio &other) {
-    format_ = other.format_;
+    layout_ = other.layout_;
     frames_ = other.frames_;
     impl_ = other.impl_;
 }
 Audio::Audio(fy_real *raw, size_t nChannels) {
-    format_ = ChannelCountToFormat(nChannels);
+    layout_ = ChannelCountToLayout(nChannels);
     switch (nChannels) {
     case 1:
-        // format_ = Format::kMono;
+        // layout_ = ChannelLayout::kMono;
         impl_ = AudioImplPtr(new AudioImplT<1>(raw));
         break;
     case 2:
-        // format_ = Format::kStereo;
+        // layout_ = ChannelLayout::kStereo;
         impl_ = AudioImplPtr(new AudioImplT<2>(raw));
         break;
     case 4:
-        // format_ = Format::kQuad;
+        // layout_ = ChannelLayout::kQuad;
         impl_ = AudioImplPtr(new AudioImplT<4>(raw));
         break;
     case 6:
-        // format_ = Format::k5_1;
+        // layout_ = ChannelLayout::k5_1;
         impl_ = AudioImplPtr(new AudioImplT<6>(raw));
         break;
     default:
-        // format_ = Format::kNull;
+        // layout_ = ChannelLayout::kNull;
         impl_ = nullptr;
         break;
     }
 }
-Audio::Audio(Format format) : format_(format) {
-    switch (format) {
-    case Format::kMono:
+Audio::Audio(ChannelLayout layout) : layout_(layout) {
+    switch (layout) {
+    case ChannelLayout::kMono:
         impl_ = AudioImplPtr(new AudioImplT<1>());
         break;
-    case Format::kStereo:
+    case ChannelLayout::kStereo:
         impl_ = AudioImplPtr(new AudioImplT<2>());
         break;
-    case Format::kQuad:
+    case ChannelLayout::kQuad:
         impl_ = AudioImplPtr(new AudioImplT<4>());
         break;
-    case Format::k5_1:
+    case ChannelLayout::k5_1:
         impl_ = AudioImplPtr(new AudioImplT<6>());
         break;
 
@@ -74,81 +74,51 @@ void Audio::WritePlanar(fy_buffer_t out, fy_real scale) {
     }
 }
 
-/*
-void Audio::WritePlanar(fy_buffer_t out, fy_real scale)
-{
-  xt::xarray<fy_real> arr = array();
-  if (scale != 1.0)
-  {
-    arr = arr * scale;
-  }
-  size_t channels = nChannels();
-  for (size_t i = 0; i < channels; ++i)
-  {
-    memcpy(out, &arr(i), frames_ * sizeof(fy_real));
-    out += frames_;
-  }
-}
-*/
-
 // Utilities
-Audio::Format Audio::ChannelCountToFormat(int count) {
+ChannelLayout Audio::ChannelCountToLayout(int count) {
     switch (count) {
     case 1:
-        return Format::kMono;
+        return ChannelLayout::kMono;
     case 2:
-        return Format::kStereo;
+        return ChannelLayout::kStereo;
     case 4:
-        return Format::kQuad;
+        return ChannelLayout::kQuad;
     case 6:
-        return Format::k5_1;
+        return ChannelLayout::k5_1;
     default:
-        return Format::kNull;
+        return ChannelLayout::kNull;
     }
-    // return Audio::Format::kNull;
 }
 
-int Audio::FormatToChannelCount(Audio::Format f) {
-    switch (f) {
-    case Audio::Format::kMono:
+int Audio::LayoutToChannelCount(ChannelLayout layout) {
+    switch (layout) {
+    case ChannelLayout::kMono:
         return 1;
-    case Audio::Format::kStereo:
+    case ChannelLayout::kStereo:
         return 2;
-    case Audio::Format::kQuad:
+    case ChannelLayout::kQuad:
         return 4;
-    case Audio::Format::k5_1:
+    case ChannelLayout::k5_1:
         return 6;
     default:
         return 0;
     }
 }
 
-/*
-int Audio::FormatToChannelCount(Audio::Format format) {
-    switch (format) {
-    case Audio::Format::kMono:
-        return 1;
-    case Audio::Format::kStereo:
-        return 2;
-    }
-    return 0;
-}
-*/
-
-Audio Audio::Convert(Audio::Format toFormat) {
-    switch (format_) {
-    case Format::kMono: {
-        switch (toFormat) {
-        case Format::kStereo:
+Audio Audio::Convert(ChannelLayout toLayout) {
+    switch (layout_) {
+    case ChannelLayout::kMono: {
+        switch (toLayout) {
+        case ChannelLayout::kStereo:
             return ConvertMonoToStereo();
 
         default:
             return Audio();
         }
     }
-    case Format::kStereo: {
-        switch (toFormat) {
-        case Format::kMono:
+    case ChannelLayout::kStereo: {
+        switch (toLayout) {
+        case ChannelLayout::kMono:
             return ConvertStereoToMono();
 
         default:
@@ -162,7 +132,7 @@ Audio Audio::Convert(Audio::Format toFormat) {
 }
 
 Audio Audio::ConvertMonoToStereo() {
-    Audio audio(Format::kStereo);
+    Audio audio(ChannelLayout::kStereo);
     auto &srcArr = array(); // [1, F]
     const fy_real *src = srcArr.data();
     const size_t F = frames();
@@ -178,7 +148,7 @@ Audio Audio::ConvertMonoToStereo() {
 }
 
 Audio Audio::ConvertStereoToMono() {
-    Audio audio(Format::kMono);
+    Audio audio(ChannelLayout::kMono);
     auto &srcArr = array(); // [2, F]
     const size_t F = frames();
     const fy_real *L = srcArr.data() + 0 * F;
@@ -189,32 +159,3 @@ Audio Audio::ConvertStereoToMono() {
         M[i] = (L[i] + R[i]) * fy_real(0.5);
     return audio;
 }
-
-/*
-Audio Audio::ConvertMonoToStereo()
-{
-  Audio audio(Format::kStereo);
-
-  xt::xarray<fy_real> arr = array();
-  for (size_t i = 0; i < 2; ++i)
-  {
-    memcpy(audio.buffers()[i], &arr(0), frames_ * sizeof(fy_real));
-  }
-
-  return audio;
-}
-
-Audio Audio::ConvertStereoToMono()
-{
-  Audio audio(Format::kMono);
-
-  xt::xarray<fy_real> arr = array();
-  // TODO: Cheat and just copy the first channel
-  for (size_t i = 0; i < 1; ++i)
-  {
-    memcpy(audio.buffers()[i], &arr(0), frames_ * sizeof(fy_real));
-  }
-
-  return audio;
-}
-*/

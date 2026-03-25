@@ -42,14 +42,14 @@ public:
     view_->Draw();
   }
   // Data members
-  ExeRack rack_;
+  RtAudioRack rack_;
   RackView *view_;
 };
 
 int main(int, char **)
 {
   MyApp &app = *new MyApp();
-  ExeRack &rack = app.rack_;
+  RtAudioRack &rack = app.rack_;
   rack.Create();
   rack.Start();
   app.Run();

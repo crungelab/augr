@@ -7,7 +7,7 @@
 
 namespace augr {
 
-// REFLECT_REGISTER(ExeRack);
+// REFLECT_REGISTER(RtAudioRack);
 
 // #define FORMAT RTAUDIO_FLOAT64
 #define FORMAT RTAUDIO_FLOAT32
@@ -16,11 +16,11 @@ namespace augr {
 static int AudioCallback(void *outputBuffer, void *inputBuffer,
                          unsigned int nBufferFrames, double streamTime,
                          RtAudioStreamStatus status, void *rack) {
-    return static_cast<ExeRack *>(rack)->ProcessAudio(
+    return static_cast<RtAudioRack *>(rack)->ProcessAudio(
         streamTime, inputBuffer, outputBuffer, nBufferFrames);
 }
 
-int ExeRack::ProcessAudio(double streamTime, void *inbuf, void *outbuf,
+int RtAudioRack::ProcessAudio(double streamTime, void *inbuf, void *outbuf,
                           unsigned long frames) {
     const Audio input(static_cast<fy_real *>(inbuf), devNumInChans_);
     audio_input_device_->audio_out_->Write(input);
@@ -31,27 +31,27 @@ int ExeRack::ProcessAudio(double streamTime, void *inbuf, void *outbuf,
 
     Audio output = audio_output_device_->audio_in_->Read();
 
-    if (output.format_ != Audio::Format::kNull) {
+    if (output.layout_ != ChannelLayout::kNull) {
         output.WritePlanar(static_cast<fy_buffer_t>(outbuf), SCALE);
     }
     return 0;
 }
 
-bool ExeRack::CreateAudioInputDevice() {
+bool RtAudioRack::CreateAudioInputDevice() {
     AudioInputDevice &m = ModelFactoryT<AudioInputDevice>::Make(*this);
     AddChild(m);
     audio_input_device_ = &m;
     return true;
 }
 
-bool ExeRack::CreateAudioOutputDevice() {
+bool RtAudioRack::CreateAudioOutputDevice() {
     AudioOutputDevice &m = ModelFactoryT<AudioOutputDevice>::Make(*this);
     AddChild(m);
     audio_output_device_ = &m;
     return true;
 }
 
-bool ExeRack::Create() {
+bool RtAudioRack::Create() {
     audio_dac_ = new RtAudio();
 
     if (audio_dac().getDeviceCount() < 1) {
@@ -109,11 +109,11 @@ bool ExeRack::Create() {
     return e == RtAudioErrorType::RTAUDIO_NO_ERROR;
 }
 
-bool ExeRack::Start() {
+bool RtAudioRack::Start() {
     RtAudioErrorType e = audio_dac().startStream();
     return e == RtAudioErrorType::RTAUDIO_NO_ERROR;
 }
 
-void ExeRack::Stop() { RtAudioErrorType e = audio_dac().stopStream(); }
+void RtAudioRack::Stop() { RtAudioErrorType e = audio_dac().stopStream(); }
 
 } // namespace augr

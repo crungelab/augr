@@ -15,39 +15,24 @@ bool FaustDsp::Create(Part &owner) {
     //
     int nInputs = getNumInputs();
     if (nInputs > 0) {
-        Audio::Format inputFormat = Audio::ChannelCountToFormat(nInputs);
-        audio_in_ = new AudioPin(*this, "audio_in_", inputFormat);
+        ChannelLayout inputLayout = Audio::ChannelCountToLayout(nInputs);
+        audio_in_ = new AudioPin(*this, "audio_in_", inputLayout);
         AddInput(*audio_in_);
     }
     //
     int nOutputs = getNumOutputs();
     if (nOutputs > 0) {
-        Audio::Format outputFormat = Audio::ChannelCountToFormat(nOutputs);
-        audio_out_ = new AudioPin(*this, "audio_out_", outputFormat);
+        ChannelLayout outputLayout = Audio::ChannelCountToLayout(nOutputs);
+        audio_out_ = new AudioPin(*this, "audio_out_", outputLayout);
         AddOutput(*audio_out_);
     }
 
     return true;
 }
 
-/*Audio FaustDsp::ProcessAudio(Audio input)
-{
-  Audio output(Audio::Format::kMono);
-  compute(output.frames(), nullptr, output.buffers());
-  return output;
-}*/
-
 Audio FaustDsp::ProcessAudio(Audio input) {
-    /*Audio::Format format = Audio::Format::kMono;
-    auto numInputs = getNumInputs();
-    auto numOutputs = getNumOutputs();
-    switch (numOutputs)
-    {
-    case 2:
-      format = Audio::Format::kStereo;
-    }*/
-    Audio::Format format = audio_out_->format_;
-    Audio output(format);
+    ChannelLayout layout = audio_out_->layout_;
+    Audio output(layout);
 
     if (audio_in_) {
         compute(output.frames(), input.buffers(), output.buffers());
@@ -61,7 +46,7 @@ void FaustDsp::Process() {
     control();
     if (audio_in_) {
         auto input = audio_in_->Read();
-        if (input.format_ != Audio::Format::kNull) {
+        if (input.layout_ != ChannelLayout::kNull) {
             audio_out_->Write(ProcessAudio(input));
         }
     } else {

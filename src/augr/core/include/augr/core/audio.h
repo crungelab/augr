@@ -14,7 +14,6 @@ public:
     virtual fy_buffers_t buffers() = 0;
 
     // Accessors
-    // xt::xarray<fy_real> array() { return array_; }
     xt::xarray<fy_real> &array() { return array_; }
     const xt::xarray<fy_real> &array() const { return array_; }
 
@@ -25,24 +24,24 @@ public:
 
 typedef std::shared_ptr<AudioImpl> AudioImplPtr;
 
+enum class ChannelLayout { kNull, kMono, kStereo, kQuad, k5_1 };
+
 class Audio {
 public:
-    enum class Format { kNull, kMono, kStereo, kQuad, k5_1 };
     Audio(const Audio &other);
-    Audio(Format format = Format::kNull);
+    Audio(ChannelLayout layout = ChannelLayout::kNull);
     Audio(fy_real *raw, size_t channels);
     //
     void WritePlanar(fy_buffer_t out, fy_real scale = 1.0);
     // Utilities
-    static Format ChannelCountToFormat(int count);
-    static int FormatToChannelCount(Format format);
-    Audio Convert(Format toFormat);
+    static ChannelLayout ChannelCountToLayout(int count);
+    static int LayoutToChannelCount(ChannelLayout layout);
+    Audio Convert(ChannelLayout toLayout);
     Audio ConvertMonoToStereo();
     Audio ConvertStereoToMono();
     // Accessors
     static unsigned int sampleRate() { return sampleRate_; }
     static unsigned int frames() { return frames_; }
-    // xt::xarray<fy_real> array() { return impl_->array(); }
 
     xt::xarray<fy_real> &array() { return impl_->array(); }
     const xt::xarray<fy_real> &array() const { return impl_->array(); }
@@ -54,7 +53,7 @@ public:
     // Data members
     static unsigned int frames_;
     static unsigned int sampleRate_;
-    Format format_;
+    ChannelLayout layout_;
     AudioImplPtr impl_;
 };
 
@@ -89,30 +88,3 @@ public:
     size_t nChannels() override { return nChannels_; }
     fy_buffers_t buffers() override { return buffers_; }
 };
-
-/*
-template <size_t N> class AudioImplT : public AudioImpl {
-public:
-    AudioImplT() {
-        shape_ = {N, Audio::frames()};
-        array_ = xt::xarray<fy_real>(shape_);
-        for (int i = 0; i < N; ++i) {
-            buffers_[i] = &array_(i);
-        }
-    }
-    AudioImplT(fy_real *raw) {
-        size_t size = Audio::frames() * N;
-        shape_ = {N, Audio::frames()};
-        array_ = xt::adapt(raw, size, xt::no_ownership(), shape_);
-        for (int i = 0; i < N; ++i) {
-            buffers_[i] = &array_(i);
-        }
-    }
-    // Accessors
-    virtual size_t nChannels() override { return nChannels_; }
-    virtual fy_buffers_t buffers() override { return buffers_; }
-    // Data members
-    size_t nChannels_ = N;
-    fy_buffer_t buffers_[N];
-};
-*/

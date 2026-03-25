@@ -10,20 +10,20 @@ typedef PinT<Audio> AudioPinBase;
 class AudioPin : public AudioPinBase
 {
 public:
-  AudioPin(Node &node, std::string name, Audio::Format format = Audio::Format::kMono) : AudioPinBase(node, name), format_(format)
+  AudioPin(Node &node, std::string name, ChannelLayout layout = ChannelLayout::kMono) : AudioPinBase(node, name), layout_(layout)
   {
   }
   void Write(Audio audio) override
   {
-    if(audio.format_ != format_) {
+    if(audio.layout_ != layout_) {
       //audio = audio.Convert(format_);
-      AudioPinBase::Write(audio.Convert(format_));
+      AudioPinBase::Write(audio.Convert(layout_));
       return;
     }
     AudioPinBase::Write(audio);
   }
   // Data members
-  Audio::Format format_ = Audio::Format::kMono;
+  ChannelLayout layout_ = ChannelLayout::kMono;
 };
 
 } // namespace augr

@@ -1,7 +1,5 @@
 #pragma once
 
-#define AUGR_SINGLE
-
 #if defined AUGR_QUAD
 typedef long double fy_real;
 #elif defined AUGR_DOUBLE
