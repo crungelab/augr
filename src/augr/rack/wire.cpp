@@ -1,5 +1,5 @@
-#include "pin.h"
-#include "wire.h"
+#include <augr/rack/pin.h>
+#include <augr/rack/wire.h>
 
 namespace augr {
 

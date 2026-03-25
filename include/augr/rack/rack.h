@@ -1,6 +1,6 @@
 #pragma once
 
-#include "graph.h"
+#include <augr/rack/graph.h>
 
 namespace augr {
 

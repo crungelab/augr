@@ -1,4 +1,4 @@
-#include "part.h"
+#include <augr/part.h>
 
 namespace augr {
 

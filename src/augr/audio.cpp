@@ -1,6 +1,6 @@
 #include <cstring>
 
-#include "audio.h"
+#include <augr/audio.h>
 
 unsigned int Audio::frames_ = 512;
 unsigned int Audio::sampleRate_ = 44100;

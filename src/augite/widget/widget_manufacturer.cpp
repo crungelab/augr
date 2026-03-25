@@ -1,5 +1,6 @@
 //#include <rttr/type>
-#include "../reflect.h"
+#include <augr/reflect.h>
+
 #include "widget_manufacturer.h"
 #include "widget.h"
 

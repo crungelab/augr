@@ -3,7 +3,7 @@
 #include <augr/audio.h>
 #include <augr/rack/module/audio_device.h>
 
-#include "exe_rack.h"
+#include <augr/rack/format/exe/exe_rack.h>
 
 namespace augr {
 

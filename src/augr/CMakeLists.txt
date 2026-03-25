@@ -10,6 +10,7 @@ add_library(${PROJECT_NAME} STATIC
   ${AUGR_SRC}
   ${AUGR_INCLUDE}
 )
+target_include_directories(${THIS} PRIVATE ${AUGR_ROOT}/include)
 
 include(${AUGR_CMAKE}/XTensor.cmake)
 USES_XTENSOR(${THIS})

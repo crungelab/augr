@@ -1,7 +1,7 @@
 //#include <rttr/type>
-#include "../reflect.h"
-#include "model_manufacturer.h"
-#include "model.h"
+#include <augr/reflect.h>
+#include <augr/rack/model_manufacturer.h>
+#include <augr/rack/model.h>
 
 namespace augr {
 

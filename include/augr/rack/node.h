@@ -2,7 +2,7 @@
 
 #include <vector>
 
-#include "model.h"
+#include <augr/rack/model.h>
 #include "port.h"
 
 namespace augr {

@@ -1,6 +1,6 @@
-#include "graph.h"
-#include "wire.h"
-#include "pin.h"
+#include <augr/rack/graph.h>
+#include <augr/rack/wire.h>
+#include <augr/rack/pin.h>
 
 namespace augr {
 

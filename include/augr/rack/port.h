@@ -2,7 +2,7 @@
 
 #include <vector>
 
-#include "pin.h"
+#include <augr/rack/pin.h>
 
 namespace augr {
 

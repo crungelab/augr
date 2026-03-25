@@ -1,23 +1,23 @@
-#include "module.h"
+#include <augr/rack/module/module.h>
 
-#include "faust_dsp.h"
-#include "faust_dsp_ui.h"
+#include <augr/rack/module/faust_dsp.h>
+#include <augr/rack/module/faust_dsp_ui.h>
 
-#include "control/button.h"
-#include "control/check_button.h"
-#include "control/frame_box.h"
-#include "control/h_bargraph.h"
-#include "control/h_box.h"
-#include "control/h_slider.h"
-#include "control/knob.h"
-#include "control/num_display.h"
-#include "control/num_entry.h"
-#include "control/tab_box.h"
-#include "control/text_display.h"
-#include "control/toggle_button.h"
-#include "control/v_bargraph.h"
-#include "control/v_box.h"
-#include "control/v_slider.h"
+#include <augr/rack/control/button.h>
+#include <augr/rack/control/check_button.h>
+#include <augr/rack/control/frame_box.h>
+#include <augr/rack/control/h_bargraph.h>
+#include <augr/rack/control/h_box.h>
+#include <augr/rack/control/h_slider.h>
+#include <augr/rack/control/knob.h>
+#include <augr/rack/control/num_display.h>
+#include <augr/rack/control/num_entry.h>
+#include <augr/rack/control/tab_box.h>
+#include <augr/rack/control/text_display.h>
+#include <augr/rack/control/toggle_button.h>
+#include <augr/rack/control/v_bargraph.h>
+#include <augr/rack/control/v_box.h>
+#include <augr/rack/control/v_slider.h>
 
 namespace augr {
 

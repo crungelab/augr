@@ -1,2 +1,2 @@
-#include "pin.h"
-#include "node.h"
+#include <augr/rack/pin.h>
+#include <augr/rack/node.h>
