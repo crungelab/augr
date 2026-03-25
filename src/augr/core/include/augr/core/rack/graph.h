@@ -28,6 +28,8 @@ public:
     std::map<int, Pin *> output_map_;
     std::map<int, Pin *> input_map_;
 
+    bool graph_dirty_ = false;
+
     REFLECT_ENABLE(Model)
 };
 

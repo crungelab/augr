@@ -16,7 +16,6 @@ public:
   void Write(Audio audio) override
   {
     if(audio.layout_ != layout_) {
-      //audio = audio.Convert(format_);
       AudioPinBase::Write(audio.Convert(layout_));
       return;
     }

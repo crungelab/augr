@@ -38,7 +38,6 @@ public:
   Node &node() { return *(Node *)owner_; }
   std::string name_;
   std::vector<Wire *> wires_;
-  //REFLECT_ENABLE()
 };
 
 template <typename T>
