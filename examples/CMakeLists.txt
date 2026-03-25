@@ -1,0 +1,40 @@
+cmake_minimum_required(VERSION 3.15)
+
+include(${AUGR_CMAKE}/RtAudio.cmake)
+
+include(${AUGR_CMAKE}/Augr.cmake)
+include(${AUGR_CMAKE}/Rack.cmake)
+include(${AUGR_CMAKE}/ExeApp.cmake)
+include(${AUGR_CMAKE}/ImNodes.cmake)
+
+add_executable(rtplaysaw rtplaysaw.cpp)
+USES_RTAUDIO(rtplaysaw)
+
+add_executable(xtbuffer xtbuffer.cpp ${AUGR_HEADERS})
+USES_RTAUDIO(xtbuffer)
+USES_AUGR(xtbuffer)
+
+add_executable(ports ports.cpp ${AUGR_HEADERS})
+USES_RTAUDIO(ports)
+USES_RACK(ports)
+
+add_executable(app app.cpp ${AUGR_HEADERS})
+USES_EXE_APP(app)
+
+add_executable(graph graph.cpp ${AUGR_HEADERS})
+USES_EXE_APP(graph)
+USES_IMNODES(graph)
+
+add_subdirectory(panner)
+
+add_subdirectory(osc)
+
+add_subdirectory(frenchbell)
+
+add_subdirectory(chain)
+
+add_subdirectory(multi)
+
+add_subdirectory(bubble)
+
+add_subdirectory(daw)
