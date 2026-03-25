@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 3.14)
 
 set(THIS ${PROJECT_NAME}${CMAKE_SYSTEM_NAME}Dx12)
 
-include(${AUGR_CMAKE}/Augr.cmake)
+include(${AUGR_CMAKE}/AugrCore.cmake)
 include(${AUGR_CMAKE}/ImGui.cmake)
 
 file(GLOB SHELL_SRC ${CMAKE_CURRENT_SOURCE_DIR}/*.cpp)
@@ -15,7 +15,7 @@ add_library(${THIS} STATIC
 
   ${IMGUI_EX}/imgui_impl_dx12.cpp
 )
-USES_AUGR(${THIS})
+USES_AUGR_CORE(${THIS})
 USES_IMGUI(${THIS})
 
 target_link_libraries(${THIS} PRIVATE ${PROJECT_NAME}${CMAKE_SYSTEM_NAME} AugiteShell D3d12 dxgi)

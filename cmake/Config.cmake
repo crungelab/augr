@@ -7,6 +7,9 @@ set(SHELL_PLATFORM X11)
 set(AUGR_ROOT ${CMAKE_CURRENT_LIST_DIR}/..)
 set(AUGR_CMAKE ${AUGR_ROOT}/cmake)
 set(AUGR_DEPOT ${AUGR_ROOT}/depot)
+set(AUGR_SRC ${AUGR_ROOT}/src)
+
+set(AUGR_CORE_ROOT ${AUGR_SRC}/augr/core)
 
 set(FMT_ROOT ${AUGR_DEPOT}/fmt)
 set(RTTR_ROOT ${AUGR_DEPOT}/rttr)

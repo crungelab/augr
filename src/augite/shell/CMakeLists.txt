@@ -3,7 +3,7 @@ cmake_minimum_required(VERSION 3.14)
 project(AugiteShell LANGUAGES CXX)
 set(THIS ${PROJECT_NAME})
 
-include(${AUGR_CMAKE}/Augr.cmake)
+include(${AUGR_CMAKE}/AugrCore.cmake)
 include(${AUGR_CMAKE}/Augite.cmake)
 include(${AUGR_CMAKE}/ImGui.cmake)
 include(${AUGR_CMAKE}/Sdl.cmake)
@@ -17,7 +17,7 @@ add_library(${THIS} STATIC
   ${IMGUI_EX}/imgui_impl_sdl3.cpp
 )
 
-USES_AUGR(${THIS})
+USES_AUGR_CORE(${THIS})
 USES_AUGITE(${THIS})
 USES_IMGUI(${THIS})
 USES_SDL(${THIS})

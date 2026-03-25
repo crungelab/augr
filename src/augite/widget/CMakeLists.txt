@@ -4,7 +4,7 @@ set(THIS AugiteWidget)
 
 project(${THIS} CXX)
 
-include(${AUGR_CMAKE}/Augr.cmake)
+include(${AUGR_CMAKE}/AugrCore.cmake)
 include(${AUGR_CMAKE}/Augite.cmake)
 include(${AUGR_CMAKE}/Rack.cmake)
 include(${AUGR_CMAKE}/ImPlot.cmake)
@@ -24,7 +24,7 @@ add_library(${PROJECT_NAME} STATIC
   ${WIDGET_INCLUDE}
 )
 
-USES_AUGR(${THIS})
+USES_AUGR_CORE(${THIS})
 USES_AUGITE(${THIS})
 USES_RACK(${THIS})
 USES_IMPLOT(${THIS})

@@ -115,7 +115,7 @@ list(APPEND _ALL_FAUST_HEADERS "${GENERATED_HEADER}")
 # Single aggregate target that depends on *all* headers
 add_custom_target(faust_headers ALL DEPENDS ${_ALL_FAUST_HEADERS})
 
-include(${AUGR_CMAKE}/Augr.cmake)
+include(${AUGR_CMAKE}/AugrCore.cmake)
 
 set(THIS fausty_dsp)
 
@@ -123,4 +123,4 @@ set(THIS fausty_dsp)
 add_library(${THIS} STATIC library.cpp ${_ALL_FAUST_HEADERS})
 add_dependencies(${THIS} faust_headers)
 target_include_directories(${THIS} PUBLIC "${FAUST_GEN_DIR}")
-USES_AUGR(${THIS})
+USES_AUGR_CORE(${THIS})

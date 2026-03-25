@@ -3,12 +3,12 @@
 
 #include "imnodes.h"
 
-#include <augr/rack/model_manufacturer.h>
-#include <augr/rack/module/module.h>
+#include <augr/core/rack/model_manufacturer.h>
+#include <augr/core/rack/module/module.h>
 
-#include <augr/rack/pin.h>
-#include <augr/rack/rack.h>
-#include <augr/rack/wire.h>
+#include <augr/core/rack/pin.h>
+#include <augr/core/rack/rack.h>
+#include <augr/core/rack/wire.h>
 
 #include <augite/widget/module_widget.h>
 #include <augite/widget/widget_builder.h>

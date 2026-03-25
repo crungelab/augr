@@ -1,7 +1,7 @@
 #include "imgui.h"
 
 #include "widget.h"
-#include <augr/rack/control/check_button.h>
+#include <augr/core/rack/control/check_button.h>
 
 namespace augr {
 

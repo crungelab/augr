@@ -66,7 +66,7 @@ add_subdirectory(depot/sdl)
 
 
 #Augr
-add_subdirectory(src/augr)
+add_subdirectory(src/augr/core)
 
 #Augite
 add_subdirectory(src/augite)

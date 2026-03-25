@@ -2,7 +2,7 @@
 
 //#include "public.sdk/source/vst/vsteditcontroller.h"
 //#include "vstgui/plugin-bindings/vst3editor.h"
-#include <augr/vst3/plug_editor.h>
+#include <augr/core/vst3/plug_editor.h>
 
 namespace Steinberg {
 namespace Panner {

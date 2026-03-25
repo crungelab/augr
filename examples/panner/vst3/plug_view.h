@@ -1,4 +1,4 @@
-#include <augr/vst3/plug_view.h>
+#include <augr/core/vst3/plug_view.h>
 
 namespace Steinberg {
 namespace Panner {

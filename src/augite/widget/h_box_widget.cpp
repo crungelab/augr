@@ -1,7 +1,7 @@
 #include "imgui.h"
 
 #include "box_widget.h"
-#include <augr/rack/control/h_box.h>
+#include <augr/core/rack/control/h_box.h>
 
 namespace augr {
 

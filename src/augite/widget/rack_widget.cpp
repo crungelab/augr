@@ -1,7 +1,7 @@
 #include "imgui.h"
 
 #include "rack_widget.h"
-#include <augr/rack/rack.h>
+#include <augr/core/rack/rack.h>
 
 namespace augr {
 

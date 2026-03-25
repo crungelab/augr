@@ -1,6 +1,6 @@
 #include "imgui.h"
 
-#include <augr/rack/control/v_box.h>
+#include <augr/core/rack/control/v_box.h>
 
 #include "box_widget.h"
 

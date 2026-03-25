@@ -8,7 +8,7 @@
 #include "imgui_internal.h" // ImGuiWindow, ImDrawList
 
 #include "widget.h"
-#include <augr/rack/control/v_bargraph.h>
+#include <augr/core/rack/control/v_bargraph.h>
 
 namespace augr {
 

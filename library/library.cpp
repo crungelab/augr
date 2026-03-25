@@ -1,8 +1,8 @@
-#include <augr/rack/model_manufacturer.h>
+#include <augr/core/rack/model_manufacturer.h>
 
-#include <augr/rack/module/faust_dsp.h>
-#include <augr/rack/module/faust_dsp_ui.h>
-#include <augr/rack/module/module.h>
+#include <augr/core/rack/module/faust_dsp.h>
+#include <augr/core/rack/module/faust_dsp_ui.h>
+#include <augr/core/rack/module/module.h>
 
 #include "dbmeter_dsp.h"
 #include "flanger_dsp.h"

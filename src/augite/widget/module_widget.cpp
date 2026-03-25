@@ -1,7 +1,7 @@
 #include "imgui.h"
 #include "imnodes.h"
 
-#include <augr/rack/module/module.h>
+#include <augr/core/rack/module/module.h>
 
 #include "module_widget.h"
 

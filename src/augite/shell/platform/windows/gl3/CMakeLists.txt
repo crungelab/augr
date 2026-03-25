@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 3.14)
 
 set(THIS ${PROJECT_NAME}${CMAKE_SYSTEM_NAME}Gl3)
 
-include(${AUGR_CMAKE}/Augr.cmake)
+include(${AUGR_CMAKE}/AugrCore.cmake)
 inclue(${AUGR_CMAKE}/Glfw.cmake)
 include(${AUGR_CMAKE}/ImGui.cmake)
 
@@ -14,7 +14,7 @@ add_library(${THIS} STATIC
   ${SHELL_INCLUDE}
   ${IMGUI_EX}/imgui_impl_opengl3.cpp
 )
-USES_AUGR(${THIS})
+USES_AUGR_CORE(${THIS})
 USES_SDL(${THIS})
 USES_IMGUI(${THIS})
 
