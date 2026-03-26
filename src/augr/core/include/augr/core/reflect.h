@@ -22,7 +22,7 @@ namespace reflect {
 // ------------------------- Tiny base graph ------------------------------
 class Registry {
 public:
-  static Registry& instance() {
+  static Registry& singleton() {
     static Registry r;
     return r;
   }
@@ -79,7 +79,7 @@ struct register_recursive<T, type_list<Bases...>> {
     (ensure_registered<Bases>(), ...);
 
     // 2) Now register T with its immediate bases (edge list).
-    Registry::instance().template register_type<T, Bases...>();
+    Registry::singleton().template register_type<T, Bases...>();
   }
 };
 

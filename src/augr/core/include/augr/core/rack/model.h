@@ -22,12 +22,6 @@ public:
     REFLECT_ENABLE(Part)
 };
 
-template <typename T = Model> class ModelT : T {
-    void AddChild(T &model) { children_.push_back(&model); }
-    // Data members
-    std::vector<T *> children_;
-};
-
 // Factory
 class ModelFactory {
 public:

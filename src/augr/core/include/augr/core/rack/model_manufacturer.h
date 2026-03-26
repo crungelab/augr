@@ -11,7 +11,7 @@ class ModelFactory;
 
 class ModelManufacturer {
 public:
-    static ModelManufacturer &instance() noexcept {
+    static ModelManufacturer &singleton() noexcept {
         static auto *self = new ModelManufacturer();
         return *self;
     }
@@ -25,6 +25,6 @@ public:
 
 #define REGISTER_MODEL_FACTORY(T)                                             \
     extern ModelFactory *Get##T##Factory();                                   \
-    ModelManufacturer::instance().AddFactory(*Get##T##Factory());
+    ModelManufacturer::singleton().AddFactory(*Get##T##Factory());
 
 } // namespace augr

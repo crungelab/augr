@@ -174,7 +174,7 @@ void RackView::DrawModuleCatalog() {
         ImGui::InputTextWithHint("##filter", "Search modules…", filter,
                                  IM_ARRAYSIZE(filter));
 
-        for (const auto &it : ModelManufacturer::instance().factories_) {
+        for (const auto &it : ModelManufacturer::singleton().factories_) {
             if (filter[0] && !strstr(it->name_.c_str(), filter))
                 continue;
 

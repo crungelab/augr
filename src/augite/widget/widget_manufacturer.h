@@ -11,7 +11,7 @@ class WidgetFactory;
 
 class WidgetManufacturer {
 public:
-    static WidgetManufacturer &instance() noexcept {
+    static WidgetManufacturer &singleton() noexcept {
         static WidgetManufacturer *self = new WidgetManufacturer();
         return *self;
     }
@@ -25,6 +25,6 @@ public:
 
 #define REGISTER_WIDGET_FACTORY(T)                                             \
     extern WidgetFactory *Get##T##Factory();                                   \
-    WidgetManufacturer::instance().AddFactory(*Get##T##Factory());
+    WidgetManufacturer::singleton().AddFactory(*Get##T##Factory());
 
 } // namespace augr

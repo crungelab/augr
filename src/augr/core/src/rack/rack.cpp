@@ -7,7 +7,7 @@
 
 namespace augr {
 
-Rack *Rack::instance_;
+Rack *Rack::singleton_;
 
 void Rack::RebuildExecutionOrder() {
     std::unordered_map<Module *, std::vector<Module *>> dependents;

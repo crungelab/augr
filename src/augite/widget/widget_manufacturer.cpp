@@ -21,7 +21,7 @@ WidgetFactory* WidgetManufacturer::FindFactory(const std::type_index& t) {
     return it->second;
 
   // search bases (depth-first)
-  for (const auto& b : ::reflect::Registry::instance().bases_of(t)) {
+  for (const auto& b : ::reflect::Registry::singleton().bases_of(t)) {
     if (auto* f = FindFactory(b))
       return f;
   }

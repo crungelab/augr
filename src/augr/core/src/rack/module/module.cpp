@@ -6,7 +6,7 @@ namespace augr {
 
 bool Module::Create(Part& owner) {
   Node::Create(owner);
-  Rack::instance().AddModule(*this);
+  Rack::singleton().AddModule(*this);
   return true;
 }
 

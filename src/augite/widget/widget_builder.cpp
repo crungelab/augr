@@ -9,7 +9,7 @@ namespace augr {
 Widget *WidgetBuilder::Build(Model &model) {
     auto type = ::reflect::get_type(model);
 
-    auto manufacturer = WidgetManufacturer::instance();
+    auto manufacturer = WidgetManufacturer::singleton();
 
     WidgetFactory *factory = manufacturer.GetFactory(type);
     Widget *widget = factory->Produce(model);
