@@ -22,6 +22,7 @@ int RtAudioRack::ProcessAudio(double streamTime, void *inbuf, void *outbuf,
                               unsigned long frames) {
 
     if (graph_dirty_) RebuildExecutionOrder();  // only on topology change
+    ProcessActions();
     const Audio input(static_cast<fy_real *>(inbuf), devNumInChans_);
     audio_input_device_->audio_out_->Write(input);
 
@@ -34,6 +35,8 @@ int RtAudioRack::ProcessAudio(double streamTime, void *inbuf, void *outbuf,
     if (output.layout_ != ChannelLayout::kNull) {
         output.WritePlanar(static_cast<fy_buffer_t>(outbuf), SCALE);
     }
+    ProcessUpdateActions();
+
     return 0;
 }
 
