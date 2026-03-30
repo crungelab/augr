@@ -1,3 +1,5 @@
+set(THIS AugrFaustLibrary)
+
 # One place to collect all outputs
 set(FAUST_GEN_DIR "${CMAKE_CURRENT_BINARY_DIR}/generated/faust")
 file(MAKE_DIRECTORY "${FAUST_GEN_DIR}")
@@ -14,6 +16,9 @@ set(FAUST_EXAMPLES_DIR "${AUGR_ROOT}/depot/faust/examples")
 
 # Collect outputs in a variable (not via per-file custom targets)
 set(_ALL_FAUST_HEADERS "")
+set_property(GLOBAL PROPERTY FAUST_OUTPUTS "")
+set_property(GLOBAL PROPERTY FAUST_ALL_HEADERS "")
+set_property(GLOBAL PROPERTY FAUST_HEADER_TARGETS "")
 
 function(faust_generate_header_once DSP CLASS_NAME OUT_BASENAME)
   # Compute absolute, names, and output
@@ -29,6 +34,10 @@ function(faust_generate_header_once DSP CLASS_NAME OUT_BASENAME)
   endif()
   if(_idx GREATER -1)
     # Just expose it to caller—rule already exists
+    string(SHA1 _out_hash "${_out}")
+    set(_hdr_target "faust_header_${_out_hash}")
+    set_property(GLOBAL APPEND PROPERTY FAUST_HEADER_TARGETS "${_hdr_target}")
+    set_property(GLOBAL APPEND PROPERTY FAUST_ALL_HEADERS "${_out}")
     set(GENERATED_HEADER "${_out}" PARENT_SCOPE)
     return()
   endif()
@@ -52,8 +61,15 @@ function(faust_generate_header_once DSP CLASS_NAME OUT_BASENAME)
     VERBATIM
   )
 
+  # Wrap each generated header in its own target so cross-directory deps are reliable.
+  string(SHA1 _out_hash "${_out}")
+  set(_hdr_target "faust_header_${_out_hash}")
+  add_custom_target("${_hdr_target}" DEPENDS "${_out}")
+
   # Remember we defined a rule for this path
   set_property(GLOBAL APPEND PROPERTY FAUST_OUTPUTS "${_out}")
+  set_property(GLOBAL APPEND PROPERTY FAUST_ALL_HEADERS "${_out}")
+  set_property(GLOBAL APPEND PROPERTY FAUST_HEADER_TARGETS "${_hdr_target}")
 
   # Return to caller
   set(GENERATED_HEADER "${_out}" PARENT_SCOPE)
@@ -61,44 +77,12 @@ endfunction()
 
 # ---- Declare your DSPs exactly once -----------------------------------------
 
-# Analysis
-faust_generate_header_once(
-  "${FAUST_EXAMPLES_DIR}/analysis/dbmeter.dsp"
-  "DbMeterDsp"
-  "dbmeter_dsp.h"
-)
-list(APPEND _ALL_FAUST_HEADERS "${GENERATED_HEADER}")
-
-# Phasing
-faust_generate_header_once(
-  "${FAUST_EXAMPLES_DIR}/phasing/phaser.dsp"
-  "PhaserDsp"
-  "phaser_dsp.h"
-)
-list(APPEND _ALL_FAUST_HEADERS "${GENERATED_HEADER}")
-
-faust_generate_header_once(
-  "${FAUST_EXAMPLES_DIR}/phasing/flanger.dsp"
-  "FlangerDsp"
-  "flanger_dsp.h"
-)
-list(APPEND _ALL_FAUST_HEADERS "${GENERATED_HEADER}")
-
-# Physical Modeling
-faust_generate_header_once(
-  "${FAUST_EXAMPLES_DIR}/physicalModeling/frenchBell.dsp"
-  "FrenchBellDsp"
-  "frenchbell_dsp.h"
-)
-list(APPEND _ALL_FAUST_HEADERS "${GENERATED_HEADER}")
-
 # Generator
 faust_generate_header_once(
   "${FAUST_EXAMPLES_DIR}/generator/osc.dsp"
   "OscDsp"
   "osc_dsp.h"
 )
-list(APPEND _ALL_FAUST_HEADERS "${GENERATED_HEADER}")
 
 # Reverb
 faust_generate_header_once(
@@ -106,36 +90,33 @@ faust_generate_header_once(
   "FreeverbDsp"
   "freeverb_dsp.h"
 )
-list(APPEND _ALL_FAUST_HEADERS "${GENERATED_HEADER}")
-
-# Game Audio
-faust_generate_header_once(
-  "${FAUST_EXAMPLES_DIR}/gameaudio/rain.dsp"
-  "RainDsp"
-  "rain_dsp.h"
-)
-list(APPEND _ALL_FAUST_HEADERS "${GENERATED_HEADER}")
-
-faust_generate_header_once(
-  "${FAUST_EXAMPLES_DIR}/gameaudio/thunder.dsp"
-  "ThunderDsp"
-  "thunder_dsp.h"
-)
-list(APPEND _ALL_FAUST_HEADERS "${GENERATED_HEADER}")
 
 # Add more DSPs here with unique OUT_BASENAME values
 # faust_generate_header_once("${CMAKE_CURRENT_SOURCE_DIR}/dsp/organ.dsp" "OrganDsp" "organ_dsp.h")
-# list(APPEND _ALL_FAUST_HEADERS "${GENERATED_HEADER}")
-
-# Single aggregate target that depends on *all* headers
-add_custom_target(faust_headers ALL DEPENDS ${_ALL_FAUST_HEADERS})
+# Headers are auto-registered by faust_generate_header_once.
 
 include(${AUGR_CMAKE}/AugrCore.cmake)
 
-set(THIS fausty_dsp)
-
 # Consumers
-add_library(${THIS} STATIC library.cpp ${_ALL_FAUST_HEADERS})
-add_dependencies(${THIS} faust_headers)
+add_library(${THIS} STATIC library.cpp)
 target_include_directories(${THIS} PUBLIC "${FAUST_GEN_DIR}")
 USES_AUGR_CORE(${THIS})
+
+add_subdirectory(analysis)
+add_subdirectory(gameaudio)
+add_subdirectory(phasing)
+add_subdirectory(physicalModeling)
+
+get_property(_ALL_FAUST_HEADERS GLOBAL PROPERTY FAUST_ALL_HEADERS)
+if(_ALL_FAUST_HEADERS)
+  list(REMOVE_DUPLICATES _ALL_FAUST_HEADERS)
+endif()
+
+get_property(_FAUST_HEADER_TARGETS GLOBAL PROPERTY FAUST_HEADER_TARGETS)
+if(_FAUST_HEADER_TARGETS)
+  list(REMOVE_DUPLICATES _FAUST_HEADER_TARGETS)
+endif()
+
+# Single aggregate target that depends on *all* headers
+add_custom_target(faust_headers ALL DEPENDS ${_FAUST_HEADER_TARGETS})
+add_dependencies(${THIS} faust_headers)

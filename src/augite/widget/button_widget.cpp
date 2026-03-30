@@ -10,6 +10,14 @@ namespace augr {
 class ButtonWidget : public WidgetT<Button> {
 public:
     ButtonWidget(Button &model) : WidgetT<Button>(model) {}
+
+    void Draw() override {
+        ImGui::Button("Gate");
+        float gate = ImGui::IsItemActive() ? 1.0f : 0.0f;
+        *model_->zone_ = gate;
+    }
+
+    /*
     void Draw() override {
         if (ImGui::Button(model_->label_)) {
             auto zone = model_->zone_;
@@ -17,6 +25,7 @@ public:
                                            [zone]() { *zone = 0.0f; });
         }
     }
+    */
     /*
     void Draw() override {
       if (ImGui::Button(model_->label_)) {

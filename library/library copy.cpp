@@ -1,0 +1,84 @@
+#include <augr/core/rack/model_manufacturer.h>
+
+#include <augr/core/rack/module/faust_dsp.h>
+#include <augr/core/rack/module/faust_dsp_ui.h>
+#include <augr/core/rack/module/module.h>
+
+#include "dbmeter_dsp.h"
+#include "vumeter_dsp.h"
+
+#include "flanger_dsp.h"
+#include "freeverb_dsp.h"
+#include "frenchbell_dsp.h"
+#include "osc_dsp.h"
+#include "phaser_dsp.h"
+
+#include "rain_dsp.h"
+#include "thunder_dsp.h"
+
+
+using namespace augr;
+
+// Analysis
+
+class DbMeterDspImpl : public DbMeterDsp {
+public:
+    REFLECT_ENABLE(FaustDsp)
+};
+DEFINE_MODEL_FACTORY(DbMeterDspImpl, "Db Meter", "Analysis")
+
+class VuMeterDspImpl : public VuMeterDsp {
+public:
+    REFLECT_ENABLE(FaustDsp)
+};
+DEFINE_MODEL_FACTORY(VuMeterDspImpl, "Vu Meter", "Analysis")
+
+// Physical Modeling
+
+class FrenchBellDspImpl : public FrenchBellDsp {
+public:
+    REFLECT_ENABLE(FaustDsp)
+};
+DEFINE_MODEL_FACTORY(FrenchBellDspImpl, "French Bell", "Instrument")
+
+class OscDspImpl final : public OscDsp {
+    REFLECT_ENABLE(FaustDsp)
+};
+DEFINE_MODEL_FACTORY(OscDspImpl, "Oscillator", "Generator")
+
+class FreeverbDspImpl final : public FreeverbDsp {
+    REFLECT_ENABLE(FaustDsp)
+};
+DEFINE_MODEL_FACTORY(FreeverbDspImpl, "Freeverb", "Reverb")
+
+class FlangerDspImpl final : public FlangerDsp {
+    REFLECT_ENABLE(FaustDsp)
+};
+DEFINE_MODEL_FACTORY(FlangerDspImpl, "Flanger", "Effect")
+
+class PhaserDspImpl final : public PhaserDsp {
+    REFLECT_ENABLE(FaustDsp)
+};
+DEFINE_MODEL_FACTORY(PhaserDspImpl, "Phaser", "Effect")
+
+class RainDspImpl final : public RainDsp {
+    REFLECT_ENABLE(FaustDsp)
+};
+DEFINE_MODEL_FACTORY(RainDspImpl, "Rain", "Generator")
+
+class ThunderDspImpl final : public ThunderDsp {
+    REFLECT_ENABLE(FaustDsp)
+};
+DEFINE_MODEL_FACTORY(ThunderDspImpl, "Thunder", "Generator")
+
+void InitFaustDspLibrary() {
+    REGISTER_MODEL_FACTORY(DbMeterDspImpl);
+    REGISTER_MODEL_FACTORY(VuMeterDspImpl);
+    REGISTER_MODEL_FACTORY(FrenchBellDspImpl);
+    REGISTER_MODEL_FACTORY(OscDspImpl);
+    REGISTER_MODEL_FACTORY(FreeverbDspImpl);
+    REGISTER_MODEL_FACTORY(FlangerDspImpl);
+    REGISTER_MODEL_FACTORY(PhaserDspImpl);
+    REGISTER_MODEL_FACTORY(RainDspImpl);
+    REGISTER_MODEL_FACTORY(ThunderDspImpl);
+}
