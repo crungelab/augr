@@ -18,6 +18,7 @@ void Graph::Connect(Pin &output, Pin &input) {
 void Graph::Disconnect(Wire &wire) {
     wires_.remove(&wire);
     wire_map_.erase(wire.id_);
+    delete &wire;
     graph_dirty_ = true;
 }
 

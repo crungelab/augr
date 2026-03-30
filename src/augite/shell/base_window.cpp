@@ -55,24 +55,6 @@ bool BaseWindow::DoCreate(CreateParams params)
         NativeAttachTo(params.nativeParent);
     }
 
-    /*
-    // Create GPU Device
-    SDL_GPUDevice *gpu_device = SDL_CreateGPUDevice(SDL_GPU_SHADERFORMAT_SPIRV | SDL_GPU_SHADERFORMAT_DXIL | SDL_GPU_SHADERFORMAT_METALLIB, true, nullptr);
-    if (gpu_device == nullptr)
-    {
-        printf("Error: SDL_CreateGPUDevice(): %s\n", SDL_GetError());
-        return 1;
-    }
-
-    // Claim window for GPU Device
-    if (!SDL_ClaimWindowForGPUDevice(gpu_device, window_))
-    {
-        printf("Error: SDL_ClaimWindowForGPUDevice(): %s\n", SDL_GetError());
-        return 1;
-    }
-    SDL_SetGPUSwapchainParameters(gpu_device, window_, SDL_GPU_SWAPCHAINCOMPOSITION_SDR, SDL_GPU_PRESENTMODE_VSYNC);
-    */
-
     return true;
 }
 
@@ -80,53 +62,6 @@ void BaseWindow::SetQuitOnClose(bool quit_on_close)
 {
     quit_on_close_ = quit_on_close;
 }
-
-/*
-bool BaseWindow::DoRun(RunParams params)
-{
-
-    Point origin(10, 10);
-    Size size(1280, 720);
-
-    bool success = CreateAndShow(params);
-
-    assert(success);
-    if (!success)
-    {
-        return false;
-    }
-
-    // Main loop
-    bool done = false;
-    while (!done)
-    {
-        SDL_Event event;
-        SDL_WaitEvent(&event);
-        while (SDL_PollEvent(&event))
-        {
-
-            if (auto* raw = TryDecode<ResizeEvent>(event)) {
-                auto ev = Adopt(raw);
-                ApplyResize(ev->width, ev->height);
-            } else if (auto* raw = TryDecode<CloseEvent>(event)) {
-                auto ev = Adopt(raw);
-                //ApplyClose();
-                done = true;
-            }
-
-            ImGui_ImplSDL3_ProcessEvent(&event);
-
-            if (event.type == SDL_EVENT_QUIT)
-                done = true;
-            if (event.type == SDL_EVENT_WINDOW_CLOSE_REQUESTED && event.window.windowID == SDL_GetWindowID(window_))
-                done = true;
-        }
-        Render();
-    }
-
-    return true;
-}
-*/
 
 bool BaseWindow::Dispatch(const SDL_Event &event) {
     if (auto* raw = TryDecode<ResizeEvent>(event)) {
@@ -186,37 +121,6 @@ bool BaseWindow::DoRun(RunParams params)
     return true;
 }
 
-/*
-bool BaseWindow::DoRun(RunParams params)
-{
-    bool success = CreateAndShow(params);
-
-    assert(success);
-    if (!success)
-    {
-        return false;
-    }
-
-    // Main loop
-    bool done = false;
-    while (!done)
-    {
-        Render();
-        SDL_Event event;
-        SDL_WaitEvent(&event);
-        //SDL_WaitEventTimeout(&event, 1);
-        done = Dispatch(event);
-        while (SDL_PollEvent(&event))
-        {
-            done = Dispatch(event) || done;
-        }
-        //Render();
-    }
-
-    return true;
-}
-*/
-
 bool BaseWindow::PostRun(RunParams params)
 {
     Destroy();
@@ -235,24 +139,6 @@ void BaseWindow::Destroy()
     SDL_Quit();
 }
 
-/*
-void BaseWindow::RequestResize(int w, int h)
-{
-    {
-        std::lock_guard<std::mutex> lk(mtx_);
-        q_.push({Cmd::Resize, w, h});
-    }
-    // glfwPostEmptyEvent(); // wake the window loop
-
-    SDL_Event event;
-    SDL_zero(event);
-    event.type = SDL_EVENT_USER;
-    event.user.code = 0;
-    event.user.data1 = nullptr;
-    event.user.data2 = nullptr;
-    SDL_PushEvent(&event);
-}
-*/
 void BaseWindow::RequestResize(int w, int h)
 {
     Post<augr::ResizeEvent>(w, h);

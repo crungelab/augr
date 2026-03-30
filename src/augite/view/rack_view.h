@@ -24,6 +24,7 @@ public:
     void CheckLinkCreated();
     void CheckLinkDestroyed();
     void CheckCreateNode();
+    void CheckNodeSelection();
 
     void CheckMouse();
 
@@ -37,6 +38,7 @@ private:
     int hovered_node_id = -1;
     int pending_link_start_attr = -1;
     ImVec2 pending_spawn_pos = ImVec2(0, 0);
+    std::vector<int> selected_nodes_;
 
 };
 

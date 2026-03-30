@@ -13,6 +13,8 @@ set(AUGR_CORE_ROOT ${AUGR_SRC}/augr/core)
 set(AUGR_RTAUDIO_ROOT ${AUGR_SRC}/augr/rtaudio)
 
 set(FMT_ROOT ${AUGR_DEPOT}/fmt)
+set(SPDLOG_ROOT ${AUGR_DEPOT}/spdlog)
+
 set(RTTR_ROOT ${AUGR_DEPOT}/rttr)
 set(RTAUDIO_ROOT ${AUGR_DEPOT}/rtaudio)
 set(XTENSOR_ROOT ${AUGR_DEPOT}/xtensor)

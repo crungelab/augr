@@ -1,3 +1,5 @@
+#include <spdlog/spdlog.h>
+
 #include "imgui.h"
 #include "imgui_internal.h"
 
@@ -88,6 +90,7 @@ void RackView::Draw() {
     CheckLinkCreated();
     CheckLinkDestroyed();
     CheckCreateNode();
+    CheckNodeSelection();
 
     DrawModuleCatalog();
 
@@ -116,6 +119,7 @@ void RackView::CheckLinkDestroyed() {
     int linkId;
     if (ImNodes::IsLinkDestroyed(&linkId)) {
         auto wire = model_->wire_map_[linkId];
+        spdlog::debug("Link destroyed: {}", linkId);
         model_->Disconnect(*wire);
     }
 }
@@ -129,9 +133,9 @@ void RackView::CheckCreateNode() {
         ImGui::OpenPopup("ModuleCatalog");
     }
 
-    if (ImGui::IsMouseReleased(ImGuiMouseButton_Right) &&
-        is_editor_hovered_ && !ImNodes::IsAnyAttributeActive() &&
-        !ImGui::IsAnyItemHovered() && !ImNodes::IsNodeHovered(&node_id)) {
+    if (ImGui::IsMouseReleased(ImGuiMouseButton_Right) && is_editor_hovered_ &&
+        !ImNodes::IsAnyAttributeActive() && !ImGui::IsAnyItemHovered() &&
+        !ImNodes::IsNodeHovered(&node_id)) {
         pending_link_start_attr = -1; // no pending link
         pending_spawn_pos = ImGui::GetMousePos();
         ImGui::OpenPopup("ModuleCatalog");
@@ -161,6 +165,37 @@ void RackView::CheckMouse() {
             // e.g. open a context menu:
             ImGui::OpenPopup("node_ctx");
         }
+    }
+}
+
+void RackView::CheckNodeSelection() {
+    // This is a placeholder for node selection logic, which can be implemented
+    // based on your specific requirements. You can use ImNodes functions to
+    // check for node selection and update the selected_nodes_ vector
+    // accordingly.
+    const int num_selected_nodes = ImNodes::NumSelectedNodes();
+    if (num_selected_nodes > 0) {
+        selected_nodes_.resize(num_selected_nodes);
+        ImNodes::GetSelectedNodes(selected_nodes_.data());
+    }
+    if (ImGui::IsKeyPressed(ImGuiKey_Escape)) {
+        ImNodes::ClearNodeSelection();
+        selected_nodes_.clear();
+    } else if (ImGui::IsKeyPressed(ImGuiKey_Delete)) {
+        for (int node_id : selected_nodes_) {
+            if (const auto it = widget_map_.find(node_id);
+                it != widget_map_.end()) {
+                Widget *widget = it->second;
+                if (auto *module_widget =
+                        dynamic_cast<ModuleWidget *>(widget)) {
+                    model_->RemoveChild(*module_widget->model());
+                    root_->RemoveChild(*widget);
+                    widget_map_.erase(it);
+                    delete widget;
+                }
+            }
+        }
+        selected_nodes_.clear();
     }
 }
 

@@ -108,6 +108,21 @@ faust_generate_header_once(
 )
 list(APPEND _ALL_FAUST_HEADERS "${GENERATED_HEADER}")
 
+# Game Audio
+faust_generate_header_once(
+  "${FAUST_EXAMPLES_DIR}/gameaudio/rain.dsp"
+  "RainDsp"
+  "rain_dsp.h"
+)
+list(APPEND _ALL_FAUST_HEADERS "${GENERATED_HEADER}")
+
+faust_generate_header_once(
+  "${FAUST_EXAMPLES_DIR}/gameaudio/thunder.dsp"
+  "ThunderDsp"
+  "thunder_dsp.h"
+)
+list(APPEND _ALL_FAUST_HEADERS "${GENERATED_HEADER}")
+
 # Add more DSPs here with unique OUT_BASENAME values
 # faust_generate_header_once("${CMAKE_CURRENT_SOURCE_DIR}/dsp/organ.dsp" "OrganDsp" "organ_dsp.h")
 # list(APPEND _ALL_FAUST_HEADERS "${GENERATED_HEADER}")

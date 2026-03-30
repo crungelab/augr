@@ -3,6 +3,7 @@
 #include <string>
 #include <utility>
 #include <vector>
+#include <algorithm>
 
 #include <augr/core/part.h>
 
@@ -12,6 +13,10 @@ class Model : public Part {
 public:
     Model() = default;
     void AddChild(Model &model) { children_.push_back(&model); }
+    void RemoveChild(Model &model) {
+        children_.erase(std::remove(children_.begin(), children_.end(), &model),
+                        children_.end());
+    }
     // Accessors
     [[nodiscard]] Model &parent() const {
         return *dynamic_cast<Model *>(owner_);

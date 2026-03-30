@@ -36,6 +36,9 @@ int RtAudioRack::ProcessAudio(double streamTime, void *inbuf, void *outbuf,
 
     if (output.layout_ != ChannelLayout::kNull) {
         output.WritePlanar(static_cast<fy_buffer_t>(outbuf), SCALE);
+    } else {
+        // If no output, write silence
+        std::fill_n(static_cast<fy_real *>(outbuf), frames * devNumOutChans_, 0.0f);
     }
 
     ProcessUpdateActions();
@@ -75,12 +78,14 @@ bool RtAudioRack::Create() {
     RtAudio::StreamParameters iParams, oParams;
 
     iParams.deviceId = audio_dac().getDefaultInputDevice();
-    devNumInChans_ = info_in.inputChannels;
+    //devNumInChans_ = info_in.inputChannels;
+    devNumInChans_ = std::min<unsigned int>(2, info_in.inputChannels);
     iParams.nChannels = devNumInChans_;
     iParams.firstChannel = 0;
 
     oParams.deviceId = audio_dac().getDefaultOutputDevice();
-    devNumOutChans_ = info_out.outputChannels;
+    //devNumOutChans_ = info_out.outputChannels;
+    devNumOutChans_ = std::min<unsigned int>(2, info_out.outputChannels);
     oParams.nChannels = devNumOutChans_;
     oParams.firstChannel = 0;
 

@@ -11,6 +11,10 @@
 #include "osc_dsp.h"
 #include "phaser_dsp.h"
 
+#include "rain_dsp.h"
+#include "thunder_dsp.h"
+
+
 using namespace augr;
 
 // Analysis
@@ -47,6 +51,16 @@ class PhaserDspImpl final : public PhaserDsp {
 };
 DEFINE_MODEL_FACTORY(PhaserDspImpl, "Phaser", "Effect")
 
+class RainDspImpl final : public RainDsp {
+    REFLECT_ENABLE(FaustDsp)
+};
+DEFINE_MODEL_FACTORY(RainDspImpl, "Rain", "Generator")
+
+class ThunderDspImpl final : public ThunderDsp {
+    REFLECT_ENABLE(FaustDsp)
+};
+DEFINE_MODEL_FACTORY(ThunderDspImpl, "Thunder", "Generator")
+
 void InitFaustDspLibrary() {
     REGISTER_MODEL_FACTORY(DbMeterDspImpl);
     REGISTER_MODEL_FACTORY(FrenchBellDspImpl);
@@ -54,4 +68,6 @@ void InitFaustDspLibrary() {
     REGISTER_MODEL_FACTORY(FreeverbDspImpl);
     REGISTER_MODEL_FACTORY(FlangerDspImpl);
     REGISTER_MODEL_FACTORY(PhaserDspImpl);
+    REGISTER_MODEL_FACTORY(RainDspImpl);
+    REGISTER_MODEL_FACTORY(ThunderDspImpl);
 }
