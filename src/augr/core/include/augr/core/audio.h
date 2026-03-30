@@ -24,7 +24,7 @@ public:
 
 typedef std::shared_ptr<AudioImpl> AudioImplPtr;
 
-enum class ChannelLayout { kNull, kMono, kStereo, kQuad, k5_1 };
+enum class ChannelLayout { kNull, kMono, kStereo, kQuad, k5_1, k7_1 };
 
 class Audio {
 public:

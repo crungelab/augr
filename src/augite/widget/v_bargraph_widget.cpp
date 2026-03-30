@@ -1,180 +1,211 @@
 #include <algorithm>
-#include <string>
-#include <cmath>
 #include <cfloat>
-#include <cstring> // memcpy for atomic-like load
+#include <cmath>
+#include <string>
+
+#include <fmt/core.h>
 
 #include "imgui.h"
-#include "imgui_internal.h" // ImGuiWindow, ImDrawList
+#include "imgui_internal.h"
 
 #include "widget.h"
 #include <augr/core/rack/control/v_bargraph.h>
 
 namespace augr {
 
-// ---------- helpers (local to this translation unit) ----------
+// ---------------------------------------------------------------------------
+// Helpers
+// ---------------------------------------------------------------------------
 
-static std::string fmtValue(float v) {
-    // If you use dB ranges (-60..0), append " dB" if you like.
-    return std::to_string(v);
+// Map a raw dB value to 0..1 using a linear-in-dB scale (correct for meters).
+// vmin/vmax come directly from the Faust bargraph registration.
+inline float DbToUnit(float db, float vmin, float vmax) {
+    const float range = vmax - vmin;
+    if (range <= 0.0f)
+        return 0.0f;
+    return std::clamp((db - vmin) / range, 0.0f, 1.0f);
 }
 
-// Light heuristic: treat ranges like [-96..0], [-60..0], etc. as dB meters.
-inline bool IsLikelyDbRange(float vmin, float vmax) {
-    return (vmax <= 0.0f) && (vmin < 0.0f) && (vmin > -200.0f);
+// Map a raw linear value to 0..1.
+inline float LinearToUnit(float v, float vmin, float vmax) {
+    const float range = vmax - vmin;
+    if (range <= 0.0f)
+        return 0.0f;
+    return std::clamp((v - vmin) / range, 0.0f, 1.0f);
 }
 
-// If your Faust value is std::atomic<float>, prefer .load() instead of this.
-// This memcpy trick avoids tearing for plain float in practice.
-inline float atomic_like_load(const float* p) {
-    float v;
-    std::memcpy(&v, p, sizeof(float));
-    return v;
+// Zone to unit, dispatching on whether the bargraph is dB-typed.
+inline float ZoneToUnit(float raw, float vmin, float vmax, bool is_db) {
+    return is_db ? DbToUnit(raw, vmin, vmax) : LinearToUnit(raw, vmin, vmax);
 }
 
-// Map dB to 0..1 with a floor for responsiveness (default -60..0 dB).
-inline float DbToUnit(float db, float floorDB = -60.0f, float ceilDB = 0.0f) {
-    if (db <= floorDB) return 0.0f;
-    if (db >= ceilDB)  return 1.0f;
-    float lin      = std::pow(10.0f, db * 0.05f);          // 20*log10(x) => x = 10^(db/20)
-    float linFloor = std::pow(10.0f, floorDB * 0.05f);
-    float linCeil  = std::pow(10.0f, ceilDB  * 0.05f);
-    return (lin - linFloor) / (linCeil - linFloor);
+inline ImU32 MeterColor(float unit) {
+    if (unit < 0.70f)
+        return ImGui::GetColorU32(ImVec4(0.20f, 0.88f, 0.20f, 1.0f)); // green
+    if (unit < 0.90f)
+        return ImGui::GetColorU32(ImVec4(0.95f, 0.82f, 0.12f, 1.0f)); // yellow
+    return ImGui::GetColorU32(ImVec4(0.95f, 0.18f, 0.12f, 1.0f));     // red
 }
 
-inline ImU32 MeterAutoColor(float unit) {
-    if (unit < 0.7f) return ImGui::GetColorU32(ImVec4(0.20f, 0.9f, 0.20f, 1.0f)); // green
-    if (unit < 0.9f) return ImGui::GetColorU32(ImVec4(0.95f, 0.85f, 0.15f, 1.0f)); // yellow
-    return ImGui::GetColorU32(ImVec4(0.95f, 0.20f, 0.15f, 1.0f));                  // red
+// Format a value for the tooltip.  Appends " dB" for dB-typed bars.
+static std::string FormatZoneValue(float v, bool is_db) {
+    char buf[32];
+    if (is_db)
+        std::snprintf(buf, sizeof(buf), "%.1f dB", v);
+    else
+        std::snprintf(buf, sizeof(buf), "%.3f", v);
+    return buf;
 }
+
+// ---------------------------------------------------------------------------
+// Peak-hold state
+// ---------------------------------------------------------------------------
 
 struct VBarPeakState {
-    float peakUnit = 0.0f; // track in 0..1 space for simplicity
+    float unit = 0.0f; // tracked in normalised 0..1 space
+    float hold = 0.0f; // seconds remaining at peak before decay starts
+
+    static constexpr float kHoldSec = 1.2f;    // how long peak is held
+    static constexpr float kFallPerSec = 0.5f; // normalised units / second
 };
 
-inline void UpdatePeak(VBarPeakState& s, float unitNow, float dt, float fallRatePerSec = 0.7f) {
-    s.peakUnit = std::max(s.peakUnit - fallRatePerSec * dt, unitNow);
+inline void UpdatePeak(VBarPeakState &s, float unitNow, float dt) {
+    if (unitNow >= s.unit) {
+        s.unit = unitNow;
+        s.hold = VBarPeakState::kHoldSec;
+    } else {
+        s.hold -= dt;
+        if (s.hold <= 0.0f)
+            s.unit =
+                std::max(s.unit - VBarPeakState::kFallPerSec * dt, unitNow);
+    }
 }
 
-// Draw a compact vertical bar graph (bottom->top fill).
-// - label: text drawn below (also used for ID/hover tip)
-// - zone: Faust-updated value (float*)
-// - vmin/vmax: Faust range (linear or dB)
-// - size: bar size in pixels
-// - use_db_mapping: interpret raw value as dB (use DbToUnit mapping)
-inline void DrawVBargraphCore(const char* label,
-                              const float* zone,
-                              float vmin, float vmax,
-                              ImVec2 size,
-                              bool use_db_mapping,
-                              VBarPeakState* peakOpt)
-{
-    ImGuiWindow* window = ImGui::GetCurrentWindow();
-    if (window->SkipItems) return;
+// ---------------------------------------------------------------------------
+// Core draw routine
+// ---------------------------------------------------------------------------
 
+inline void DrawVBargraphCore(const char *label,
+                              const float *zone, // live pointer into DSP field
+                              float vmin, float vmax, bool is_db, ImVec2 size,
+                              VBarPeakState *peak) {
+    ImGuiWindow *window = ImGui::GetCurrentWindow();
+    if (window->SkipItems)
+        return;
+
+    ImGui::PushID(label);
     ImGui::BeginGroup();
 
-    // Reserve rect
+    const ImGuiStyle &style = ImGui::GetStyle();
+    ImDrawList *dl = ImGui::GetWindowDrawList();
+    const float round = style.FrameRounding;
+
+    // --- reserve rect ---
     const ImVec2 pos = ImGui::GetCursorScreenPos();
     const ImRect bb(pos, ImVec2(pos.x + size.x, pos.y + size.y));
     ImGui::ItemSize(size);
-    if (!ImGui::ItemAdd(bb, ImGui::GetID(label))) {
-        ImGui::TextUnformatted(label);
+    const ImGuiID id = ImGui::GetID("bar");
+    if (!ImGui::ItemAdd(bb, id)) {
         ImGui::EndGroup();
+        ImGui::PopID();
         return;
     }
 
-    // Colors
-    ImDrawList* dl = ImGui::GetWindowDrawList();
-    const ImGuiStyle& style = ImGui::GetStyle();
-    const float rounding = style.FrameRounding;
-    const ImU32 col_bg     = ImGui::GetColorU32(style.Colors[ImGuiCol_FrameBg]);
-    const ImU32 col_border = ImGui::GetColorU32(style.Colors[ImGuiCol_Border]);
+    // --- read zone (direct float* read is safe for display purposes) ---
+    const float raw = *zone;
+    /*
+    fmt::print("zone={} raw={} is_db={} vmin={} vmax={}\n", (void *)zone, raw,
+               is_db, vmin, vmax);
+    */
+    const float unit = ZoneToUnit(raw, vmin, vmax, is_db);
 
-    // Read raw and normalize
-    const float raw = atomic_like_load(zone);
-    float unit = 0.0f;
-    if (use_db_mapping) {
-        // You can tie the floor/ceil to vmin/vmax if desired:
-        // unit = DbToUnit(raw, vmin, vmax);
-        unit = DbToUnit(raw, -60.0f, 0.0f);
-    } else {
-        const float denom = (vmax != vmin) ? (vmax - vmin) : 1.0f;
-        unit = (raw - vmin) / denom;
-        unit = std::clamp(unit, 0.0f, 1.0f);
-    }
+    // --- background + border ---
+    dl->AddRectFilled(bb.Min, bb.Max,
+                      ImGui::GetColorU32(style.Colors[ImGuiCol_FrameBg]),
+                      round);
+    dl->AddRect(bb.Min, bb.Max,
+                ImGui::GetColorU32(style.Colors[ImGuiCol_Border]), round);
 
-    // Frame
-    dl->AddRectFilled(bb.Min, bb.Max, col_bg, rounding);
-    dl->AddRect(bb.Min, bb.Max, col_border, rounding);
-
-    // Inner area + bar
+    // --- inner fill area ---
     const float pad = 2.0f;
-    ImRect inner(ImVec2(bb.Min.x + pad, bb.Min.y + pad),
-                 ImVec2(bb.Max.x - pad, bb.Max.y - pad));
+    const ImRect inner(ImVec2(bb.Min.x + pad, bb.Min.y + pad),
+                       ImVec2(bb.Max.x - pad, bb.Max.y - pad));
+    const float innerH = inner.GetHeight();
 
-    const float fill_h = unit * inner.GetHeight();
-    ImRect fillRect(ImVec2(inner.Min.x, inner.Max.y - fill_h),
-                    ImVec2(inner.Max.x, inner.Max.y));
-
-    const ImU32 col_fill = MeterAutoColor(unit);
-    dl->AddRectFilled(fillRect.Min, fillRect.Max, col_fill, rounding);
-
-    // Tick marks (25%, 50%, 75%)
-    for (int i = 1; i < 4; ++i) {
-        float y = inner.Max.y - inner.GetHeight() * (i / 4.0f);
-        dl->AddLine(ImVec2(inner.Min.x, y), ImVec2(inner.Min.x + 6.0f, y),
-                    ImGui::GetColorU32(ImVec4(1,1,1,0.25f)));
+    // bar fill (bottom-to-top)
+    const float fillH = unit * innerH;
+    if (fillH > 0.0f) {
+        const ImRect fillRect(ImVec2(inner.Min.x, inner.Max.y - fillH),
+                              ImVec2(inner.Max.x, inner.Max.y));
+        dl->AddRectFilled(fillRect.Min, fillRect.Max, MeterColor(unit),
+                          round * 0.5f);
     }
 
-    // Peak-hold line (optional)
-    if (peakOpt) {
-        float dt = ImGui::GetIO().DeltaTime;
-        UpdatePeak(*peakOpt, unit, dt);
-        float ph = std::clamp(peakOpt->peakUnit, 0.0f, 1.0f) * inner.GetHeight();
-        float y = inner.Max.y - ph;
+    // tick marks at -12, -6, 0 dB (or 25%/50%/75% for linear)
+    {
+        const ImU32 tickCol = ImGui::GetColorU32(ImVec4(1, 1, 1, 0.20f));
+        const float tickW = inner.GetWidth() * 0.35f;
+        for (int i = 1; i <= 3; ++i) {
+            const float frac = i / 4.0f;
+            const float y = inner.Max.y - innerH * frac;
+            dl->AddLine(ImVec2(inner.Min.x, y), ImVec2(inner.Min.x + tickW, y),
+                        tickCol);
+        }
+    }
+
+    // peak-hold line
+    if (peak) {
+        UpdatePeak(*peak, unit, ImGui::GetIO().DeltaTime);
+        const float ph = std::clamp(peak->unit, 0.0f, 1.0f) * innerH;
+        const float y = inner.Max.y - ph;
         dl->AddLine(ImVec2(inner.Min.x, y), ImVec2(inner.Max.x, y),
-                    ImGui::GetColorU32(ImVec4(1,1,1,0.9f)), 2.0f);
+                    ImGui::GetColorU32(ImVec4(1, 1, 1, 0.85f)), 1.5f);
     }
 
-    // Tooltip w/ your formatter
-    if (ImGui::IsItemHovered()) {
+    // --- tooltip ---
+    if (ImGui::IsItemHovered(ImGuiHoveredFlags_DelayShort)) {
         ImGui::BeginTooltip();
-        if (label && *label) ImGui::TextUnformatted(label);
-        ImGui::Separator();
-        ImGui::TextUnformatted(fmtValue(raw).c_str());
+        if (label && *label) {
+            ImGui::TextUnformatted(label);
+            ImGui::Separator();
+        }
+        ImGui::TextUnformatted(FormatZoneValue(raw, is_db).c_str());
         ImGui::EndTooltip();
     }
 
-    // Label under the meter
-    ImGui::SetCursorScreenPos(ImVec2(pos.x,
-        pos.y + size.y + style.ItemInnerSpacing.y * 0.5f));
-    if (label && *label) ImGui::TextUnformatted(label);
+    // --- label clipped to bar width, centred below ---
+    if (label && *label) {
+        const float labelY = pos.y + size.y + style.ItemInnerSpacing.y;
+        ImGui::SetCursorScreenPos(ImVec2(pos.x, labelY));
+        // Push a clip rect so the label never spills outside the bar width.
+        ImGui::PushClipRect(
+            ImVec2(pos.x, labelY),
+            ImVec2(pos.x + size.x, labelY + ImGui::GetTextLineHeight()), true);
+        ImGui::TextUnformatted(label);
+        ImGui::PopClipRect();
+    }
 
     ImGui::EndGroup();
+    ImGui::PopID();
 }
 
-// ---------- your widget ----------
+// ---------------------------------------------------------------------------
+// Widget
+// ---------------------------------------------------------------------------
 
 class VBarGraphWidget : public WidgetT<VBarGraph> {
 public:
-    VBarGraphWidget(VBarGraph &model) : WidgetT<VBarGraph>(model) {}
+    explicit VBarGraphWidget(VBarGraph &model) : WidgetT<VBarGraph>(model) {}
 
     void Draw() override {
-        // Heuristic: use dB meter mapping when the range looks like dB.
-        const bool as_db = IsLikelyDbRange(model_->min_, model_->max_);
+        // VBarGraph::is_db_ must be set by FaustDspUi when the "unit"="dB"
+        // metadata is declared — this is the correct, reliable signal rather
+        // than a heuristic on the range values.
+        const bool is_db = model_->is_db_;
+        const ImVec2 size(24.0f, 120.0f);
 
-        // Width/height: choose something compact; tweak to taste or make configurable on model.
-        const ImVec2 size(22.0f, 120.0f);
-
-        DrawVBargraphCore(
-            model_->label_ ? model_->label_ : "vbar",
-            model_->zone_,
-            model_->min_, model_->max_,
-            size,
-            as_db,
-            &peak_ // Pass &peak_ for a subtle peak-hold line; pass nullptr to disable.
-        );
+        DrawVBargraphCore(model_->label_ ? model_->label_ : "", model_->zone_,
+                          model_->min_, model_->max_, is_db, size, &peak_);
     }
 
 private:

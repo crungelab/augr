@@ -29,6 +29,10 @@ Audio::Audio(fy_real *raw, size_t nChannels) {
         // layout_ = ChannelLayout::k5_1;
         impl_ = AudioImplPtr(new AudioImplT<6>(raw));
         break;
+    case 8:
+        // layout_ = ChannelLayout::k7_1;
+        impl_ = AudioImplPtr(new AudioImplT<8>(raw));
+        break;
     default:
         // layout_ = ChannelLayout::kNull;
         impl_ = nullptr;
@@ -49,7 +53,9 @@ Audio::Audio(ChannelLayout layout) : layout_(layout) {
     case ChannelLayout::k5_1:
         impl_ = AudioImplPtr(new AudioImplT<6>());
         break;
-
+    case ChannelLayout::k7_1:
+        impl_ = AudioImplPtr(new AudioImplT<8>());
+        break;
     default:
         impl_ = nullptr;
         break;
@@ -85,6 +91,8 @@ ChannelLayout Audio::ChannelCountToLayout(int count) {
         return ChannelLayout::kQuad;
     case 6:
         return ChannelLayout::k5_1;
+    case 8:
+        return ChannelLayout::k7_1;
     default:
         return ChannelLayout::kNull;
     }
@@ -100,6 +108,8 @@ int Audio::LayoutToChannelCount(ChannelLayout layout) {
         return 4;
     case ChannelLayout::k5_1:
         return 6;
+    case ChannelLayout::k7_1:
+        return 8;
     default:
         return 0;
     }

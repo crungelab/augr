@@ -3,12 +3,11 @@
 
 namespace augr {
 
-Wire::Wire(Pin& output, Pin& input) : output_(&output), input_(&input)
-{
-  input.AddWire(*this);
-  output.AddWire(*this);
+Wire::Wire(Pin &output, Pin &input) : output_(&output), input_(&input) {
+    input.AddWire(*this);
+    output.AddWire(*this);
 
-  subscription_ = output.Connect(input);
+    subscription_ = output.Connect(input);
 }
 
 } // namespace augr

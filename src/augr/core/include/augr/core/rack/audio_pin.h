@@ -7,22 +7,20 @@ namespace augr {
 
 typedef PinT<Audio> AudioPinBase;
 
-class AudioPin : public AudioPinBase
-{
+class AudioPin : public AudioPinBase {
 public:
-  AudioPin(Node &node, std::string name, ChannelLayout layout = ChannelLayout::kMono) : AudioPinBase(node, name), layout_(layout)
-  {
-  }
-  void Write(Audio audio) override
-  {
-    if(audio.layout_ != layout_) {
-      AudioPinBase::Write(audio.Convert(layout_));
-      return;
+    AudioPin(Node &node, std::string name,
+             ChannelLayout layout = ChannelLayout::kMono)
+        : AudioPinBase(node, name), layout_(layout) {}
+    void Write(Audio audio) override {
+        if (audio.layout_ != layout_) {
+            AudioPinBase::Write(audio.Convert(layout_));
+            return;
+        }
+        AudioPinBase::Write(audio);
     }
-    AudioPinBase::Write(audio);
-  }
-  // Data members
-  ChannelLayout layout_ = ChannelLayout::kMono;
+    // Data members
+    ChannelLayout layout_ = ChannelLayout::kMono;
 };
 
 } // namespace augr
