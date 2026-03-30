@@ -14,6 +14,7 @@ public:
     Model() = default;
     void AddChild(Model &model) { children_.push_back(&model); }
     void RemoveChild(Model &model) {
+        OnRemovingChild(model);
         children_.erase(std::remove(children_.begin(), children_.end(), &model),
                         children_.end());
     }
@@ -21,6 +22,9 @@ public:
     [[nodiscard]] Model &parent() const {
         return *dynamic_cast<Model *>(owner_);
     }
+protected:
+    virtual void OnRemovingChild(Model& model) {}
+public:
     // Data members
     std::vector<Model *> children_;
 

@@ -1,4 +1,5 @@
 #include <augr/core/rack/graph.h>
+#include <augr/core/rack/node.h>
 #include <augr/core/rack/pin.h>
 #include <augr/core/rack/wire.h>
 
@@ -30,4 +31,17 @@ bool Graph::IsInputPin(int pin_id) const {
     return input_map_.find(pin_id) != input_map_.end();
 }
 
+void Graph::OnRemovingChild(Model &model) {
+    auto node = dynamic_cast<Node *>(&model);
+    for (auto pin : node->inport_.pins_) {
+        for (auto wire : pin->wires_) {
+            Disconnect(*wire);
+        }
+    }
+    for (auto pin : node->outport_.pins_) {
+        for (auto wire : pin->wires_) {
+            Disconnect(*wire);
+        }
+    }
+}
 } // namespace augr

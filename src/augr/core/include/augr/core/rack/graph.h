@@ -21,6 +21,11 @@ public:
     //
     bool IsOutputPin(int pin_id) const;
     bool IsInputPin(int pin_id) const;
+
+protected:
+    void OnRemovingChild(Model &model) override;
+
+public:
     // Accessors
     // Data members
     std::list<Wire *> wires_;
