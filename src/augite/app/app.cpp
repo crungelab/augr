@@ -1,5 +1,3 @@
-#include <spdlog/spdlog.h>
-
 #include "imgui.h"
 #include <backends/imgui_impl_sdl3.h>
 #include <backends/imgui_impl_sdlgpu3.h>
@@ -22,8 +20,6 @@ namespace augr {
 App::App() {};
 
 bool App::DoCreate(CreateParams params) {
-    spdlog::set_level(spdlog::level::debug); // Set *global* log level to debug
-    spdlog::debug("This message should be displayed..");
 
     bool success = Window::DoCreate(params);
     success = InitUserEvents() && success;

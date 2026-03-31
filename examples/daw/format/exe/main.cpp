@@ -1,3 +1,6 @@
+#include <spdlog/spdlog.h>
+#include <spdlog/sinks/stdout_color_sinks.h>
+
 #include <augr/core/rack/model_manufacturer.h>
 
 #include <augr/rtaudio/rack/rtaudio_rack.h>
@@ -30,7 +33,15 @@ public:
     RackView *view_;
 };
 
-int main(int, char **) {
+int main(int, char**) {
+    auto logger = spdlog::stdout_color_mt("console");
+    spdlog::set_default_logger(logger);
+
+    spdlog::set_level(spdlog::level::debug);
+    spdlog::flush_on(spdlog::level::debug);
+
+    spdlog::debug("This message should be displayed.");
+
     MyApp &app = *new MyApp();
     RtAudioRack &rack = app.rack_;
     rack.Create();
