@@ -24,7 +24,8 @@ template <typename T = void> class ConnectionT : public Connection {
 public:
     typedef std::function<void(T)> TCallback;
 
-    ConnectionT(Pin &output, Pin &input, const TCallback &callback) : Connection(output, input), callback_(callback) {}
+    ConnectionT(Pin &output, Pin &input, const TCallback &callback)
+        : Connection(output, input), callback_(callback) {}
     TCallback callback_;
 };
 
@@ -36,29 +37,46 @@ public:
         auto it = std::remove(wires_.begin(), wires_.end(), &wire);
         wires_.erase(it, wires_.end());
     }
-    virtual Connection *Connect(Pin &output) = 0;
+    virtual Connection *Connect(Pin &other) = 0;
     virtual void Disconnect(Connection &connection) = 0;
     virtual void DisconnectInput(Pin &input) = 0;
 
-    // Data members
     Node &node() { return *(Node *)owner_; }
     std::string name_;
     std::vector<Wire *> wires_;
 };
 
-template <typename T> class PinT : public Pin {
+// Forward declarations
+template <typename T, typename TBase = Pin> class InputT;
+template <typename T, typename TBase = Pin> class OutputT;
+
+template <typename T, typename TBase> class OutputT : public TBase {
     using TCallback = std::function<void(T)>;
     using TConnection = ConnectionT<T>;
+    using TInput = InputT<T, TBase>;
 
 public:
-    PinT(Node &node, std::string name) : Pin(node, name) {}
-    Connection *Connect(Pin &_output) override {
-        PinT<T> *output = dynamic_cast<PinT<T> *>(&_output);
-        return output->Subscribe(*this, [this](T value) { this->Write(value); });
+    template <typename... Args>
+    OutputT(Node &node, std::string name, Args &&...args)
+        : TBase(node, name, std::forward<Args>(args)...) {}
+
+    Connection *Connect(Pin &_input) override {
+        TInput *input = dynamic_cast<TInput *>(&_input);
+        if (!input) return nullptr;
+        return Subscribe(*input, [input](T value) { input->Write(value); });
     }
+
     void Disconnect(Connection &connection) override {
-        connection.output_->DisconnectInput(*this);
+        connection.input_->DisconnectInput(*this);
+        for (auto it = connections_.begin(); it != connections_.end(); ++it) {
+            if (*it == &connection) {
+                delete *it;
+                connections_.erase(it);
+                break;
+            }
+        }
     }
+
     void DisconnectInput(Pin &input) override {
         for (auto it = connections_.begin(); it != connections_.end(); ++it) {
             TConnection *connection = dynamic_cast<TConnection *>(*it);
@@ -68,29 +86,64 @@ public:
             }
         }
     }
-    virtual void Write(T value) {
-        value_ = value;
-        Publish(value);
-    }
-    T Read() { return value_; }
-    // Connections
-    std::list<TConnection *> connections_;
+
     void Publish(T value) {
         for (auto connection : connections_) {
             connection->callback_(value);
         }
     }
+
     TConnection *Subscribe(Pin &pin, const TCallback &callback) {
         TConnection *connection = new TConnection(*this, pin, callback);
         connections_.push_back(connection);
         return connection;
     }
+
     void Unsubscribe(TConnection *connection) {
         connections_.remove(connection);
         delete connection;
     }
-    // Accessors
-    // Data members
+
+    virtual void Write(T value) {
+        value_ = value;
+        Publish(value);
+    }
+
+    T Read() { return value_; }
+
+    std::list<TConnection *> connections_;
+    T value_;
+};
+
+template <typename T, typename TBase> class InputT : public TBase {
+    using TConnection = ConnectionT<T>;
+    using TOutput = OutputT<T, TBase>;
+
+public:
+    template <typename... Args>
+    InputT(Node &node, std::string name, Args &&...args)
+        : TBase(node, name, std::forward<Args>(args)...) {}
+
+    Connection *Connect(Pin &_output) override {
+        TOutput *output = dynamic_cast<TOutput *>(&_output);
+        if (!output) return nullptr;
+        return output->Connect(*this);
+    }
+
+    void Disconnect(Connection &connection) override {
+        connection.output_->DisconnectInput(*this);
+    }
+
+    void DisconnectInput(Pin &input) override {
+        // Inputs don't hold connections
+    }
+
+    virtual void Write(T value) {
+        value_ = value;
+    }
+
+    T Read() { return value_; }
+
     T value_;
 };
 

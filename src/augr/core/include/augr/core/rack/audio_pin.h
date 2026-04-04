@@ -5,28 +5,48 @@
 
 namespace augr {
 
-using AudioPinBase = PinT<Audio>;
-
-class AudioPin : public AudioPinBase {
+class AudioPin : public Pin {
 public:
     AudioPin(Node &node, std::string name,
              ChannelLayout layout = ChannelLayout::kMono)
-        : AudioPinBase(node, name), layout_(layout) {}
+        : Pin(node, name), layout_(layout) {}
+
+    ChannelLayout layout_ = ChannelLayout::kMono;
+};
+
+class AudioOutput : public OutputT<Audio, AudioPin> {
+public:
+    AudioOutput(Node &node, std::string name,
+                ChannelLayout layout = ChannelLayout::kMono)
+        : OutputT<Audio, AudioPin>(node, name, layout) {}
+
+    void Write(Audio audio) override {
+        if (audio.layout_ != layout_) {
+            OutputT<Audio, AudioPin>::Write(audio.Convert(layout_));
+            return;
+        }
+        OutputT<Audio, AudioPin>::Write(audio);
+    }
+};
+
+class AudioInput : public InputT<Audio, AudioPin> {
+public:
+    AudioInput(Node &node, std::string name,
+               ChannelLayout layout = ChannelLayout::kMono)
+        : InputT<Audio, AudioPin>(node, name, layout) {}
 
     void Disconnect(Connection &connection) override {
-        AudioPinBase::Disconnect(connection);
-        Write(Audio()); // Write silence to the input pin when disconnected
+        InputT<Audio, AudioPin>::Disconnect(connection);
+        Write(Audio());
     }
 
     void Write(Audio audio) override {
         if (audio.layout_ != layout_) {
-            AudioPinBase::Write(audio.Convert(layout_));
+            InputT<Audio, AudioPin>::Write(audio.Convert(layout_));
             return;
         }
-        AudioPinBase::Write(audio);
+        InputT<Audio, AudioPin>::Write(audio);
     }
-    // Data members
-    ChannelLayout layout_ = ChannelLayout::kMono;
 };
 
 } // namespace augr

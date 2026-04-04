@@ -16,8 +16,8 @@ public:
   virtual void Process() {}
   // Data members
   const char *label_ = nullptr;
-  AudioInput *audio_in_ = nullptr;
-  AudioOutput *audio_out_ = nullptr;
+  AudioPin *audio_in_ = nullptr;
+  AudioPin *audio_out_ = nullptr;
 
   REFLECT_ENABLE(Node)
 };
