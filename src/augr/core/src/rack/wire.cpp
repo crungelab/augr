@@ -4,21 +4,22 @@
 namespace augr {
 
 Wire::Wire(Pin &output, Pin &input) : output_(&output), input_(&input) {
-    input.AddWire(*this);
     output.AddWire(*this);
+    input.AddWire(*this);
 
-    subscription_ = output.Connect(input);
+    connection_ = input.Connect(output);
 }
 
 Wire::~Wire() {
-    if (output_) {
-        output_->Disconnect(*input_);
-        output_->RemoveWire(*this);
-        output_ = nullptr;
-    }
     if (input_) {
+        input_->Disconnect(*connection_);
         input_->RemoveWire(*this);
         input_ = nullptr;
+    }
+
+    if (output_) {
+        output_->RemoveWire(*this);
+        output_ = nullptr;
     }
 }
 } // namespace augr

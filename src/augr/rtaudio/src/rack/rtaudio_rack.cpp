@@ -126,11 +126,6 @@ bool RtAudioRack::Create() {
 
     Audio::frames_ = frames;
     Audio::sampleRate_ = config.sampleRate;
-    /*
-    RtAudioErrorType e =
-        audio_dac().openStream(&oParams, nullptr, FORMAT, Audio::sampleRate(),
-                               &Audio::frames_, AudioCallback, this, &options);
-    */
 
     return e == RtAudioErrorType::RTAUDIO_NO_ERROR;
 }
