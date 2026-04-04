@@ -1,8 +1,8 @@
 #pragma once
 
-#include <algorithm>
 #include <functional>
 #include <list>
+#include <algorithm>
 #include <string>
 #include <vector>
 
@@ -48,22 +48,11 @@ public:
     std::vector<Wire *> wires_;
 };
 
-template <typename T, typename TBase> class PinT : public TBase {
-public:
-    template <typename... Args>
-    PinT(Node &node, std::string name, Args &&...args)
-        : TBase(node, name, std::forward<Args>(args)...) {}
-
-    T Read() { return value_; }
-    virtual void Write(T value) { value_ = value; }
-    T value_;
-};
-
 // Forward declarations
 template <typename T, typename TBase = Pin> class InputT;
 template <typename T, typename TBase = Pin> class OutputT;
 
-template <typename T, typename TBase> class OutputT : public PinT<T, TBase> {
+template <typename T, typename TBase> class OutputT : public TBase {
     using TCallback = std::function<void(T)>;
     using TConnection = ConnectionT<T>;
     using TInput = InputT<T, TBase>;
@@ -71,11 +60,12 @@ template <typename T, typename TBase> class OutputT : public PinT<T, TBase> {
 public:
     template <typename... Args>
     OutputT(Node &node, std::string name, Args &&...args)
-        : PinT<T, TBase>(node, name, std::forward<Args>(args)...) {}
+        : TBase(node, name, std::forward<Args>(args)...) {}
 
     Connection *Connect(Pin &_input) override {
-        // TODO: Only allow connecting to InputT<T>
-        return nullptr;
+        TInput *input = dynamic_cast<TInput *>(&_input);
+        if (!input) return nullptr;
+        return Subscribe(*input, [input](T value) { input->Write(value); });
     }
 
     void Disconnect(Connection &connection) override {
@@ -88,49 +78,57 @@ public:
         }
     }
 
-    TConnection *Subscribe(Pin &input, const TCallback &callback) {
-        TConnection *connection = new TConnection(*this, input, callback);
+    TConnection *Subscribe(Pin &pin, const TCallback &callback) {
+        TConnection *connection = new TConnection(*this, pin, callback);
         connections_.push_back(connection);
         return connection;
     }
 
     void Unsubscribe(Connection &connection) {
         auto *typed = dynamic_cast<TConnection *>(&connection);
-        if (!typed)
-            return;
+        if (!typed) return;
 
         connections_.remove(typed);
         delete typed;
     }
 
     virtual void Write(T value) {
-        PinT<T, TBase>::Write(value);
+        value_ = value;
         Publish(value);
     }
 
+    T Read() { return value_; }
+
     std::list<TConnection *> connections_;
+    T value_;
 };
 
-template <typename T, typename TBase> class InputT : public PinT<T, TBase> {
+template <typename T, typename TBase> class InputT : public TBase {
     using TConnection = ConnectionT<T>;
     using TOutput = OutputT<T, TBase>;
 
 public:
     template <typename... Args>
     InputT(Node &node, std::string name, Args &&...args)
-        : PinT<T, TBase>(node, name, std::forward<Args>(args)...) {}
+        : TBase(node, name, std::forward<Args>(args)...) {}
 
     Connection *Connect(Pin &_output) override {
         TOutput *output = dynamic_cast<TOutput *>(&_output);
-        if (!output)
-            return nullptr;
-        return output->Subscribe(*this,
-                                 [this](T value) { this->Write(value); });
+        if (!output) return nullptr;
+        return output->Connect(*this);
     }
 
     void Disconnect(Connection &connection) override {
         connection.output_->Disconnect(connection);
     }
+
+    virtual void Write(T value) {
+        value_ = value;
+    }
+
+    T Read() { return value_; }
+
+    T value_;
 };
 
 } // namespace augr
