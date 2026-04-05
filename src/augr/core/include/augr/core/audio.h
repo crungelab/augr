@@ -29,7 +29,7 @@ enum class ChannelLayout { kNull, kMono, kStereo, kQuad, k5_1, k7_1 };
 class Audio {
 public:
     Audio(const Audio &other);
-    Audio(ChannelLayout layout = ChannelLayout::kNull);
+    explicit Audio(ChannelLayout layout = ChannelLayout::kNull);
     Audio(fy_real *raw, size_t channels);
     //
     void WritePlanar(fy_buffer_t out, fy_real scale = 1.0);
@@ -39,6 +39,27 @@ public:
     Audio Convert(ChannelLayout toLayout);
     Audio ConvertMonoToStereo();
     Audio ConvertStereoToMono();
+    // Operators
+    Audio operator+(const Audio &other) const {
+        if (!impl_)
+            return other;
+        if (!other.impl_)
+            return *this;
+        Audio result(layout_);
+        result.array() = array() + other.array();
+        return result;
+    }
+
+    Audio &operator+=(const Audio &other) {
+        if (!other.impl_)
+            return *this;
+        if (!impl_) {
+            *this = other;
+            return *this;
+        }
+        array() += other.array();
+        return *this;
+    }
     // Accessors
     static unsigned int sampleRate() { return sampleRate_; }
     static unsigned int frames() { return frames_; }
