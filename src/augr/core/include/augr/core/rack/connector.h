@@ -177,36 +177,21 @@ public:
         }
     }
 
+    virtual T Reduce() const {
+        T mixed = slots_[0]->Read();
+        for (size_t i = 1; i < slots_.size(); ++i)
+            mixed += slots_[i]->Read();
+        return mixed;
+    }
+
     T Read() {
         if (dirty_) {
-            if (slots_.size() == 1) {
-                this->pin_->Write(slots_[0]->Read());
-            } else {
-                T mixed = slots_[0]->Read();
-                for (size_t i = 1; i < slots_.size(); ++i)
-                    mixed += slots_[i]->Read();
-                this->pin_->Write(mixed);
-            }
+            this->pin_->Write(slots_.size() == 1 ? slots_[0]->Read()
+                                                 : Reduce());
             dirty_ = false;
         }
         return this->pin_->Read();
     }
-
-    /*
-    T Read() {
-        if (dirty_) {
-            T mixed = std::accumulate(
-                slots_.begin(), slots_.end(), T{},
-                [](T acc, const PinT<T> *slot) { return acc + slot->Read(); }
-            );
-            this->pin_->Write(mixed);
-            dirty_ = false;
-        }
-        return this->pin_->Read();
-    }
-    */
-
-    // For simplicity, just return the most recent value (no mixing)
 
     ~InputT() {
         for (auto *slot : slots_)
