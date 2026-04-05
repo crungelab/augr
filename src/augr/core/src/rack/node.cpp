@@ -5,13 +5,13 @@ namespace augr {
 
 Node::Node(Graph &graph) : Model(graph) {}
 
-void Node::AddInput(Pin &input) {
-    inport_.AddPin(input);
+void Node::AddInput(Connector &input) {
+    inport_.AddConnector(input);
     graph().AddInput(input);
 }
 
-void Node::AddOutput(Pin &output) {
-    outport_.AddPin(output);
+void Node::AddOutput(Connector &output) {
+    outport_.AddConnector(output);
     graph().AddOutput(output);
 }
 

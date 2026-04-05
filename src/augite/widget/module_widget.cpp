@@ -32,13 +32,13 @@ void ModuleWidget::DrawNode() {
     ImGui::TextUnformatted(model_->label_);
     ImNodes::EndNodeTitleBar();
 
-    for (auto input : model_->inport_.pins_) {
+    for (auto input : model_->inport_.connectors_) {
         ImNodes::BeginInputAttribute(input->id_);
         ImGui::TextUnformatted(input->name_.c_str());
         ImNodes::EndInputAttribute();
     }
 
-    for (auto output : model_->outport_.pins_) {
+    for (auto output : model_->outport_.connectors_) {
         ImNodes::BeginOutputAttribute(output->id_);
         ImGui::Indent(40);
         ImGui::TextUnformatted(output->name_.c_str());

@@ -4,16 +4,16 @@
 
 namespace augr {
 
-class Pin;
+class Connector;
 class Connection;
 
 class Wire : public Part {
 public:
-  Wire(Pin& output, Pin& input);
+  Wire(Connector& output, Connector& input);
   ~Wire();
   //Data members
-  Pin* output_ = nullptr;
-  Pin* input_ = nullptr;
+  Connector* output_ = nullptr;
+  Connector* input_ = nullptr;
   Connection* connection_ = nullptr;
 };
 

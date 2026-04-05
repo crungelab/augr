@@ -1,9 +1,9 @@
-#include <augr/core/rack/pin.h>
+#include <augr/core/rack/connector.h>
 #include <augr/core/rack/wire.h>
 
 namespace augr {
 
-Wire::Wire(Pin &output, Pin &input) : output_(&output), input_(&input) {
+Wire::Wire(Connector &output, Connector &input) : output_(&output), input_(&input) {
     output.AddWire(*this);
     input.AddWire(*this);
 

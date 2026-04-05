@@ -8,7 +8,7 @@
 #include <augr/core/rack/model_manufacturer.h>
 #include <augr/core/rack/module/module.h>
 
-#include <augr/core/rack/pin.h>
+#include <augr/core/rack/connector.h>
 #include <augr/core/rack/rack.h>
 #include <augr/core/rack/wire.h>
 
@@ -109,8 +109,8 @@ void RackView::CheckLinkCreated() {
     int startId, endId;
     bool createdFromSnap;
     if (ImNodes::IsLinkCreated(&startId, &endId, &createdFromSnap)) {
-        Pin &output = *model_->output_map_[startId];
-        Pin &input = *model_->input_map_[endId];
+        Connector &output = *model_->output_map_[startId];
+        Connector &input = *model_->input_map_[endId];
         model_->Connect(output, input);
     }
 }
@@ -227,29 +227,29 @@ void RackView::DrawModuleCatalog() {
 
                 // 5) If user was dragging a link, try to auto-connect
                 if (pending_link_start_attr != -1) {
-                    // Decide direction based on the starting pin’s kind
-                    bool start_is_output = model_->IsOutputPin(
+                    // Decide direction based on the starting connector’s kind
+                    bool start_is_output = model_->IsOutput(
                         pending_link_start_attr); // your helper
 
-                    Pin *output_pin = nullptr;
-                    Pin *input_pin = nullptr;
+                    Connector *output = nullptr;
+                    Connector *input = nullptr;
 
                     if (start_is_output) {
-                        // Find first input pin
-                        output_pin =
+                        // Find first input
+                        output =
                             model_->output_map_[pending_link_start_attr];
-                        if (!node.inport_.pins_.empty()) {
-                            input_pin = node.inport_.pins_[0];
+                        if (!node.inport_.connectors_.empty()) {
+                            input = node.inport_.connectors_[0];
                         }
                     } else {
-                        // Find first output pin
-                        if (!node.outport_.pins_.empty()) {
-                            output_pin = node.outport_.pins_[0];
+                        // Find first output
+                        if (!node.outport_.connectors_.empty()) {
+                            output = node.outport_.connectors_[0];
                         }
-                        input_pin = model_->input_map_[pending_link_start_attr];
+                        input = model_->input_map_[pending_link_start_attr];
                     }
-                    if (output_pin && input_pin) {
-                        model_->Connect(*output_pin, *input_pin);
+                    if (output && input) {
+                        model_->Connect(*output, *input);
                     }
                     // pending_link_start_attr = -1;
                 }

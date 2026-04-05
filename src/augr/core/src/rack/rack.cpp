@@ -56,8 +56,8 @@ void Rack::RebuildExecutionOrder() {
     for (Module *m : modules_) {
         std::unordered_set<Module *> seen_downstream;
 
-        for (auto *out_pin : m->outport_.pins_) {
-            for (auto *out_wire : out_pin->wires_) {
+        for (auto *out_connector : m->outport_.connectors_) {
+            for (auto *out_wire : out_connector->wires_) {
                 if (!out_wire || !out_wire->input_ ||
                     !out_wire->input_->owner_) {
                     continue;
