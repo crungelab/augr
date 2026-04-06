@@ -10,7 +10,7 @@ public:
   CheckButtonWidget(CheckButton& model) : WidgetT<CheckButton>(model) {}
   void Draw() override {
     bool value = *model_->zone_ == 0.0 ? false : true;
-    bool changed = ImGui::Checkbox(model_->label_, &value);
+    bool changed = ImGui::Checkbox(model_->label_.c_str(), &value);
     if(changed)
       *model_->zone_ = value ? 1.0 : 0.0;
   }

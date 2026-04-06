@@ -25,9 +25,9 @@ public:
         t = std::clamp(t, 0.0f, 1.0f);
 
         // Expand to full width (-FLT_MIN), auto height
-        std::string overlay =
-            model_->label_ ? (std::string(model_->label_) + ": " + fmtValue(v))
-                           : fmtValue(v);
+        std::string overlay = !model_->label_.empty()
+                                  ? model_->label_ + ": " + fmtValue(v)
+                                  : fmtValue(v);
         ImGui::ProgressBar(t, ImVec2(-FLT_MIN, 0), overlay.c_str());
 
         /*

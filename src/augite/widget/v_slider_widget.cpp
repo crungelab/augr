@@ -10,7 +10,7 @@ public:
   VSliderWidget(VSlider& model) : WidgetT<VSlider>(model) {}
   void Draw() override {
     ImVec2 size(64, 128);
-    ImGui::VSliderFloat(model_->label_, size, model_->zone_, model_->min_, model_->max_);
+    ImGui::VSliderFloat(model_->label_.c_str(), size, model_->zone_, model_->min_, model_->max_);
   }
 };
 DEFINE_WIDGET_FACTORY(VSliderWidget, VSlider)

@@ -1,5 +1,6 @@
 #pragma once
 
+#include <string>
 #include <vector>
 
 #include <augr/core/config.h>
@@ -9,11 +10,11 @@ namespace augr {
 
 class Control : public Model {
 public:
-  Control() : label_(nullptr), zone_(nullptr) {}
-  Control(const char* label, fy_real* zone = nullptr) : label_(label), zone_(zone) {}
+  Control() = default;
+  Control(std::string label, fy_real* zone = nullptr) : label_(std::move(label)), zone_(zone) {}
   //Data members
-  const char* label_;
-  fy_real* zone_;
+  std::string label_;
+  fy_real* zone_ = nullptr;
 
   REFLECT_ENABLE(Model)
 };

@@ -12,7 +12,7 @@ public:
     }
     void Draw() override {
 
-        ImGui::SliderFloat(model_->label_, model_->zone_, model_->min_,
+        ImGui::SliderFloat(model_->label_.c_str(), model_->zone_, model_->min_,
                            model_->max_);
 
         /*

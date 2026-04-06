@@ -11,7 +11,7 @@ public:
     void DrawHeader() {
         if (!this->model_->is_top_level_) {
             if(this->model_->label_visible_)
-                ImGui::SeparatorText(this->model_->label_);
+                ImGui::SeparatorText(this->model_->label_.c_str());
         }
     }
 

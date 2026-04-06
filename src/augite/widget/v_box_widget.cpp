@@ -30,7 +30,7 @@ public:
         ImGui::PushID(model_); // ensure stable IDs even with duplicate labels
 
         const char *label =
-            (model_->label_ && *model_->label_) ? model_->label_ : nullptr;
+            !model_->label_.empty() ? model_->label_.c_str() : nullptr;
 
         /*
         if (style_cfg.collapsible) {

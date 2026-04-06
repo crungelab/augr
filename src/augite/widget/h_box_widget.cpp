@@ -22,7 +22,7 @@ public:
         HBoxStyle style_cfg{};
         ImGui::PushID(model_);
         const char *label =
-            (model_->label_ && *model_->label_) ? model_->label_ : nullptr;
+            !model_->label_.empty() ? model_->label_.c_str() : nullptr;
 
         /*
         if (style_cfg.collapsible && label) {
