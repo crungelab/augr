@@ -1,7 +1,7 @@
 #include "imgui.h"
 
 #include "widget.h"
-#include <augr/core/rack/control/num_entry.h>
+#include <augr/core/control/num_entry.h>
 
 namespace augr {
 

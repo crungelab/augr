@@ -5,7 +5,7 @@
 #include "implot.h"
 
 #include "widget.h"
-#include <augr/core/rack/control/h_bargraph.h>
+#include <augr/core/control/h_bargraph.h>
 
 namespace augr {
 
