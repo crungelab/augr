@@ -1,8 +1,8 @@
 #include <fmt/core.h>
 
 #include <augr/core/rack/audio_connector.h>
-#include <augr/core/rack/module/faust_dsp.h>
-#include <augr/core/rack/module/faust_dsp_ui.h>
+#include <augr/faust/faust_dsp.h>
+#include <augr/faust/faust_dsp_ui.h>
 #include <augr/core/audio.h>
 
 namespace augr {

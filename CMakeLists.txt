@@ -72,6 +72,9 @@ add_subdirectory(depot/sdl)
 #AugrCore
 add_subdirectory(src/augr-core)
 
+#AugrFaust
+add_subdirectory(src/augr-faust)
+
 #AugrExe
 add_subdirectory(src/augr-exe)
 

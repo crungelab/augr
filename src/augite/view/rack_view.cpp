@@ -5,7 +5,7 @@
 
 #include "imnodes.h"
 
-#include <augr/core/rack/model_manufacturer.h>
+#include <augr/core/model_manufacturer.h>
 #include <augr/core/rack/module/module.h>
 
 #include <augr/core/rack/connector.h>

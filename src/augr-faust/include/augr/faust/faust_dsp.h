@@ -1,6 +1,6 @@
 #pragma once
 
-#include "dsp.h"
+#include <augr/core/rack/module/dsp.h>
 
 class UI;
 

@@ -1,4 +1,4 @@
-#include <augr/core/rack/model.h>
+#include <augr/core/model.h>
 
 #include "widget.h"
 #include "widget_builder.h"

@@ -3,7 +3,7 @@
 #include <vector>
 
 #include <augr/core/config.h>
-#include <augr/core/rack/model.h>
+#include <augr/core/model.h>
 
 namespace augr {
 

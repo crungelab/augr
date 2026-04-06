@@ -3,7 +3,7 @@
 #include <list>
 #include <map>
 
-#include <augr/core/rack/model.h>
+#include <augr/core/model.h>
 
 namespace augr {
 

@@ -1,7 +1,7 @@
 //#include <rttr/type>
 #include <augr/core/reflect.h>
-#include <augr/core/rack/model_manufacturer.h>
-#include <augr/core/rack/model.h>
+#include <augr/core/model_manufacturer.h>
+#include <augr/core/model.h>
 
 namespace augr {
 

@@ -10,6 +10,7 @@ set(AUGR_DEPOT ${AUGR_ROOT}/depot)
 set(AUGR_SRC ${AUGR_ROOT}/src)
 
 set(AUGR_CORE_ROOT ${AUGR_SRC}/augr-core)
+set(AUGR_FAUST_ROOT ${AUGR_SRC}/augr-faust)
 set(AUGR_RTAUDIO_ROOT ${AUGR_SRC}/augr-exe)
 
 set(FMT_ROOT ${AUGR_DEPOT}/fmt)

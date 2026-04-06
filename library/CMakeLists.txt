@@ -95,12 +95,12 @@ faust_generate_header_once(
 # faust_generate_header_once("${CMAKE_CURRENT_SOURCE_DIR}/dsp/organ.dsp" "OrganDsp" "organ_dsp.h")
 # Headers are auto-registered by faust_generate_header_once.
 
-include(${AUGR_CMAKE}/AugrCore.cmake)
+include(${AUGR_CMAKE}/AugrFaust.cmake)
 
 # Consumers
 add_library(${THIS} STATIC library.cpp)
 target_include_directories(${THIS} PUBLIC "${FAUST_GEN_DIR}")
-USES_AUGR_CORE(${THIS})
+USES_AUGR_FAUST(${THIS})
 
 add_subdirectory(analysis)
 add_subdirectory(gameaudio)
