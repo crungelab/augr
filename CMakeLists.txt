@@ -70,10 +70,10 @@ add_subdirectory(depot/sdl)
 
 
 #AugrCore
-add_subdirectory(src/augr/core)
+add_subdirectory(src/augr-core)
 
-#AugrRtAudio
-add_subdirectory(src/augr/rtaudio)
+#AugrExe
+add_subdirectory(src/augr-exe)
 
 #Augite
 add_subdirectory(src/augite)

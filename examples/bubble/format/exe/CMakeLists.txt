@@ -11,9 +11,9 @@ add_executable(${THIS} "main.cpp" ${CMN_SOURCES} ${CMN_INCLUDES} ${EXE_SOURCES} 
 target_include_directories(${THIS} PRIVATE ${PROJECT_ROOT})
 
 include(${AUGR_CMAKE}/ExeApp.cmake)
-include(${AUGR_CMAKE}/AugrRtAudio.cmake)
+include(${AUGR_CMAKE}/AugrExe.cmake)
 include(${THIS_DIR}/../../cmake/Common.cmake)
 
 USES_EXE_APP(${THIS})
-USES_AUGR_RTAUDIO(${THIS})
+USES_AUGR_EXE(${THIS})
 USES_COMMON(${THIS})

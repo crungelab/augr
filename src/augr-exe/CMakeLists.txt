@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.14)
 
-project(AugrRtAudio LANGUAGES CXX)
+project(AugrExe LANGUAGES CXX)
 set(THIS ${PROJECT_NAME})
 
 file(GLOB AUGR_SRC ${CMAKE_CURRENT_SOURCE_DIR}/src/*.cpp)

@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.14)
 
-include(${AUGR_CMAKE}/AugrRtAudio.cmake)
+include(${AUGR_CMAKE}/AugrExe.cmake)
 
 set(RACK_SRC 
   rtaudio_rack.cpp
@@ -11,4 +11,4 @@ target_sources(${THIS}
   ${RACK_SRC}
 )
 
-INTERNAL_AUGR_RTAUDIO(${THIS})
+INTERNAL_AUGR_EXE(${THIS})

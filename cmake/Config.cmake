@@ -9,8 +9,8 @@ set(AUGR_CMAKE ${AUGR_ROOT}/cmake)
 set(AUGR_DEPOT ${AUGR_ROOT}/depot)
 set(AUGR_SRC ${AUGR_ROOT}/src)
 
-set(AUGR_CORE_ROOT ${AUGR_SRC}/augr/core)
-set(AUGR_RTAUDIO_ROOT ${AUGR_SRC}/augr/rtaudio)
+set(AUGR_CORE_ROOT ${AUGR_SRC}/augr-core)
+set(AUGR_RTAUDIO_ROOT ${AUGR_SRC}/augr-exe)
 
 set(FMT_ROOT ${AUGR_DEPOT}/fmt)
 set(SPDLOG_ROOT ${AUGR_DEPOT}/spdlog)
