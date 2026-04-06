@@ -28,17 +28,16 @@ public:
     Connector *input_;
 };
 
-// Typed connection — also owns the input pin slot
+// Typed connection — also owns the input pin
 template <typename T> class ConnectionT : public Connection {
 public:
     using TCallback = std::function<void(T)>;
 
-    ConnectionT(Connector &output, Connector &input, PinT<T> *pin_slot,
+    ConnectionT(Connector &output, Connector &input, PinT<T> *pin,
                 const TCallback &callback)
-        : Connection(output, input), pin_slot_(pin_slot), callback_(callback) {}
+        : Connection(output, input), pin_(pin), callback_(callback) {}
 
-    PinT<T> *pin_slot_ =
-        nullptr; // owned by InputT, identified here for removal
+    PinT<T> *pin_ = nullptr; // owned by InputT, identified here for removal
     TCallback callback_;
 };
 
@@ -68,13 +67,12 @@ class ConnectorT : public TBase {
 public:
     template <typename... Args>
     ConnectorT(Node &node, std::string name, Args &&...args)
-        : TBase(node, name, std::forward<Args>(args)...),
-          pin_(std::make_unique<PinT<T>>()) {}
+        : TBase(node, name, std::forward<Args>(args)...) {}
 
-    T Read() const { return pin_->Read(); }
-    virtual void Write(T value) { pin_->Write(value); }
+    T Read() const { return value_; }
+    virtual void Write(T value) { value_ = value; }
 
-    std::unique_ptr<PinT<T>> pin_;
+    T value_{};
 };
 
 // Forward declarations
@@ -108,9 +106,9 @@ public:
         }
     }
 
-    TConnection *Subscribe(Connector &input, PinT<T> *pin_slot,
+    TConnection *Subscribe(Connector &input, PinT<T> *pin,
                            const TCallback &callback) {
-        auto *connection = new TConnection(*this, input, pin_slot, callback);
+        auto *connection = new TConnection(*this, input, pin, callback);
         connections_.push_back(connection);
         return connection;
     }
@@ -131,7 +129,7 @@ public:
     std::list<TConnection *> connections_;
 };
 
-// Input connector — accumulates into per-connection pin slots, mixes on Read
+// Input connector — uses per-connection pins, mixes on Read
 template <typename T, typename TBase>
 class InputT : public ConnectorT<T, TBase> {
     using TConnection = ConnectionT<T>;
@@ -147,12 +145,12 @@ public:
         if (!output)
             return nullptr;
 
-        // Allocate a dedicated pin slot for this connection
-        auto *slot = new PinT<T>();
-        slots_.push_back(slot);
+        // Allocate a dedicated pin for this connection
+        auto *pin = new PinT<T>();
+        pins_.push_back(pin);
 
-        return output->Subscribe(*this, slot, [this, slot](T value) {
-            slot->Write(value);
+        return output->Subscribe(*this, pin, [this, pin](T value) {
+            pin->Write(value);
             dirty_ = true;
         });
     }
@@ -160,45 +158,44 @@ public:
     void Disconnect(Connection &connection) override {
         auto *typed = dynamic_cast<TConnection *>(&connection);
         if (typed) {
-            // Remove and delete the pin slot owned by this connection
-            auto it = std::find(slots_.begin(), slots_.end(), typed->pin_slot_);
-            if (it != slots_.end()) {
+            // Remove and delete the pin owned by this connection
+            auto it = std::find(pins_.begin(), pins_.end(), typed->pin_);
+            if (it != pins_.end()) {
                 delete *it;
-                slots_.erase(it);
+                pins_.erase(it);
             }
         }
         // Delegate unsubscribe to the output
         connection.output_->Disconnect(connection);
 
         // If no connections remain, clear cached value and dirty flag
-        if (slots_.empty()) {
-            this->pin_->Write(T{});
+        if (pins_.empty()) {
+            this->value_ = T{};
             dirty_ = false;
         }
     }
 
     virtual T Reduce() const {
-        T mixed = slots_[0]->Read();
-        for (size_t i = 1; i < slots_.size(); ++i)
-            mixed += slots_[i]->Read();
+        T mixed = pins_[0]->Read();
+        for (size_t i = 1; i < pins_.size(); ++i)
+            mixed += pins_[i]->Read();
         return mixed;
     }
 
     T Read() {
         if (dirty_) {
-            this->pin_->Write(slots_.size() == 1 ? slots_[0]->Read()
-                                                 : Reduce());
+            this->value_ = (pins_.size() == 1 ? pins_[0]->Read() : Reduce());
             dirty_ = false;
         }
-        return this->pin_->Read();
+        return this->value_;
     }
 
     ~InputT() {
-        for (auto *slot : slots_)
-            delete slot;
+        for (auto *pin : pins_)
+            delete pin;
     }
 
-    std::vector<PinT<T> *> slots_;
+    std::vector<PinT<T> *> pins_;
     bool dirty_ = false;
 };
 
