@@ -5,7 +5,7 @@ namespace augr {
 
 class BoxBase : public Control {
 public:
-  BoxBase(const char* label) : Control(label) {}
+  BoxBase(std::string label) : Control(label) {}
   //Data members
   bool is_top_level_ = false;
   bool label_visible_ = true;

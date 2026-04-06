@@ -5,7 +5,7 @@ namespace augr {
 
 class Knob : public RangeBase {
 public:
-  Knob(const char* label, fy_real* zone, fy_real init, fy_real min, fy_real max, fy_real step) :
+  Knob(std::string label, fy_real* zone, fy_real init, fy_real min, fy_real max, fy_real step) :
     RangeBase(label, zone, init, min, max, step) {}
 
   REFLECT_ENABLE(RangeBase)

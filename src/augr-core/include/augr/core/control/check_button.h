@@ -5,7 +5,7 @@ namespace augr {
 
 class CheckButton : public ButtonBase {
 public:
-  CheckButton(const char* label, fy_real* zone) : ButtonBase(label, zone) {}
+  CheckButton(std::string label, fy_real* zone) : ButtonBase(label, zone) {}
 
   REFLECT_ENABLE(ButtonBase)
 };

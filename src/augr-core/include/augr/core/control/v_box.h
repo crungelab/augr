@@ -5,7 +5,7 @@ namespace augr {
 
 class VBox : public BoxBase {
 public:
-  VBox(const char* label) : BoxBase(label) {}
+  VBox(std::string label) : BoxBase(label) {}
 
   REFLECT_ENABLE(BoxBase)
 };

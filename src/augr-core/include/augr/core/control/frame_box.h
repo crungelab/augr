@@ -5,7 +5,7 @@ namespace augr {
 
 class FrameBox : public BoxBase {
 public:
-  FrameBox(const char* label) : BoxBase(label) {}
+  FrameBox(std::string label) : BoxBase(label) {}
 
   REFLECT_ENABLE(BoxBase)
 };
