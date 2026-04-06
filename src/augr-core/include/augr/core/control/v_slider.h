@@ -5,7 +5,7 @@ namespace augr {
 
 class VSlider : public SliderBase {
 public:
-  VSlider(std::string label, fy_real* zone, fy_real init, fy_real min, fy_real max, fy_real step) :
+  VSlider(std::string label, PropertyPtr zone, fy_real init, fy_real min, fy_real max, fy_real step) :
     SliderBase(label, zone, init, min, max, step) {}
 
   REFLECT_ENABLE(SliderBase)

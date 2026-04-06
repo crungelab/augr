@@ -9,7 +9,9 @@ class NumEntryWidget : public WidgetT<NumEntry> {
 public:
   NumEntryWidget(NumEntry& model) : WidgetT<NumEntry>(model) {}
   void Draw() override {
-    ImGui::InputFloat(model_->label_.c_str(), model_->zone_);
+    float value = model_->value();
+    ImGui::InputFloat(model_->label_.c_str(), &value);
+    model_->set_value(value);
   }
 };
 DEFINE_WIDGET_FACTORY(NumEntryWidget, NumEntry)

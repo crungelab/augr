@@ -3,9 +3,9 @@
 
 namespace augr {
 
-class ButtonBase : public Control {
+class ButtonBase : public FloatControl {
 public:
-  ButtonBase(std::string label, fy_real* zone) : Control(label, zone) {}
+  ButtonBase(std::string label, PropertyPtr zone) : FloatControl(label, zone) {}
 
   REFLECT_ENABLE(Control)
 };

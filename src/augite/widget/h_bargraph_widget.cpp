@@ -18,7 +18,8 @@ class HBarGraphWidget : public WidgetT<HBarGraph> {
 public:
     HBarGraphWidget(HBarGraph &model) : WidgetT<HBarGraph>(model) {}
     void Draw() override {
-        float v = *model_->zone_; // see thread-safety note below
+        //float v = *model_->zone_; // see thread-safety note below
+        float v = model_->value();
         float t = 0.0f;
         if (model_->max_ > model_->min_)
             t = (v - model_->min_) / (model_->max_ - model_->min_);

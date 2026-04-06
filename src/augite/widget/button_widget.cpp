@@ -14,7 +14,8 @@ public:
     void Draw() override {
         ImGui::Button("Gate");
         float gate = ImGui::IsItemActive() ? 1.0f : 0.0f;
-        *model_->zone_ = gate;
+        //*model_->zone_ = gate;
+        model_->set_value(gate);
     }
 
     /*

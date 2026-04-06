@@ -3,10 +3,10 @@
 
 namespace augr {
 
-class BarGraphBase : public Control {
+class BarGraphBase : public FloatControl {
 public:
-    BarGraphBase(std::string label, fy_real *zone, fy_real min, fy_real max)
-        : Control(label, zone), min_(min), max_(max), is_db_(false) {}
+    BarGraphBase(std::string label, PropertyPtr zone, fy_real min, fy_real max)
+        : FloatControl(label, zone), min_(min), max_(max), is_db_(false) {}
 
     // Data members
     fy_real min_, max_;

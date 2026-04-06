@@ -3,9 +3,9 @@
 
 namespace augr {
 
-class NumDisplay : public Control {
+class NumDisplay : public FloatControl {
 public:
-  NumDisplay(std::string label, fy_real* zone, int precision) : Control(label, zone), precision_(precision) {}
+  NumDisplay(std::string label, PropertyPtr zone, int precision) : FloatControl(label, zone), precision_(precision) {}
   //Data members
   int precision_;
 

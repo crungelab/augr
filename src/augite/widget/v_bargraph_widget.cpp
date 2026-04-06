@@ -204,7 +204,8 @@ public:
         const bool is_db = model_->is_db_;
         const ImVec2 size(24.0f, 120.0f);
 
-        DrawVBargraphCore(!model_->label_.empty() ? model_->label_.c_str() : "", model_->zone_,
+        auto value = model_->value(); // read zone for tooltip and peak hold
+        DrawVBargraphCore(!model_->label_.empty() ? model_->label_.c_str() : "", &value,
                           model_->min_, model_->max_, is_db, size, &peak_);
     }
 
