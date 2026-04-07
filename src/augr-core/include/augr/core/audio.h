@@ -10,7 +10,9 @@
 
 class AudioImpl {
 public:
-    virtual size_t nChannels() = 0;
+    virtual ~AudioImpl() = default;
+
+    virtual size_t nChannels() const = 0;
     virtual fy_buffers_t buffers() = 0;
 
     // Accessors
@@ -69,7 +71,7 @@ public:
 
     fy_buffers_t buffers() { return impl_->buffers(); }
 
-    size_t nChannels() { return impl_->nChannels(); }
+    size_t nChannels() const { return impl_->nChannels(); }
     AudioImpl &impl() { return *impl_.get(); }
     // Data members
     static unsigned int frames_;
@@ -101,11 +103,11 @@ public:
             buffers_[i] = base + i * Audio::frames();
         }
     }
-
+    
     size_t nChannels_ = N;
     fy_buffer_t buffers_[N];
 
     // Accessors
-    size_t nChannels() override { return nChannels_; }
+    size_t nChannels() const override { return nChannels_; }
     fy_buffers_t buffers() override { return buffers_; }
 };

@@ -21,9 +21,9 @@
 
 namespace augr {
 
-std::shared_ptr<PropertyT<fy_real>>
-MakeZoneProperty(float *zone) {
-    return std::make_shared<ZoneProperty>(zone);
+std::shared_ptr<BindingT<fy_real>>
+MakeZoneBinding(float *zone) {
+    return std::make_shared<ZoneBinding>(zone);
 }
 
 FaustDspUi::FaustDspUi(FaustDsp &m) : UI(), m_(&m) { PushModel(m); }
@@ -57,60 +57,60 @@ static bool ZoneIsDb(const map<FAUSTFLOAT *, Zone> &zones, float *zone) {
 }
 
 void FaustDspUi::addButton(const char *label, float *zone) {
-    AddModel(*new Button(label, MakeZoneProperty(zone)));
+    AddModel(*new Button(label, MakeZoneBinding(zone)));
 }
 
 void FaustDspUi::addToggleButton(const char *label, float *zone) {
-    AddModel(*new ToggleButton(label, MakeZoneProperty(zone)));
+    AddModel(*new ToggleButton(label, MakeZoneBinding(zone)));
 }
 
 void FaustDspUi::addCheckButton(const char *label, float *zone) {
-    AddModel(*new CheckButton(label, MakeZoneProperty(zone)));
+    AddModel(*new CheckButton(label, MakeZoneBinding(zone)));
 }
 
 void FaustDspUi::addVerticalSlider(const char *label, float *zone, float init,
                                    float min, float max, float step) {
     if (zones_[zone].isKnob())
         return addKnob(label, zone, init, min, max, step);
-    AddModel(*new VSlider(label, MakeZoneProperty(zone), init, min, max, step));
+    AddModel(*new VSlider(label, MakeZoneBinding(zone), init, min, max, step));
 }
 
 void FaustDspUi::addHorizontalSlider(const char *label, float *zone, float init,
                                      float min, float max, float step) {
     if (zones_[zone].isKnob())
         return addKnob(label, zone, init, min, max, step);
-    AddModel(*new HSlider(label, MakeZoneProperty(zone), init, min, max, step));
+    AddModel(*new HSlider(label, MakeZoneBinding(zone), init, min, max, step));
 }
 
 void FaustDspUi::addKnob(const char *label, float *zone, float init, float min,
                          float max, float step) {
-    AddModel(*new Knob(label, MakeZoneProperty(zone), init, min, max, step));
+    AddModel(*new Knob(label, MakeZoneBinding(zone), init, min, max, step));
 }
 
 void FaustDspUi::addNumEntry(const char *label, float *zone, float init,
                              float min, float max, float step) {
-    AddModel(*new NumEntry(label, MakeZoneProperty(zone), init, min, max, step));
+    AddModel(*new NumEntry(label, MakeZoneBinding(zone), init, min, max, step));
 }
 
 void FaustDspUi::addNumDisplay(const char *label, float *zone, int precision) {
-    AddModel(*new NumDisplay(label, MakeZoneProperty(zone), precision));
+    AddModel(*new NumDisplay(label, MakeZoneBinding(zone), precision));
 }
 
 void FaustDspUi::addTextDisplay(const char *label, float *zone, char *names[],
                                 float min, float max) {
-    AddModel(*new TextDisplay(label, MakeZoneProperty(zone), names, min, max));
+    AddModel(*new TextDisplay(label, MakeZoneBinding(zone), names, min, max));
 }
 
 void FaustDspUi::addHorizontalBargraph(const char *label, float *zone,
                                        float min, float max) {
-    auto *bg = new HBarGraph(label, MakeZoneProperty(zone), min, max);
+    auto *bg = new HBarGraph(label, MakeZoneBinding(zone), min, max);
     bg->is_db_ = ZoneIsDb(zones_, zone);
     AddModel(*bg);
 }
 
 void FaustDspUi::addVerticalBargraph(const char *label, float *zone, float min,
                                      float max) {
-    auto *bg = new VBarGraph(label, MakeZoneProperty(zone), min, max);
+    auto *bg = new VBarGraph(label, MakeZoneBinding(zone), min, max);
     bg->is_db_ = ZoneIsDb(zones_, zone);
     AddModel(*bg);
 }

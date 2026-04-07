@@ -5,7 +5,7 @@ namespace augr {
 
 class ButtonBase : public FloatControl {
 public:
-  ButtonBase(std::string label, PropertyPtr zone) : FloatControl(label, zone) {}
+  ButtonBase(std::string label, BindingPtr zone) : FloatControl(label, zone) {}
 
   REFLECT_ENABLE(Control)
 };

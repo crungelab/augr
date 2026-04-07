@@ -7,21 +7,21 @@
 
 #include "config.h"
 
-class Property {
+class Binding {
 public:
-    Property() = default;
-    virtual ~Property() = default;
+    Binding() = default;
+    virtual ~Binding() = default;
 
     virtual const std::type_info& value_type() const = 0;
 };
 
 template <typename T>
-class PropertyT : public Property {
+class BindingT : public Binding {
 public:
     using ValueType = T;
 
-    PropertyT() = default;
-    ~PropertyT() override = default;
+    BindingT() = default;
+    ~BindingT() override = default;
 
     const std::type_info& value_type() const override { return typeid(T); }
 
@@ -30,11 +30,11 @@ public:
 };
 
 template <typename T>
-class ValueProperty : public PropertyT<T> {
+class ValueBinding : public BindingT<T> {
 public:
-    ValueProperty() = default;
+    ValueBinding() = default;
 
-    explicit ValueProperty(T value) : value_(std::move(value)) {}
+    explicit ValueBinding(T value) : value_(std::move(value)) {}
 
     T get() const override { return value_; }
 
@@ -45,12 +45,12 @@ private:
 };
 
 template <typename T>
-class CallbackProperty : public PropertyT<T> {
+class CallbackBinding : public BindingT<T> {
 public:
     using Getter = std::function<T()>;
     using Setter = std::function<void(const T&)>;
 
-    CallbackProperty(Getter getter, Setter setter)
+    CallbackBinding(Getter getter, Setter setter)
         : getter_(std::move(getter)), setter_(std::move(setter)) {}
 
     T get() const override { return getter_ ? getter_() : T{}; }
@@ -66,9 +66,9 @@ private:
     Setter setter_;
 };
 
-class ZoneProperty : public PropertyT<fy_real> {
+class ZoneBinding : public BindingT<fy_real> {
 public:
-    ZoneProperty(fy_real* zone)
+    ZoneBinding(fy_real* zone)
         : zone_(zone) {}
 
     fy_real get() const override { return zone_ ? *zone_ : fy_real{}; }

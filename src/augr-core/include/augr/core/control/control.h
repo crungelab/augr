@@ -6,7 +6,7 @@
 
 #include <augr/core/config.h>
 #include <augr/core/model.h>
-#include <augr/core/property.h>
+#include <augr/core/binding.h>
 
 namespace augr {
 
@@ -21,36 +21,36 @@ public:
     REFLECT_ENABLE(Model)
 };
 
-template <typename T> class PropertyControl : public Control {
+template <typename T> class BoundControl : public Control {
 public:
-    using PropertyType = PropertyT<T>;
-    using PropertyPtr = std::shared_ptr<PropertyType>;
+    using BindingType = BindingT<T>;
+    using BindingPtr = std::shared_ptr<BindingType>;
 
-    PropertyControl() = default;
+    BoundControl() = default;
 
-    explicit PropertyControl(std::string label, PropertyPtr property = nullptr)
-        : Control(std::move(label)), property_(std::move(property)) {}
+    explicit BoundControl(std::string label, BindingPtr binding = nullptr)
+        : Control(std::move(label)), binding_(std::move(binding)) {}
 
-    T value() const { return property_ ? property_->get() : T{}; }
+    T value() const { return binding_ ? binding_->get() : T{}; }
 
     void set_value(const T &value) {
-        if (property_) {
-            property_->set(value);
+        if (binding_) {
+            binding_->set(value);
         }
     }
 
-    PropertyType *property() { return property_.get(); }
-    const PropertyType *property() const { return property_.get(); }
+    BindingType *binding() { return binding_.get(); }
+    const BindingType *binding() const { return binding_.get(); }
 
-    void set_property(PropertyPtr property) { property_ = std::move(property); }
+    void set_binding(BindingPtr binding) { binding_ = std::move(binding); }
 
-    bool has_property() const { return static_cast<bool>(property_); }
+    bool has_binding() const { return static_cast<bool>(binding_); }
 
 protected:
-    PropertyPtr property_;
+    BindingPtr binding_;
 };
 
-using FloatControl = PropertyControl<fy_real>;
-using BoolControl = PropertyControl<bool>;
+using FloatControl = BoundControl<fy_real>;
+using BoolControl = BoundControl<bool>;
 
 } // namespace augr
