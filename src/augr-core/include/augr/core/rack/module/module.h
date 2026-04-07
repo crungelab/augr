@@ -3,7 +3,7 @@
 #include <vector>
 
 #include <augr/core/rack/node.h>
-#include <augr/core/rack/audio_connector.h>
+#include <augr/core/rack/audio_pin.h>
 
 namespace augr {
 

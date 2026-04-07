@@ -14,8 +14,8 @@ public:
   Node() {}
   Node(Graph& graph);
   //Pins
-  void AddInput(Connector& input);
-  void AddOutput(Connector& output);
+  void AddInput(Pin& input);
+  void AddOutput(Pin& output);
   //Accessors
   Graph& graph() { return *(Graph*)owner_; }
   //Data members

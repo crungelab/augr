@@ -2,20 +2,20 @@
 
 #include <vector>
 
-#include <augr/core/rack/connector.h>
+#include <augr/core/rack/pin.h>
 
 namespace augr {
 
 class Port {
 public:
-  void AddConnector(Connector& connector) {
-    connectors_.push_back(&connector);
+  void AddPin(Pin& pin) {
+    pins_.push_back(&pin);
   }
-  virtual void CreateConnector(std::string name) {}
+  virtual void CreatePin(std::string name) {}
   //Accessors
-  int nConnectors() { return connectors_.size();}
+  int nPins() { return pins_.size();}
   //Data members
-  std::vector<Connector*> connectors_;
+  std::vector<Pin*> pins_;
 };
 
 class Inport : public Port {

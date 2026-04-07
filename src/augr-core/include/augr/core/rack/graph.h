@@ -8,16 +8,16 @@
 namespace augr {
 
 class Wire;
-class Connector;
+class Pin;
 
 class Graph : public Model {
 public:
     Graph() {}
     //
-    void Connect(Connector &output, Connector &input);
+    void Connect(Pin &output, Pin &input);
     void Disconnect(Wire &wire);
-    void AddOutput(Connector &output);
-    void AddInput(Connector &input);
+    void AddOutput(Pin &output);
+    void AddInput(Pin &input);
     //
     bool IsOutput(int id) const;
     bool IsInput(int id) const;
@@ -30,8 +30,8 @@ public:
     // Data members
     std::list<Wire *> wires_;
     std::map<int, Wire *> wire_map_;
-    std::map<int, Connector *> output_map_;
-    std::map<int, Connector *> input_map_;
+    std::map<int, Pin *> output_map_;
+    std::map<int, Pin *> input_map_;
 
     bool graph_dirty_ = false;
 
