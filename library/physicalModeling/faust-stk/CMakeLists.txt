@@ -4,7 +4,6 @@ faust_generate_header_once(
   "BlowBottleDsp"
   "blow_bottle_dsp.h"
 )
-#list(APPEND _ALL_FAUST_HEADERS "${GENERATED_HEADER}")
 
 target_sources(${THIS}
   PRIVATE

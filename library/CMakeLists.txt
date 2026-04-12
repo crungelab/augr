@@ -77,13 +77,6 @@ endfunction()
 
 # ---- Declare your DSPs exactly once -----------------------------------------
 
-# Generator
-faust_generate_header_once(
-  "${FAUST_EXAMPLES_DIR}/generator/osc.dsp"
-  "OscDsp"
-  "osc_dsp.h"
-)
-
 # Reverb
 faust_generate_header_once(
   "${FAUST_EXAMPLES_DIR}/reverb/freeverb.dsp"
@@ -104,6 +97,7 @@ USES_AUGR_FAUST(${THIS})
 
 add_subdirectory(analysis)
 add_subdirectory(gameaudio)
+add_subdirectory(generator)
 add_subdirectory(phasing)
 add_subdirectory(physicalModeling)
 

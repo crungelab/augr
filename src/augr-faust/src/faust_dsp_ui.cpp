@@ -42,8 +42,6 @@ void FaustDspUi::AddModel(Model &model) {
 }
 
 void FaustDspUi::declare(float *zone, const char *key, const char *value) {
-    // Always store into the zone entry, creating it if needed — the original
-    // code created an empty Zone() and discarded key/value on first sight.
     zones_[zone].declare(key, value);
 }
 

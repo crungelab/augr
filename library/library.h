@@ -9,6 +9,7 @@
 void InitFaustDspLibrary();
 void InitFaustDspLibrary_Analysis();
 void InitFaustDspLibrary_GameAudio();
+void InitFaustDspLibrary_Generator();
 void InitFaustDspLibrary_Phasing();
 void InitFaustDspLibrary_PhysicalModeling();
 void InitFaustDspLibrary_PhysicalModeling_FaustStk();
