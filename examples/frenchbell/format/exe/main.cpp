@@ -1,7 +1,7 @@
 #include <augr/exe/rack/exe_rack.h>
 #include <augr/faust/faust_dsp.h>
 #include <augr/faust/faust_dsp_ui.h>
-#include <augr/core/rack/module/module.h>
+#include <augr/rack/module/module.h>
 
 #include <augite/app/app.h>
 

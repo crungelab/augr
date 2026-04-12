@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.14)
 
-project(AugrCore LANGUAGES CXX)
+project(AugrRack LANGUAGES CXX)
 set(THIS ${PROJECT_NAME})
 
 file(GLOB AUGR_SRC "src/*.cpp")
@@ -10,10 +10,10 @@ add_library(${PROJECT_NAME} STATIC
   ${AUGR_SRC}
   ${AUGR_INCLUDE}
 )
-target_include_directories(${THIS} PRIVATE ${AUGR_CORE_ROOT}/include)
+target_include_directories(${THIS} PRIVATE ${AUGR_RACK_ROOT}/include)
 
-include(${AUGR_CMAKE}/XTensor.cmake)
-USES_XTENSOR(${THIS})
+include(${AUGR_CMAKE}/AugrCore.cmake)
+USES_AUGR_CORE(${THIS})
 
-add_subdirectory(src/midi)
+add_subdirectory(src)
 

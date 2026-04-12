@@ -3,7 +3,7 @@
 #include "widget.h"
 
 #include <augr/core/control/button.h>
-#include <augr/core/rack/rack.h>
+#include <augr/rack/rack.h>
 
 namespace augr {
 

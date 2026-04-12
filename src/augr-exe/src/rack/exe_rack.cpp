@@ -1,5 +1,5 @@
 #include <augr/core/audio.h>
-#include <augr/core/rack/module/audio_device.h>
+#include <augr/rack/module/audio_device.h>
 #include <augr/exe/rack/exe_rack.h>
 #include <spdlog/spdlog.h>
 

@@ -11,11 +11,8 @@ add_library(${PROJECT_NAME} STATIC
   ${AUGITE_INCLUDE}
 )
 
-#include(${AUGR_CMAKE}/SpdLog.cmake)
-#USES_SPDLOG(${THIS})
 add_subdirectory(shell)
 add_subdirectory(vst3)
-#add_subdirectory(rack)
 add_subdirectory(widget)
 add_subdirectory(view)
 add_subdirectory(app)

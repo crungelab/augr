@@ -1,13 +1,9 @@
 include_guard()
 
-include(${CMAKE_CURRENT_LIST_DIR}/Fmt.cmake)
-include(${CMAKE_CURRENT_LIST_DIR}/SpdLog.cmake)
-include(${CMAKE_CURRENT_LIST_DIR}/XTensor.cmake)
+include(${CMAKE_CURRENT_LIST_DIR}/AugrCore.cmake)
 
 function(USES_AUGITE THIS)
-  USES_FMT(${THIS})
-  USES_SPDLOG(${THIS})
-  USES_XTENSOR(${THIS})
+  USES_AUGR_CORE(${THIS})
   target_include_directories(${THIS} PRIVATE ${AUGR_ROOT}/src)
   target_link_libraries(${THIS} PRIVATE Augite)
   target_compile_definitions(${THIS} PRIVATE "NOMINMAX")

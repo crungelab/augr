@@ -6,7 +6,7 @@
 
 #include "public.sdk/source/vst/vsteditcontroller.h"
 
-#include <augr/core/rack/rack.h>
+#include <augr/rack/rack.h>
 
 using namespace Steinberg;
 

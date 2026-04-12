@@ -9,7 +9,7 @@
 #include <vector>
 
 #include <augr/core/part.h>
-#include <augr/core/rack/slot.h>
+#include <augr/rack/slot.h>
 
 namespace augr {
 

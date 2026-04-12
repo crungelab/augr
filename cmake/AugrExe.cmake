@@ -1,11 +1,11 @@
 include_guard()
 
-include(${CMAKE_CURRENT_LIST_DIR}/AugrCore.cmake)
+include(${CMAKE_CURRENT_LIST_DIR}/AugrRack.cmake)
 include(${CMAKE_CURRENT_LIST_DIR}/RtAudio.cmake)
 include(${CMAKE_CURRENT_LIST_DIR}/RtMidi.cmake)
 
 function(INTERNAL_AUGR_EXE THIS)
-  USES_AUGR_CORE(${THIS})
+  USES_AUGR_RACK(${THIS})
   USES_RTAUDIO(${THIS})
   USES_RTMIDI(${THIS})
   target_include_directories(${THIS} PRIVATE ${AUGR_EXE_ROOT}/include)

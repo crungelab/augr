@@ -1,7 +1,7 @@
-#include <augr/core/rack/graph.h>
-#include <augr/core/rack/node.h>
-#include <augr/core/rack/pin.h>
-#include <augr/core/rack/wire.h>
+#include <augr/rack/graph.h>
+#include <augr/rack/node.h>
+#include <augr/rack/pin.h>
+#include <augr/rack/wire.h>
 
 namespace augr {
 

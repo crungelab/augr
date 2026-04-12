@@ -1,9 +1,9 @@
 #include <queue>
 #include <unordered_set>
 
-#include <augr/core/rack/module/module.h>
-#include <augr/core/rack/rack.h>
-#include <augr/core/rack/wire.h>
+#include <augr/rack/module/module.h>
+#include <augr/rack/rack.h>
+#include <augr/rack/wire.h>
 
 namespace augr {
 

@@ -1,7 +1,7 @@
 #pragma once
 
 #include <augr/core/midi/midi_message.h>
-#include <augr/core/rack/rack.h>
+#include <augr/rack/rack.h>
 
 #include <augr/exe/rack/audio_configurator.h>
 #include <augr/exe/rack/audio_system.h>

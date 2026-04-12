@@ -1,5 +1,5 @@
-#include <augr/core/rack/node.h>
-#include <augr/core/rack/graph.h>
+#include <augr/rack/node.h>
+#include <augr/rack/graph.h>
 
 namespace augr {
 

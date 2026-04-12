@@ -3,7 +3,7 @@
 #include <augr/core/model_manufacturer.h>
 #include <augr/faust/faust_dsp.h>
 #include <augr/faust/faust_dsp_ui.h>
-#include <augr/core/rack/module/module.h>
+#include <augr/rack/module/module.h>
 
 
 void InitFaustDspLibrary();

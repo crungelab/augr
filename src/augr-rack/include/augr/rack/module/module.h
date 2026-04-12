@@ -2,8 +2,8 @@
 
 #include <vector>
 
-#include <augr/core/rack/node.h>
-#include <augr/core/rack/audio_pin.h>
+#include <augr/rack/node.h>
+#include <augr/rack/audio_pin.h>
 
 namespace augr {
 

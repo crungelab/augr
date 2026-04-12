@@ -2,7 +2,7 @@
 #include <cstdlib>
 
 #include <vector>
-#include <augr/core/rack/node.h>
+#include <augr/rack/node.h>
 
 using namespace augr;
 

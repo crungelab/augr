@@ -12,5 +12,5 @@ add_library(${PROJECT_NAME} STATIC
 )
 target_include_directories(${THIS} PRIVATE ${AUGR_FAUST_ROOT}/include)
 
-include(${AUGR_CMAKE}/AugrCore.cmake)
-USES_AUGR_CORE(${THIS})
+include(${AUGR_CMAKE}/AugrRack.cmake)
+USES_AUGR_RACK(${THIS})

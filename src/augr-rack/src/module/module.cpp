@@ -1,6 +1,6 @@
-#include <augr/core/rack/rack.h>
+#include <augr/rack/rack.h>
 
-#include <augr/core/rack/module/module.h>
+#include <augr/rack/module/module.h>
 
 namespace augr {
 
