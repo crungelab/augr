@@ -10,7 +10,7 @@ add_library(${PROJECT_NAME} STATIC
   ${AUGR_SRC}
   ${AUGR_INCLUDE}
 )
-target_include_directories(${THIS} PRIVATE ${AUGR_RTAUDIO_ROOT}/include)
+target_include_directories(${THIS} PRIVATE ${AUGR_EXE_ROOT}/include)
 
 include(${AUGR_CMAKE}/AugrCore.cmake)
 INTERNAL_AUGR_CORE(${THIS})

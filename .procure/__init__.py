@@ -53,6 +53,11 @@ class RtMidi(GitSolution):
     url = "https://github.com/thestk/rtmidi"
 
 
+class MidiFile(GitSolution):
+    path = "depot/midifile"
+    url = "https://github.com/craigsapp/midifile"
+
+
 class VST3SDK(GitSolution):
     path = "depot/vst3sdk"
     url = "https://github.com/steinbergmedia/vst3sdk"
@@ -80,6 +85,7 @@ solutions = [
     ImPlot,
     RtAudio,
     RtMidi,
+    MidiFile,
     VST3SDK,
     Xtensor,
     Xtl,

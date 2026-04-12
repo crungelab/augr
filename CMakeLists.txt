@@ -30,6 +30,11 @@ set(RTMIDI_API_ALSA ON CACHE BOOL "Compile RtMidi with ALSA support" FORCE)
 add_subdirectory(${RTMIDI_ROOT})
 #RTMIDI END
 
+#MIDIFILE BEGIN
+#add_subdirectory(${MIDIFILE_ROOT})
+add_subdirectory(${AUGR_ROOT}/src/midifile)
+#MIDIFILE END
+
 #XTL BEGIN
 add_subdirectory(${XTL_ROOT})
 #XTL END

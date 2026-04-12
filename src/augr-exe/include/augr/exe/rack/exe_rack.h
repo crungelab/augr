@@ -1,5 +1,8 @@
 #pragma once
+
+#include <augr/core/midi/midi_message.h>
 #include <augr/core/rack/rack.h>
+
 #include <augr/exe/rack/audio_configurator.h>
 #include <augr/exe/rack/audio_system.h>
 #include <augr/exe/rack/midi_system.h>
@@ -22,8 +25,7 @@ public:
 
     // Called by MidiSystem::Callback on the MIDI thread;
     // enqueues into the action queue for processing on the audio thread
-    void EnqueueMidiMessage(double timestamp,
-                            const std::vector<unsigned char> &bytes);
+    void EnqueueMidiMessage(MidiMessage message);
 
 private:
     bool CreateAudioInputDevice();

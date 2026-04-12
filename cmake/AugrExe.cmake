@@ -8,7 +8,7 @@ function(INTERNAL_AUGR_EXE THIS)
   USES_AUGR_CORE(${THIS})
   USES_RTAUDIO(${THIS})
   USES_RTMIDI(${THIS})
-  target_include_directories(${THIS} PRIVATE ${AUGR_RTAUDIO_ROOT}/include)
+  target_include_directories(${THIS} PRIVATE ${AUGR_EXE_ROOT}/include)
 endfunction()
 
 function(USES_AUGR_EXE THIS)

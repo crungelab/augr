@@ -15,6 +15,6 @@ target_include_directories(${THIS} PRIVATE ${AUGR_CORE_ROOT}/include)
 include(${AUGR_CMAKE}/XTensor.cmake)
 USES_XTENSOR(${THIS})
 
-#add_subdirectory(vst3)
+add_subdirectory(src/midi)
 add_subdirectory(src/rack)
 

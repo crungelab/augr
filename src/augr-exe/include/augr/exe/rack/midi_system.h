@@ -1,18 +1,16 @@
 #pragma once
 
-#include <RtMidi.h>
 #include <memory>
 #include <string>
 #include <vector>
 
+#include <RtMidi.h>
+
+#include <augr/core/midi/midi_message.h>
+
 namespace augr {
 
 class ExeRack;
-
-struct MidiMessage {
-    double                     timestamp;
-    std::vector<unsigned char> bytes;
-};
 
 class MidiSystem {
 public:
@@ -26,17 +24,16 @@ public:
 
 private:
     struct PortCallbackData {
-        MidiSystem  *system;
+        MidiSystem *system;
         unsigned int port_index;
-        std::string  port_name;
+        std::string port_name;
     };
 
-    static void Callback(double timestamp,
-                         std::vector<unsigned char> *message,
+    static void Callback(double timestamp, std::vector<unsigned char> *message,
                          void *userdata);
 
     ExeRack &rack_;
-    std::vector<std::unique_ptr<RtMidiIn>>         inputs_;
+    std::vector<std::unique_ptr<RtMidiIn>> inputs_;
     std::vector<std::unique_ptr<PortCallbackData>> callback_data_;
 };
 

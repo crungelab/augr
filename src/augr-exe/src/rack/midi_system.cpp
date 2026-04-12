@@ -1,7 +1,10 @@
+#include <spdlog/spdlog.h>
+
+#include <augr/core/midi/midi_message_logger.h>
+
 #include <augr/exe/rack/exe_rack.h>
 #include <augr/exe/rack/midi_configurator.h>
 #include <augr/exe/rack/midi_system.h>
-#include <spdlog/spdlog.h>
 
 namespace augr {
 
@@ -9,12 +12,19 @@ MidiSystem::MidiSystem(ExeRack &rack) : rack_(rack) {}
 
 MidiSystem::~MidiSystem() { Stop(); }
 
-void MidiSystem::Callback(double timestamp, std::vector<unsigned char> *message,
-                          void *userdata) {
-    if (!message || message->empty())
-        return;
-    auto *data = static_cast<PortCallbackData *>(userdata);
-    data->system->rack_.EnqueueMidiMessage(timestamp, *message);
+void MidiSystem::Callback(double timestamp,
+                          std::vector<unsigned char>* raw,
+                          void* userdata) {
+  if (!raw || raw->empty()) return;
+
+  MidiMessage message = MidiMessage::FromBytes(
+      raw->data(),
+      static_cast<uint8_t>(raw->size()),
+      timestamp);
+
+  auto* data = static_cast<PortCallbackData*>(userdata);
+  LogMidiMessage(message, data->port_name);
+  data->system->rack_.EnqueueMidiMessage(std::move(message));
 }
 
 bool MidiSystem::Create() {
