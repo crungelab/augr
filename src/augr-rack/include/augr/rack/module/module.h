@@ -2,41 +2,26 @@
 
 #include <vector>
 
-#include <augr/rack/node.h>
 #include <augr/rack/audio_pin.h>
+#include <augr/rack/midi_pin.h>
+#include <augr/rack/node.h>
 
 namespace augr {
 
-class Module : public Node
-{
+class Module : public Node {
 public:
-  //
-  virtual bool Create(Part &owner) override;
-  virtual Audio ProcessAudio(Audio input = Audio()) { return Audio(); }
-  virtual void Process() {}
-  // Data members
-  const char *label_ = nullptr;
-  AudioInput *audio_in_ = nullptr;
-  AudioOutput *audio_out_ = nullptr;
-
-  REFLECT_ENABLE(Node)
-};
-
-// Factory
-
-/*
-template <typename T>
-class ModuleFactoryT : public ModelFactoryT<T> {
-public:
-    ModuleFactoryT(std::string name, std::string category) : name_(name), category_(category) {}
+    //
+    virtual bool Create(Part &owner) override;
+    virtual Audio ProcessAudio(Audio input = Audio()) { return Audio(); }
+    virtual void Process() {}
     // Data members
-    std::string name_;
-    std::string category_;
-};
+    const char *label_ = nullptr;
+    AudioInput *audio_in_ = nullptr;
+    AudioOutput *audio_out_ = nullptr;
+    MidiInput *midi_in_ = nullptr;
+    MidiOutput *midi_out_ = nullptr;
 
-#define DEFINE_MODULE_FACTORY(T, NAME, CATEGORY)                                                    \
-    ModuleFactoryT<T> T##Factory(NAME, CATEGORY);                                           \
-    ModelFactory *Get##T##Factory() { return &T##Factory; }
-*/
+    REFLECT_ENABLE(Node)
+};
 
 } // namespace augr

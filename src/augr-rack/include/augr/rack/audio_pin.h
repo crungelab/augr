@@ -29,23 +29,23 @@ public:
     }
 };
 
-class AudioInput : public InputT<Audio, AudioPin> {
+class AudioInput : public PolyInputT<Audio, AudioPin> {
 public:
     AudioInput(Node &node, std::string name,
                ChannelLayout layout = ChannelLayout::kMono)
-        : InputT<Audio, AudioPin>(node, name, layout) {}
+        : PolyInputT<Audio, AudioPin>(node, name, layout) {}
 
     void Disconnect(Connection &connection) override {
-        InputT<Audio, AudioPin>::Disconnect(connection);
+        PolyInputT<Audio, AudioPin>::Disconnect(connection);
         Write(Audio());
     }
 
     void Write(Audio audio) override {
         if (audio.layout_ != layout_) {
-            InputT<Audio, AudioPin>::Write(audio.Convert(layout_));
+            PolyInputT<Audio, AudioPin>::Write(audio.Convert(layout_));
             return;
         }
-        InputT<Audio, AudioPin>::Write(audio);
+        PolyInputT<Audio, AudioPin>::Write(audio);
     }
 };
 

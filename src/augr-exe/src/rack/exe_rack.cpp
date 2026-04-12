@@ -1,5 +1,6 @@
 #include <augr/core/audio.h>
 #include <augr/rack/module/audio_device.h>
+#include <augr/rack/module/midi_device.h>
 #include <augr/exe/rack/exe_rack.h>
 #include <spdlog/spdlog.h>
 
@@ -42,7 +43,8 @@ void ExeRack::EnqueueMidiMessage(MidiMessage message) {
     EnqueueAction([this, message = std::move(message)]() {
         // TODO: route to MidiInputDevice's MidiOutput pin
         // e.g. midi_input_device_->midi_out_->Write(message);
-        (void)message;
+        //(void)message;
+        midi_input_device_->midi_out_->Write(message);
     });
 }
 
@@ -61,6 +63,20 @@ bool ExeRack::CreateAudioOutputDevice() {
     AudioOutputDevice &m = ModelFactoryT<AudioOutputDevice>::Make(*this);
     AddChild(m);
     audio_output_device_ = &m;
+    return true;
+}
+
+bool ExeRack::CreateMidiInputDevice() {
+    MidiInputDevice &m = ModelFactoryT<MidiInputDevice>::Make(*this);
+    AddChild(m);
+    midi_input_device_ = &m;
+    return true;
+}
+
+bool ExeRack::CreateMidiOutputDevice() {
+    MidiOutputDevice &m = ModelFactoryT<MidiOutputDevice>::Make(*this);
+    AddChild(m);
+    midi_output_device_ = &m;
     return true;
 }
 
@@ -86,6 +102,9 @@ bool ExeRack::Create() {
 
     // MIDI is best-effort; don't fail the rack if no ports exist
     midi_system_.Create();
+
+    CreateMidiInputDevice();
+    //CreateMidiOutputDevice();
 
     return true;
 }

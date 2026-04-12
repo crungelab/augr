@@ -20,8 +20,7 @@ class Pin;
 // Base connection — holds pin-level pointers
 class Connection {
 public:
-    Connection(Pin &output, Pin &input)
-        : output_(&output), input_(&input) {}
+    Connection(Pin &output, Pin &input) : output_(&output), input_(&input) {}
     virtual ~Connection() = default;
 
     Pin *output_;
@@ -61,9 +60,8 @@ public:
     std::vector<Wire *> wires_;
 };
 
-// Typed pin base — holds the primary slot
-template <typename T, typename TBase = Pin>
-class PinT : public TBase {
+// Typed pin base — holds the primary value
+template <typename T, typename TBase = Pin> class PinT : public TBase {
 public:
     template <typename... Args>
     PinT(Node &node, std::string name, Args &&...args)
@@ -76,15 +74,16 @@ public:
 };
 
 // Forward declarations
-template <typename T, typename TBase = Pin> class InputT;
+template <typename T, typename TBase = Pin> class MonoInputT;
+template <typename T, typename TBase = Pin> class PolyInputT;
 template <typename T, typename TBase = Pin> class OutputT;
 
 // Output pin — publishes to all subscribers
-template <typename T, typename TBase>
-class OutputT : public PinT<T, TBase> {
+template <typename T, typename TBase> class OutputT : public PinT<T, TBase> {
     using TCallback = std::function<void(T)>;
     using TConnection = ConnectionT<T>;
-    using TInput = InputT<T, TBase>;
+    using TMonoInput = MonoInputT<T, TBase>;
+    using TPolyInput = PolyInputT<T, TBase>;
 
 public:
     template <typename... Args>
@@ -129,15 +128,58 @@ public:
     std::list<TConnection *> connections_;
 };
 
-// Input pin — uses per-connection slots, mixes on Read
-template <typename T, typename TBase>
-class InputT : public PinT<T, TBase> {
+// MonoInputT — single-connection input; rejects additional connections
+template <typename T, typename TBase> class MonoInputT : public PinT<T, TBase> {
     using TConnection = ConnectionT<T>;
     using TOutput = OutputT<T, TBase>;
 
 public:
     template <typename... Args>
-    InputT(Node &node, std::string name, Args &&...args)
+    MonoInputT(Node &node, std::string name, Args &&...args)
+        : PinT<T, TBase>(node, name, std::forward<Args>(args)...) {}
+
+    Connection *Connect(Pin &_output) override {
+        // Reject if already connected
+        if (connection_)
+            return nullptr;
+
+        TOutput *output = dynamic_cast<TOutput *>(&_output);
+        if (!output)
+            return nullptr;
+
+        connection_ = output->Subscribe(
+            *this, nullptr, [this](T value) { this->value_ = value; });
+
+        return connection_;
+    }
+
+    void Disconnect(Connection &connection) override {
+        if (&connection != connection_)
+            return;
+
+        connection.output_->Disconnect(connection);
+        // connection_ was deleted by OutputT::Unsubscribe
+        connection_ = nullptr;
+
+        this->value_ = T{};
+    }
+
+    // Read() inherited from PinT — value_ is written directly by the callback
+
+    bool connected() const { return connection_ != nullptr; }
+
+private:
+    TConnection *connection_ = nullptr;
+};
+
+// PolyInputT — multi-connection input; mixes all sources via Reduce()
+template <typename T, typename TBase> class PolyInputT : public PinT<T, TBase> {
+    using TConnection = ConnectionT<T>;
+    using TOutput = OutputT<T, TBase>;
+
+public:
+    template <typename... Args>
+    PolyInputT(Node &node, std::string name, Args &&...args)
         : PinT<T, TBase>(node, name, std::forward<Args>(args)...) {}
 
     Connection *Connect(Pin &_output) override {
@@ -145,7 +187,6 @@ public:
         if (!output)
             return nullptr;
 
-        // Allocate a dedicated slot for this connection
         auto *slot = new SlotT<T>();
         slots_.push_back(slot);
 
@@ -158,17 +199,14 @@ public:
     void Disconnect(Connection &connection) override {
         auto *typed = dynamic_cast<TConnection *>(&connection);
         if (typed) {
-            // Remove and delete the slot owned by this connection
             auto it = std::find(slots_.begin(), slots_.end(), typed->slot_);
             if (it != slots_.end()) {
                 delete *it;
                 slots_.erase(it);
             }
         }
-        // Delegate unsubscribe to the output
         connection.output_->Disconnect(connection);
 
-        // If no connections remain, clear cached value and dirty flag
         if (slots_.empty()) {
             this->value_ = T{};
             dirty_ = false;
@@ -190,12 +228,16 @@ public:
         return this->value_;
     }
 
-    ~InputT() {
+    size_t connection_count() const { return slots_.size(); }
+
+    ~PolyInputT() {
         for (auto *slot : slots_)
             delete slot;
     }
 
     std::vector<SlotT<T> *> slots_;
+
+private:
     bool dirty_ = false;
 };
 

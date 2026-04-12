@@ -11,6 +11,8 @@ namespace augr {
 
 class AudioInputDevice;
 class AudioOutputDevice;
+class MidiInputDevice;
+class MidiOutputDevice;
 
 class ExeRack : public Rack {
 public:
@@ -31,11 +33,17 @@ private:
     bool CreateAudioInputDevice();
     bool CreateAudioOutputDevice();
 
+    bool CreateMidiInputDevice();
+    bool CreateMidiOutputDevice();
+
     AudioSystem audio_system_{*this};
     MidiSystem midi_system_{*this};
 
     AudioInputDevice *audio_input_device_ = nullptr;
     AudioOutputDevice *audio_output_device_ = nullptr;
+
+    MidiInputDevice *midi_input_device_ = nullptr;
+    MidiOutputDevice *midi_output_device_ = nullptr;
 
     unsigned int devNumInChans_ = 0;
     unsigned int devNumOutChans_ = 0;
