@@ -1,6 +1,8 @@
+#pragma once
 #include <augr/core/rack/rack.h>
-
-class RtAudio;
+#include <augr/exe/rack/audio_configurator.h>
+#include <augr/exe/rack/audio_system.h>
+#include <augr/exe/rack/midi_system.h>
 
 namespace augr {
 
@@ -9,28 +11,32 @@ class AudioOutputDevice;
 
 class ExeRack : public Rack {
 public:
-  virtual bool Create() override;
-  bool CreateAudioInputDevice();
-  bool CreateAudioOutputDevice();
-  int ProcessAudio(double streamTime, void* inbuf, void* outbuf, unsigned long frames);
-  //
-  bool Start();
-  void Stop();
-  //Accessors
-  int NumInputs() { return devNumInChans_; }
-  int NumOutputs() { return devNumOutChans_; }
-  RtAudio& audio_dac() { return *audio_dac_; }
-  //Data members
-  RtAudio* audio_dac_;
-  AudioInputDevice* audio_input_device_ = nullptr;
-  AudioOutputDevice* audio_output_device_ = nullptr;
-  //----------------------------------------------------------------------------
-  // 	number of physical input and output channels of the PA device
-  //----------------------------------------------------------------------------
-  int	devNumInChans_;
-  int	devNumOutChans_;
+    REFLECT_ENABLE(Rack)
+    bool Create() override;
+    bool Start();
+    void Stop();
 
-  REFLECT_ENABLE(Rack)
+    // Called by AudioSystem::Callback on the audio thread
+    int ProcessAudio(double streamTime, void *inbuf, void *outbuf,
+                     unsigned long frames);
+
+    // Called by MidiSystem::Callback on the MIDI thread;
+    // enqueues into the action queue for processing on the audio thread
+    void EnqueueMidiMessage(double timestamp,
+                            const std::vector<unsigned char> &bytes);
+
+private:
+    bool CreateAudioInputDevice();
+    bool CreateAudioOutputDevice();
+
+    AudioSystem audio_system_{*this};
+    MidiSystem midi_system_{*this};
+
+    AudioInputDevice *audio_input_device_ = nullptr;
+    AudioOutputDevice *audio_output_device_ = nullptr;
+
+    unsigned int devNumInChans_ = 0;
+    unsigned int devNumOutChans_ = 0;
 };
 
 } // namespace augr

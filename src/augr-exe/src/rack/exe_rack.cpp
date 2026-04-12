@@ -1,53 +1,56 @@
-#include <RtAudio.h>
-
+#include <augr/exe/rack/exe_rack.h>
 #include <augr/core/audio.h>
 #include <augr/core/rack/module/audio_device.h>
+#include <spdlog/spdlog.h>
 
-#include <augr/exe/rack/audio_configurator.h>
-#include <augr/exe/rack/exe_rack.h>
+#define SCALE 1.0
 
 namespace augr {
 
-// #define FORMAT RTAUDIO_FLOAT64
-#define FORMAT RTAUDIO_FLOAT32
-#define SCALE 1.0
-
-static int AudioCallback(void *outputBuffer, void *inputBuffer,
-                         unsigned int nBufferFrames, double streamTime,
-                         RtAudioStreamStatus status, void *rack) {
-    return static_cast<ExeRack *>(rack)->ProcessAudio(
-        streamTime, inputBuffer, outputBuffer, nBufferFrames);
-}
+// ---------------------------------------------------------------------------
+// Audio thread entry point
+// ---------------------------------------------------------------------------
 
 int ExeRack::ProcessAudio(double streamTime, void *inbuf, void *outbuf,
-                              unsigned long frames) {
-
+                          unsigned long frames) {
     if (graph_dirty_)
-        RebuildExecutionOrder(); // only on topology change
+        RebuildExecutionOrder();
 
     ProcessActions();
 
-    // const Audio input(static_cast<fy_real *>(inbuf), devNumInChans_);
-    // audio_input_device_->audio_out_->Write(input);
-
-    for (const auto &m : sorted_modules_) {
+    for (const auto &m : sorted_modules_)
         m->Process();
-    }
 
     Audio output = audio_output_device_->audio_in_->Read();
 
     if (output.layout_ != ChannelLayout::kNull) {
         output.WritePlanar(static_cast<fy_buffer_t>(outbuf), SCALE);
     } else {
-        // If no output, write silence
-        std::fill_n(static_cast<fy_real *>(outbuf), frames * devNumOutChans_,
-                    0.0f);
+        std::fill_n(static_cast<fy_real *>(outbuf),
+                    frames * devNumOutChans_, 0.0f);
     }
 
     ProcessUpdateActions();
-
     return 0;
 }
+
+// ---------------------------------------------------------------------------
+// MIDI thread entry point — just enqueue; processed on the audio thread
+// ---------------------------------------------------------------------------
+
+void ExeRack::EnqueueMidiMessage(double timestamp,
+                                 const std::vector<unsigned char> &bytes) {
+    EnqueueAction([this, timestamp, bytes]() {
+        // TODO: route to a MidiInputDevice module, same pattern as audio
+        // e.g. midi_input_device_->HandleMessage(timestamp, bytes);
+        (void)timestamp;
+        (void)bytes;
+    });
+}
+
+// ---------------------------------------------------------------------------
+// Device module helpers
+// ---------------------------------------------------------------------------
 
 bool ExeRack::CreateAudioInputDevice() {
     AudioInputDevice &m = ModelFactoryT<AudioInputDevice>::Make(*this);
@@ -63,78 +66,39 @@ bool ExeRack::CreateAudioOutputDevice() {
     return true;
 }
 
+// ---------------------------------------------------------------------------
+// Lifecycle
+// ---------------------------------------------------------------------------
+
 bool ExeRack::Create() {
-    // audio_dac_ = new RtAudio();
-    audio_dac_ =
-        new RtAudio(RtAudio::Api::UNSPECIFIED,
-                    [](RtAudioErrorType type, const std::string &errorText) {
-                        spdlog::error("RtAudio error type={} message={}",
-                                      static_cast<int>(type), errorText);
-                    });
-
-    if (audio_dac().getDeviceCount() < 1) {
-        std::cout << "No audio devices found!\n";
-        return false;
-    }
-
     AudioConfig config;
-    config.enableInput = false; // set true for duplex
-    config.sampleRate = 48000;  // preferred target
-    config.frames = 512;        // requested buffer size
+    config.enableInput = false;
+    config.sampleRate  = 48000;
+    config.frames      = 512;
 
-    AudioConfigurator configurator(audio_dac());
-    if (!configurator.configure(config)) {
-        std::cout << "Failed to configure audio devices\n";
+    if (!audio_system_.Create(config))
         return false;
-    }
 
-    if (config.enableInput) {
+    devNumInChans_  = audio_system_.num_in_chans();
+    devNumOutChans_ = audio_system_.num_out_chans();
+
+    if (config.enableInput)
         CreateAudioInputDevice();
-    }
     CreateAudioOutputDevice();
 
-    RtAudio::StreamParameters oParams{};
-    oParams.deviceId = config.outputDeviceId;
-    oParams.nChannels = config.outputChannels;
-    oParams.firstChannel = 0;
+    // MIDI is best-effort; don't fail the rack if no ports exist
+    midi_system_.Create();
 
-    RtAudio::StreamParameters iParams{};
-    if (config.enableInput) {
-        iParams.deviceId = config.inputDeviceId;
-        iParams.nChannels = config.inputChannels;
-        iParams.firstChannel = 0;
-    }
-
-    devNumInChans_ = config.enableInput ? config.inputChannels : 0;
-    devNumOutChans_ = config.outputChannels;
-
-    RtAudio::StreamOptions options{};
-    if (config.nonInterleaved) {
-        options.flags |= RTAUDIO_NONINTERLEAVED;
-    }
-
-    unsigned int frames = config.frames;
-
-    RtAudioErrorType e = audio_dac().openStream(
-        &oParams, config.enableInput ? &iParams : nullptr, FORMAT,
-        config.sampleRate, &frames, AudioCallback, this, &options);
-
-    if (e != RTAUDIO_NO_ERROR) {
-        spdlog::error("RtAudio openStream failed");
-        return false;
-    }
-
-    Audio::frames_ = frames;
-    Audio::sampleRate_ = config.sampleRate;
-
-    return e == RtAudioErrorType::RTAUDIO_NO_ERROR;
+    return true;
 }
 
 bool ExeRack::Start() {
-    RtAudioErrorType e = audio_dac().startStream();
-    return e == RtAudioErrorType::RTAUDIO_NO_ERROR;
+    return audio_system_.Start();
 }
 
-void ExeRack::Stop() { RtAudioErrorType e = audio_dac().stopStream(); }
+void ExeRack::Stop() {
+    audio_system_.Stop();
+    midi_system_.Stop();
+}
 
 } // namespace augr

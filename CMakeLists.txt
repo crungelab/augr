@@ -25,6 +25,11 @@ set(RTAUDIO_BUILD_TESTING OFF CACHE BOOL "" FORCE)
 add_subdirectory(${RTAUDIO_ROOT})
 #RTAUDIO END
 
+#RTMIDI BEGIN
+set(RTMIDI_API_ALSA ON CACHE BOOL "Compile RtMidi with ALSA support" FORCE)
+add_subdirectory(${RTMIDI_ROOT})
+#RTMIDI END
+
 #XTL BEGIN
 add_subdirectory(${XTL_ROOT})
 #XTL END

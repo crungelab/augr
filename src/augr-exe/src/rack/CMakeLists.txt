@@ -4,6 +4,8 @@ include(${AUGR_CMAKE}/AugrExe.cmake)
 
 set(RACK_SRC 
   exe_rack.cpp
+  audio_system.cpp
+  midi_system.cpp
 )
 
 target_sources(${THIS}

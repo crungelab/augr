@@ -18,6 +18,7 @@ set(SPDLOG_ROOT ${AUGR_DEPOT}/spdlog)
 
 set(RTTR_ROOT ${AUGR_DEPOT}/rttr)
 set(RTAUDIO_ROOT ${AUGR_DEPOT}/rtaudio)
+set(RTMIDI_ROOT ${AUGR_DEPOT}/rtmidi)
 set(XTENSOR_ROOT ${AUGR_DEPOT}/xtensor)
 set(XTL_ROOT ${AUGR_DEPOT}/xtl)
 set(IMGUI_ROOT ${AUGR_DEPOT}/imgui)
