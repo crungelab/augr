@@ -3,8 +3,8 @@
 #include <augr/core/audio.h>
 #include <augr/core/rack/module/audio_device.h>
 
-#include <augr/rtaudio/rack/audio_configurator.h>
-#include <augr/rtaudio/rack/rtaudio_rack.h>
+#include <augr/exe/rack/audio_configurator.h>
+#include <augr/exe/rack/exe_rack.h>
 
 namespace augr {
 
@@ -15,11 +15,11 @@ namespace augr {
 static int AudioCallback(void *outputBuffer, void *inputBuffer,
                          unsigned int nBufferFrames, double streamTime,
                          RtAudioStreamStatus status, void *rack) {
-    return static_cast<RtAudioRack *>(rack)->ProcessAudio(
+    return static_cast<ExeRack *>(rack)->ProcessAudio(
         streamTime, inputBuffer, outputBuffer, nBufferFrames);
 }
 
-int RtAudioRack::ProcessAudio(double streamTime, void *inbuf, void *outbuf,
+int ExeRack::ProcessAudio(double streamTime, void *inbuf, void *outbuf,
                               unsigned long frames) {
 
     if (graph_dirty_)
@@ -49,21 +49,21 @@ int RtAudioRack::ProcessAudio(double streamTime, void *inbuf, void *outbuf,
     return 0;
 }
 
-bool RtAudioRack::CreateAudioInputDevice() {
+bool ExeRack::CreateAudioInputDevice() {
     AudioInputDevice &m = ModelFactoryT<AudioInputDevice>::Make(*this);
     AddChild(m);
     audio_input_device_ = &m;
     return true;
 }
 
-bool RtAudioRack::CreateAudioOutputDevice() {
+bool ExeRack::CreateAudioOutputDevice() {
     AudioOutputDevice &m = ModelFactoryT<AudioOutputDevice>::Make(*this);
     AddChild(m);
     audio_output_device_ = &m;
     return true;
 }
 
-bool RtAudioRack::Create() {
+bool ExeRack::Create() {
     // audio_dac_ = new RtAudio();
     audio_dac_ =
         new RtAudio(RtAudio::Api::UNSPECIFIED,
@@ -130,11 +130,11 @@ bool RtAudioRack::Create() {
     return e == RtAudioErrorType::RTAUDIO_NO_ERROR;
 }
 
-bool RtAudioRack::Start() {
+bool ExeRack::Start() {
     RtAudioErrorType e = audio_dac().startStream();
     return e == RtAudioErrorType::RTAUDIO_NO_ERROR;
 }
 
-void RtAudioRack::Stop() { RtAudioErrorType e = audio_dac().stopStream(); }
+void ExeRack::Stop() { RtAudioErrorType e = audio_dac().stopStream(); }
 
 } // namespace augr

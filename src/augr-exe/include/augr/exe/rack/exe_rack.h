@@ -7,7 +7,7 @@ namespace augr {
 class AudioInputDevice;
 class AudioOutputDevice;
 
-class RtAudioRack : public Rack {
+class ExeRack : public Rack {
 public:
   virtual bool Create() override;
   bool CreateAudioInputDevice();

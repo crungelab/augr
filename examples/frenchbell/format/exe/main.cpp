@@ -1,4 +1,4 @@
-#include <augr/rtaudio/rack/rtaudio_rack.h>
+#include <augr/exe/rack/exe_rack.h>
 #include <augr/faust/faust_dsp.h>
 #include <augr/faust/faust_dsp_ui.h>
 #include <augr/core/rack/module/module.h>
@@ -31,13 +31,13 @@ public:
         App::Draw();
     }
     // Data members
-    RtAudioRack rack_;
+    ExeRack rack_;
     RackView *view_;
 };
 
 int main(int, char **) {
     MyApp &app = *new MyApp();
-    RtAudioRack &rack = app.rack_;
+    ExeRack &rack = app.rack_;
     rack.Create();
     rack.Start();
     app.Run();
