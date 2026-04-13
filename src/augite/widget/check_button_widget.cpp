@@ -8,11 +8,13 @@ namespace augr {
 class CheckButtonWidget : public WidgetT<CheckButton> {
 public:
     CheckButtonWidget(CheckButton &model) : WidgetT<CheckButton>(model) {}
+
     void Draw() override {
-        bool value = model_->value() != 0.0f;
-        bool changed = ImGui::Checkbox(model_->label_.c_str(), &value);
-        if (changed)
-            model_->set_value(value ? 1.0f : 0.0f);
+        Parameter *param = model_->param();
+        bool checked = param->GetValue() != fy_real{0};
+
+        if (ImGui::Checkbox(param->label().c_str(), &checked))
+            param->SetValue(checked ? param->max() : param->min());
     }
 };
 DEFINE_WIDGET_FACTORY(CheckButtonWidget, CheckButton)

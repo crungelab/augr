@@ -5,10 +5,9 @@ namespace augr {
 
 class Knob : public RangeBase {
 public:
-  Knob(std::string label, BindingPtr zone, fy_real init, fy_real min, fy_real max, fy_real step) :
-    RangeBase(label, zone, init, min, max, step) {}
+    Knob(std::string label, Parameter *param) : RangeBase(label, param) {}
 
-  REFLECT_ENABLE(RangeBase)
+    REFLECT_ENABLE(RangeBase)
 };
 
 } // namespace augr

@@ -5,8 +5,8 @@ namespace augr {
 
 class NumEntry : public RangeBase {
 public:
-    NumEntry(std::string label, BindingPtr zone, fy_real init, fy_real min, fy_real max, fy_real step) :
-      RangeBase(label, zone, init, min, max, step) {}
+    NumEntry(std::string label, Parameter *param) :
+      RangeBase(label, param) {}
 
   REFLECT_ENABLE(RangeBase)
 };

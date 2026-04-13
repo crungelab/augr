@@ -5,8 +5,8 @@ namespace augr {
 
 class HSlider : public SliderBase {
 public:
-  HSlider(std::string label, BindingPtr zone, fy_real init, fy_real min, fy_real max, fy_real step) :
-    SliderBase(label, zone, init, min, max, step) {}
+  HSlider(std::string label, Parameter *param) :
+    SliderBase(label, param) {}
 
   REFLECT_ENABLE(SliderBase)
 };

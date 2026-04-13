@@ -5,7 +5,7 @@ namespace augr {
 
 class ToggleButton : public ButtonBase {
 public:
-  ToggleButton(std::string label, BindingPtr zone) : ButtonBase(label, zone) {}
+  ToggleButton(std::string label, Parameter *param) : ButtonBase(label, param) {}
 
   REFLECT_ENABLE(ButtonBase)
 };

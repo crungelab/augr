@@ -5,7 +5,7 @@ namespace augr {
 
 class VBarGraph : public BarGraphBase {
 public:
-  VBarGraph(std::string label, BindingPtr zone, fy_real min, fy_real max) : BarGraphBase(label, zone, min, max) {}
+  VBarGraph(std::string label, Parameter *param, fy_real min, fy_real max) : BarGraphBase(label, param, min, max) {}
 
   REFLECT_ENABLE(BarGraphBase)
 };

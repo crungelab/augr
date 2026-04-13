@@ -3,11 +3,11 @@
 
 namespace augr {
 
-class ButtonBase : public FloatControl {
+class ButtonBase : public ParameterControl {
 public:
-  ButtonBase(std::string label, BindingPtr zone) : FloatControl(label, zone) {}
+  ButtonBase(std::string label, Parameter* param) : ParameterControl(label, param) {}
 
-  REFLECT_ENABLE(Control)
+  REFLECT_ENABLE(ParameterControl)
 };
 
 } // namespace augr

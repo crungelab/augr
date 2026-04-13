@@ -5,10 +5,10 @@ namespace augr {
 
 class VSlider : public SliderBase {
 public:
-  VSlider(std::string label, BindingPtr zone, fy_real init, fy_real min, fy_real max, fy_real step) :
-    SliderBase(label, zone, init, min, max, step) {}
+    VSlider(std::string label, Parameter *param)
+        : SliderBase(label, param) {}
 
-  REFLECT_ENABLE(SliderBase)
+    REFLECT_ENABLE(SliderBase)
 };
 
 } // namespace augr

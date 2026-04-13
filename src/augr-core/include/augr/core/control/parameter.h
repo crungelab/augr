@@ -33,8 +33,8 @@
 #include <string>
 #include <vector>
 
-#include "binding.h"       // Binding, BindingT, ZoneBinding, etc.
-#include "parameter_meta.h"  // ParameterMeta, ParameterUnit
+#include <augr/core/binding.h>
+#include <augr/core/control/parameter_meta.h>
 
 namespace augr {
 
@@ -43,111 +43,103 @@ namespace augr {
 // ---------------------------------------------------------------------------
 
 class Parameter {
- public:
-  using BindingPtr = std::unique_ptr<BindingT<fy_real>>;
+public:
+    using BindingPtr = std::unique_ptr<BindingT<fy_real>>;
 
-  Parameter(std::string label, ParameterMeta meta,
-            BindingPtr binding,
-            fy_real init, fy_real min, fy_real max, fy_real step)
-      : label_(std::move(label)),
-        meta_(std::move(meta)),
-        binding_(std::move(binding)),
-        init_(init),
-        min_(min),
-        max_(max),
-        step_(step),
-        unit_(meta_.Unit()) {}
+    Parameter(std::string label, ParameterMeta meta, BindingPtr binding,
+              fy_real init, fy_real min, fy_real max, fy_real step)
+        : label_(std::move(label)), meta_(std::move(meta)),
+          binding_(std::move(binding)), init_(init), min_(min), max_(max),
+          step_(step), unit_(meta_.Unit()) {}
 
-  virtual ~Parameter() = default;
+    virtual ~Parameter() = default;
 
-  // Non-copyable, non-movable — held by pointer throughout lifetime
-  Parameter(const Parameter&) = delete;
-  Parameter& operator=(const Parameter&) = delete;
+    // Non-copyable, non-movable — held by pointer throughout lifetime
+    Parameter(const Parameter &) = delete;
+    Parameter &operator=(const Parameter &) = delete;
 
-  // -- Core interface (subclasses implement these) --------------------------
+    // -- Core interface (subclasses implement these) --------------------------
 
-  // Current value → normalized [0..1] for ImGui
-  virtual fy_real GetNormalized() const = 0;
+    // Current value → normalized [0..1] for ImGui
+    virtual fy_real GetNormalized() const = 0;
 
-  // Normalized [0..1] from ImGui → snap/clamp → write to binding
-  virtual void SetNormalized(fy_real pos) = 0;
+    // Normalized [0..1] from ImGui → snap/clamp → write to binding
+    virtual void SetNormalized(fy_real pos) = 0;
 
-  // Human-readable string with units, e.g. "-6.0 dB", "440.0 Hz"
-  virtual std::string Format() const = 0;
+    // Human-readable string with units, e.g. "-6.0 dB", "440.0 Hz"
+    virtual std::string Format() const = 0;
 
-  // -- Value access in internal space ---------------------------------------
+    // -- Value access in internal space ---------------------------------------
 
-  fy_real GetValue() const { return binding_->get(); }
+    fy_real GetValue() const { return binding_->get(); }
 
-  void SetValue(fy_real internal) {
-    binding_->set(SnapAndClamp(internal));
-    NotifyObservers();
-  }
+    void SetValue(fy_real internal) {
+        binding_->set(SnapAndClamp(internal));
+        NotifyObservers();
+    }
 
-  void ResetToInit() {
-    binding_->set(init_);
-    NotifyObservers();
-  }
+    void ResetToInit() {
+        binding_->set(init_);
+        NotifyObservers();
+    }
 
-  // -- Observers ------------------------------------------------------------
-  // Lightweight callback list — lets controls/displays react to
-  // programmatic changes (automation, OSC, preset recall, etc.)
+    // -- Observers ------------------------------------------------------------
+    // Lightweight callback list — lets controls/displays react to
+    // programmatic changes (automation, OSC, preset recall, etc.)
 
-  using Observer = std::function<void(fy_real value)>;
+    using Observer = std::function<void(fy_real value)>;
 
-  void AddObserver(Observer cb) {
-    observers_.push_back(std::move(cb));
-  }
+    void AddObserver(Observer cb) { observers_.push_back(std::move(cb)); }
 
-  // -- Accessors ------------------------------------------------------------
+    // -- Accessors ------------------------------------------------------------
 
-  const std::string& label()  const { return label_; }
-  const ParameterMeta& meta()   const { return meta_;  }
-  ParameterUnit        unit()   const { return unit_;  }
-  fy_real            init()   const { return init_;  }
-  fy_real            min()    const { return min_;   }
-  fy_real            max()    const { return max_;   }
-  fy_real            step()   const { return step_;  }
-  bool               IsKnob() const { return meta_.IsKnob(); }
+    const std::string &label() const { return label_; }
+    const ParameterMeta &meta() const { return meta_; }
+    ParameterUnit unit() const { return unit_; }
+    fy_real init() const { return init_; }
+    fy_real min() const { return min_; }
+    fy_real max() const { return max_; }
+    fy_real step() const { return step_; }
+    bool IsKnob() const { return meta_.IsKnob(); }
 
-  // Normalized positions of init/min/max — useful for tick marks
-  fy_real NormalizedInit() const { return GetNormalizedFor(init_); }
-  fy_real NormalizedMin()  const { return GetNormalizedFor(min_);  }
-  fy_real NormalizedMax()  const { return GetNormalizedFor(max_);  }
+    // Normalized positions of init/min/max — useful for tick marks
+    fy_real NormalizedInit() const { return GetNormalizedFor(init_); }
+    fy_real NormalizedMin() const { return GetNormalizedFor(min_); }
+    fy_real NormalizedMax() const { return GetNormalizedFor(max_); }
 
-  // -- Factory --------------------------------------------------------------
+    // -- Factory --------------------------------------------------------------
 
-  static std::unique_ptr<Parameter> Make(
-      std::string label, ParameterMeta meta,
-      BindingPtr binding,
-      fy_real init, fy_real min, fy_real max, fy_real step);
+    static std::unique_ptr<Parameter>
+    Make(std::string label, ParameterMeta meta, BindingPtr binding,
+         fy_real init, fy_real min, fy_real max, fy_real step);
 
- protected:
-  // Snap to step grid then clamp — always operates in internal space
-  fy_real SnapAndClamp(fy_real value) const {
-    if (step_ > fy_real{0})
-      value = min_ + std::round((value - min_) / step_) * step_;
-    return std::clamp(value, min_, max_);
-  }
+protected:
+    // Snap to step grid then clamp — always operates in internal space
+    fy_real SnapAndClamp(fy_real value) const {
+        if (step_ > fy_real{0})
+            value = min_ + std::round((value - min_) / step_) * step_;
+        return std::clamp(value, min_, max_);
+    }
 
-  void NotifyObservers() {
-    fy_real v = binding_->get();
-    for (auto& cb : observers_) cb(v);
-  }
+    void NotifyObservers() {
+        fy_real v = binding_->get();
+        for (auto &cb : observers_)
+            cb(v);
+    }
 
-  // Used by NormalizedInit/Min/Max without triggering SetNormalized
-  // side effects
-  virtual fy_real GetNormalizedFor(fy_real value) const = 0;
+    // Used by NormalizedInit/Min/Max without triggering SetNormalized
+    // side effects
+    virtual fy_real GetNormalizedFor(fy_real value) const = 0;
 
-  std::string label_;
-  ParameterMeta meta_;
-  BindingPtr  binding_;
-  fy_real     init_;
-  fy_real     min_;
-  fy_real     max_;
-  fy_real     step_;
-  ParameterUnit unit_;
-  std::vector<Observer> observers_;
+    std::string label_;
+    ParameterMeta meta_;
+    BindingPtr binding_;
+    fy_real init_;
+    fy_real min_;
+    fy_real max_;
+    fy_real step_;
+    ParameterUnit unit_;
+    std::vector<Observer> observers_;
 };
 
 // ---------------------------------------------------------------------------
@@ -155,37 +147,39 @@ class Parameter {
 // ---------------------------------------------------------------------------
 
 class LinearParameter : public Parameter {
- public:
-  LinearParameter(std::string label, ParameterMeta meta,
-                  BindingPtr binding,
-                  fy_real init, fy_real min, fy_real max, fy_real step,
-                  const char* suffix = "")
-      : Parameter(std::move(label), std::move(meta),
-                  std::move(binding), init, min, max, step),
-        suffix_(suffix) {}
+public:
+    LinearParameter(std::string label, ParameterMeta meta, BindingPtr binding,
+                    fy_real init, fy_real min, fy_real max, fy_real step,
+                    const char *suffix = "")
+        : Parameter(std::move(label), std::move(meta), std::move(binding), init,
+                    min, max, step),
+          suffix_(suffix) {}
 
-  fy_real GetNormalized() const override {
-    return GetNormalizedFor(binding_->get());
-  }
+    fy_real GetNormalized() const override {
+        return GetNormalizedFor(binding_->get());
+    }
 
-  void SetNormalized(fy_real pos) override {
-    binding_->set(SnapAndClamp(min_ + pos * (max_ - min_)));
-    NotifyObservers();
-  }
+    void SetNormalized(fy_real pos) override {
+        binding_->set(SnapAndClamp(min_ + pos * (max_ - min_)));
+        NotifyObservers();
+    }
 
-  std::string Format() const override {
-    int decimals = (step_ < fy_real{0.1}) ? 2 : (step_ < fy_real{1}) ? 1 : 0;
-    return std::format("{:.{}f}{}", binding_->get(), decimals, suffix_);
-  }
+    std::string Format() const override {
+        int decimals = (step_ < fy_real{0.1}) ? 2
+                       : (step_ < fy_real{1}) ? 1
+                                              : 0;
+        return std::format("{:.{}f}{}", binding_->get(), decimals, suffix_);
+    }
 
- protected:
-  fy_real GetNormalizedFor(fy_real value) const override {
-    if (max_ == min_) return fy_real{0};
-    return (value - min_) / (max_ - min_);
-  }
+protected:
+    fy_real GetNormalizedFor(fy_real value) const override {
+        if (max_ == min_)
+            return fy_real{0};
+        return (value - min_) / (max_ - min_);
+    }
 
- private:
-  const char* suffix_;  // e.g. " ms", "%", "" — set by Make()
+private:
+    const char *suffix_; // e.g. " ms", "%", "" — set by Make()
 };
 
 // ---------------------------------------------------------------------------
@@ -198,29 +192,31 @@ class LinearParameter : public Parameter {
 //   - Convention: min_ is the "silence" floor
 
 class DecibelParameter : public Parameter {
- public:
-  using Parameter::Parameter;
+public:
+    using Parameter::Parameter;
 
-  fy_real GetNormalized() const override {
-    return GetNormalizedFor(binding_->get());
-  }
+    fy_real GetNormalized() const override {
+        return GetNormalizedFor(binding_->get());
+    }
 
-  void SetNormalized(fy_real pos) override {
-    binding_->set(SnapAndClamp(min_ + pos * (max_ - min_)));
-    NotifyObservers();
-  }
+    void SetNormalized(fy_real pos) override {
+        binding_->set(SnapAndClamp(min_ + pos * (max_ - min_)));
+        NotifyObservers();
+    }
 
-  std::string Format() const override {
-    fy_real v = binding_->get();
-    if (v <= min_) return "-inf dB";
-    return std::format("{:+.1f} dB", v);
-  }
+    std::string Format() const override {
+        fy_real v = binding_->get();
+        if (v <= min_)
+            return "-inf dB";
+        return std::format("{:+.1f} dB", v);
+    }
 
- protected:
-  fy_real GetNormalizedFor(fy_real value) const override {
-    if (max_ == min_) return fy_real{0};
-    return (value - min_) / (max_ - min_);
-  }
+protected:
+    fy_real GetNormalizedFor(fy_real value) const override {
+        if (max_ == min_)
+            return fy_real{0};
+        return (value - min_) / (max_ - min_);
+    }
 };
 
 // ---------------------------------------------------------------------------
@@ -232,95 +228,95 @@ class DecibelParameter : public Parameter {
 // any other octave (e.g. 1000→2000 Hz).
 
 class FrequencyParameter : public Parameter {
- public:
-  FrequencyParameter(std::string label, ParameterMeta meta,
-                     BindingPtr binding,
-                     fy_real init, fy_real min, fy_real max, fy_real step)
-      : Parameter(std::move(label), std::move(meta),
-                  std::move(binding), init, min, max, step) {
-    assert(min > fy_real{0} && max > fy_real{0});
-    log_ratio_ = std::log(max / min);
-  }
+public:
+    FrequencyParameter(std::string label, ParameterMeta meta,
+                       BindingPtr binding, fy_real init, fy_real min,
+                       fy_real max, fy_real step)
+        : Parameter(std::move(label), std::move(meta), std::move(binding), init,
+                    min, max, step) {
+        assert(min > fy_real{0} && max > fy_real{0});
+        log_ratio_ = std::log(max / min);
+    }
 
-  fy_real GetNormalized() const override {
-    return GetNormalizedFor(binding_->get());
-  }
+    fy_real GetNormalized() const override {
+        return GetNormalizedFor(binding_->get());
+    }
 
-  void SetNormalized(fy_real pos) override {
-    binding_->set(SnapAndClamp(min_ * std::exp(pos * log_ratio_)));
-    NotifyObservers();
-  }
+    void SetNormalized(fy_real pos) override {
+        binding_->set(SnapAndClamp(min_ * std::exp(pos * log_ratio_)));
+        NotifyObservers();
+    }
 
-  std::string Format() const override {
-    fy_real v = binding_->get();
-    if (v >= fy_real{1000})
-      return std::format("{:.2f} kHz", v / fy_real{1000});
-    return std::format("{:.1f} Hz", v);
-  }
+    std::string Format() const override {
+        fy_real v = binding_->get();
+        if (v >= fy_real{1000})
+            return std::format("{:.2f} kHz", v / fy_real{1000});
+        return std::format("{:.1f} Hz", v);
+    }
 
- protected:
-  fy_real GetNormalizedFor(fy_real value) const override {
-    if (log_ratio_ == fy_real{0}) return fy_real{0};
-    return std::log(value / min_) / log_ratio_;
-  }
+protected:
+    fy_real GetNormalizedFor(fy_real value) const override {
+        if (log_ratio_ == fy_real{0})
+            return fy_real{0};
+        return std::log(value / min_) / log_ratio_;
+    }
 
- private:
-  fy_real log_ratio_;  // cached log(max/min)
+private:
+    fy_real log_ratio_; // cached log(max/min)
 };
 
 // ---------------------------------------------------------------------------
 // Parameter::Make  (factory — defined here after all subclasses)
 // ---------------------------------------------------------------------------
 
-inline std::unique_ptr<Parameter> Parameter::Make(
-    std::string label, ParameterMeta meta,
-    BindingPtr binding,
-    fy_real init, fy_real min, fy_real max, fy_real step) {
-  switch (meta.Unit()) {
+inline std::unique_ptr<Parameter>
+Parameter::Make(std::string label, ParameterMeta meta, BindingPtr binding,
+                fy_real init, fy_real min, fy_real max, fy_real step) {
+    switch (meta.Unit()) {
     case ParameterUnit::kDecibel:
-      return std::make_unique<DecibelParameter>(
-          std::move(label), std::move(meta),
-          std::move(binding), init, min, max, step);
+        return std::make_unique<DecibelParameter>(
+            std::move(label), std::move(meta), std::move(binding), init, min,
+            max, step);
 
     case ParameterUnit::kHertz:
-      if (min > fy_real{0}) {
-        return std::make_unique<FrequencyParameter>(
-            std::move(label), std::move(meta),
-            std::move(binding), init, min, max, step);
-      }
-      // min == 0: fall through to linear (guard against log(0))
-      [[fallthrough]];
+        if (min > fy_real{0}) {
+            return std::make_unique<FrequencyParameter>(
+                std::move(label), std::move(meta), std::move(binding), init,
+                min, max, step);
+        }
+        // min == 0: fall through to linear (guard against log(0))
+        [[fallthrough]];
 
     case ParameterUnit::kMilliseconds:
-      return std::make_unique<LinearParameter>(
-          std::move(label), std::move(meta),
-          std::move(binding), init, min, max, step, " ms");
+        return std::make_unique<LinearParameter>(
+            std::move(label), std::move(meta), std::move(binding), init, min,
+            max, step, " ms");
 
     case ParameterUnit::kSeconds:
-      return std::make_unique<LinearParameter>(
-          std::move(label), std::move(meta),
-          std::move(binding), init, min, max, step, " s");
+        return std::make_unique<LinearParameter>(
+            std::move(label), std::move(meta), std::move(binding), init, min,
+            max, step, " s");
 
     case ParameterUnit::kPercent:
-      return std::make_unique<LinearParameter>(
-          std::move(label), std::move(meta),
-          std::move(binding), init, min, max, step, "%");
+        return std::make_unique<LinearParameter>(
+            std::move(label), std::move(meta), std::move(binding), init, min,
+            max, step, "%");
 
     case ParameterUnit::kSemitones:
-      return std::make_unique<LinearParameter>(
-          std::move(label), std::move(meta),
-          std::move(binding), init, min, max, step, " st");
+        return std::make_unique<LinearParameter>(
+            std::move(label), std::move(meta), std::move(binding), init, min,
+            max, step, " st");
 
     case ParameterUnit::kBpm:
-      return std::make_unique<LinearParameter>(
-          std::move(label), std::move(meta),
-          std::move(binding), init, min, max, step, " bpm");
+        return std::make_unique<LinearParameter>(
+            std::move(label), std::move(meta), std::move(binding), init, min,
+            max, step, " bpm");
 
     default:
-      return std::make_unique<LinearParameter>(
-          std::move(label), std::move(meta),
-          std::move(binding), init, min, max, step);
-  }
+        return std::make_unique<LinearParameter>(
+            std::move(label), std::move(meta), std::move(binding), init, min,
+            max, step);
+    }
 }
 
 // ---------------------------------------------------------------------------
@@ -335,48 +331,48 @@ inline std::unique_ptr<Parameter> Parameter::Make(
 #include "imgui.h"
 
 class SliderControl : public Control {
- public:
-  explicit SliderControl(Parameter* param)
-      : Control(param->label()), param_(param) {}
+public:
+    explicit SliderControl(Parameter *param)
+        : Control(param->label()), param_(param) {}
 
-  void Draw() {
-    fy_real pos = param_->GetNormalized();
+    void Draw() {
+        fy_real pos = param_->GetNormalized();
 
-    ImGui::PushID(param_);
+        ImGui::PushID(param_);
 
-    if (ImGui::SliderFloat(param_->label().c_str(), &pos, 0.f, 1.f, ""))
-      param_->SetNormalized(pos);
+        if (ImGui::SliderFloat(param_->label().c_str(), &pos, 0.f, 1.f, ""))
+            param_->SetNormalized(pos);
 
-    ImGui::SameLine();
-    ImGui::TextUnformatted(param_->Format().c_str());
+        ImGui::SameLine();
+        ImGui::TextUnformatted(param_->Format().c_str());
 
-    // Right-click to reset to init value
-    if (ImGui::IsItemClicked(ImGuiMouseButton_Right))
-      param_->ResetToInit();
+        // Right-click to reset to init value
+        if (ImGui::IsItemClicked(ImGuiMouseButton_Right))
+            param_->ResetToInit();
 
-    ImGui::PopID();
-  }
+        ImGui::PopID();
+    }
 
- private:
-  Parameter* param_;  // non-owning — Parameter lives in FaustDsp or Rack
+private:
+    Parameter *param_; // non-owning — Parameter lives in FaustDsp or Rack
 };
 
 // HBarGraph is a read-only view
 class HBarGraph : public Control {
- public:
-  explicit HBarGraph(Parameter* param)
-      : Control(param->label()), param_(param) {}
+public:
+    explicit HBarGraph(Parameter *param)
+        : Control(param->label()), param_(param) {}
 
-  void Draw() {
-    fy_real pos = param_->GetNormalized();
-    ImGui::ProgressBar(pos, ImVec2(-1, 0), param_->Format().c_str());
-  }
+    void Draw() {
+        fy_real pos = param_->GetNormalized();
+        ImGui::ProgressBar(pos, ImVec2(-1, 0), param_->Format().c_str());
+    }
 
- private:
-  Parameter* param_;  // non-owning
+private:
+    Parameter *param_; // non-owning
 };
 
-#endif  // AUGR_EXAMPLE_WIDGET
+#endif // AUGR_EXAMPLE_WIDGET
 
 // ---------------------------------------------------------------------------
 // FaustDspUi integration sketch
@@ -399,4 +395,4 @@ class HBarGraph : public Control {
 //     AddModel(*control);                   // Rack owns the Control
 //   }
 
-}  // namespace augr
+} // namespace augr

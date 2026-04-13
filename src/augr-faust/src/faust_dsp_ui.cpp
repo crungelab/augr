@@ -21,8 +21,8 @@
 
 namespace augr {
 
-std::shared_ptr<BindingT<fy_real>> MakeZoneBinding(float *zone) {
-    return std::make_shared<ZoneBinding>(zone);
+std::unique_ptr<BindingT<fy_real>> MakeZoneBinding(float *zone) {
+    return std::make_unique<ZoneBinding>(zone);
 }
 
 FaustDspUi::FaustDspUi(FaustDsp &m) : UI(), m_(&m) { PushModel(m); }
@@ -44,50 +44,86 @@ void FaustDspUi::declare(float *zone, const char *key, const char *value) {
     zones_[zone].declare(key, value);
 }
 
-// Helper: look up the Zone for a pointer and check whether "unit" == "dB".
-static bool ZoneIsDb(const ZoneMetaMap &zones, float *zone) {
-    auto it = zones.find(zone);
-    if (it == zones.end())
-        return false;
-    const char *unit = it->second.get("unit");
-    return unit && (strcmp(unit, "dB") == 0 || strcmp(unit, "db") == 0);
+// ---------------------------------------------------------------------------
+// Helper: build a Parameter, register it with FaustDsp, return a
+// ParameterControl view.  The Parameter is owned by FaustDsp; the
+// ParameterControl is owned by the model tree.
+// ---------------------------------------------------------------------------
+
+Parameter* FaustDspUi::MakeParameter(const char *label, float *zone,
+                                               fy_real init, fy_real min,
+                                               fy_real max, fy_real step) {
+
+    auto meta = std::move(zones_[zone]);
+    auto binding = MakeZoneBinding(zone);
+    auto param = Parameter::Make(label, std::move(meta), std::move(binding),
+                                 init, min, max, step);
+    Parameter *raw = param.get();
+    m_->AddParameter(std::move(param)); // FaustDsp owns the Parameter
+    return raw;
 }
 
+// ---------------------------------------------------------------------------
+// Buttons / toggles — no range, map to [0, 1] boolean parameters
+// ---------------------------------------------------------------------------
+
 void FaustDspUi::addButton(const char *label, float *zone) {
-    AddModel(*new Button(label, MakeZoneBinding(zone)));
+    AddModel(*new Button(label, MakeParameter(label, zone, 0, 0, 1, 1)));
 }
 
 void FaustDspUi::addToggleButton(const char *label, float *zone) {
-    AddModel(*new ToggleButton(label, MakeZoneBinding(zone)));
+    AddModel(*new ToggleButton(label, MakeParameter(label, zone, 0, 0, 1, 1)));
 }
 
 void FaustDspUi::addCheckButton(const char *label, float *zone) {
-    AddModel(*new CheckButton(label, MakeZoneBinding(zone)));
+    AddModel(*new CheckButton(label, MakeParameter(label, zone, 0, 0, 1, 1)));
 }
+
+// ---------------------------------------------------------------------------
+// Sliders / knobs / num entry — full range
+// ---------------------------------------------------------------------------
 
 void FaustDspUi::addVerticalSlider(const char *label, float *zone, float init,
                                    float min, float max, float step) {
     if (zones_[zone].IsKnob())
         return addKnob(label, zone, init, min, max, step);
-    AddModel(*new VSlider(label, MakeZoneBinding(zone), init, min, max, step));
+    AddModel(*new VSlider(label, MakeParameter(label, zone, init, min, max, step)));
 }
 
 void FaustDspUi::addHorizontalSlider(const char *label, float *zone, float init,
                                      float min, float max, float step) {
     if (zones_[zone].IsKnob())
         return addKnob(label, zone, init, min, max, step);
-    AddModel(*new HSlider(label, MakeZoneBinding(zone), init, min, max, step));
+    AddModel(*new HSlider(label, MakeParameter(label, zone, init, min, max, step)));
 }
 
 void FaustDspUi::addKnob(const char *label, float *zone, float init, float min,
                          float max, float step) {
-    AddModel(*new Knob(label, MakeZoneBinding(zone), init, min, max, step));
+    AddModel(*new Knob(label, MakeParameter(label, zone, init, min, max, step)));
 }
 
 void FaustDspUi::addNumEntry(const char *label, float *zone, float init,
                              float min, float max, float step) {
-    AddModel(*new NumEntry(label, MakeZoneBinding(zone), init, min, max, step));
+    AddModel(*new NumEntry(label, MakeParameter(label, zone, init, min, max, step)));
 }
+
+// ---------------------------------------------------------------------------
+// Bargraphs — read-only, no step
+// ---------------------------------------------------------------------------
+
+void FaustDspUi::addHorizontalBargraph(const char *label, float *zone,
+                                       float min, float max) {
+    AddModel(*new HBarGraph(label, MakeParameter(label, zone, min, min, max, 0), min, max));
+}
+
+void FaustDspUi::addVerticalBargraph(const char *label, float *zone, float min,
+                                     float max) {
+    AddModel(*new VBarGraph(label, MakeParameter(label, zone, min, min, max, 0), min, max));
+}
+
+// ---------------------------------------------------------------------------
+// Displays — kept as-is until NumDisplay/TextDisplay are ported
+// ---------------------------------------------------------------------------
 
 void FaustDspUi::addNumDisplay(const char *label, float *zone, int precision) {
     AddModel(*new NumDisplay(label, MakeZoneBinding(zone), precision));
@@ -98,19 +134,9 @@ void FaustDspUi::addTextDisplay(const char *label, float *zone, char *names[],
     AddModel(*new TextDisplay(label, MakeZoneBinding(zone), names, min, max));
 }
 
-void FaustDspUi::addHorizontalBargraph(const char *label, float *zone,
-                                       float min, float max) {
-    auto *bg = new HBarGraph(label, MakeZoneBinding(zone), min, max);
-    bg->is_db_ = ZoneIsDb(zones_, zone);
-    AddModel(*bg);
-}
-
-void FaustDspUi::addVerticalBargraph(const char *label, float *zone, float min,
-                                     float max) {
-    auto *bg = new VBarGraph(label, MakeZoneBinding(zone), min, max);
-    bg->is_db_ = ZoneIsDb(zones_, zone);
-    AddModel(*bg);
-}
+// ---------------------------------------------------------------------------
+// Box layout — unchanged
+// ---------------------------------------------------------------------------
 
 void FaustDspUi::openFrameBox(const char *label) {
     PushModel(*new FrameBox(label));

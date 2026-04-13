@@ -7,13 +7,20 @@ namespace augr {
 
 class KnobWidget : public WidgetT<Knob> {
 public:
-  KnobWidget(Knob& model) : WidgetT<Knob>(model) {}
-  void Draw() override {
-    //ImGuiKnobs::Knob(model_->label_, model_->zone_, model_->min_, model_->max_, 0.1f, "%.1fdB", ImGuiKnobVariant_Wiper);
-    float value = model_->value();
-    ImGuiKnobs::Knob(model_->label_.c_str(), &value, model_->min_, model_->max_, model_->step_, "%.1fdB", ImGuiKnobVariant_Wiper);
-    model_->set_value(value);
-  }
+    KnobWidget(Knob &model) : WidgetT<Knob>(model) {}
+
+    void Draw() override {
+        Parameter *param = model_->param();
+        float pos = static_cast<float>(param->GetNormalized());
+
+        if (ImGuiKnobs::Knob(param->label().c_str(), &pos, 0.f, 1.f, 0.f,
+                             param->Format().c_str(), ImGuiKnobVariant_WiperDot,
+                             0.f))
+            param->SetNormalized(static_cast<fy_real>(pos));
+
+        if (ImGui::IsItemClicked(ImGuiMouseButton_Right))
+            param->ResetToInit();
+    }
 };
 DEFINE_WIDGET_FACTORY(KnobWidget, Knob)
 

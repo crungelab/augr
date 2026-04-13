@@ -7,16 +7,20 @@ namespace augr {
 
 class HSliderWidget : public WidgetT<HSlider> {
 public:
-    HSliderWidget(HSlider &model) : WidgetT<HSlider>(model) {
-        // model_->zone_ = model_->zone_ ? model_->zone_ : &model_->init_;
-        model_->set_value(model_->value() ? model_->value() : model_->init_);
-    }
-    void Draw() override {
+    HSliderWidget(HSlider &model) : WidgetT<HSlider>(model) {}
 
-        float value = model_->value();
-        ImGui::SliderFloat(model_->label_.c_str(), &value, model_->min_,
-                           model_->max_);
-        model_->set_value(value);
+    void Draw() override {
+        Parameter *param = model_->param();
+        float pos = static_cast<float>(param->GetNormalized());
+
+        if (ImGui::SliderFloat(param->label().c_str(), &pos, 0.f, 1.f, ""))
+            param->SetNormalized(static_cast<fy_real>(pos));
+
+        if (ImGui::IsItemClicked(ImGuiMouseButton_Right))
+            param->ResetToInit();
+
+        if (ImGui::IsItemHovered())
+            ImGui::SetTooltip("%s", param->Format().c_str());
     }
 };
 DEFINE_WIDGET_FACTORY(HSliderWidget, HSlider)

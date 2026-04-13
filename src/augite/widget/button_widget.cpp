@@ -1,9 +1,7 @@
 #include "imgui.h"
 
 #include "widget.h"
-
 #include <augr/core/control/button.h>
-#include <augr/rack/rack.h>
 
 namespace augr {
 
@@ -12,31 +10,10 @@ public:
     ButtonWidget(Button &model) : WidgetT<Button>(model) {}
 
     void Draw() override {
-        ImGui::Button("Gate");
-        float gate = ImGui::IsItemActive() ? 1.0f : 0.0f;
-        //*model_->zone_ = gate;
-        model_->set_value(gate);
+        Parameter *param = model_->param();
+        ImGui::Button(param->label().c_str());
+        param->SetValue(ImGui::IsItemActive() ? param->max() : param->min());
     }
-
-    /*
-    void Draw() override {
-        if (ImGui::Button(model_->label_)) {
-            auto zone = model_->zone_;
-            Rack::singleton().EnqueueAction([zone]() { *zone = 1.0f; },
-                                           [zone]() { *zone = 0.0f; });
-        }
-    }
-    */
-    /*
-    void Draw() override {
-      if (ImGui::Button(model_->label_)) {
-        *model_->zone_ = 1.0;
-      }
-      else {
-        *model_->zone_ = 0.0;
-      }
-    }
-    */
 };
 DEFINE_WIDGET_FACTORY(ButtonWidget, Button)
 
