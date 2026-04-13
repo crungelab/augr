@@ -67,14 +67,14 @@ void FaustDspUi::addCheckButton(const char *label, float *zone) {
 
 void FaustDspUi::addVerticalSlider(const char *label, float *zone, float init,
                                    float min, float max, float step) {
-    if (zones_[zone].isKnob())
+    if (zones_[zone].IsKnob())
         return addKnob(label, zone, init, min, max, step);
     AddModel(*new VSlider(label, MakeZoneBinding(zone), init, min, max, step));
 }
 
 void FaustDspUi::addHorizontalSlider(const char *label, float *zone, float init,
                                      float min, float max, float step) {
-    if (zones_[zone].isKnob())
+    if (zones_[zone].IsKnob())
         return addKnob(label, zone, init, min, max, step);
     AddModel(*new HSlider(label, MakeZoneBinding(zone), init, min, max, step));
 }
