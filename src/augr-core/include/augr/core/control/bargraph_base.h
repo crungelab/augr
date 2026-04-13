@@ -5,8 +5,8 @@ namespace augr {
 
 class BarGraphBase : public FloatControl {
 public:
-    BarGraphBase(std::string label, BindingPtr zone, fy_real min, fy_real max)
-        : FloatControl(label, zone), min_(min), max_(max), is_db_(false) {}
+    BarGraphBase(std::string label, BindingPtr zone, fy_real min, fy_real max, ControlMeta meta = {})
+        : FloatControl(label, zone, std::move(meta)), min_(min), max_(max), is_db_(false) {}
 
     // Data members
     fy_real min_, max_;

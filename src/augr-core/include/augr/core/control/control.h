@@ -8,15 +8,19 @@
 #include <augr/core/model.h>
 #include <augr/core/binding.h>
 
+#include <augr/core/control/control_meta.h>
+
 namespace augr {
 
 class Control : public Model {
 public:
     Control() = default;
-    Control(std::string label)
-        : label_(std::move(label)) {}
+    Control(std::string label, ControlMeta meta = {})
+        : label_(std::move(label)), meta_(std::move(meta)), unit_(meta_.unit()) {}
     // Data members
     std::string label_;
+    ControlMeta meta_;
+    ControlUnit unit_ = ControlUnit::None;
 
     REFLECT_ENABLE(Model)
 };
@@ -28,8 +32,8 @@ public:
 
     BoundControl() = default;
 
-    explicit BoundControl(std::string label, BindingPtr binding = nullptr)
-        : Control(std::move(label)), binding_(std::move(binding)) {}
+    explicit BoundControl(std::string label, BindingPtr binding = nullptr, ControlMeta meta = {})
+        : Control(std::move(label), std::move(meta)), binding_(std::move(binding)) {}
 
     T value() const { return binding_ ? binding_->get() : T{}; }
 

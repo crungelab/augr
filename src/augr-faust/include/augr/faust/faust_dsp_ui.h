@@ -8,54 +8,23 @@
 #include <set>
 #include <vector>
 
+#include <augr/core/control/control_meta.h>
+
 #include "faust_ui.h"
 
 using namespace std;
 
-struct Meta : std::map<const char *, const char *> {
-    void declare(const char *key, const char *value) { (*this)[key] = value; }
-    const char *get(const char *key, const char *def) {
-        if (this->find(key) != this->end())
-            return (*this)[key];
-        else
-            return def;
-    }
-};
+using Meta = augr::Meta;
 
 namespace augr {
+
+using ZoneMetaMap = map<FAUSTFLOAT *, ControlMeta>;
 
 class Model;
 
 class FaustDsp;
 
 typedef pair<const char *, const char *> strpair;
-
-struct Zone {
-    std::map<std::string, std::string> data;
-
-    void declare(const std::string key, const std::string value) {
-        data[key] = value;
-    }
-
-    // non-inserting get; returns pointer for cheap use-or-null
-    const std::string *get_ptr(const char *key) const {
-        auto it = data.find(key); // std::string find
-        return it == data.end() ? nullptr : &it->second;
-    }
-
-    // If you really want a C-string, expose a view (safer than owning char*)
-    const char *get(const char *key) const {
-        if (auto s = get_ptr(key))
-            return s->c_str();
-        return nullptr;
-    }
-
-    bool isKnob() const {
-        if (auto s = get_ptr("style"))
-            return *s == "knob";
-        return false;
-    }
-};
 
 enum SliderKind { Vertical, Horizontal };
 
@@ -99,7 +68,7 @@ public:
     // Data members
     FaustDsp *m_;
     map<int, list<strpair>> metadata_;
-    map<FAUSTFLOAT *, Zone> zones_;
+    ZoneMetaMap zones_;
     int nelems_, nports_;
     std::vector<Model *> models_;
     bool is_top_ = true;

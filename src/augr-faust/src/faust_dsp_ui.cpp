@@ -21,8 +21,7 @@
 
 namespace augr {
 
-std::shared_ptr<BindingT<fy_real>>
-MakeZoneBinding(float *zone) {
+std::shared_ptr<BindingT<fy_real>> MakeZoneBinding(float *zone) {
     return std::make_shared<ZoneBinding>(zone);
 }
 
@@ -46,7 +45,7 @@ void FaustDspUi::declare(float *zone, const char *key, const char *value) {
 }
 
 // Helper: look up the Zone for a pointer and check whether "unit" == "dB".
-static bool ZoneIsDb(const map<FAUSTFLOAT *, Zone> &zones, float *zone) {
+static bool ZoneIsDb(const ZoneMetaMap &zones, float *zone) {
     auto it = zones.find(zone);
     if (it == zones.end())
         return false;
