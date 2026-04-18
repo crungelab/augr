@@ -5,8 +5,8 @@ namespace augr {
 
 class HBarGraph : public BarGraphBase {
 public:
-    HBarGraph(std::string label, Parameter *param, fy_real min, fy_real max)
-        : BarGraphBase(label, param, min, max) {}
+    HBarGraph(std::string label, Parameter *param)
+        : BarGraphBase(label, param) {}
 
     REFLECT_ENABLE(BarGraphBase)
 };

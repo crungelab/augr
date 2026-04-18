@@ -113,12 +113,12 @@ void FaustDspUi::addNumEntry(const char *label, float *zone, float init,
 
 void FaustDspUi::addHorizontalBargraph(const char *label, float *zone,
                                        float min, float max) {
-    AddModel(*new HBarGraph(label, MakeParameter(label, zone, min, min, max, 0), min, max));
+    AddModel(*new HBarGraph(label, MakeParameter(label, zone, min, min, max, 0)));
 }
 
 void FaustDspUi::addVerticalBargraph(const char *label, float *zone, float min,
                                      float max) {
-    AddModel(*new VBarGraph(label, MakeParameter(label, zone, min, min, max, 0), min, max));
+    AddModel(*new VBarGraph(label, MakeParameter(label, zone, min, min, max, 0)));
 }
 
 // ---------------------------------------------------------------------------
