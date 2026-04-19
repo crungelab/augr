@@ -8,20 +8,20 @@
 #include <augr/core/config.h>
 #include <augr/core/model.h>
 
-#include <augr/core/control/parameter.h>
+#include <augr/core/control/control_meta.h>
 
 namespace augr {
 
 class Control : public Model {
 public:
     Control() = default;
-    Control(std::string label, ParameterMeta meta = {})
+    Control(std::string label, ControlMeta meta = {})
         : label_(std::move(label)), meta_(std::move(meta)),
           unit_(meta_.Unit()) {}
     // Data members
     std::string label_;
-    ParameterMeta meta_;
-    ParameterUnit unit_ = ParameterUnit::kNone;
+    ControlMeta meta_;
+    ControlUnit unit_ = ControlUnit::kNone;
 
     REFLECT_ENABLE(Model)
 };
@@ -34,7 +34,7 @@ public:
     BoundControl() = default;
 
     explicit BoundControl(std::string label, BindingPtr binding = nullptr,
-                          ParameterMeta meta = {})
+                          ControlMeta meta = {})
         : Control(std::move(label), std::move(meta)),
           binding_(std::move(binding)) {}
 
@@ -59,20 +59,5 @@ protected:
 
 using FloatControl = BoundControl<fy_real>;
 using BoolControl = BoundControl<bool>;
-
-class ParameterControl : public Control {
-public:
-    ParameterControl() = default;
-    explicit ParameterControl(std::string label, Parameter *param)
-        : Control(std::move(label), param->meta()), param_(param) {}
-
-    Parameter *param() { return param_; }
-    const Parameter *param() const { return param_; }
-
-    REFLECT_ENABLE(Control)
-
-private:
-    Parameter *param_; // non-owning — Parameter lives in Module
-};
 
 } // namespace augr

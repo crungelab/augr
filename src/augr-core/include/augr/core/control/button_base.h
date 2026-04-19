@@ -1,5 +1,6 @@
 #pragma once
-#include "control.h"
+
+#include "parameter_control.h"
 
 namespace augr {
 

@@ -3,39 +3,39 @@
 
 #include <cstring>
 
-#include <augr/core/control/parameter_unit.h>
+#include <augr/core/control/control_unit.h>
 #include <augr/core/meta.h>
 
 namespace augr {
 
-struct ParameterMeta : Meta {
-    ParameterUnit Unit() const {
+struct ControlMeta : Meta {
+    ControlUnit Unit() const {
         const char *u = get("unit");
         if (!u)
-            return ParameterUnit::kNone;
+            return ControlUnit::kNone;
         if (strcmp(u, "dB") == 0)
-            return ParameterUnit::kDecibel;
+            return ControlUnit::kDecibel;
         if (strcmp(u, "Hz") == 0)
-            return ParameterUnit::kHertz;
+            return ControlUnit::kHertz;
         if (strcmp(u, "kHz") == 0)
-            return ParameterUnit::kKilohertz;
+            return ControlUnit::kKilohertz;
         if (strcmp(u, "s") == 0)
-            return ParameterUnit::kSeconds;
+            return ControlUnit::kSeconds;
         if (strcmp(u, "ms") == 0)
-            return ParameterUnit::kMilliseconds;
+            return ControlUnit::kMilliseconds;
         if (strcmp(u, "deg") == 0)
-            return ParameterUnit::kDegrees;
+            return ControlUnit::kDegrees;
         if (strcmp(u, "rad") == 0)
-            return ParameterUnit::kRadians;
+            return ControlUnit::kRadians;
         if (strcmp(u, "%") == 0)
-            return ParameterUnit::kPercent;
+            return ControlUnit::kPercent;
         if (strcmp(u, "st") == 0)
-            return ParameterUnit::kSemitones;
+            return ControlUnit::kSemitones;
         if (strcmp(u, "oct") == 0)
-            return ParameterUnit::kOctaves;
+            return ControlUnit::kOctaves;
         if (strcmp(u, "bpm") == 0)
-            return ParameterUnit::kBpm;
-        return ParameterUnit::kNone;
+            return ControlUnit::kBpm;
+        return ControlUnit::kNone;
     }
 
     bool IsKnob() const {

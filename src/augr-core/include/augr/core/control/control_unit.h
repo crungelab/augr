@@ -4,7 +4,7 @@
 
 namespace augr {
 
-enum class ParameterUnit {
+enum class ControlUnit {
     kNone,
     // Amplitude / level
     kDecibel, // "dB"

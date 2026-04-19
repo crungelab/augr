@@ -22,7 +22,7 @@
 //
 // Factory:
 //   Parameter::Make(label, meta, binding, init, min, max, step)
-//   → picks the right subclass from ParameterMeta::Unit()
+//   → picks the right subclass from ControlMeta::Unit()
 
 #include <algorithm>
 #include <cassert>
@@ -34,7 +34,7 @@
 #include <vector>
 
 #include <augr/core/binding.h>
-#include <augr/core/control/parameter_meta.h>
+#include <augr/core/control/control_meta.h>
 
 namespace augr {
 
@@ -46,7 +46,7 @@ class Parameter {
 public:
     using BindingPtr = std::unique_ptr<BindingT<fy_real>>;
 
-    Parameter(std::string label, ParameterMeta meta, BindingPtr binding,
+    Parameter(std::string label, ControlMeta meta, BindingPtr binding,
               fy_real init, fy_real min, fy_real max, fy_real step)
         : label_(std::move(label)), meta_(std::move(meta)),
           binding_(std::move(binding)), init_(init), min_(min), max_(max),
@@ -94,8 +94,8 @@ public:
     // -- Accessors ------------------------------------------------------------
 
     const std::string &label() const { return label_; }
-    const ParameterMeta &meta() const { return meta_; }
-    ParameterUnit unit() const { return unit_; }
+    const ControlMeta &meta() const { return meta_; }
+    ControlUnit unit() const { return unit_; }
     fy_real init() const { return init_; }
     fy_real min() const { return min_; }
     fy_real max() const { return max_; }
@@ -110,7 +110,7 @@ public:
     // -- Factory --------------------------------------------------------------
 
     static std::unique_ptr<Parameter>
-    Make(std::string label, ParameterMeta meta, BindingPtr binding,
+    Make(std::string label, ControlMeta meta, BindingPtr binding,
          fy_real init, fy_real min, fy_real max, fy_real step);
 
 protected:
@@ -132,13 +132,13 @@ protected:
     virtual fy_real GetNormalizedFor(fy_real value) const = 0;
 
     std::string label_;
-    ParameterMeta meta_;
+    ControlMeta meta_;
     BindingPtr binding_;
     fy_real init_;
     fy_real min_;
     fy_real max_;
     fy_real step_;
-    ParameterUnit unit_;
+    ControlUnit unit_;
     std::vector<Observer> observers_;
 };
 
@@ -148,7 +148,7 @@ protected:
 
 class LinearParameter : public Parameter {
 public:
-    LinearParameter(std::string label, ParameterMeta meta, BindingPtr binding,
+    LinearParameter(std::string label, ControlMeta meta, BindingPtr binding,
                     fy_real init, fy_real min, fy_real max, fy_real step,
                     const char *suffix = "")
         : Parameter(std::move(label), std::move(meta), std::move(binding), init,
@@ -229,7 +229,7 @@ protected:
 
 class FrequencyParameter : public Parameter {
 public:
-    FrequencyParameter(std::string label, ParameterMeta meta,
+    FrequencyParameter(std::string label, ControlMeta meta,
                        BindingPtr binding, fy_real init, fy_real min,
                        fy_real max, fy_real step)
         : Parameter(std::move(label), std::move(meta), std::move(binding), init,
@@ -270,15 +270,15 @@ private:
 // ---------------------------------------------------------------------------
 
 inline std::unique_ptr<Parameter>
-Parameter::Make(std::string label, ParameterMeta meta, BindingPtr binding,
+Parameter::Make(std::string label, ControlMeta meta, BindingPtr binding,
                 fy_real init, fy_real min, fy_real max, fy_real step) {
     switch (meta.Unit()) {
-    case ParameterUnit::kDecibel:
+    case ControlUnit::kDecibel:
         return std::make_unique<DecibelParameter>(
             std::move(label), std::move(meta), std::move(binding), init, min,
             max, step);
 
-    case ParameterUnit::kHertz:
+    case ControlUnit::kHertz:
         if (min > fy_real{0}) {
             return std::make_unique<FrequencyParameter>(
                 std::move(label), std::move(meta), std::move(binding), init,
@@ -287,27 +287,27 @@ Parameter::Make(std::string label, ParameterMeta meta, BindingPtr binding,
         // min == 0: fall through to linear (guard against log(0))
         [[fallthrough]];
 
-    case ParameterUnit::kMilliseconds:
+    case ControlUnit::kMilliseconds:
         return std::make_unique<LinearParameter>(
             std::move(label), std::move(meta), std::move(binding), init, min,
             max, step, " ms");
 
-    case ParameterUnit::kSeconds:
+    case ControlUnit::kSeconds:
         return std::make_unique<LinearParameter>(
             std::move(label), std::move(meta), std::move(binding), init, min,
             max, step, " s");
 
-    case ParameterUnit::kPercent:
+    case ControlUnit::kPercent:
         return std::make_unique<LinearParameter>(
             std::move(label), std::move(meta), std::move(binding), init, min,
             max, step, "%");
 
-    case ParameterUnit::kSemitones:
+    case ControlUnit::kSemitones:
         return std::make_unique<LinearParameter>(
             std::move(label), std::move(meta), std::move(binding), init, min,
             max, step, " st");
 
-    case ParameterUnit::kBpm:
+    case ControlUnit::kBpm:
         return std::make_unique<LinearParameter>(
             std::move(label), std::move(meta), std::move(binding), init, min,
             max, step, " bpm");

@@ -8,7 +8,7 @@
 #include <set>
 #include <vector>
 
-#include <augr/core/control/parameter_meta.h>
+#include <augr/core/control/control_meta.h>
 
 #include "faust_ui.h"
 
@@ -18,7 +18,7 @@ using Meta = augr::Meta;
 
 namespace augr {
 
-using ZoneMetaMap = map<FAUSTFLOAT *, ParameterMeta>;
+using ZoneMetaMap = map<FAUSTFLOAT *, ControlMeta>;
 
 class Model;
 class Parameter;
