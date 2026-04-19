@@ -12,7 +12,7 @@ public:
     void Draw() override {
         Parameter *param = model_->param();
         ImGui::Button(param->label().c_str());
-        param->SetValue(ImGui::IsItemActive() ? param->max() : param->min());
+        param->set_value(ImGui::IsItemActive() ? param->max() : param->min());
     }
 };
 DEFINE_WIDGET_FACTORY(ButtonWidget, Button)

@@ -1,15 +1,17 @@
 #pragma once
+
 #include "control.h"
 
 namespace augr {
 
 class NumDisplay : public FloatControl {
 public:
-  NumDisplay(std::string label, BindingPtr zone, int precision) : FloatControl(label, zone), precision_(precision) {}
-  //Data members
-  int precision_;
+    NumDisplay(std::string label, ControlMeta meta, BindingPtr binding, int precision)
+        : FloatControl(label, meta, binding), precision_(precision) {}
+    // Data members
+    int precision_;
 
-  REFLECT_ENABLE(Control)
+    REFLECT_ENABLE(Control)
 };
 
 } // namespace augr

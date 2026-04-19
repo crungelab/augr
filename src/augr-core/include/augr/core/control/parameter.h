@@ -1,28 +1,33 @@
-#pragma once
+#ifndef AUGR_CORE_PARAMETER_H_
+#define AUGR_CORE_PARAMETER_H_
 
-// parameter.h
-//
 // VST3-inspired Parameter architecture for augr-core.
 //
 // Design principles:
-//   - Parameter is the single source of truth for a control value
-//   - It owns a BindingT<fy_real> rather than a raw float* — any binding
-//     type works: ZoneBinding (Faust), ValueBinding, CallbackBinding, etc.
-//   - GetNormalized/SetNormalized bridge to ImGui's [0..1] world
-//   - GetValue/SetValue operate in internal space (dB, Hz, etc.)
-//   - Controls are pure views — they hold a Parameter* and nothing else
+//   - Parameter is the single source of truth for a control value.
+//   - Parameter extends BoundControl<fy_real>, inheriting label/meta/binding
+//     plumbing. It adds a normalized [0, 1] view for ImGui, snap/clamp on
+//     write, range metadata (init/min/max/step), and observer notification.
+//   - Any BindingT<fy_real> works: ZoneBinding (Faust), ValueBinding,
+//     CallbackBinding, etc.
+//   - GetNormalized() / SetNormalized() bridge to ImGui's [0, 1] world.
+//   - value() / set_value() operate in internal space (dB, Hz, etc.).
+//     set_value() is the overridden BoundControl hook; it snaps, clamps, and
+//     notifies observers.
+//   - Controls are pure views -- they hold a Parameter* and nothing else.
 //   - The Rack/graph layer can enumerate and drive Parameters directly,
-//     independently of any UI
+//     independently of any UI.
 //
 // Hierarchy:
-//   Parameter            (abstract base)
-//   ├── LinearParameter
-//   ├── DecibelParameter
-//   └── FrequencyParameter
+//   BoundControl<fy_real>
+//   +-- Parameter            (abstract)
+//       |-- LinearParameter
+//       |-- DecibelParameter
+//       +-- FrequencyParameter
 //
 // Factory:
 //   Parameter::Make(label, meta, binding, init, min, max, step)
-//   → picks the right subclass from ControlMeta::Unit()
+//     picks the right subclass from ControlMeta::Unit().
 
 #include <algorithm>
 #include <cassert>
@@ -31,244 +36,217 @@
 #include <functional>
 #include <memory>
 #include <string>
+#include <utility>
 #include <vector>
 
-#include <augr/core/binding.h>
-#include <augr/core/control/control_meta.h>
+#include "augr/core/binding.h"
+#include "augr/core/control/control.h"
+#include "augr/core/control/control_meta.h"
 
 namespace augr {
 
-// ---------------------------------------------------------------------------
-// Parameter  (abstract base)
-// ---------------------------------------------------------------------------
-
-class Parameter {
+// Abstract base class for all parameters.
+class Parameter : public BoundControl<fy_real> {
 public:
-    using BindingPtr = std::unique_ptr<BindingT<fy_real>>;
+    using Observer = std::function<void(fy_real value)>;
 
     Parameter(std::string label, ControlMeta meta, BindingPtr binding,
               fy_real init, fy_real min, fy_real max, fy_real step)
-        : label_(std::move(label)), meta_(std::move(meta)),
-          binding_(std::move(binding)), init_(init), min_(min), max_(max),
-          step_(step), unit_(meta_.Unit()) {}
+        : BoundControl<fy_real>(std::move(label), std::move(meta),
+                                std::move(binding)),
+          init_(init), min_(min), max_(max), step_(step) {}
 
-    virtual ~Parameter() = default;
+    ~Parameter() override = default;
 
-    // Non-copyable, non-movable — held by pointer throughout lifetime
+    // Non-copyable, non-movable -- held by pointer throughout lifetime.
     Parameter(const Parameter &) = delete;
     Parameter &operator=(const Parameter &) = delete;
+    Parameter(Parameter &&) = delete;
+    Parameter &operator=(Parameter &&) = delete;
 
-    // -- Core interface (subclasses implement these) --------------------------
-
-    // Current value → normalized [0..1] for ImGui
+    // Core interface.
+    //
+    // Returns the current value mapped to [0, 1] for ImGui.
     virtual fy_real GetNormalized() const = 0;
 
-    // Normalized [0..1] from ImGui → snap/clamp → write to binding
+    // Maps a normalized [0, 1] position from ImGui to internal space,
+    // snaps/clamps, and writes it to the binding.
     virtual void SetNormalized(fy_real pos) = 0;
 
-    // Human-readable string with units, e.g. "-6.0 dB", "440.0 Hz"
+    // Returns a human-readable string with units, e.g. "-6.0 dB", "440.0 Hz".
     virtual std::string Format() const = 0;
 
-    // -- Value access in internal space ---------------------------------------
-
-    fy_real GetValue() const { return binding_->get(); }
-
-    void SetValue(fy_real internal) {
-        binding_->set(SnapAndClamp(internal));
-        NotifyObservers();
+    // Writes an internal-space value through snap/clamp and notifies observers.
+    // Overrides BoundControl's trivial setter.
+    void set_value(const fy_real &value) override {
+        if (binding_) {
+            binding_->set(SnapAndClamp(value));
+            NotifyObservers();
+        }
     }
 
-    void ResetToInit() {
-        binding_->set(init_);
-        NotifyObservers();
-    }
+    void ResetToInit() { set_value(init_); }
 
-    // -- Observers ------------------------------------------------------------
-    // Lightweight callback list — lets controls/displays react to
-    // programmatic changes (automation, OSC, preset recall, etc.)
-
-    using Observer = std::function<void(fy_real value)>;
-
+    // Registers a callback that fires on programmatic value changes
+    // (automation, OSC, preset recall, etc.).
     void AddObserver(Observer cb) { observers_.push_back(std::move(cb)); }
 
-    // -- Accessors ------------------------------------------------------------
-
-    const std::string &label() const { return label_; }
-    const ControlMeta &meta() const { return meta_; }
-    ControlUnit unit() const { return unit_; }
+    // Range accessors.
     fy_real init() const { return init_; }
     fy_real min() const { return min_; }
     fy_real max() const { return max_; }
     fy_real step() const { return step_; }
     bool IsKnob() const { return meta_.IsKnob(); }
 
-    // Normalized positions of init/min/max — useful for tick marks
+    // Normalized positions of init/min/max. Useful for tick marks.
     fy_real NormalizedInit() const { return GetNormalizedFor(init_); }
     fy_real NormalizedMin() const { return GetNormalizedFor(min_); }
     fy_real NormalizedMax() const { return GetNormalizedFor(max_); }
 
-    // -- Factory --------------------------------------------------------------
-
-    static std::unique_ptr<Parameter>
-    Make(std::string label, ControlMeta meta, BindingPtr binding,
-         fy_real init, fy_real min, fy_real max, fy_real step);
+    // Factory: picks the concrete subclass based on meta.Unit().
+    static std::unique_ptr<Parameter> Make(std::string label, ControlMeta meta,
+                                           BindingPtr binding, fy_real init,
+                                           fy_real min, fy_real max,
+                                           fy_real step);
 
 protected:
-    // Snap to step grid then clamp — always operates in internal space
+    // Snaps to step grid then clamps. Always operates in internal space.
     fy_real SnapAndClamp(fy_real value) const {
-        if (step_ > fy_real{0})
+        if (step_ > fy_real{0}) {
             value = min_ + std::round((value - min_) / step_) * step_;
+        }
         return std::clamp(value, min_, max_);
     }
 
     void NotifyObservers() {
-        fy_real v = binding_->get();
-        for (auto &cb : observers_)
+        const fy_real v = value();
+        for (auto &cb : observers_) {
             cb(v);
+        }
     }
 
-    // Used by NormalizedInit/Min/Max without triggering SetNormalized
-    // side effects
+    // Maps an internal-space value to [0, 1] without side effects. Used by
+    // NormalizedInit()/Min()/Max() and by subclasses' GetNormalized().
     virtual fy_real GetNormalizedFor(fy_real value) const = 0;
 
-    std::string label_;
-    ControlMeta meta_;
-    BindingPtr binding_;
+private:
     fy_real init_;
     fy_real min_;
     fy_real max_;
     fy_real step_;
-    ControlUnit unit_;
     std::vector<Observer> observers_;
 };
 
-// ---------------------------------------------------------------------------
-// LinearParameter
-// ---------------------------------------------------------------------------
-
+// Linear-scale parameter. The slider moves linearly between min and max.
 class LinearParameter : public Parameter {
 public:
     LinearParameter(std::string label, ControlMeta meta, BindingPtr binding,
                     fy_real init, fy_real min, fy_real max, fy_real step,
-                    const char *suffix = "")
+                    std::string suffix = "")
         : Parameter(std::move(label), std::move(meta), std::move(binding), init,
                     min, max, step),
-          suffix_(suffix) {}
+          suffix_(std::move(suffix)) {}
 
-    fy_real GetNormalized() const override {
-        return GetNormalizedFor(binding_->get());
-    }
+    fy_real GetNormalized() const override { return GetNormalizedFor(value()); }
 
     void SetNormalized(fy_real pos) override {
-        binding_->set(SnapAndClamp(min_ + pos * (max_ - min_)));
-        NotifyObservers();
+        set_value(min() + pos * (max() - min()));
     }
 
     std::string Format() const override {
-        int decimals = (step_ < fy_real{0.1}) ? 2
-                       : (step_ < fy_real{1}) ? 1
-                                              : 0;
-        return std::format("{:.{}f}{}", binding_->get(), decimals, suffix_);
+        const int decimals = (step() < fy_real{0.1}) ? 2
+                             : (step() < fy_real{1}) ? 1
+                                                     : 0;
+        return std::format("{:.{}f}{}", value(), decimals, suffix_);
     }
 
 protected:
-    fy_real GetNormalizedFor(fy_real value) const override {
-        if (max_ == min_)
+    fy_real GetNormalizedFor(fy_real v) const override {
+        if (max() == min()) {
             return fy_real{0};
-        return (value - min_) / (max_ - min_);
+        }
+        return (v - min()) / (max() - min());
     }
 
 private:
-    const char *suffix_; // e.g. " ms", "%", "" — set by Make()
+    std::string suffix_; // e.g. " ms", "%", "". Set by Make().
 };
 
-// ---------------------------------------------------------------------------
-// DecibelParameter
-// ---------------------------------------------------------------------------
+// Decibel-scale parameter.
 //
 // dB is already a log scale so the slider moves linearly across the dB range.
 // Differences from LinearParameter:
-//   - Display format: +/- sign, "dB" suffix, "-inf dB" at the floor
-//   - Convention: min_ is the "silence" floor
-
+//   - Display format: +/- sign, "dB" suffix, "-inf dB" at the floor.
+//   - Convention: min is the "silence" floor.
 class DecibelParameter : public Parameter {
 public:
     using Parameter::Parameter;
 
-    fy_real GetNormalized() const override {
-        return GetNormalizedFor(binding_->get());
-    }
+    fy_real GetNormalized() const override { return GetNormalizedFor(value()); }
 
     void SetNormalized(fy_real pos) override {
-        binding_->set(SnapAndClamp(min_ + pos * (max_ - min_)));
-        NotifyObservers();
+        set_value(min() + pos * (max() - min()));
     }
 
     std::string Format() const override {
-        fy_real v = binding_->get();
-        if (v <= min_)
+        const fy_real v = value();
+        if (v <= min()) {
             return "-inf dB";
+        }
         return std::format("{:+.1f} dB", v);
     }
 
 protected:
-    fy_real GetNormalizedFor(fy_real value) const override {
-        if (max_ == min_)
+    fy_real GetNormalizedFor(fy_real v) const override {
+        if (max() == min()) {
             return fy_real{0};
-        return (value - min_) / (max_ - min_);
+        }
+        return (v - min()) / (max() - min());
     }
 };
 
-// ---------------------------------------------------------------------------
-// FrequencyParameter
-// ---------------------------------------------------------------------------
+// Frequency-scale parameter.
 //
-// Hz perception is logarithmic (pitch), so we use a true log mapping.
-// One octave (e.g. 100→200 Hz) occupies the same slider distance as
-// any other octave (e.g. 1000→2000 Hz).
-
+// Hz perception is logarithmic (pitch), so a true log mapping is used.
+// One octave (e.g. 100 -> 200 Hz) occupies the same slider distance as any
+// other octave (e.g. 1000 -> 2000 Hz).
 class FrequencyParameter : public Parameter {
 public:
-    FrequencyParameter(std::string label, ControlMeta meta,
-                       BindingPtr binding, fy_real init, fy_real min,
-                       fy_real max, fy_real step)
+    FrequencyParameter(std::string label, ControlMeta meta, BindingPtr binding,
+                       fy_real init, fy_real min, fy_real max, fy_real step)
         : Parameter(std::move(label), std::move(meta), std::move(binding), init,
                     min, max, step) {
         assert(min > fy_real{0} && max > fy_real{0});
         log_ratio_ = std::log(max / min);
     }
 
-    fy_real GetNormalized() const override {
-        return GetNormalizedFor(binding_->get());
-    }
+    fy_real GetNormalized() const override { return GetNormalizedFor(value()); }
 
     void SetNormalized(fy_real pos) override {
-        binding_->set(SnapAndClamp(min_ * std::exp(pos * log_ratio_)));
-        NotifyObservers();
+        set_value(min() * std::exp(pos * log_ratio_));
     }
 
     std::string Format() const override {
-        fy_real v = binding_->get();
-        if (v >= fy_real{1000})
+        const fy_real v = value();
+        if (v >= fy_real{1000}) {
             return std::format("{:.2f} kHz", v / fy_real{1000});
+        }
         return std::format("{:.1f} Hz", v);
     }
 
 protected:
-    fy_real GetNormalizedFor(fy_real value) const override {
-        if (log_ratio_ == fy_real{0})
+    fy_real GetNormalizedFor(fy_real v) const override {
+        if (log_ratio_ == fy_real{0}) {
             return fy_real{0};
-        return std::log(value / min_) / log_ratio_;
+        }
+        return std::log(v / min()) / log_ratio_;
     }
 
 private:
-    fy_real log_ratio_; // cached log(max/min)
+    fy_real log_ratio_; // Cached log(max/min).
 };
 
-// ---------------------------------------------------------------------------
-// Parameter::Make  (factory — defined here after all subclasses)
-// ---------------------------------------------------------------------------
-
+// Factory definition. Placed after all subclasses so they are complete types.
 inline std::unique_ptr<Parameter>
 Parameter::Make(std::string label, ControlMeta meta, BindingPtr binding,
                 fy_real init, fy_real min, fy_real max, fy_real step) {
@@ -284,7 +262,7 @@ Parameter::Make(std::string label, ControlMeta meta, BindingPtr binding,
                 std::move(label), std::move(meta), std::move(binding), init,
                 min, max, step);
         }
-        // min == 0: fall through to linear (guard against log(0))
+        // min == 0: fall through to linear (guard against log(0)).
         [[fallthrough]];
 
     case ControlUnit::kMilliseconds:
@@ -319,80 +297,6 @@ Parameter::Make(std::string label, ControlMeta meta, BindingPtr binding,
     }
 }
 
-// ---------------------------------------------------------------------------
-// SliderControl  (view — owns a Parameter*, nothing else)
-// ---------------------------------------------------------------------------
-//
-// The control has no knowledge of units, bindings, or conversion math.
-// It only knows: get a normalized value, set a normalized value, get a string.
-
-#ifdef AUGR_EXAMPLE_WIDGET
-
-#include "imgui.h"
-
-class SliderControl : public Control {
-public:
-    explicit SliderControl(Parameter *param)
-        : Control(param->label()), param_(param) {}
-
-    void Draw() {
-        fy_real pos = param_->GetNormalized();
-
-        ImGui::PushID(param_);
-
-        if (ImGui::SliderFloat(param_->label().c_str(), &pos, 0.f, 1.f, ""))
-            param_->SetNormalized(pos);
-
-        ImGui::SameLine();
-        ImGui::TextUnformatted(param_->Format().c_str());
-
-        // Right-click to reset to init value
-        if (ImGui::IsItemClicked(ImGuiMouseButton_Right))
-            param_->ResetToInit();
-
-        ImGui::PopID();
-    }
-
-private:
-    Parameter *param_; // non-owning — Parameter lives in FaustDsp or Rack
-};
-
-// HBarGraph is a read-only view
-class HBarGraph : public Control {
-public:
-    explicit HBarGraph(Parameter *param)
-        : Control(param->label()), param_(param) {}
-
-    void Draw() {
-        fy_real pos = param_->GetNormalized();
-        ImGui::ProgressBar(pos, ImVec2(-1, 0), param_->Format().c_str());
-    }
-
-private:
-    Parameter *param_; // non-owning
-};
-
-#endif // AUGR_EXAMPLE_WIDGET
-
-// ---------------------------------------------------------------------------
-// FaustDspUi integration sketch
-// ---------------------------------------------------------------------------
-//
-// FaustDspUi now builds Parameters instead of raw Controls.
-// Parameters are owned by FaustDsp (or Rack); Controls are views into them.
-//
-//   void FaustDspUi::addVerticalSlider(
-//       const char* label, float* zone,
-//       float init, float min, float max, float step) {
-//     auto meta = std::move(zones_[zone]);
-//     auto binding = std::make_unique<ZoneBinding>(zone);
-//     auto param = Parameter::Make(label, std::move(meta),
-//                                  std::move(binding), init, min, max, step);
-//     auto* control = param->IsKnob()
-//         ? new KnobControl(param.get())
-//         : new SliderControl(param.get());
-//     dsp_.AddParameter(std::move(param));  // FaustDsp owns the Parameter
-//     AddModel(*control);                   // Rack owns the Control
-//   }
-
 } // namespace augr
+
+#endif // AUGR_CORE_PARAMETER_H_

@@ -11,10 +11,10 @@ public:
 
     void Draw() override {
         Parameter *param = model_->param();
-        float value = static_cast<float>(param->GetValue());
+        float value = static_cast<float>(param->value());
 
         if (ImGui::InputFloat(param->label().c_str(), &value, 0.f, 0.f, param->Format().c_str()))
-            param->SetValue(static_cast<fy_real>(value));
+            param->set_value(static_cast<fy_real>(value));
     }
 };
 DEFINE_WIDGET_FACTORY(NumEntryWidget, NumEntry)

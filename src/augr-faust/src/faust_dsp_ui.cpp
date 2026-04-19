@@ -51,8 +51,8 @@ void FaustDspUi::declare(float *zone, const char *key, const char *value) {
 // ---------------------------------------------------------------------------
 
 Parameter* FaustDspUi::MakeParameter(const char *label, float *zone,
-                                               fy_real init, fy_real min,
-                                               fy_real max, fy_real step) {
+                                     const fy_real init, const fy_real min,
+                                     const fy_real max, const fy_real step) {
 
     auto meta = std::move(zones_[zone]);
     auto binding = MakeZoneBinding(zone);
@@ -122,20 +122,24 @@ void FaustDspUi::addVerticalBargraph(const char *label, float *zone, float min,
 }
 
 // ---------------------------------------------------------------------------
-// Displays — kept as-is until NumDisplay/TextDisplay are ported
+// Displays
 // ---------------------------------------------------------------------------
 
-void FaustDspUi::addNumDisplay(const char *label, float *zone, int precision) {
-    AddModel(*new NumDisplay(label, MakeZoneBinding(zone), precision));
+void FaustDspUi::addNumDisplay(const char *label, float *zone,
+                               const int precision) {
+    const auto meta = zones_[zone];
+    AddModel(*new NumDisplay(label, meta, MakeZoneBinding(zone), precision));
 }
 
 void FaustDspUi::addTextDisplay(const char *label, float *zone, char *names[],
-                                float min, float max) {
-    AddModel(*new TextDisplay(label, MakeZoneBinding(zone), names, min, max));
+                                const float min, const float max) {
+
+    const auto meta = zones_[zone];
+    AddModel(*new TextDisplay(label, meta, MakeZoneBinding(zone), names, min, max));
 }
 
 // ---------------------------------------------------------------------------
-// Box layout — unchanged
+// Box layout
 // ---------------------------------------------------------------------------
 
 void FaustDspUi::openFrameBox(const char *label) {

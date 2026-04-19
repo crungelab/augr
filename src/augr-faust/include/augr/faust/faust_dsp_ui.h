@@ -72,7 +72,6 @@ public:
     FaustDsp *m_;
     map<int, list<strpair>> metadata_;
     ZoneMetaMap zones_;
-    int nelems_, nports_;
     std::vector<Model *> models_;
     bool is_top_ = true;
 };
