@@ -27,16 +27,16 @@ std::unique_ptr<BindingT<fy_real>> MakeZoneBinding(float *zone) {
 
 FaustDspUi::FaustDspUi(FaustDsp &m) : UI(), m_(&m) { PushModel(m); }
 
-void FaustDspUi::PushModel(Model &model) { models_.push_back(&model); }
+void FaustDspUi::PushModel(Model &model) { model_stack_.push_back(&model); }
 
 Model *FaustDspUi::PopModel() {
-    Model *top = models_.back();
-    models_.pop_back();
+    Model *top = model_stack_.back();
+    model_stack_.pop_back();
     return top;
 }
 
 void FaustDspUi::AddModel(Model &model) {
-    Model &top = *models_.back();
+    Model &top = *model_stack_.back();
     top.AddChild(model);
 }
 
@@ -176,7 +176,7 @@ void FaustDspUi::openVerticalBox(const char *label) {
 
 void FaustDspUi::closeBox() {
     Model *top = PopModel();
-    if (models_.empty())
+    if (model_stack_.empty())
         return;
     AddModel(*top);
 }
