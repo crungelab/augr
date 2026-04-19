@@ -88,6 +88,9 @@ add_subdirectory(src/augr-rack)
 #AugrFaust
 add_subdirectory(src/augr-faust)
 
+#AugrFaustLibrary
+add_subdirectory(src/augr-faust-library)
+
 #AugrExe
 add_subdirectory(src/augr-exe)
 
@@ -96,6 +99,3 @@ add_subdirectory(src/augite)
 
 #Examples
 add_subdirectory(examples)
-
-#Library
-add_subdirectory(library)

@@ -12,11 +12,11 @@ target_include_directories(${THIS} PRIVATE ${PROJECT_ROOT})
 
 include(${AUGR_CMAKE}/ExeApp.cmake)
 include(${AUGR_CMAKE}/AugrFaust.cmake)
-include(${AUGR_CMAKE}/Library.cmake)
+include(${AUGR_CMAKE}/AugrFaustLibrary.cmake)
 include(${THIS_DIR}/../../cmake/Common.cmake)
 
 USES_EXE_APP(${THIS})
 USES_AUGR_EXE(${THIS})
 USES_AUGR_FAUST(${THIS})
-USES_LIBRARY(${THIS})
+USES_AUGR_FAUST_LIBRARY(${THIS})
 USES_COMMON(${THIS})
