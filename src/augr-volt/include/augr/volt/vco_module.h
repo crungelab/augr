@@ -4,6 +4,8 @@
 #include <cmath>
 
 #include <augr/core/audio.h>
+#include <augr/core/ui/ui_builder.h>
+
 #include <augr/rack/audio_pin.h>
 #include <augr/rack/module/module.h>
 #include <augr/rack/node.h>
@@ -27,6 +29,11 @@ public:
 
         audio_out_ = new AudioOutput(*this, "audio_out", ChannelLayout::kMono);
         AddOutput(*audio_out_);
+
+        UiBuilder ui(*this);
+        //auto param = CreateParameter("Detune", ControlMeta::kDefault, &detune_, 0.f, -12.f, 12.f, 0.01f);
+        auto param = CreateParameter("Detune", ControlMeta::kSemitones, &detune_, 0.f, -24.f, 24.f, 0.01f);
+        ui.Knob("Detune", param);
 
         return true;
     }

@@ -14,13 +14,6 @@ struct Meta : std::map<std::string, std::string> {
     }
 
     bool has(const char *key) const { return find(key) != end(); }
-
-    /*
-    bool isKnob() const {
-        auto it = find("style");
-        return it != end() && it->second == "knob";
-    }
-    */
 };
 
 } // namespace augr

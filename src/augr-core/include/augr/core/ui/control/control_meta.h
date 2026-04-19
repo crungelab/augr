@@ -3,8 +3,8 @@
 
 #include <cstring>
 
-#include <augr/core/ui/control/control_unit.h>
 #include <augr/core/meta.h>
+#include <augr/core/ui/control/control_unit.h>
 
 namespace augr {
 
@@ -43,7 +43,24 @@ struct ControlMeta : Meta {
         return it != end() && it->second == "knob";
     }
 
+    // Default
     static const ControlMeta kDefault;
+    // Amplitude / level
+    static const ControlMeta kDecibel;
+    // Frequency
+    static const ControlMeta kHertz;
+    static const ControlMeta kKilohertz;
+    // Time
+    static const ControlMeta kSeconds;
+    static const ControlMeta kMilliseconds;
+    // Angle / phase
+    static const ControlMeta kDegrees;
+    static const ControlMeta kRadians;
+    // Normalized / dimensionless
+    static const ControlMeta kPercent;
+    static const ControlMeta kSemitones;
+    static const ControlMeta kOctaves;
+    static const ControlMeta kBpm;
 };
 
 } // namespace augr
