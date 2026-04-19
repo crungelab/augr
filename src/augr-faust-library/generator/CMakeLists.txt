@@ -24,6 +24,12 @@ faust_generate_header_once(
   "virtual_analog_dsp.h"
 )
 
+faust_generate_header_once(
+  "${FAUST_EXAMPLES_DIR}/generator/virtualAnalogLab.dsp"
+  "VirtualAnalogLabDsp"
+  "virtual_analog_lab_dsp.h"
+)
+
 target_sources(${THIS}
   PRIVATE
   generator.cpp
