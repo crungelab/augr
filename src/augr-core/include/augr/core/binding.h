@@ -7,6 +7,8 @@
 
 #include "config.h"
 
+namespace augr {
+
 class Binding {
 public:
     Binding() = default;
@@ -82,3 +84,5 @@ public:
 private:
     fy_real* zone_ = nullptr;
 };
+
+} // namespace augr

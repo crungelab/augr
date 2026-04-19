@@ -1,7 +1,7 @@
 #include "imgui.h"
 
 #include "widget.h"
-#include <augr/core/control/h_slider.h>
+#include <augr/core/ui/control/h_slider.h>
 
 namespace augr {
 

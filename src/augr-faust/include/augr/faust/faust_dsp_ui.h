@@ -8,7 +8,7 @@
 #include <set>
 #include <vector>
 
-#include <augr/core/control/control_meta.h>
+#include <augr/core/ui/control/control_meta.h>
 
 #include "faust_ui.h"
 

@@ -3,7 +3,7 @@
 
 #include <cstring>
 
-#include <augr/core/control/control_unit.h>
+#include <augr/core/ui/control/control_unit.h>
 #include <augr/core/meta.h>
 
 namespace augr {

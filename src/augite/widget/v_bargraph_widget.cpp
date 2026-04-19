@@ -9,7 +9,7 @@
 #include "imgui_internal.h"
 
 #include "widget.h"
-#include <augr/core/control/v_bargraph.h>
+#include <augr/core/ui/control/v_bargraph.h>
 
 namespace augr {
 

@@ -1,7 +1,7 @@
 #include <imgui-knobs.h>
 
 #include "widget.h"
-#include <augr/core/control/knob.h>
+#include <augr/core/ui/control/knob.h>
 
 namespace augr {
 

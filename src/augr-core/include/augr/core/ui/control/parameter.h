@@ -39,9 +39,9 @@
 #include <utility>
 #include <vector>
 
-#include "augr/core/binding.h"
-#include "augr/core/control/control.h"
-#include "augr/core/control/control_meta.h"
+#include <augr/core/binding.h>
+#include <augr/core/ui/control/control.h>
+#include <augr/core/ui/control/control_meta.h>
 
 namespace augr {
 

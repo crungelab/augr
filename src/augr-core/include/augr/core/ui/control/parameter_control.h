@@ -8,8 +8,8 @@
 #include <augr/core/config.h>
 #include <augr/core/model.h>
 
-#include <augr/core/control/control.h>
-#include <augr/core/control/parameter.h>
+#include <augr/core/ui/control/control.h>
+#include <augr/core/ui/control/parameter.h>
 
 namespace augr {
 
