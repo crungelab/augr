@@ -51,7 +51,8 @@ public:
     // -------------------------------------------------------------------------
     // Construction
     // -------------------------------------------------------------------------
-    UiBuilder() = default;
+    //UiBuilder() = default;
+    UiBuilder(Model &model);
 
     // -------------------------------------------------------------------------
     // High-level RAII layout — preferred for hand-written modules

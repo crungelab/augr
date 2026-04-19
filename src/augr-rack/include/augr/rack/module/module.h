@@ -12,11 +12,23 @@ namespace augr {
 
 class Module : public Node {
 public:
-    virtual bool Create(Part &owner) override;
-    virtual Audio ProcessAudio(Audio input = Audio()) { return Audio(); }
+    bool Create(Part &owner) override;
+    virtual Audio ProcessAudio(Audio& input) { return Audio(); }
     virtual void Process() {}
 
-    // -- Parameter ownership -------------------------------------------------
+    // -- Parameters -------------------------------------------------
+    Parameter *CreateParameter(const std::string &label, const ControlMeta& meta,
+                               float *zone, const fy_real init,
+                               const fy_real min, const fy_real max,
+                               const fy_real step) {
+
+        auto binding = MakeZoneBinding(zone);
+        auto param = Parameter::Make(label, meta, std::move(binding),
+                                     init, min, max, step);
+        Parameter *raw = param.get();
+        AddParameter(std::move(param));
+        return raw;
+    }
 
     void AddParameter(std::unique_ptr<Parameter> param) {
         parameters_.push_back(std::move(param));
@@ -35,10 +47,10 @@ public:
 
     // Data members
     const char *label_ = nullptr;
-    AudioInput  *audio_in_  = nullptr;
+    AudioInput *audio_in_ = nullptr;
     AudioOutput *audio_out_ = nullptr;
-    MidiInput   *midi_in_   = nullptr;
-    MidiOutput  *midi_out_  = nullptr;
+    MidiInput *midi_in_ = nullptr;
+    MidiOutput *midi_out_ = nullptr;
 
     REFLECT_ENABLE(Node)
 

@@ -11,7 +11,7 @@ class FaustDsp : public Dsp
 public:
   virtual ~FaustDsp() = default;
   bool Create(Part& owner) override;
-  Audio ProcessAudio(Audio input = Audio()) override ;
+  Audio ProcessAudio(Audio& input) override ;
   void Process() override;
   //Faust interface
   virtual int getNumInputs() = 0;

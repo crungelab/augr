@@ -21,10 +21,6 @@
 
 namespace augr {
 
-std::unique_ptr<BindingT<fy_real>> MakeZoneBinding(float *zone) {
-    return std::make_unique<ZoneBinding>(zone);
-}
-
 FaustDspUi::FaustDspUi(FaustDsp &m) : UI(), m_(&m) { PushModel(m); }
 
 void FaustDspUi::PushModel(Model &model) { model_stack_.push_back(&model); }

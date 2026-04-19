@@ -42,6 +42,8 @@ struct ControlMeta : Meta {
         auto it = find("style");
         return it != end() && it->second == "knob";
     }
+
+    static const ControlMeta kDefault;
 };
 
 } // namespace augr

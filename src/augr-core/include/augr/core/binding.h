@@ -85,4 +85,8 @@ private:
     fy_real* zone_ = nullptr;
 };
 
+inline std::unique_ptr<BindingT<fy_real>> MakeZoneBinding(float *zone) {
+    return std::make_unique<ZoneBinding>(zone);
+}
+
 } // namespace augr

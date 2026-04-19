@@ -30,7 +30,7 @@ bool FaustDsp::Create(Part &owner) {
     return true;
 }
 
-Audio FaustDsp::ProcessAudio(Audio input) {
+Audio FaustDsp::ProcessAudio(Audio& input) {
     ChannelLayout layout = audio_out_->layout_;
     Audio output(layout);
 
@@ -50,7 +50,8 @@ void FaustDsp::Process() {
             audio_out_->Write(ProcessAudio(input));
         }
     } else {
-        audio_out_->Write(ProcessAudio());
+        Audio input;
+        audio_out_->Write(ProcessAudio(input));
     }
 }
 
