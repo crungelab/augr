@@ -11,12 +11,13 @@ add_executable(${THIS} "main.cpp" ${CMN_SOURCES} ${CMN_INCLUDES} ${EXE_SOURCES} 
 target_include_directories(${THIS} PRIVATE ${PROJECT_ROOT})
 
 include(${AUGR_CMAKE}/ExeApp.cmake)
-include(${AUGR_CMAKE}/AugrFaust.cmake)
 include(${AUGR_CMAKE}/AugrFaustLibrary.cmake)
+include(${AUGR_CMAKE}/AugrVolt.cmake)
+
 include(${THIS_DIR}/../../cmake/Common.cmake)
 
 USES_EXE_APP(${THIS})
 USES_AUGR_EXE(${THIS})
-USES_AUGR_FAUST(${THIS})
 USES_AUGR_FAUST_LIBRARY(${THIS})
+USES_AUGR_VOLT(${THIS})
 USES_COMMON(${THIS})

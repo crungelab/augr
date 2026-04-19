@@ -20,6 +20,8 @@ public:
     MyApp() {
         extern void InitFaustDspLibrary();
         InitFaustDspLibrary();
+        extern void InitAugrVoltLibrary();
+        InitAugrVoltLibrary();
         // Create the rack view
         view_ = new RackView(rack_);
     }

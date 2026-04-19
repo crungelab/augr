@@ -91,6 +91,9 @@ add_subdirectory(src/augr-faust)
 #AugrFaustLibrary
 add_subdirectory(src/augr-faust-library)
 
+#AugrVolt
+add_subdirectory(src/augr-volt)
+
 #AugrExe
 add_subdirectory(src/augr-exe)
 
