@@ -17,13 +17,28 @@ void ModuleWidget::Draw() {
 
 void ModuleWidget::DrawWindow() {
     ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(8, 8));
+
+    if (ImGui::Begin(window_name_.c_str(), &is_open_)) {
+        ImGui::PushID(model_->id_);
+        DrawChildren();
+        ImGui::PopID();
+    }
+
+    ImGui::End();
+    ImGui::PopStyleVar();
+}
+
+/*
+void ModuleWidget::DrawWindow() {
+    ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(8, 8));
     ImGui::Begin(model_->label_, &is_open_);
-    
+
     DrawChildren();
 
     ImGui::End();
     ImGui::PopStyleVar();
 }
+*/
 
 void ModuleWidget::DrawNode() {
     ImNodes::BeginNode(model_->id_);

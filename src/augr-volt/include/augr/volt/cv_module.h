@@ -7,6 +7,10 @@
 
 namespace augr {
 
+/*
+* Control Voltage (CV) module with adjustable output voltage.
+*/
+
 class CvModule : public Module {
 public:
     bool Create(Part &owner) override {

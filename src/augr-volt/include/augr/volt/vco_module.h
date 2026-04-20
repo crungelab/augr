@@ -13,6 +13,10 @@
 
 namespace augr {
 
+/*
+* Voltage Controlled Oscillator (VCO) module with 1V/oct pitch control, pulse width modulation, and selectable waveforms (saw, square, triangle, sine). Detune parameter allows fine-tuning in semitones.
+*/
+
 class VcoModule : public Module {
 public:
     enum class Waveform { Saw, Square, Tri, Sine };
