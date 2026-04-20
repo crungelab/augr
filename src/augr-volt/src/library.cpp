@@ -7,6 +7,7 @@
 #include <augr/volt/adsr_module.h>
 #include <augr/volt/vcf_module.h>
 #include <augr/volt/attenuverter_module.h>
+#include <augr/volt/lfo_module.h>
 #include <augr/volt/midi_cv_module.h>
 
 using namespace augr;
@@ -17,6 +18,7 @@ DEFINE_MODEL_FACTORY(VcaModule, "VcaModule", "Volt")
 DEFINE_MODEL_FACTORY(AdsrModule, "AdsrModule", "Volt")
 DEFINE_MODEL_FACTORY(VcfModule, "VcfModule", "Volt")
 DEFINE_MODEL_FACTORY(AttenuverterModule, "AttenuverterModule", "Volt")
+DEFINE_MODEL_FACTORY(LfoModule, "LfoModule", "Volt")
 DEFINE_MODEL_FACTORY(MidiCvModule, "MidiCvModule", "Volt")
 
 void InitAugrVoltLibrary() {
@@ -26,5 +28,6 @@ void InitAugrVoltLibrary() {
     REGISTER_MODEL_FACTORY(AdsrModule);
     REGISTER_MODEL_FACTORY(VcfModule);
     REGISTER_MODEL_FACTORY(AttenuverterModule);
+    REGISTER_MODEL_FACTORY(LfoModule);
     REGISTER_MODEL_FACTORY(MidiCvModule);
 }
