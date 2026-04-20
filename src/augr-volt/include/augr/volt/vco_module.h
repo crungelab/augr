@@ -31,17 +31,19 @@ public:
         AddOutput(*audio_out_);
 
         UiBuilder ui(*this);
-        //auto param = CreateFloatParameter("Detune", ControlMeta::kDefault, &detune_, 0.f, -12.f, 12.f, 0.01f);
-        auto detuneParam = CreateFloatParameter("Detune", ControlMeta::kSemitones, &detune_, 0.f, -24.f, 24.f, 0.01f);
+        auto detuneParam =
+            CreateFloatParameter("Detune", ControlMeta::kSemitones, &detune_,
+                                 0.f, -24.f, 24.f, 0.01f);
         ui.Knob("Detune", detuneParam);
 
         std::vector<EnumParameterT<Waveform>::Choice> waveformChoices = {
             {Waveform::Saw, "Saw"},
             {Waveform::Square, "Square"},
             {Waveform::Tri, "Tri"},
-            {Waveform::Sine, "Sine"}
-        };
-        auto waveformParam = CreateEnumParameter("Waveform", ControlMeta::kDefault, &waveform_, waveformChoices, Waveform::Saw);
+            {Waveform::Sine, "Sine"}};
+        auto waveformParam =
+            CreateEnumParameter("Waveform", ControlMeta::kDefault, &waveform_,
+                                waveformChoices, Waveform::Saw);
         ui.Combo("Waveform", waveformParam);
 
         return true;
@@ -52,22 +54,46 @@ public:
         Audio pw_cv = cv_pw_in_->Read();
         Audio output(ChannelLayout::kMono);
 
-        float sr = Audio::sampleRate();
-        int nFrames = Audio::frames();
-        bool has_pitch = pitch_cv.layout_ != ChannelLayout::kNull;
-        bool has_pw = pw_cv.layout_ != ChannelLayout::kNull;
+        const float sr = Audio::sampleRate();
+        const int nFrames = Audio::frames();
+        const bool has_pitch = pitch_cv.layout_ != ChannelLayout::kNull;
+        const bool has_pw = pw_cv.layout_ != ChannelLayout::kNull;
+        const float detune_octaves = detune_ / 12.f;
 
-        auto &out = output.array(); // shape [1][frames]
+        fy_real *out = output.array().data();
+        const fy_real *pitch = has_pitch ? pitch_cv.array().data() : nullptr;
+        const fy_real *pw_buf = has_pw ? pw_cv.array().data() : nullptr;
 
-        for (int i = 0; i < nFrames; ++i) {
-            float cv = has_pitch ? pitch_cv.array()(0, i) : 0.f;
-            float pw =
-                has_pw ? std::clamp(pw_cv.array()(0, i), 0.05f, 0.95f) : 0.5f;
-            float freq = cvToFreq(cv + detune_ / 12.f);
-            float dt = freq / sr;
-
-            out(0, i) = tick(phase_, pw);
-            phase_ = std::fmod(phase_ + dt, 1.f);
+        if (has_pitch && has_pw) {
+            for (int i = 0; i < nFrames; ++i) {
+                const float pw = std::clamp(float(pw_buf[i]), 0.05f, 0.95f);
+                const float freq = cvToFreq(float(pitch[i]) + detune_octaves);
+                const float dt = freq / sr;
+                out[i] = tick(phase_, pw);
+                phase_ = std::fmod(phase_ + dt, 1.f);
+            }
+        } else if (has_pitch) {
+            for (int i = 0; i < nFrames; ++i) {
+                const float freq = cvToFreq(float(pitch[i]) + detune_octaves);
+                const float dt = freq / sr;
+                out[i] = tick(phase_, 0.5f);
+                phase_ = std::fmod(phase_ + dt, 1.f);
+            }
+        } else if (has_pw) {
+            const float freq = cvToFreq(detune_octaves);
+            const float dt = freq / sr;
+            for (int i = 0; i < nFrames; ++i) {
+                const float pw = std::clamp(float(pw_buf[i]), 0.05f, 0.95f);
+                out[i] = tick(phase_, pw);
+                phase_ = std::fmod(phase_ + dt, 1.f);
+            }
+        } else {
+            const float freq = cvToFreq(detune_octaves);
+            const float dt = freq / sr;
+            for (int i = 0; i < nFrames; ++i) {
+                out[i] = tick(phase_, 0.5f);
+                phase_ = std::fmod(phase_ + dt, 1.f);
+            }
         }
 
         audio_out_->Write(output);
@@ -82,9 +108,11 @@ public:
 private:
     VoltageInput *cv_pitch_in_ = nullptr;
     VoltageInput *cv_pw_in_ = nullptr;
+    AudioOutput *audio_out_ = nullptr;
     float phase_ = 0.f;
 
-    static float cvToFreq(float cv) { return 440.f * std::pow(2.f, cv); }
+    // 0V = C4 (middle C, ~261.63 Hz), 1V/octave
+    static float cvToFreq(float cv) { return 261.6255653f * std::pow(2.f, cv); }
 
     float tick(float phase, float pw) {
         switch (waveform_) {

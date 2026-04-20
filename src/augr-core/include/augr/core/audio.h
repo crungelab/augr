@@ -4,7 +4,6 @@
 #undef min
 #undef max
 
-// #include <xtensor/xarray.hpp>
 #include "config.h"
 #include <xtensor/containers/xadapt.hpp>
 

@@ -7,7 +7,7 @@
 
 namespace augr {
 
-class ControlVoltage : public Module {
+class CvModule : public Module {
 public:
     bool Create(Part &owner) override {
         Module::Create(owner);
