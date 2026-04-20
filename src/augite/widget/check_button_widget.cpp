@@ -10,7 +10,7 @@ public:
     CheckButtonWidget(CheckButton &model) : WidgetT<CheckButton>(model) {}
 
     void Draw() override {
-        Parameter *param = model_->param();
+        FloatParameter *param = model_->param();
         bool checked = param->value() != fy_real{0};
 
         if (ImGui::Checkbox(param->label().c_str(), &checked))

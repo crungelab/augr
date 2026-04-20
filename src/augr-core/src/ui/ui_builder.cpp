@@ -39,42 +39,22 @@ void UiBuilder::declare(float *zone, const char *key, const char *value) {
 }
 */
 
-// ---------------------------------------------------------------------------
-// Helper: build a Parameter, register it with FaustDsp, return a
-// ParameterControl view.  The Parameter is owned by FaustDsp; the
-// ParameterControl is owned by the model tree.
-// ---------------------------------------------------------------------------
-
-/*
-Parameter* UiBuilder::MakeParameter(const std::string& label, float *zone,
-                                     const fy_real init, const fy_real min,
-                                     const fy_real max, const fy_real step) {
-
-    auto meta = std::move(zones_[zone]);
-    auto binding = MakeZoneBinding(zone);
-    auto param = Parameter::Make(label, std::move(meta), std::move(binding),
-                                 init, min, max, step);
-    Parameter *raw = param.get();
-    m_->AddParameter(std::move(param)); // FaustDsp owns the Parameter
-    return raw;
-}
-*/
 
 // ---------------------------------------------------------------------------
 // Buttons / toggles — no range, map to [0, 1] boolean parameters
 // ---------------------------------------------------------------------------
 
-UiBuilder &UiBuilder::Button(const std::string &label, Parameter *param) {
+UiBuilder &UiBuilder::Button(const std::string &label, FloatParameter *param) {
     AddModel(*new augr::Button(label, param));
     return *this;
 }
 
-UiBuilder &UiBuilder::ToggleButton(const std::string &label, Parameter *param) {
+UiBuilder &UiBuilder::ToggleButton(const std::string &label, FloatParameter *param) {
     AddModel(*new augr::ToggleButton(label, param));
     return *this;
 }
 
-UiBuilder &UiBuilder::CheckButton(const std::string &label, Parameter *param) {
+UiBuilder &UiBuilder::CheckButton(const std::string &label, FloatParameter *param) {
     AddModel(*new augr::CheckButton(label, param));
     return *this;
 }
@@ -83,22 +63,22 @@ UiBuilder &UiBuilder::CheckButton(const std::string &label, Parameter *param) {
 // Sliders / knobs / num entry — full range
 // ---------------------------------------------------------------------------
 
-UiBuilder &UiBuilder::VSlider(const std::string &label, Parameter *param) {
+UiBuilder &UiBuilder::VSlider(const std::string &label, FloatParameter *param) {
     AddModel(*new augr::VSlider(label, param));
     return *this;
 }
 
-UiBuilder &UiBuilder::HSlider(const std::string &label, Parameter *param) {
+UiBuilder &UiBuilder::HSlider(const std::string &label, FloatParameter *param) {
     AddModel(*new augr::HSlider(label, param));
     return *this;
 }
 
-UiBuilder &UiBuilder::Knob(const std::string &label, Parameter *param) {
+UiBuilder &UiBuilder::Knob(const std::string &label, FloatParameter *param) {
     AddModel(*new augr::Knob(label, param));
     return *this;
 }
 
-UiBuilder &UiBuilder::NumEntry(const std::string &label, Parameter *param) {
+UiBuilder &UiBuilder::NumEntry(const std::string &label, FloatParameter *param) {
     AddModel(*new augr::NumEntry(label, param));
     return *this;
 }
@@ -107,12 +87,12 @@ UiBuilder &UiBuilder::NumEntry(const std::string &label, Parameter *param) {
 // Bargraphs — read-only, no step
 // ---------------------------------------------------------------------------
 
-UiBuilder &UiBuilder::HBarGraph(const std::string &label, Parameter *param) {
+UiBuilder &UiBuilder::HBarGraph(const std::string &label, FloatParameter *param) {
     AddModel(*new augr::HBarGraph(label, param));
     return *this;
 }
 
-UiBuilder &UiBuilder::VBarGraph(const std::string &label, Parameter *param) {
+UiBuilder &UiBuilder::VBarGraph(const std::string &label, FloatParameter *param) {
     AddModel(*new augr::VBarGraph(label, param));
     return *this;
 }

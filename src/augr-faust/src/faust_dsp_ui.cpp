@@ -42,19 +42,19 @@ void FaustDspUi::declare(float *zone, const char *key, const char *value) {
 
 // ---------------------------------------------------------------------------
 // Helper: build a Parameter, register it with FaustDsp, return a
-// ParameterControl view.  The Parameter is owned by FaustDsp; the
-// ParameterControl is owned by the model tree.
+// FloatParameterControl view.  The Parameter is owned by FaustDsp; the
+// FloatParameterControl is owned by the model tree.
 // ---------------------------------------------------------------------------
 
-Parameter* FaustDspUi::MakeParameter(const char *label, float *zone,
+FloatParameter* FaustDspUi::MakeParameter(const char *label, float *zone,
                                      const fy_real init, const fy_real min,
                                      const fy_real max, const fy_real step) {
 
     auto meta = std::move(zones_[zone]);
-    auto binding = MakeZoneBinding(zone);
-    auto param = Parameter::Make(label, std::move(meta), std::move(binding),
+    auto binding = MakePointerBinding(zone);
+    auto param = FloatParameter::Make(label, std::move(meta), std::move(binding),
                                  init, min, max, step);
-    Parameter *raw = param.get();
+    FloatParameter *raw = param.get();
     m_->AddParameter(std::move(param)); // FaustDsp owns the Parameter
     return raw;
 }
@@ -124,14 +124,14 @@ void FaustDspUi::addVerticalBargraph(const char *label, float *zone, float min,
 void FaustDspUi::addNumDisplay(const char *label, float *zone,
                                const int precision) {
     const auto meta = zones_[zone];
-    AddModel(*new NumDisplay(label, meta, MakeZoneBinding(zone), precision));
+    AddModel(*new NumDisplay(label, meta, MakePointerBinding(zone), precision));
 }
 
 void FaustDspUi::addTextDisplay(const char *label, float *zone, char *names[],
                                 const float min, const float max) {
 
     const auto meta = zones_[zone];
-    AddModel(*new TextDisplay(label, meta, MakeZoneBinding(zone), names, min, max));
+    AddModel(*new TextDisplay(label, meta, MakePointerBinding(zone), names, min, max));
 }
 
 // ---------------------------------------------------------------------------

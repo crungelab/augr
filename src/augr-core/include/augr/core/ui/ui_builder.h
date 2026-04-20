@@ -15,7 +15,7 @@
 namespace augr {
 
 class ControlMeta;
-class Parameter;
+class FloatParameter;
 
 class UiBuilder {
 public:
@@ -75,22 +75,22 @@ public:
     // -------------------------------------------------------------------------
     // Sliders / knobs — return *this for chaining
     // -------------------------------------------------------------------------
-    UiBuilder &Knob(const std::string &label, Parameter *param);
+    UiBuilder &Knob(const std::string &label, FloatParameter *param);
 
-    UiBuilder &VSlider(const std::string &label, Parameter *param);
+    UiBuilder &VSlider(const std::string &label, FloatParameter *param);
 
-    UiBuilder &HSlider(const std::string &label, Parameter *param);
+    UiBuilder &HSlider(const std::string &label, FloatParameter *param);
 
-    UiBuilder &NumEntry(const std::string &label, Parameter *param);
+    UiBuilder &NumEntry(const std::string &label, FloatParameter *param);
 
     // -------------------------------------------------------------------------
     // Buttons — return *this for chaining
     // -------------------------------------------------------------------------
-    UiBuilder &Button(const std::string &label, Parameter *param);
+    UiBuilder &Button(const std::string &label, FloatParameter *param);
 
-    UiBuilder &CheckButton(const std::string &label, Parameter *param);
+    UiBuilder &CheckButton(const std::string &label, FloatParameter *param);
 
-    UiBuilder &ToggleButton(const std::string &label, Parameter *param);
+    UiBuilder &ToggleButton(const std::string &label, FloatParameter *param);
 
     // -------------------------------------------------------------------------
     // Displays — return *this for chaining
@@ -106,9 +106,9 @@ public:
     // is_db: drives dB-scaled rendering; resolved by caller (e.g. FaustDspUi
     // checks its zones_ map before calling, hand-written modules pass directly)
     // -------------------------------------------------------------------------
-    UiBuilder &HBarGraph(const std::string &label, Parameter *param);
+    UiBuilder &HBarGraph(const std::string &label, FloatParameter *param);
 
-    UiBuilder &VBarGraph(const std::string &label, Parameter *param);
+    UiBuilder &VBarGraph(const std::string &label, FloatParameter *param);
 
     // -------------------------------------------------------------------------
     // Result
@@ -130,11 +130,7 @@ private:
     void PushModel(Model &model);
     Model *PopModel();
     void AddModel(Model &model);
-    /*
-    Parameter *MakeParameter(const std::string &label, float *zone,
-                             fy_real init, fy_real min, fy_real max,
-                             fy_real step);
-    */
+
     std::vector<Model *> model_stack_;
     Model *root_ = nullptr;
     std::string module_label_;

@@ -11,7 +11,7 @@ public:
 
     void Draw() override {
         ImVec2 size(64, 128);
-        Parameter* param = model_->param();
+        FloatParameter* param = model_->param();
 
         float pos = static_cast<float>(param->GetNormalized());
 

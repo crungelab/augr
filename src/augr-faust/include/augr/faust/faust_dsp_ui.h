@@ -35,7 +35,7 @@ public:
     Model *PopModel();
     void AddModel(Model &model);
 
-    Parameter *MakeParameter(const char *label, float *zone, fy_real init,
+    FloatParameter *MakeParameter(const char *label, float *zone, fy_real init,
                              fy_real min, fy_real max, fy_real step);
     // Builder methods
     void declare(float *zone, const char *key, const char *value) override;

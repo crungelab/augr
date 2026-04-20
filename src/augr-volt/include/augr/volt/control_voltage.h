@@ -17,7 +17,7 @@ public:
         AddOutput(*cv_out_);
 
         UiBuilder ui(*this);
-        auto param = CreateParameter("Voltage", ControlMeta::kDefault, &voltage_, 0.f, -4.f, 4.f, 0.01f);
+        auto param = CreateFloatParameter("Voltage", ControlMeta::kDefault, &voltage_, 0.f, -4.f, 4.f, 0.01f);
         ui.Knob("Voltage", param);
 
         return true;

@@ -5,7 +5,7 @@ namespace augr {
 
 class VBarGraph : public BarGraphBase {
 public:
-  VBarGraph(std::string label, Parameter *param) : BarGraphBase(label, param) {}
+  VBarGraph(std::string label, FloatParameter *param) : BarGraphBase(label, param) {}
 
   REFLECT_ENABLE(BarGraphBase)
 };

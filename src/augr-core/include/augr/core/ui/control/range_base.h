@@ -1,16 +1,16 @@
 #pragma once
 
-#include "parameter_control.h"
+#include "float_parameter_control.h"
 
 namespace augr {
 
-class RangeBase : public ParameterControl {
+class RangeBase : public FloatParameterControl {
 public:
-    RangeBase(std::string label, Parameter *param)
-        : ParameterControl(label, param) {}
+    RangeBase(std::string label, FloatParameter *param)
+        : FloatParameterControl(label, param) {}
     // Data members
 
-    REFLECT_ENABLE(ParameterControl)
+    REFLECT_ENABLE(FloatParameterControl)
 };
 
 } // namespace augr

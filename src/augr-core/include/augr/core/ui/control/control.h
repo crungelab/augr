@@ -34,7 +34,7 @@ public:
     REFLECT_ENABLE(Model)
 };
 
-template <typename T> class BoundControl : public Control {
+template <typename T, typename TBase = Control> class BoundControl : public TBase {
 public:
     using BindingType = BindingT<T>;
     using BindingPtr = std::shared_ptr<BindingType>;
@@ -43,7 +43,7 @@ public:
 
     explicit BoundControl(std::string label, ControlMeta meta = {},
                           BindingPtr binding = nullptr)
-        : Control(std::move(label), std::move(meta)),
+        : TBase(std::move(label), std::move(meta)),
           binding_(std::move(binding)) {}
 
     T value() const { return binding_ ? binding_->get() : T{}; }

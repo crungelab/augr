@@ -10,26 +10,10 @@
 
 #include <augr/core/ui/control/control.h>
 #include <augr/core/ui/control/float_parameter.h>
+#include <augr/core/ui/control/parameter_control.h>
 
 namespace augr {
 
-template <typename T, typename TBase = Control>
-class ParameterControl : public Control {
-public:
-    ParameterControl() = default;
-    explicit ParameterControl(std::string label, T *param)
-        : Control(std::move(label), param->meta()), param_(param) {}
-
-    T *param() { return param_; }
-    const T *param() const { return param_; }
-
-    REFLECT_ENABLE(Control)
-
-private:
-    T *param_; // non-owning — Parameter lives in Module
-};
-
-/*
 class FloatParameterControl : public ParameterControl<FloatParameter> {
 public:
     FloatParameterControl() = default;
@@ -38,7 +22,6 @@ public:
 
     REFLECT_ENABLE(ParameterControl<FloatParameter>)
 };
-*/
 
 /*
 class FloatParameterControl : public Control {

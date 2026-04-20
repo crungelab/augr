@@ -3,7 +3,7 @@
 #include <memory>
 #include <vector>
 
-#include <augr/core/ui/control/parameter.h>
+#include <augr/core/ui/control/float_parameter.h>
 #include <augr/rack/audio_pin.h>
 #include <augr/rack/midi_pin.h>
 #include <augr/rack/node.h>
@@ -17,15 +17,15 @@ public:
     virtual void Process() {}
 
     // -- Parameters -------------------------------------------------
-    Parameter *CreateParameter(const std::string &label, const ControlMeta& meta,
+    FloatParameter *CreateFloatParameter(const std::string &label, const ControlMeta& meta,
                                float *zone, const fy_real init,
                                const fy_real min, const fy_real max,
                                const fy_real step) {
 
-        auto binding = MakeZoneBinding(zone);
-        auto param = Parameter::Make(label, meta, std::move(binding),
+        auto binding = MakePointerBinding(zone);
+        auto param = FloatParameter::Make(label, meta, std::move(binding),
                                      init, min, max, step);
-        Parameter *raw = param.get();
+        FloatParameter *raw = param.get();
         AddParameter(std::move(param));
         return raw;
     }

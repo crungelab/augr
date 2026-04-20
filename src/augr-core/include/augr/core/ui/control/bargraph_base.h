@@ -1,15 +1,15 @@
 #pragma once
 
-#include "parameter_control.h"
+#include "float_parameter_control.h"
 
 namespace augr {
 
-class BarGraphBase : public ParameterControl {
+class BarGraphBase : public FloatParameterControl {
 public:
-    BarGraphBase(std::string label, Parameter* param)
-        : ParameterControl(label, param) {}
+    BarGraphBase(std::string label, FloatParameter* param)
+        : FloatParameterControl(label, param) {}
 
-    REFLECT_ENABLE(ParameterControl)
+    REFLECT_ENABLE(FloatParameterControl)
 };
 
 } // namespace augr

@@ -10,7 +10,7 @@ public:
     ButtonWidget(Button &model) : WidgetT<Button>(model) {}
 
     void Draw() override {
-        Parameter *param = model_->param();
+        FloatParameter *param = model_->param();
         ImGui::Button(param->label().c_str());
         param->set_value(ImGui::IsItemActive() ? param->max() : param->min());
     }

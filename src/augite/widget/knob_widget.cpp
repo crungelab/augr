@@ -10,7 +10,7 @@ public:
     KnobWidget(Knob &model) : WidgetT<Knob>(model) {}
 
     void Draw() override {
-        Parameter *param = model_->param();
+        FloatParameter *param = model_->param();
         float pos = static_cast<float>(param->GetNormalized());
 
         if (ImGuiKnobs::Knob(param->label().c_str(), &pos, 0.f, 1.f, 0.f,

@@ -14,25 +14,23 @@ public:
     Binding() = default;
     virtual ~Binding() = default;
 
-    virtual const std::type_info& value_type() const = 0;
+    virtual const std::type_info &value_type() const = 0;
 };
 
-template <typename T>
-class BindingT : public Binding {
+template <typename T> class BindingT : public Binding {
 public:
     using ValueType = T;
 
     BindingT() = default;
     ~BindingT() override = default;
 
-    const std::type_info& value_type() const override { return typeid(T); }
+    const std::type_info &value_type() const override { return typeid(T); }
 
     virtual T get() const = 0;
-    virtual void set(const T& value) = 0;
+    virtual void set(const T &value) = 0;
 };
 
-template <typename T>
-class ValueBinding : public BindingT<T> {
+template <typename T> class ValueBinding : public BindingT<T> {
 public:
     ValueBinding() = default;
 
@@ -40,24 +38,23 @@ public:
 
     T get() const override { return value_; }
 
-    void set(const T& value) override { value_ = value; }
+    void set(const T &value) override { value_ = value; }
 
 private:
     T value_{};
 };
 
-template <typename T>
-class CallbackBinding : public BindingT<T> {
+template <typename T> class CallbackBinding : public BindingT<T> {
 public:
     using Getter = std::function<T()>;
-    using Setter = std::function<void(const T&)>;
+    using Setter = std::function<void(const T &)>;
 
     CallbackBinding(Getter getter, Setter setter)
         : getter_(std::move(getter)), setter_(std::move(setter)) {}
 
     T get() const override { return getter_ ? getter_() : T{}; }
 
-    void set(const T& value) override {
+    void set(const T &value) override {
         if (setter_) {
             setter_(value);
         }
@@ -68,25 +65,24 @@ private:
     Setter setter_;
 };
 
-class ZoneBinding : public BindingT<fy_real> {
+template <typename T> class PointerBinding : public BindingT<T> {
 public:
-    ZoneBinding(fy_real* zone)
-        : zone_(zone) {}
+    PointerBinding(T *zone) : zone_(zone) {}
 
-    fy_real get() const override { return zone_ ? *zone_ : fy_real{}; }
+    T get() const override { return zone_ ? *zone_ : T{}; }
 
-    void set(const fy_real& value) override {
+    void set(const T &value) override {
         if (zone_) {
             *zone_ = value;
         }
     }
 
 private:
-    fy_real* zone_ = nullptr;
+    T *zone_ = nullptr;
 };
 
-inline std::unique_ptr<BindingT<fy_real>> MakeZoneBinding(float *zone) {
-    return std::make_unique<ZoneBinding>(zone);
+template <typename T> std::shared_ptr<BindingT<T>> MakePointerBinding(T *zone) {
+    return std::make_shared<PointerBinding<T>>(zone);
 }
 
 } // namespace augr
