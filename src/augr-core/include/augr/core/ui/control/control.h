@@ -67,6 +67,7 @@ protected:
 };
 
 using FloatControl = BoundControl<fy_real>;
+using IntControl = BoundControl<int>;
 using BoolControl = BoundControl<bool>;
 
 } // namespace augr
