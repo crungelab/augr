@@ -106,7 +106,7 @@ public:
     }
 
     TConnection *CreateConnection(Pin &input, SlotT<T> *slot,
-                           const TCallback &callback) {
+                                  const TCallback &callback) {
         auto *connection = new TConnection(*this, input, slot, callback);
         connections_.push_back(connection);
         return connection;
@@ -168,9 +168,85 @@ public:
 
     bool connected() const { return connection_ != nullptr; }
 
-private:
+protected:
     TConnection *connection_ = nullptr;
 };
+
+// QueueInputT — single-connection input that accumulates incoming values
+// for later batch retrieval. Intended for event streams like MIDI where
+// multiple messages can arrive within a single audio buffer.
+template <typename T, typename TBase>
+class QueueInputT : public MonoInputT<T, TBase> {
+    using TConnection = ConnectionT<T>;
+    using TOutput = OutputT<T, TBase>;
+
+public:
+    template <typename... Args>
+    QueueInputT(Node &node, std::string name, Args &&...args)
+        : MonoInputT<T, TBase>(node, name, std::forward<Args>(args)...) {}
+
+    Connection *Connect(Pin &_output) override {
+        if (this->connection_)
+            return nullptr;
+
+        TOutput *output = dynamic_cast<TOutput *>(&_output);
+        if (!output)
+            return nullptr;
+
+        this->connection_ =
+            output->CreateConnection(*this, nullptr, [this](T value) {
+                std::lock_guard<std::mutex> lock(mutex_);
+                queue_.push_back(value);
+            });
+        return this->connection_;
+    }
+
+    // Drain all queued values. Returns the batch; internal queue becomes empty.
+    std::vector<T> Drain() {
+        std::vector<T> out;
+        std::lock_guard<std::mutex> lock(mutex_);
+        out.swap(queue_);
+        return out;
+    }
+
+    bool Empty() const {
+        std::lock_guard<std::mutex> lock(mutex_);
+        return queue_.empty();
+    }
+
+private:
+    std::vector<T> queue_;
+    mutable std::mutex mutex_;
+};
+/*
+// QueueInputT — single-connection input; queues incoming values for later
+// retrieval
+template <typename T, typename TBase>
+class QueueInputT : public MonoInputT<T, TBase> {
+    using TConnection = ConnectionT<T>;
+    using TOutput = OutputT<T, TBase>;
+
+public:
+    template <typename... Args>
+    QueueInputT(Node &node, std::string name, Args &&...args)
+        : MonoInputT<T, TBase>(node, name, std::forward<Args>(args)...) {}
+
+    void Write(T value) override {
+        MonoInputT<T, TBase>::Write(value);
+        queue_.push_back(value);
+    }
+    T Read() {
+        if (queue_.empty())
+            return T{};
+        T value = queue_.front();
+        queue_.erase(queue_.begin());
+        return value;
+    }
+    bool Empty() const { return queue_.empty(); }
+    // Data members
+    std::vector<T> queue_;
+};
+*/
 
 // PolyInputT — multi-connection input; mixes all sources via Reduce()
 template <typename T, typename TBase> class PolyInputT : public PinT<T, TBase> {

@@ -37,6 +37,7 @@ public:
     }
 
     void Process() override {
+        /*
         MidiMessage msg = midi_in_->Read();
 
         // Only react to messages we haven't already consumed. seconds() is a
@@ -44,6 +45,13 @@ public:
         // holding a stale message from a previous buffer.
         if (msg.size() > 0 && msg.seconds() != last_seconds_) {
             last_seconds_ = msg.seconds();
+            HandleMessage(msg);
+        }
+        */
+
+        // Drain all pending MIDI messages. This allows us to handle multiple
+        // messages per buffer, which is important for high-velocity playing
+        for (const MidiMessage &msg : midi_in_->Drain()) {
             HandleMessage(msg);
         }
 

@@ -6,6 +6,7 @@
 namespace augr {
 
 using MidiOutput = OutputT<MidiMessage, Pin>;
-using MidiInput = MonoInputT<MidiMessage, Pin>;
+//using MidiInput = MonoInputT<MidiMessage, Pin>;
+using MidiInput = QueueInputT<MidiMessage, Pin>;
 
 } // namespace augr
