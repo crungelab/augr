@@ -96,7 +96,7 @@ public:
     }
 
     void Disconnect(Connection &connection) override {
-        Unsubscribe(connection);
+        DestroyConnection(connection);
     }
 
     void Publish(T value) {
@@ -105,14 +105,14 @@ public:
         }
     }
 
-    TConnection *Subscribe(Pin &input, SlotT<T> *slot,
+    TConnection *CreateConnection(Pin &input, SlotT<T> *slot,
                            const TCallback &callback) {
         auto *connection = new TConnection(*this, input, slot, callback);
         connections_.push_back(connection);
         return connection;
     }
 
-    void Unsubscribe(Connection &connection) {
+    void DestroyConnection(Connection &connection) {
         auto *typed = dynamic_cast<TConnection *>(&connection);
         if (!typed)
             return;
@@ -147,7 +147,7 @@ public:
         if (!output)
             return nullptr;
 
-        connection_ = output->Subscribe(
+        connection_ = output->CreateConnection(
             *this, nullptr, [this](T value) { this->value_ = value; });
 
         return connection_;
@@ -158,7 +158,7 @@ public:
             return;
 
         connection.output_->Disconnect(connection);
-        // connection_ was deleted by OutputT::Unsubscribe
+        // connection_ was deleted by OutputT::DestroyConnection
         connection_ = nullptr;
 
         this->value_ = T{};
@@ -190,7 +190,7 @@ public:
         auto *slot = new SlotT<T>();
         slots_.push_back(slot);
 
-        return output->Subscribe(*this, slot, [this, slot](T value) {
+        return output->CreateConnection(*this, slot, [this, slot](T value) {
             slot->Write(value);
             dirty_ = true;
         });
