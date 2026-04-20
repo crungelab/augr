@@ -4,15 +4,18 @@
 #include <augr/volt/cv_module.h>
 #include <augr/volt/vco_module.h>
 #include <augr/volt/vca_module.h>
+#include <augr/volt/adsr_module.h>
 
 using namespace augr;
 
 DEFINE_MODEL_FACTORY(CvModule, "CvModule", "Volt")
 DEFINE_MODEL_FACTORY(VcoModule, "VcoModule", "Volt")
 DEFINE_MODEL_FACTORY(VcaModule, "VcaModule", "Volt")
+DEFINE_MODEL_FACTORY(AdsrModule, "AdsrModule", "Volt")
 
 void InitAugrVoltLibrary() {
     REGISTER_MODEL_FACTORY(CvModule);
     REGISTER_MODEL_FACTORY(VcoModule);
     REGISTER_MODEL_FACTORY(VcaModule);
+    REGISTER_MODEL_FACTORY(AdsrModule);
 }
