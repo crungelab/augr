@@ -17,8 +17,8 @@ namespace augr {
 class EnumParameterControl : public ParameterControl<EnumParameter> {
 public:
     EnumParameterControl() = default;
-    explicit EnumParameterControl(std::string label, EnumParameter *param)
-        : ParameterControl(std::move(label), param) {}
+    explicit EnumParameterControl(const std::string &label, EnumParameter *param)
+        : ParameterControl(label, param) {}
 
     REFLECT_ENABLE(ParameterControl<EnumParameter>)
 };

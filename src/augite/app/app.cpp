@@ -28,6 +28,7 @@ bool App::DoCreate(CreateParams params) {
     REGISTER_WIDGET_FACTORY(ModuleWidget)
     REGISTER_WIDGET_FACTORY(ButtonWidget)
     REGISTER_WIDGET_FACTORY(CheckButtonWidget)
+    REGISTER_WIDGET_FACTORY(ComboWidget)
     REGISTER_WIDGET_FACTORY(VBoxWidget)
     REGISTER_WIDGET_FACTORY(HBoxWidget)
     REGISTER_WIDGET_FACTORY(NumEntryWidget)

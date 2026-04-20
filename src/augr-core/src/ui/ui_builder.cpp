@@ -2,6 +2,8 @@
 
 #include <augr/core/ui/control/button.h>
 #include <augr/core/ui/control/check_button.h>
+#include <augr/core/ui/control/combo.h>
+
 #include <augr/core/ui/control/frame_box.h>
 #include <augr/core/ui/control/h_bargraph.h>
 #include <augr/core/ui/control/h_box.h>
@@ -56,6 +58,15 @@ UiBuilder &UiBuilder::ToggleButton(const std::string &label, FloatParameter *par
 
 UiBuilder &UiBuilder::CheckButton(const std::string &label, FloatParameter *param) {
     AddModel(*new augr::CheckButton(label, param));
+    return *this;
+}
+
+// ---------------------------------------------------------------------------
+// Dropdowns / combos — return *this for chaining
+// ---------------------------------------------------------------------------
+
+UiBuilder &UiBuilder::Combo(const std::string &label, EnumParameter *param) {
+    AddModel(*new augr::Combo(label, param));
     return *this;
 }
 

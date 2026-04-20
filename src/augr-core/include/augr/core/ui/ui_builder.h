@@ -9,13 +9,11 @@
 #include <augr/core/config.h>
 #include <augr/core/model.h>
 
-//#include <augr/core/ui/control/control.h>
-//#include <augr/core/ui/control/control_meta.h>
-
 namespace augr {
 
 class ControlMeta;
 class FloatParameter;
+class EnumParameter;
 
 class UiBuilder {
 public:
@@ -91,6 +89,11 @@ public:
     UiBuilder &CheckButton(const std::string &label, FloatParameter *param);
 
     UiBuilder &ToggleButton(const std::string &label, FloatParameter *param);
+
+    // -------------------------------------------------------------------------
+    // Dropdowns / combos — return *this for chaining
+    // -------------------------------------------------------------------------
+    UiBuilder &Combo(const std::string &label, EnumParameter *param);
 
     // -------------------------------------------------------------------------
     // Displays — return *this for chaining

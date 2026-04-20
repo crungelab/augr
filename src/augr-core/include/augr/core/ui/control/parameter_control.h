@@ -17,8 +17,8 @@ template <typename T, typename TBase = Control>
 class ParameterControl : public Control {
 public:
     ParameterControl() = default;
-    explicit ParameterControl(std::string label, T *param)
-        : Control(std::move(label), param->meta()), param_(param) {}
+    explicit ParameterControl(const std::string &label, T *param)
+        : Control(label, param->meta()), param_(param) {}
 
     T *param() { return param_; }
     const T *param() const { return param_; }

@@ -4,6 +4,8 @@
 #include <vector>
 
 #include <augr/core/ui/control/float_parameter.h>
+#include <augr/core/ui/control/enum_parameter.h>
+
 #include <augr/rack/audio_pin.h>
 #include <augr/rack/midi_pin.h>
 #include <augr/rack/node.h>
@@ -13,19 +15,33 @@ namespace augr {
 class Module : public Node {
 public:
     bool Create(Part &owner) override;
-    virtual Audio ProcessAudio(Audio& input) { return Audio(); }
+    virtual Audio ProcessAudio(Audio &input) { return Audio(); }
     virtual void Process() {}
 
     // -- Parameters -------------------------------------------------
-    FloatParameter *CreateFloatParameter(const std::string &label, const ControlMeta& meta,
-                               float *zone, const fy_real init,
-                               const fy_real min, const fy_real max,
-                               const fy_real step) {
+    FloatParameter *CreateFloatParameter(const std::string &label,
+                                         const ControlMeta &meta, float *zone,
+                                         const fy_real init, const fy_real min,
+                                         const fy_real max,
+                                         const fy_real step) {
 
         auto binding = MakePointerBinding(zone);
-        auto param = FloatParameter::Make(label, meta, std::move(binding),
-                                     init, min, max, step);
+        auto param = FloatParameter::Make(label, meta, std::move(binding), init,
+                                          min, max, step);
         FloatParameter *raw = param.get();
+        AddParameter(std::move(param));
+        return raw;
+    }
+
+    template <typename T>
+    EnumParameterT<T> *CreateEnumParameter(
+        const std::string &label, const ControlMeta &meta, T *zone,
+        std::vector<typename EnumParameterT<T>::Choice> choices, T init) {
+
+        auto binding = MakePointerBinding(zone);
+        auto param = std::make_unique<EnumParameterT<T>>(
+            label, meta, std::move(binding), std::move(choices), init);
+        EnumParameterT<T> *raw = param.get();
         AddParameter(std::move(param));
         return raw;
     }

@@ -12,18 +12,6 @@
 // UIs hold EnumParameter*. Host/audio code that needs the typed value holds
 // EnumParameterT<MyEnum>* (or calls value() on it directly).
 
-/*
-#include <algorithm>
-#include <cassert>
-#include <cmath>
-#include <cstddef>
-#include <optional>
-#include <string>
-#include <type_traits>
-#include <utility>
-#include <vector>
-*/
-
 #include <augr/core/ui/control/parameter.h>
 
 namespace augr {

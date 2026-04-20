@@ -15,8 +15,8 @@ namespace augr {
 class Control : public Model {
 public:
     Control() = default;
-    Control(std::string label, ControlMeta meta = {})
-        : label_(std::move(label)), meta_(std::move(meta)),
+    Control(const std::string &label, ControlMeta meta = {})
+        : label_(label), meta_(meta),
           unit_(meta_.Unit()) {}
 
     virtual ~Control() = default;
@@ -41,9 +41,9 @@ public:
 
     BoundControl() = default;
 
-    explicit BoundControl(std::string label, ControlMeta meta = {},
+    explicit BoundControl(const std::string &label, ControlMeta meta = {},
                           BindingPtr binding = nullptr)
-        : TBase(std::move(label), std::move(meta)),
+        : TBase(label, meta),
           binding_(std::move(binding)) {}
 
     T value() const { return binding_ ? binding_->get() : T{}; }

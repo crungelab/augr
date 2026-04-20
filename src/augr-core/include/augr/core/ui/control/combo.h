@@ -4,9 +4,9 @@
 
 namespace augr {
 
-class Choice : public EnumParameterControl {
+class Combo : public EnumParameterControl {
 public:
-    Choice(std::string label, ControlMeta meta, EnumParameter *param)
+    Combo(const std::string &label, EnumParameter *param)
         : EnumParameterControl(label, param) {}
     // Data members
 

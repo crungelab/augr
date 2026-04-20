@@ -32,8 +32,17 @@ public:
 
         UiBuilder ui(*this);
         //auto param = CreateFloatParameter("Detune", ControlMeta::kDefault, &detune_, 0.f, -12.f, 12.f, 0.01f);
-        auto param = CreateFloatParameter("Detune", ControlMeta::kSemitones, &detune_, 0.f, -24.f, 24.f, 0.01f);
-        ui.Knob("Detune", param);
+        auto detuneParam = CreateFloatParameter("Detune", ControlMeta::kSemitones, &detune_, 0.f, -24.f, 24.f, 0.01f);
+        ui.Knob("Detune", detuneParam);
+
+        std::vector<EnumParameterT<Waveform>::Choice> waveformChoices = {
+            {Waveform::Saw, "Saw"},
+            {Waveform::Square, "Square"},
+            {Waveform::Tri, "Tri"},
+            {Waveform::Sine, "Sine"}
+        };
+        auto waveformParam = CreateEnumParameter("Waveform", ControlMeta::kDefault, &waveform_, waveformChoices, Waveform::Saw);
+        ui.Combo("Waveform", waveformParam);
 
         return true;
     }
