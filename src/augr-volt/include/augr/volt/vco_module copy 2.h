@@ -13,6 +13,10 @@
 
 namespace augr {
 
+/*
+* Voltage Controlled Oscillator (VCO) module with 1V/oct pitch control, pulse width modulation, and selectable waveforms (saw, square, triangle, sine). Detune parameter allows fine-tuning in semitones.
+*/
+
 class VcoModule : public Module {
 public:
     enum class Waveform { Saw, Square, Tri, Sine };
@@ -69,30 +73,30 @@ public:
                 const float pw = std::clamp(float(pw_buf[i]), 0.05f, 0.95f);
                 const float freq = cvToFreq(float(pitch[i]) + detune_octaves);
                 const float dt = freq / sr;
-                out[i] = tick(phase_, dt, pw);
-                phase_ = advance(phase_, dt);
+                out[i] = tick(phase_, pw);
+                phase_ = std::fmod(phase_ + dt, 1.f);
             }
         } else if (has_pitch) {
             for (int i = 0; i < nFrames; ++i) {
                 const float freq = cvToFreq(float(pitch[i]) + detune_octaves);
                 const float dt = freq / sr;
-                out[i] = tick(phase_, dt, 0.5f);
-                phase_ = advance(phase_, dt);
+                out[i] = tick(phase_, 0.5f);
+                phase_ = std::fmod(phase_ + dt, 1.f);
             }
         } else if (has_pw) {
             const float freq = cvToFreq(detune_octaves);
             const float dt = freq / sr;
             for (int i = 0; i < nFrames; ++i) {
                 const float pw = std::clamp(float(pw_buf[i]), 0.05f, 0.95f);
-                out[i] = tick(phase_, dt, pw);
-                phase_ = advance(phase_, dt);
+                out[i] = tick(phase_, pw);
+                phase_ = std::fmod(phase_ + dt, 1.f);
             }
         } else {
             const float freq = cvToFreq(detune_octaves);
             const float dt = freq / sr;
             for (int i = 0; i < nFrames; ++i) {
-                out[i] = tick(phase_, dt, 0.5f);
-                phase_ = advance(phase_, dt);
+                out[i] = tick(phase_, 0.5f);
+                phase_ = std::fmod(phase_ + dt, 1.f);
             }
         }
 
@@ -114,52 +118,14 @@ private:
     // 0V = C4 (middle C, ~261.63 Hz), 1V/octave
     static float cvToFreq(float cv) { return 261.6255653f * std::pow(2.f, cv); }
 
-    static float advance(float phase, float dt) {
-        phase += dt;
-        if (phase >= 1.f)
-            phase -= 1.f;
-        return phase;
-    }
-
-    // PolyBLEP: polynomial band-limited step correction.
-    // Returns a value to add (or subtract) near a discontinuity to suppress
-    // aliasing. |t| is the distance from the discontinuity, normalized by dt.
-    static float polyblep(float t, float dt) {
-        if (t < dt) {
-            // Just after the discontinuity.
-            t /= dt;
-            return t + t - t * t - 1.f;
-        } else if (t > 1.f - dt) {
-            // Just before the next discontinuity.
-            t = (t - 1.f) / dt;
-            return t * t + t + t + 1.f;
-        }
-        return 0.f;
-    }
-
-    float tick(float phase, float dt, float pw) {
+    float tick(float phase, float pw) {
         switch (waveform_) {
-        case Waveform::Saw: {
-            // Naive saw with a downward discontinuity at phase 0 / 1.
-            float v = 2.f * phase - 1.f;
-            v -= polyblep(phase, dt);
-            return v;
-        }
-        case Waveform::Square: {
-            // Naive square: +1 when phase < pw, -1 otherwise.
-            // Upward discontinuity at phase 0, downward at phase pw.
-            float v = phase < pw ? 1.f : -1.f;
-            v += polyblep(phase, dt); // rising edge at 0
-            v -= polyblep(std::fmod(phase - pw + 1.f, 1.f),
-                          dt); // falling edge at pw
-            return v;
-        }
-        case Waveform::Tri: {
-            // Triangle: integrate a PolyBLEP-corrected square.
-            // Slope discontinuities alias less audibly; basic triangle is fine
-            // for now.
+        case Waveform::Saw:
+            return 2.f * phase - 1.f;
+        case Waveform::Square:
+            return phase < pw ? 1.f : -1.f;
+        case Waveform::Tri:
             return 4.f * std::abs(phase - 0.5f) - 1.f;
-        }
         case Waveform::Sine:
             return std::sin(phase * 2.f * float(M_PI));
         }
