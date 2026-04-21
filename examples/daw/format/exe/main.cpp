@@ -18,6 +18,8 @@ using namespace augr;
 class MyApp final : public App {
 public:
     MyApp() {
+        extern void InitAugrRackLibrary();
+        InitAugrRackLibrary();
         extern void InitFaustDspLibrary();
         InitFaustDspLibrary();
         extern void InitAugrVoltLibrary();
