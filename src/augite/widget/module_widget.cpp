@@ -28,18 +28,6 @@ void ModuleWidget::DrawWindow() {
     ImGui::PopStyleVar();
 }
 
-/*
-void ModuleWidget::DrawWindow() {
-    ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(8, 8));
-    ImGui::Begin(model_->label_, &is_open_);
-
-    DrawChildren();
-
-    ImGui::End();
-    ImGui::PopStyleVar();
-}
-*/
-
 void ModuleWidget::DrawNode() {
     ImNodes::BeginNode(model_->id_);
 
