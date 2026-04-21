@@ -35,7 +35,7 @@ public:
     // Data members
 };
 
-template <typename T> class WidgetT : public Widget {
+template <typename T, typename TBase = Widget> class WidgetT : public TBase {
 public:
     WidgetT(T &model) : model_(&model) {}
     Model *model() override { return model_; }
