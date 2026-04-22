@@ -21,7 +21,7 @@ struct AudioConfig {
     unsigned int inputChannels = 0;
     unsigned int outputChannels = 0;
 
-    unsigned int sampleRate = 48000;
+    unsigned int sample_rate = 48000;
     unsigned int frames = 512;
 
     bool nonInterleaved = true;
@@ -43,11 +43,11 @@ public:
         if (config.enableInput) {
             spdlog::debug("AudioConfigurator: selecting duplex device for "
                           "requested sample rate {}",
-                          config.sampleRate);
+                          config.sample_rate);
 
             auto duplexId = selectBestDevice(
                 /*needInput=*/true,
-                /*needOutput=*/true, config.sampleRate);
+                /*needOutput=*/true, config.sample_rate);
 
             if (!duplexId.has_value()) {
                 spdlog::error(
@@ -72,7 +72,7 @@ public:
                 std::min<unsigned int>(2, info.inputChannels);
             config.outputChannels =
                 std::min<unsigned int>(2, info.outputChannels);
-            config.sampleRate = chooseSampleRate(info, config.sampleRate);
+            config.sample_rate = chooseSampleRate(info, config.sample_rate);
 
             if (config.frames == 0) {
                 config.frames = 512;
@@ -80,20 +80,20 @@ public:
 
             spdlog::info(
                 "AudioConfigurator: selected duplex device id={} name='{}' "
-                "inputChannels={} outputChannels={} sampleRate={} frames={}",
+                "inputChannels={} outputChannels={} sample_rate={} frames={}",
                 *duplexId, info.name, config.inputChannels,
-                config.outputChannels, config.sampleRate, config.frames);
+                config.outputChannels, config.sample_rate, config.frames);
 
             return config.inputChannels > 0 && config.outputChannels > 0;
         }
 
         spdlog::debug("AudioConfigurator: selecting output device for "
                       "requested sample rate {}",
-                      config.sampleRate);
+                      config.sample_rate);
 
         auto outputId = selectBestDevice(
             /*needInput=*/false,
-            /*needOutput=*/true, config.sampleRate);
+            /*needOutput=*/true, config.sample_rate);
 
         if (!outputId.has_value()) {
             spdlog::error(
@@ -117,7 +117,7 @@ public:
         config.inputDeviceId = 0;
         config.inputChannels = 0;
 
-        config.sampleRate = chooseSampleRate(info, config.sampleRate);
+        config.sample_rate = chooseSampleRate(info, config.sample_rate);
 
         if (config.frames == 0) {
             config.frames = 512;
@@ -125,8 +125,8 @@ public:
 
         spdlog::info(
             "AudioConfigurator: selected output device id={} name='{}' "
-            "outputChannels={} sampleRate={} frames={}",
-            *outputId, info.name, config.outputChannels, config.sampleRate,
+            "outputChannels={} sample_rate={} frames={}",
+            *outputId, info.name, config.outputChannels, config.sample_rate,
             config.frames);
 
         return config.outputChannels > 0;
@@ -148,9 +148,9 @@ private:
     }
 
     static bool supportsSampleRate(const RtAudio::DeviceInfo &info,
-                                   unsigned int sampleRate) {
+                                   unsigned int sample_rate) {
         return std::find(info.sampleRates.begin(), info.sampleRates.end(),
-                         sampleRate) != info.sampleRates.end();
+                         sample_rate) != info.sampleRates.end();
     }
 
     std::optional<RtAudio::DeviceInfo>

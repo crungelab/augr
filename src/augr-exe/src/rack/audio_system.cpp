@@ -71,7 +71,7 @@ bool AudioSystem::Create(AudioConfig &config) {
         &oParams,
         config.enableInput ? &iParams : nullptr,
         FORMAT,
-        config.sampleRate,
+        config.sample_rate,
         &frames,
         &AudioSystem::Callback,
         &rack_,
@@ -86,7 +86,7 @@ bool AudioSystem::Create(AudioConfig &config) {
     config.frames = frames;
 
     Audio::frames_     = frames;
-    Audio::sampleRate_ = config.sampleRate;
+    Audio::sample_rate_ = config.sample_rate;
 
     return true;
 }

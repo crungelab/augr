@@ -5,7 +5,7 @@
 namespace augr {
 
 // A Voltage is a mono Audio buffer carrying a control signal rather than audio.
-// Using a typedef keeps the buffer machinery (xtensor, frames, sampleRate) shared.
+// Using a typedef keeps the buffer machinery (xtensor, frames, sample_rate) shared.
 using Voltage = Audio;
 
 class VoltageInput : public AudioInput {

@@ -58,7 +58,7 @@ public:
         Audio output(ChannelLayout::kMono);
 
         const int nFrames = Audio::frames();
-        const float sr = Audio::sampleRate();
+        const float sr = Audio::sample_rate();
         const bool has_rate_cv = rate_cv.layout_ != ChannelLayout::kNull;
         const bool has_reset = reset_cv.layout_ != ChannelLayout::kNull;
 

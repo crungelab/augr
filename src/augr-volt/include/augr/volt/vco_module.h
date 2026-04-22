@@ -58,7 +58,7 @@ public:
         Audio fm_audio = audio_fm_in_->Read();
         Audio output(ChannelLayout::kMono);
 
-        const float sr = Audio::sampleRate();
+        const float sr = Audio::sample_rate();
         const int nFrames = Audio::frames();
         const bool has_pitch = pitch_cv.layout_ != ChannelLayout::kNull;
         const bool has_pw = pw_cv.layout_ != ChannelLayout::kNull;

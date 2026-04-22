@@ -51,7 +51,7 @@ public:
         Audio pw_cv = cv_pw_in_->Read();
         Audio output(ChannelLayout::kMono);
 
-        float sr = Audio::sampleRate();
+        float sr = Audio::sample_rate();
         int nFrames = Audio::frames();
         bool has_pitch = pitch_cv.layout_ != ChannelLayout::kNull;
         bool has_pw = pw_cv.layout_ != ChannelLayout::kNull;

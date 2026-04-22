@@ -62,7 +62,7 @@ public:
         return *this;
     }
     // Accessors
-    static unsigned int sampleRate() { return sampleRate_; }
+    static unsigned int sample_rate() { return sample_rate_; }
     static unsigned int frames() { return frames_; }
 
     xt::xarray<fy_real> &array() { return impl_->array(); }
@@ -74,7 +74,7 @@ public:
     AudioImpl &impl() { return *impl_.get(); }
     // Data members
     static unsigned int frames_;
-    static unsigned int sampleRate_;
+    static unsigned int sample_rate_;
     ChannelLayout layout_;
     AudioImplPtr impl_;
 };

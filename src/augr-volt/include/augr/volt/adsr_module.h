@@ -52,7 +52,7 @@ public:
         Audio gate_cv = gate_in_->Read();
         Audio output(ChannelLayout::kMono);
 
-        const float sr = Audio::sampleRate();
+        const float sr = Audio::sample_rate();
         const int nFrames = Audio::frames();
         const bool has_gate = gate_cv.layout_ != ChannelLayout::kNull;
 

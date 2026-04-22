@@ -3,7 +3,7 @@
 #include <augr/core/audio.h>
 
 unsigned int Audio::frames_ = 512;
-unsigned int Audio::sampleRate_ = 44100;
+unsigned int Audio::sample_rate_ = 44100;
 
 Audio::Audio(const Audio &other) {
     layout_ = other.layout_;

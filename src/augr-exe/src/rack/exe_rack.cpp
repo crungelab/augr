@@ -87,7 +87,7 @@ bool ExeRack::CreateMidiOutputDevice() {
 bool ExeRack::Create() {
     AudioConfig config;
     config.enableInput = false;
-    config.sampleRate = 48000;
+    config.sample_rate = 48000;
     config.frames = 512;
 
     if (!audio_system_.Create(config))
