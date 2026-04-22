@@ -43,6 +43,10 @@ add_subdirectory(${XTL_ROOT})
 add_subdirectory(${XTENSOR_ROOT})
 #XTENSOR END
 
+#KISSFFT BEGIN
+add_subdirectory(${KISSFFT_ROOT})
+#KISSFFT END
+
 #IMGUI BEGIN
 add_subdirectory(${AUGR_ROOT}/src/imgui)
 #IMGUI END

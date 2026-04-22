@@ -27,6 +27,7 @@ bool App::DoCreate(CreateParams params) {
     REGISTER_WIDGET_FACTORY(RackWidget)
     REGISTER_WIDGET_FACTORY(DefaultModuleWidget)
     REGISTER_WIDGET_FACTORY(ScopeWidget)
+    REGISTER_WIDGET_FACTORY(SpectralWidget)
     REGISTER_WIDGET_FACTORY(ButtonWidget)
     REGISTER_WIDGET_FACTORY(CheckButtonWidget)
     REGISTER_WIDGET_FACTORY(ComboWidget)

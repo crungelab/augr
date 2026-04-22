@@ -24,6 +24,8 @@ set(RTMIDI_ROOT ${AUGR_DEPOT}/rtmidi)
 set(MIDIFILE_ROOT ${AUGR_DEPOT}/midifile)
 set(XTENSOR_ROOT ${AUGR_DEPOT}/xtensor)
 set(XTL_ROOT ${AUGR_DEPOT}/xtl)
+set(KISSFFT_ROOT ${AUGR_DEPOT}/kissfft)
+
 set(IMGUI_ROOT ${AUGR_DEPOT}/imgui)
 set(IMGUI_EX ${AUGR_DEPOT}/imgui/backends)
 set(IMPLOT_ROOT ${AUGR_DEPOT}/implot)

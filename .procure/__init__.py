@@ -74,6 +74,11 @@ class Xtl(GitSolution):
     url = "https://github.com/xtensor-stack/xtl"
 
 
+class KissFFT(GitSolution):
+    path = "depot/kissfft"
+    url = "https://github.com/mborgerding/kissfft"
+
+
 solutions = [
     Faust,
     Fmt,
@@ -89,4 +94,5 @@ solutions = [
     VST3SDK,
     Xtensor,
     Xtl,
+    KissFFT,
 ]
