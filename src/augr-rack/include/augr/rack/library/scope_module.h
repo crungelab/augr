@@ -23,6 +23,7 @@ namespace augr {
 class ScopeModule : public Module {
 public:
     static constexpr std::size_t kRingSize = 16384;
+    //static constexpr std::size_t kRingSize = 32768;
 
     bool Create(Part &owner) override {
         Module::Create(owner);

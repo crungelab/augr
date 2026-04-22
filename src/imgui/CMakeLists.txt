@@ -22,3 +22,10 @@ set(IMGUI_SRC
 )
 
 add_library(ImGui STATIC ${IMGUI_SRC} ${IMGUI_HEADERS})
+
+target_compile_definitions(ImGui PRIVATE IMGUI_USER_CONFIG=<imgui/imconfig.h>)
+target_include_directories(ImGui PRIVATE
+${IMGUI_ROOT}
+${IMGUI_EX}
+${AUGR_ROOT}/src
+)
