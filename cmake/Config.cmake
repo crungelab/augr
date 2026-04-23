@@ -14,6 +14,7 @@ set(AUGR_RACK_ROOT ${AUGR_SRC}/augr-rack)
 set(AUGR_EXE_ROOT ${AUGR_SRC}/augr-exe)
 set(AUGR_FAUST_ROOT ${AUGR_SRC}/augr-faust)
 set(AUGR_VOLT_ROOT ${AUGR_SRC}/augr-volt)
+set(AUGR_FM_ROOT ${AUGR_SRC}/augr-fm)
 
 set(FMT_ROOT ${AUGR_DEPOT}/fmt)
 set(SPDLOG_ROOT ${AUGR_DEPOT}/spdlog)

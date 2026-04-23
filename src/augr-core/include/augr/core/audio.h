@@ -61,6 +61,7 @@ public:
         array() += other.array();
         return *this;
     }
+    bool Empty() const { return !impl_; }
     // Accessors
     static unsigned int sample_rate() { return sample_rate_; }
     static unsigned int frames() { return frames_; }
