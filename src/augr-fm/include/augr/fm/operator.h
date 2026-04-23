@@ -26,7 +26,6 @@ public:
     VoltageInput *cv_level_in_ = nullptr;   // envelope / amp mod
     VoltageInput *cv_phase_in_ = nullptr;   // the FM input — sum of modulators
 
-    // audio_out_ reused from Module base
     REFLECT_ENABLE(Module)
 
 private:

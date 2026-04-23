@@ -2,12 +2,16 @@
 
 #include <cmath>
 
+#include <augr/core/ui/ui_builder.h>
 #include <augr/fm/operator.h>
 
 namespace augr::fm {
 
 namespace {
 constexpr float kTwoPi = 6.28318530717958647692f;
+
+// 0V = C4 (~261.63 Hz), 1V/octave — matches VcoModule convention.
+float cvToFreq(float cv) { return 261.6255653f * std::pow(2.f, cv); }
 }
 
 bool Operator::Create(Part &owner) {
@@ -23,6 +27,15 @@ bool Operator::Create(Part &owner) {
     AddInput(*cv_phase_in_);
     audio_out_ = new AudioOutput(*this, "out", ChannelLayout::kMono);
     AddOutput(*audio_out_);
+
+    UiBuilder ui(*this);
+    auto ratioParam = CreateFloatParameter("Ratio", ControlMeta::kDefault, &ratio_, 1.f, 0.f, 16.f, 0.01f);
+    ui.Knob("Ratio", ratioParam);
+    auto levelParam = CreateFloatParameter("Level", ControlMeta::kDefault, &output_level_, 1.f, 0.f, 1.f, 0.01f);
+    ui.Knob("Level", levelParam);
+    auto feedbackParam = CreateFloatParameter("Feedback", ControlMeta::kDefault, &feedback_, 0.f, 0.f, 1.f, 0.01f);
+    ui.Knob("Feedback", feedbackParam);
+
     return true;
 }
 
@@ -44,11 +57,12 @@ void Operator::Process() {
     fy_real *out_data = out.array().data();
 
     for (std::size_t i = 0; i < frames; ++i) {
-        const float pitch_hz  = pitch_data ? static_cast<float>(pitch_data[i]) : 0.0f;
+        const float pitch_cv  = pitch_data ? static_cast<float>(pitch_data[i]) : 0.0f;
         const float level     = level_data ? static_cast<float>(level_data[i]) : 1.0f;
         const float phase_mod = phase_data ? static_cast<float>(phase_data[i]) : 0.0f;
 
-        const float freq = ratio_mode ? (pitch_hz * ratio_) : frequency_;
+        const float base_hz = cvToFreq(pitch_cv);
+        const float freq = ratio_mode ? (base_hz * ratio_) : frequency_;
         const float phase_inc = freq / sample_rate;
 
         // Feedback: self-modulate using last sample. The 0.5 scaling matches
