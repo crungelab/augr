@@ -5,9 +5,11 @@
 #include <cstdint>
 #include <vector>
 
-#include <augr/fm/voice.h>
 #include <augr/rack/midi_pin.h>
-#include <augr/rack/module.h>
+#include <augr/rack/module/module.h>
+
+#include <augr/fm/voice.h>
+#include <augr/fm/patch.h>
 
 namespace augr::fm {
 
@@ -24,7 +26,6 @@ class VoiceBank : public Module {
 public:
     bool Create(Part &owner) override;
     void Process() override;
-    void Update(float deltaTime) override;
 
     // Load a patch into all voices. Voices share a patch; per-voice variation
     // (unison detune, random, etc.) is a future extension.

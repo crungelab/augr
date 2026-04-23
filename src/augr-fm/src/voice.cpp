@@ -2,7 +2,6 @@
 
 #include <algorithm>
 #include <array>
-#include <cstring>
 
 #include <augr/fm/voice.h>
 
@@ -45,9 +44,15 @@ bool TopoSort(const Algorithm<N> &algo, std::array<std::uint8_t, N> &out) {
 } // namespace
 
 template <std::size_t N> bool Voice<N>::Create(Part &owner) {
+    static_assert(N <= 9, "process_order_ uses uint8_t indices; N must fit in a single decimal digit");
+
     if (!Module::Create(owner))
         return false;
-    label_ = "Voice";
+
+    static constexpr char kLabel[] = {
+        'V','o','i','c','e','<', static_cast<char>('0' + N), '>', '\0'
+    };
+    label_ = kLabel;
 
     cv_pitch_in_ = new VoltageInput(*this, "pitch");
     AddInput(*cv_pitch_in_);
@@ -61,8 +66,8 @@ template <std::size_t N> bool Voice<N>::Create(Part &owner) {
         AddChild(*operators_[i]);
         envelopes_[i] = new Envelope();
         AddChild(*envelopes_[i]);
-        operators_[i]->Create(owner);
-        envelopes_[i]->Create(owner);
+        if (!operators_[i]->Create(owner) || !envelopes_[i]->Create(owner))
+            return false;
     }
 
     if (!TopoSort(algorithm_, process_order_)) {
@@ -91,12 +96,13 @@ template <std::size_t N> void Voice<N>::Process() {
     // each completed modulator to the operators it drives.
     std::array<Audio, N> op_out{};
 
+    Audio phase_sum(ChannelLayout::kMono);
+    fy_real *phase_data = phase_sum.array().data();
+
     for (std::size_t oi = 0; oi < N; ++oi) {
         const std::size_t i = process_order_[oi];
 
         // Accumulate phase modulation from all modulators already processed.
-        Audio phase_sum(ChannelLayout::kMono);
-        fy_real *phase_data = phase_sum.array().data();
         std::fill(phase_data, phase_data + frames, fy_real{0});
 
         for (std::size_t j = 0; j < N; ++j) {
