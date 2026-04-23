@@ -27,6 +27,7 @@ float LevelToAmplitude(float level_0_99) {
 bool Envelope::Create(Part &owner) {
     if (!Module::Create(owner))
         return false;
+    label_ = "Envelope";
 
     gate_in_ = new VoltageInput(*this, "gate");
     AddInput(*gate_in_);

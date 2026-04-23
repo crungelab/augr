@@ -13,6 +13,7 @@ constexpr float kTwoPi = 6.28318530717958647692f;
 bool Operator::Create(Part &owner) {
     if (!Module::Create(owner))
         return false;
+    label_ = "Operator";
 
     cv_pitch_in_ = new VoltageInput(*this, "pitch");
     AddInput(*cv_pitch_in_);

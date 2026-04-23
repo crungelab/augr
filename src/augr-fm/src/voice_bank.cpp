@@ -18,7 +18,9 @@ float NoteToHz(std::uint8_t note) {
 
 template <std::size_t NV, std::size_t OP>
 bool VoiceBank<NV, OP>::Create(Part &owner) {
+
     if (!Module::Create(owner)) return false;
+    label_ = "VoiceBank";
 
     midi_in_   = owner.Add<MidiInput>(*this, "midi");
     audio_out_ = owner.Add<AudioOutput>(*this, "out", ChannelLayout::kMono);

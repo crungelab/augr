@@ -47,6 +47,7 @@ bool TopoSort(const Algorithm<N> &algo, std::array<std::uint8_t, N> &out) {
 template <std::size_t N> bool Voice<N>::Create(Part &owner) {
     if (!Module::Create(owner))
         return false;
+    label_ = "Voice";
 
     cv_pitch_in_ = new VoltageInput(*this, "pitch");
     AddInput(*cv_pitch_in_);

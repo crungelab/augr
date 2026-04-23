@@ -24,6 +24,8 @@ public:
         InitFaustDspLibrary();
         extern void InitAugrVoltLibrary();
         InitAugrVoltLibrary();
+        extern void InitAugrFmLibrary();
+        InitAugrFmLibrary();
         // Create the rack view
         view_ = new RackView(rack_);
     }
