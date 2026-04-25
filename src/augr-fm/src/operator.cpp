@@ -29,8 +29,10 @@ bool Operator::Create(Part &owner) {
     AddOutput(*audio_out_);
 
     UiBuilder ui(*this);
-    auto ratioParam = CreateFloatParameter("Ratio", ControlMeta::kDefault, &ratio_, 1.f, 0.f, 16.f, 0.01f);
-    ui.Knob("Ratio", ratioParam);
+    auto coarseParam = CreateFloatParameter("Coarse", ControlMeta::kDefault, &ratio_coarse_, 1.f, 0.f, 16.f, 1.f);
+    ui.Knob("Coarse", coarseParam);
+    auto fineParam = CreateFloatParameter("Fine", ControlMeta::kDefault, &ratio_fine_, 0.f, 0.f, 0.99f, 0.01f);
+    ui.Knob("Fine", fineParam);
     auto levelParam = CreateFloatParameter("Level", ControlMeta::kDefault, &output_level_, 1.f, 0.f, 1.f, 0.01f);
     ui.Knob("Level", levelParam);
     auto feedbackParam = CreateFloatParameter("Feedback", ControlMeta::kDefault, &feedback_, 0.f, 0.f, 1.f, 0.01f);
@@ -51,7 +53,8 @@ void Operator::Process() {
     const fy_real *level_data = level_buf.Empty() ? nullptr : level_buf.array().data();
     const fy_real *phase_data = phase_buf.Empty() ? nullptr : phase_buf.array().data();
 
-    const bool ratio_mode = ratio_ > 0.0f;
+    const float ratio = ratio_coarse_ + ratio_fine_;
+    const bool ratio_mode = ratio > 0.0f;
 
     Audio out(ChannelLayout::kMono);
     fy_real *out_data = out.array().data();
@@ -62,7 +65,7 @@ void Operator::Process() {
         const float phase_mod = phase_data ? static_cast<float>(phase_data[i]) : 0.0f;
 
         const float base_hz = cvToFreq(pitch_cv);
-        const float freq = ratio_mode ? (base_hz * ratio_) : frequency_;
+        const float freq = ratio_mode ? (base_hz * ratio) : frequency_;
         const float phase_inc = freq / sample_rate;
 
         // Feedback: self-modulate using last sample. The 0.5 scaling matches

@@ -20,12 +20,12 @@ public:
     MyApp() {
         extern void InitAugrRackLibrary();
         InitAugrRackLibrary();
-        extern void InitFaustDspLibrary();
-        InitFaustDspLibrary();
         extern void InitAugrVoltLibrary();
         InitAugrVoltLibrary();
         extern void InitAugrFmLibrary();
         InitAugrFmLibrary();
+        extern void InitFaustDspLibrary();
+        InitFaustDspLibrary();
         // Create the rack view
         view_ = new RackView(rack_);
     }

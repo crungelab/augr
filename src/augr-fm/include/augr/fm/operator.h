@@ -16,8 +16,9 @@ public:
 
     // Ratio to fundamental (e.g. 1.0 = carrier pitch, 2.0 = octave up).
     // Fixed-frequency mode uses frequency_ directly when ratio_ <= 0.
-    float ratio_ = 1.0f;
-    float frequency_ = 0.0f;  // Hz, used when ratio_ <= 0
+    float ratio_coarse_ = 1.0f;
+    float ratio_fine_   = 0.0f;
+    float frequency_ = 0.0f;  // Hz, used when ratio <= 0
     float output_level_ = 1.0f;
     float feedback_ = 0.0f;   // self-modulation amount [0..1]
 
