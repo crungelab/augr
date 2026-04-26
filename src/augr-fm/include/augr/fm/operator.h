@@ -16,6 +16,7 @@ public:
 
     // Ratio to fundamental (e.g. 1.0 = carrier pitch, 2.0 = octave up).
     // Fixed-frequency mode uses frequency_ directly when ratio_ <= 0.
+    float detune_ = 0.f;  // -7 to 7, stored as float, treated as integer
     float ratio_coarse_ = 1.0f;
     float ratio_fine_   = 0.0f;
     float frequency_ = 0.0f;  // Hz, used when ratio <= 0
