@@ -22,11 +22,6 @@ public:
         return true;
     }
 
-    void CreatePins() override {
-        audio_out_ = new AudioOutput(*this, "audio_out", ChannelLayout::kMono);
-        AddOutput(*audio_out_);
-    }
-
     void CreateControls() override {
         UiBuilder ui(*this);
 
@@ -42,6 +37,11 @@ public:
         auto colorParam = CreateEnumParameter(
             "Color", ControlMeta::kDefault, &color_, colorChoices, Color::Pink);
         ui.Combo("Color", colorParam);
+    }
+
+    void CreatePins() override {
+        audio_out_ = new AudioOutput(*this, "audio_out", ChannelLayout::kMono);
+        AddOutput(*audio_out_);
     }
 
     void Process() override {

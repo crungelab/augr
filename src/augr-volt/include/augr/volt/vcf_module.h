@@ -27,6 +27,19 @@ public:
         return true;
     }
 
+    void CreateControls() override {
+        UiBuilder ui(*this);
+
+        auto cutoffParam = CreateFloatParameter(
+            "Cutoff", ControlMeta::kDefault, &cutoff_, 2.f, -4.f, 6.f, 0.01f);
+        ui.Knob("Cutoff", cutoffParam);
+
+        auto resonanceParam =
+            CreateFloatParameter("Resonance", ControlMeta::kDefault,
+                                 &resonance_, 0.f, 0.f, 1.f, 0.01f);
+        ui.Knob("Resonance", resonanceParam);
+    }
+
     void CreatePins() override {
         audio_in_ = new AudioInput(*this, "audio_in", ChannelLayout::kMono);
         AddInput(*audio_in_);
@@ -39,19 +52,6 @@ public:
 
         audio_out_ = new AudioOutput(*this, "audio_out", ChannelLayout::kMono);
         AddOutput(*audio_out_);
-    }
-
-    void CreateControls() override {
-        UiBuilder ui(*this);
-
-        auto cutoffParam = CreateFloatParameter(
-            "Cutoff", ControlMeta::kDefault, &cutoff_, 2.f, -4.f, 6.f, 0.01f);
-        ui.Knob("Cutoff", cutoffParam);
-
-        auto resonanceParam =
-            CreateFloatParameter("Resonance", ControlMeta::kDefault,
-                                 &resonance_, 0.f, 0.f, 1.f, 0.01f);
-        ui.Knob("Resonance", resonanceParam);
     }
 
     void Process() override {

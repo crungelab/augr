@@ -22,17 +22,6 @@ public:
         return true;
     }
 
-    void CreatePins() override {
-        for (int ch = 0; ch < kNumChannels; ++ch) {
-            const std::string name = "audio_in_" + std::to_string(ch + 1);
-            audio_in_[ch] = new AudioInput(*this, name, ChannelLayout::kMono);
-            AddInput(*audio_in_[ch]);
-        }
-
-        audio_out_ = new AudioOutput(*this, "audio_out", ChannelLayout::kMono);
-        AddOutput(*audio_out_);
-    }
-
     void CreateControls() override {
         UiBuilder ui(*this);
 
@@ -44,6 +33,17 @@ public:
 
         auto masterParam = CreateFloatParameter("Master", ControlMeta::kDefault, &master_, 1.f, 0.f, 1.f, 0.01f);
         ui.Knob("Master", masterParam);        
+    }
+
+    void CreatePins() override {
+        for (int ch = 0; ch < kNumChannels; ++ch) {
+            const std::string name = "audio_in_" + std::to_string(ch + 1);
+            audio_in_[ch] = new AudioInput(*this, name, ChannelLayout::kMono);
+            AddInput(*audio_in_[ch]);
+        }
+
+        audio_out_ = new AudioOutput(*this, "audio_out", ChannelLayout::kMono);
+        AddOutput(*audio_out_);
     }
 
     void Process() override {

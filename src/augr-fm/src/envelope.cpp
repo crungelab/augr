@@ -33,13 +33,6 @@ bool Envelope::Create(Part &owner) {
     return true;
 }
 
-void Envelope::CreatePins() {
-    gate_in_ = new VoltageInput(*this, "gate");
-    AddInput(*gate_in_);
-    cv_out_ = new VoltageOutput(*this, "cv");
-    AddOutput(*cv_out_);
-}
-
 void Envelope::CreateControls() {
     UiBuilder ui(*this);
 
@@ -54,6 +47,13 @@ void Envelope::CreateControls() {
     auto l3 = CreateFloatParameter("L3", ControlMeta::kDefault, &levels_[2], 50.f, 0.f, 99.f, 1.f);
     auto l4 = CreateFloatParameter("L4", ControlMeta::kDefault, &levels_[3],  0.f, 0.f, 99.f, 1.f);
     ui.Knob("L1", l1); ui.Knob("L2", l2); ui.Knob("L3", l3); ui.Knob("L4", l4);
+}
+
+void Envelope::CreatePins() {
+    gate_in_ = new VoltageInput(*this, "gate");
+    AddInput(*gate_in_);
+    cv_out_ = new VoltageOutput(*this, "cv");
+    AddOutput(*cv_out_);
 }
 
 void Envelope::Process() {

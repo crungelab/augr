@@ -33,11 +33,6 @@ public:
         return true;
     }
 
-    void CreatePins() override {
-        audio_in_ = new AudioInput(*this, "audio_in", ChannelLayout::kMono);
-        AddInput(*audio_in_);
-    }
-
     void CreateControls() override {
         UiBuilder ui(*this);
 
@@ -50,6 +45,11 @@ public:
             "Floor", ControlMeta::kDefault,
             &floor_db_, -80.f, -120.f, -40.f, 1.f);
         ui.Knob("Floor", floorParam);
+    }
+
+    void CreatePins() override {
+        audio_in_ = new AudioInput(*this, "audio_in", ChannelLayout::kMono);
+        AddInput(*audio_in_);
     }
 
     void Process() override {

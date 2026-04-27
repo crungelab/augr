@@ -20,17 +20,6 @@ bool Operator::Create(Part &owner) {
     return true;
 }
 
-void Operator::CreatePins() {
-    cv_pitch_in_ = new VoltageInput(*this, "pitch");
-    AddInput(*cv_pitch_in_);
-    cv_level_in_ = new VoltageInput(*this, "level");
-    AddInput(*cv_level_in_);
-    cv_phase_in_ = new VoltageInput(*this, "phase");
-    AddInput(*cv_phase_in_);
-    audio_out_ = new AudioOutput(*this, "out", ChannelLayout::kMono);
-    AddOutput(*audio_out_);
-}
-
 void Operator::CreateControls() {
     UiBuilder ui(*this);
 
@@ -56,6 +45,17 @@ void Operator::CreateControls() {
     auto feedbackParam = CreateFloatParameter("Feedback", ControlMeta::kDefault,
                                               &feedback_, 0.f, 0.f, 1.f, 0.01f);
     ui.Knob("Feedback", feedbackParam);
+}
+
+void Operator::CreatePins() {
+    cv_pitch_in_ = new VoltageInput(*this, "pitch");
+    AddInput(*cv_pitch_in_);
+    cv_level_in_ = new VoltageInput(*this, "level");
+    AddInput(*cv_level_in_);
+    cv_phase_in_ = new VoltageInput(*this, "phase");
+    AddInput(*cv_phase_in_);
+    audio_out_ = new AudioOutput(*this, "out", ChannelLayout::kMono);
+    AddOutput(*audio_out_);
 }
 
 void Operator::Process() {

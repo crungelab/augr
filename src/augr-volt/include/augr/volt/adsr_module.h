@@ -22,14 +22,6 @@ public:
         return true;
     }
 
-    void CreatePins() override {
-        gate_in_ = new VoltageInput(*this, "gate_in");
-        AddInput(*gate_in_);
-
-        env_out_ = new VoltageOutput(*this, "env_out");
-        AddOutput(*env_out_);
-    }
-
     void CreateControls() override {
         UiBuilder ui(*this);
         auto attackParam =
@@ -50,6 +42,14 @@ public:
             CreateFloatParameter("Release", ControlMeta::kSeconds, &release_,
                                  0.2f, 0.001f, 10.f, 0.001f);
         ui.Knob("Release", releaseParam);
+    }
+
+    void CreatePins() override {
+        gate_in_ = new VoltageInput(*this, "gate_in");
+        AddInput(*gate_in_);
+
+        env_out_ = new VoltageOutput(*this, "env_out");
+        AddOutput(*env_out_);
     }
 
     void Process() override {

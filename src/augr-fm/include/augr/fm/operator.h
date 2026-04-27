@@ -12,8 +12,8 @@ namespace augr::fm {
 class Operator : public Module {
 public:
     bool Create(Part &owner) override;
-    void CreatePins() override;
     void CreateControls() override;
+    void CreatePins() override;
     void Process() override;
 
     // Ratio to fundamental (e.g. 1.0 = carrier pitch, 2.0 = octave up).

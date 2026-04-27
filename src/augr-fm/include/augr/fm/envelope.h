@@ -15,8 +15,8 @@ public:
     enum class Stage { kIdle, kR1, kR2, kR3, kR4 };
 
     bool Create(Part &owner) override;
-    void CreatePins() override;
     void CreateControls() override;
+    void CreatePins() override;
 
     void Process() override;
 

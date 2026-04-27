@@ -31,11 +31,6 @@ public:
         return true;
     }
 
-    void CreatePins() override {
-        audio_in_ = new AudioInput(*this, "audio_in", ChannelLayout::kMono);
-        AddInput(*audio_in_);
-    }
-
     void CreateControls() override {
         UiBuilder ui(*this);
         auto windowParam = CreateFloatParameter(
@@ -47,6 +42,11 @@ public:
             "Trigger", ControlMeta::kDefault,
             &trigger_level_, 0.f, -1.f, 1.f, 0.01f);
         ui.Knob("Trigger", triggerParam);
+    }
+
+    void CreatePins() override {
+        audio_in_ = new AudioInput(*this, "audio_in", ChannelLayout::kMono);
+        AddInput(*audio_in_);
     }
 
     void Process() override {

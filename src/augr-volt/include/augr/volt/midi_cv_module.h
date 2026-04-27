@@ -18,7 +18,10 @@ public:
     bool Create(Part &owner) override {
         Module::Create(owner);
         label_ = "MIDI/CV";
+        return true;
+    }
 
+    void CreatePins() override {
         midi_in_ = new MidiInput(*this, "midi_in");
         AddInput(*midi_in_);
 
@@ -30,25 +33,9 @@ public:
 
         velocity_out_ = new VoltageOutput(*this, "velocity_out");
         AddOutput(*velocity_out_);
-
-        // No UI parameters for now. Channel filter / transpose could be added
-        // later.
-        return true;
     }
 
     void Process() override {
-        /*
-        MidiMessage msg = midi_in_->Read();
-
-        // Only react to messages we haven't already consumed. seconds() is a
-        // timestamp from the MIDI source; if it hasn't advanced, the pin is
-        // holding a stale message from a previous buffer.
-        if (msg.size() > 0 && msg.seconds() != last_seconds_) {
-            last_seconds_ = msg.seconds();
-            HandleMessage(msg);
-        }
-        */
-
         // Drain all pending MIDI messages. This allows us to handle multiple
         // messages per buffer, which is important for high-velocity playing
         for (const MidiMessage &msg : midi_in_->Drain()) {

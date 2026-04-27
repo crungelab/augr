@@ -13,6 +13,11 @@ bool FaustDsp::Create(Part &owner) {
     return true;
 }
 
+void FaustDsp::CreateControls() {
+    FaustDspUi ui(*this);
+    buildUserInterface(&ui);
+}
+
 void FaustDsp::CreatePins() {
     int nInputs = getNumInputs();
     if (nInputs > 0) {
@@ -27,11 +32,6 @@ void FaustDsp::CreatePins() {
         audio_out_ = new AudioOutput(*this, "audio_out_", outputLayout);
         AddOutput(*audio_out_);
     }
-}
-
-void FaustDsp::CreateControls() {
-    FaustDspUi ui(*this);
-    buildUserInterface(&ui);
 }
 
 Audio FaustDsp::ProcessAudio(Audio& input) {

@@ -17,14 +17,6 @@ public:
         return true;
     }
 
-    void CreatePins() override {
-        cv_in_ = new VoltageInput(*this, "cv_in");
-        AddInput(*cv_in_);
-
-        cv_out_ = new VoltageOutput(*this, "cv_out");
-        AddOutput(*cv_out_);
-    }
-
     void CreateControls() override {
         UiBuilder ui(*this);
 
@@ -39,6 +31,14 @@ public:
         auto offsetParam = CreateFloatParameter(
             "Offset", ControlMeta::kDefault, &offset_, 0.f, -5.f, 5.f, 0.01f);
         ui.Knob("Offset", offsetParam);
+    }
+
+    void CreatePins() override {
+        cv_in_ = new VoltageInput(*this, "cv_in");
+        AddInput(*cv_in_);
+
+        cv_out_ = new VoltageOutput(*this, "cv_out");
+        AddOutput(*cv_out_);
     }
 
     void Process() override {

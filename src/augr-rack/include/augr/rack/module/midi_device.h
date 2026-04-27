@@ -13,6 +13,7 @@ class MidiInputDevice : public MidiDevice
 public:
   virtual ~MidiInputDevice() {}
   bool Create(Part &owner) override;
+  void CreatePins() override;
   REFLECT_ENABLE(MidiDevice)
 };
 
@@ -21,6 +22,7 @@ class MidiOutputDevice : public MidiDevice
 public:
   virtual ~MidiOutputDevice() {}
   bool Create(Part &owner) override;
+  void CreatePins() override;
   REFLECT_ENABLE(MidiDevice)
 };
 

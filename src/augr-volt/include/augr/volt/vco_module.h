@@ -23,20 +23,6 @@ public:
         return true;
     }
 
-    void CreatePins() override {
-        cv_pitch_in_ = new VoltageInput(*this, "cv_pitch_in");
-        AddInput(*cv_pitch_in_);
-
-        cv_pw_in_ = new VoltageInput(*this, "cv_pw_in");
-        AddInput(*cv_pw_in_);
-
-        audio_fm_in_ = new AudioInput(*this, "audio_fm_in", ChannelLayout::kMono);
-        AddInput(*audio_fm_in_);
-
-        audio_out_ = new AudioOutput(*this, "audio_out", ChannelLayout::kMono);
-        AddOutput(*audio_out_);
-    }
-
     void CreateControls() override {
         UiBuilder ui(*this);
 
@@ -54,6 +40,20 @@ public:
         };
         auto waveformParam = CreateEnumParameter("Waveform", ControlMeta::kDefault, &waveform_, waveformChoices, Waveform::Saw);
         ui.Combo("Waveform", waveformParam);
+    }
+
+    void CreatePins() override {
+        cv_pitch_in_ = new VoltageInput(*this, "cv_pitch_in");
+        AddInput(*cv_pitch_in_);
+
+        cv_pw_in_ = new VoltageInput(*this, "cv_pw_in");
+        AddInput(*cv_pw_in_);
+
+        audio_fm_in_ = new AudioInput(*this, "audio_fm_in", ChannelLayout::kMono);
+        AddInput(*audio_fm_in_);
+
+        audio_out_ = new AudioOutput(*this, "audio_out", ChannelLayout::kMono);
+        AddOutput(*audio_out_);
     }
 
     void Process() override {
