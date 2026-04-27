@@ -21,7 +21,7 @@ public:
         : OutputT<Audio, AudioPin>(node, name, layout) {}
 
     void Write(Audio audio) override {
-        if (audio.layout_ != layout_) {
+        if (audio.layout() != layout_) {
             OutputT<Audio, AudioPin>::Write(audio.Convert(layout_));
             return;
         }
@@ -41,7 +41,7 @@ public:
     }
 
     void Write(Audio audio) override {
-        if (audio.layout_ != layout_) {
+        if (audio.layout() != layout_) {
             PolyInputT<Audio, AudioPin>::Write(audio.Convert(layout_));
             return;
         }

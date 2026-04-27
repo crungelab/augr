@@ -55,7 +55,7 @@ public:
     void Process() override {
         Audio audio_in = audio_in_->Read();
         const int nFrames = Audio::frames();
-        const bool has_audio = audio_in.layout_ != ChannelLayout::kNull;
+        const bool has_audio = audio_in.layout() != ChannelLayout::kNull;
 
         if (!has_audio) return;
 

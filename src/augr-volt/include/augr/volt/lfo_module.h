@@ -59,8 +59,8 @@ public:
 
         const int nFrames = Audio::frames();
         const float sr = Audio::sample_rate();
-        const bool has_rate_cv = rate_cv.layout_ != ChannelLayout::kNull;
-        const bool has_reset = reset_cv.layout_ != ChannelLayout::kNull;
+        const bool has_rate_cv = rate_cv.layout() != ChannelLayout::kNull;
+        const bool has_reset = reset_cv.layout() != ChannelLayout::kNull;
 
         fy_real *out = output.array().data();
         const fy_real *rate_buf =

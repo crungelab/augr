@@ -58,7 +58,7 @@ public:
         std::array<bool, kNumChannels> active{};
         for (int ch = 0; ch < kNumChannels; ++ch) {
             inputs[ch] = audio_in_[ch]->Read();
-            active[ch] = inputs[ch].layout_ != ChannelLayout::kNull && levels_[ch] != 0.f;
+            active[ch] = inputs[ch].layout() != ChannelLayout::kNull && levels_[ch] != 0.f;
             bufs[ch] = active[ch] ? inputs[ch].array().data() : nullptr;
         }
 

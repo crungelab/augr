@@ -64,9 +64,9 @@ public:
 
         const float sr = Audio::sample_rate();
         const int nFrames = Audio::frames();
-        const bool has_pitch = pitch_cv.layout_ != ChannelLayout::kNull;
-        const bool has_pw = pw_cv.layout_ != ChannelLayout::kNull;
-        const bool has_fm = fm_audio.layout_ != ChannelLayout::kNull && fm_depth_ > 0.f;
+        const bool has_pitch = pitch_cv.layout() != ChannelLayout::kNull;
+        const bool has_pw = pw_cv.layout() != ChannelLayout::kNull;
+        const bool has_fm = fm_audio.layout() != ChannelLayout::kNull && fm_depth_ > 0.f;
         const float detune_octaves = detune_ / 12.f;
 
         fy_real *out = output.array().data();

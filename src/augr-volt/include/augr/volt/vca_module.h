@@ -46,8 +46,8 @@ public:
         Audio output(ChannelLayout::kMono);
 
         const int nFrames = Audio::frames();
-        const bool has_audio = audio_in.layout_ != ChannelLayout::kNull;
-        const bool has_cv = cv_gain.layout_ != ChannelLayout::kNull;
+        const bool has_audio = audio_in.layout() != ChannelLayout::kNull;
+        const bool has_cv = cv_gain.layout() != ChannelLayout::kNull;
 
         fy_real *out = output.array().data();
 

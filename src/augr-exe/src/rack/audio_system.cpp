@@ -85,8 +85,8 @@ bool AudioSystem::Create(AudioConfig &config) {
     // Feed back the actual negotiated values
     config.frames = frames;
 
-    Audio::frames_     = frames;
-    Audio::sample_rate_ = config.sample_rate;
+    Audio::set_frames(frames);
+    Audio::set_sample_rate(config.sample_rate);
 
     return true;
 }

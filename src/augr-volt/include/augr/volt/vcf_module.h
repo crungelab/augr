@@ -62,9 +62,9 @@ public:
 
         const int nFrames = Audio::frames();
         const float sr = Audio::sample_rate();
-        const bool has_audio = audio_in.layout_ != ChannelLayout::kNull;
-        const bool has_cutoff_cv = cutoff_cv.layout_ != ChannelLayout::kNull;
-        const bool has_res_cv = resonance_cv.layout_ != ChannelLayout::kNull;
+        const bool has_audio = audio_in.layout() != ChannelLayout::kNull;
+        const bool has_cutoff_cv = cutoff_cv.layout() != ChannelLayout::kNull;
+        const bool has_res_cv = resonance_cv.layout() != ChannelLayout::kNull;
 
         fy_real *out = output.array().data();
 

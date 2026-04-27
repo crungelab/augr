@@ -50,7 +50,7 @@ void FaustDsp::Process() {
     control();
     if (audio_in_) {
         auto input = audio_in_->Read();
-        if (input.layout_ != ChannelLayout::kNull) {
+        if (input.layout() != ChannelLayout::kNull) {
             audio_out_->Write(ProcessAudio(input));
         }
     } else {

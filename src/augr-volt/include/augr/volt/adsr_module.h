@@ -58,7 +58,7 @@ public:
 
         const float sr = Audio::sample_rate();
         const int nFrames = Audio::frames();
-        const bool has_gate = gate_cv.layout_ != ChannelLayout::kNull;
+        const bool has_gate = gate_cv.layout() != ChannelLayout::kNull;
 
         fy_real *out = output.array().data();
         const fy_real *gate = has_gate ? gate_cv.array().data() : nullptr;
