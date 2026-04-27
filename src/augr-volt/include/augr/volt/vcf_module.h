@@ -24,6 +24,10 @@ public:
         Module::Create(owner);
         label_ = "VCF";
 
+        return true;
+    }
+
+    void CreatePins() override {
         audio_in_ = new AudioInput(*this, "audio_in", ChannelLayout::kMono);
         AddInput(*audio_in_);
 
@@ -35,21 +39,6 @@ public:
 
         audio_out_ = new AudioOutput(*this, "audio_out", ChannelLayout::kMono);
         AddOutput(*audio_out_);
-        /*
-        UiBuilder ui(*this);
-
-        // Cutoff stored in octaves relative to C4 (same convention as VCO
-        // pitch). 0 = 261.6 Hz (C4), +3 = 2093 Hz (C7), -3 = 32.7 Hz (C1).
-        auto cutoffParam = CreateFloatParameter(
-            "Cutoff", ControlMeta::kDefault, &cutoff_, 2.f, -4.f, 6.f, 0.01f);
-        ui.Knob("Cutoff", cutoffParam);
-
-        auto resonanceParam =
-            CreateFloatParameter("Resonance", ControlMeta::kDefault,
-                                 &resonance_, 0.f, 0.f, 1.f, 0.01f);
-        ui.Knob("Resonance", resonanceParam);
-        */
-        return true;
     }
 
     void CreateControls() override {

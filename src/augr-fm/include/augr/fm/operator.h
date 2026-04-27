@@ -12,6 +12,7 @@ namespace augr::fm {
 class Operator : public Module {
 public:
     bool Create(Part &owner) override;
+    void CreatePins() override;
     void CreateControls() override;
     void Process() override;
 

@@ -28,23 +28,12 @@ public:
     bool Create(Part &owner) override {
         Module::Create(owner);
         label_ = "Scope";
+        return true;
+    }
 
+    void CreatePins() override {
         audio_in_ = new AudioInput(*this, "audio_in", ChannelLayout::kMono);
         AddInput(*audio_in_);
-        /*
-        UiBuilder ui(*this);
-        auto windowParam = CreateFloatParameter(
-            "Window", ControlMeta::kDefault,
-            &window_samples_, 1024.f, 128.f, 8192.f, 1.f);
-        ui.Knob("Window", windowParam);
-
-        auto triggerParam = CreateFloatParameter(
-            "Trigger", ControlMeta::kDefault,
-            &trigger_level_, 0.f, -1.f, 1.f, 0.01f);
-        ui.Knob("Trigger", triggerParam);
-        */
-
-        return true;
     }
 
     void CreateControls() override {

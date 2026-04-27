@@ -19,26 +19,12 @@ public:
     bool Create(Part &owner) override {
         Module::Create(owner);
         label_ = "Noise";
+        return true;
+    }
 
+    void CreatePins() override {
         audio_out_ = new AudioOutput(*this, "audio_out", ChannelLayout::kMono);
         AddOutput(*audio_out_);
-        /*
-        UiBuilder ui(*this);
-
-        auto levelParam = CreateFloatParameter("Level", ControlMeta::kDefault,
-                                               &level_, 1.f, 0.f, 1.f, 0.01f);
-        ui.Knob("Level", levelParam);
-
-        std::vector<EnumParameterT<Color>::Choice> colorChoices = {
-            {Color::White, "White"},
-            {Color::Pink, "Pink"},
-            {Color::Brown, "Brown"},
-        };
-        auto colorParam = CreateEnumParameter(
-            "Color", ControlMeta::kDefault, &color_, colorChoices, Color::Pink);
-        ui.Combo("Color", colorParam);
-        */
-        return true;
     }
 
     void CreateControls() override {

@@ -10,11 +10,10 @@ namespace augr {
 bool FaustDsp::Create(Part &owner) {
     Dsp::Create(owner);
     init(Audio::sample_rate());
-    /*
-    FaustDspUi ui(*this);
-    buildUserInterface(&ui);
-    */
-    //
+    return true;
+}
+
+void FaustDsp::CreatePins() {
     int nInputs = getNumInputs();
     if (nInputs > 0) {
         ChannelLayout inputLayout = Audio::ChannelCountToLayout(nInputs);
@@ -28,8 +27,6 @@ bool FaustDsp::Create(Part &owner) {
         audio_out_ = new AudioOutput(*this, "audio_out_", outputLayout);
         AddOutput(*audio_out_);
     }
-
-    return true;
 }
 
 void FaustDsp::CreateControls() {

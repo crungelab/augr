@@ -28,25 +28,14 @@ public:
         Module::Create(owner);
         label_ = "Spectral";
 
-        audio_in_ = new AudioInput(*this, "audio_in", ChannelLayout::kMono);
-        AddInput(*audio_in_);
-        /*
-        UiBuilder ui(*this);
-
-        auto smoothParam = CreateFloatParameter(
-            "Smooth", ControlMeta::kDefault,
-            &smoothing_, 0.6f, 0.f, 0.99f, 0.01f);
-        ui.Knob("Smooth", smoothParam);
-
-        auto floorParam = CreateFloatParameter(
-            "Floor", ControlMeta::kDefault,
-            &floor_db_, -80.f, -120.f, -40.f, 1.f);
-        ui.Knob("Floor", floorParam);
-        */
-
         sample_rate_ = static_cast<float>(Audio::sample_rate());
 
         return true;
+    }
+
+    void CreatePins() override {
+        audio_in_ = new AudioInput(*this, "audio_in", ChannelLayout::kMono);
+        AddInput(*audio_in_);
     }
 
     void CreateControls() override {

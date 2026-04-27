@@ -19,34 +19,15 @@ public:
         Module::Create(owner);
         label_ = "ADSR";
 
+        return true;
+    }
+
+    void CreatePins() override {
         gate_in_ = new VoltageInput(*this, "gate_in");
         AddInput(*gate_in_);
 
         env_out_ = new VoltageOutput(*this, "env_out");
         AddOutput(*env_out_);
-        /*
-        UiBuilder ui(*this);
-        auto attackParam =
-            CreateFloatParameter("Attack", ControlMeta::kSeconds, &attack_,
-                                 0.01f, 0.001f, 10.f, 0.001f);
-        ui.Knob("Attack", attackParam);
-
-        auto decayParam =
-            CreateFloatParameter("Decay", ControlMeta::kSeconds, &decay_, 0.1f,
-                                 0.001f, 10.f, 0.001f);
-        ui.Knob("Decay", decayParam);
-
-        auto sustainParam = CreateFloatParameter(
-            "Sustain", ControlMeta::kDefault, &sustain_, 0.7f, 0.f, 1.f, 0.01f);
-        ui.Knob("Sustain", sustainParam);
-
-        auto releaseParam =
-            CreateFloatParameter("Release", ControlMeta::kSeconds, &release_,
-                                 0.2f, 0.001f, 10.f, 0.001f);
-        ui.Knob("Release", releaseParam);
-        */
-
-        return true;
     }
 
     void CreateControls() override {

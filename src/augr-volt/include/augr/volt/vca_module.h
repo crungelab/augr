@@ -19,7 +19,10 @@ public:
     bool Create(Part &owner) override {
         Module::Create(owner);
         label_ = "VCA";
+        return true;
+    }
 
+    void CreatePins() override {
         audio_in_ = new AudioInput(*this, "audio_in", ChannelLayout::kMono);
         AddInput(*audio_in_);
 
@@ -28,13 +31,6 @@ public:
 
         audio_out_ = new AudioOutput(*this, "audio_out", ChannelLayout::kMono);
         AddOutput(*audio_out_);
-        /*
-        UiBuilder ui(*this);
-        auto gainParam = CreateFloatParameter("Gain", ControlMeta::kDefault,
-                                              &gain_, 1.f, 0.f, 1.f, 0.01f);
-        ui.Knob("Gain", gainParam);
-        */
-        return true;
     }
 
     void CreateControls() override {

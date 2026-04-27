@@ -6,6 +6,7 @@ namespace augr {
 
 bool Module::Create(Part& owner) {
   Node::Create(owner);
+  CreatePins();
   CreateControls();
   Rack::singleton().AddModule(*this);
   return true;

@@ -17,7 +17,10 @@ bool Operator::Create(Part &owner) {
     if (!Module::Create(owner))
         return false;
     label_ = "Operator";
+    return true;
+}
 
+void Operator::CreatePins() {
     cv_pitch_in_ = new VoltageInput(*this, "pitch");
     AddInput(*cv_pitch_in_);
     cv_level_in_ = new VoltageInput(*this, "level");
@@ -26,32 +29,6 @@ bool Operator::Create(Part &owner) {
     AddInput(*cv_phase_in_);
     audio_out_ = new AudioOutput(*this, "out", ChannelLayout::kMono);
     AddOutput(*audio_out_);
-    /*
-    UiBuilder ui(*this);
-
-    // DX7-style detune: integer steps -7..7, each step ≈ 0.49 cents.
-    auto detuneParam = CreateFloatParameter("Detune", ControlMeta::kDefault,
-                                            &detune_, 0.f, -7.f, 7.f, 1.f);
-    ui.Knob("Detune", detuneParam);
-
-    auto coarseParam = CreateFloatParameter(
-        "Coarse", ControlMeta::kDefault, &ratio_coarse_, 1.f, 0.f, 16.f, 1.f);
-    ui.Knob("Coarse", coarseParam);
-
-    auto fineParam = CreateFloatParameter("Fine", ControlMeta::kDefault,
-                                          &ratio_fine_, 0.f, 0.f, 0.99f, 0.01f);
-    ui.Knob("Fine", fineParam);
-
-    auto levelParam = CreateFloatParameter(
-        "Level", ControlMeta::kDefault, &output_level_, 1.f, 0.f, 1.f, 0.01f);
-    ui.Knob("Level", levelParam);
-
-    auto feedbackParam = CreateFloatParameter("Feedback", ControlMeta::kDefault,
-                                              &feedback_, 0.f, 0.f, 1.f, 0.01f);
-    ui.Knob("Feedback", feedbackParam);
-    */
-
-    return true;
 }
 
 void Operator::CreateControls() {
