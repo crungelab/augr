@@ -29,7 +29,7 @@ public:
 
         cv_out_ = new VoltageOutput(*this, "cv_out");
         AddOutput(*cv_out_);
-
+        /*
         UiBuilder ui(*this);
 
         // Rate stored as octaves above 1 Hz. Range: -6.64 (0.01 Hz) to +4.32
@@ -48,8 +48,27 @@ public:
             CreateEnumParameter("Waveform", ControlMeta::kDefault, &waveform_,
                                 waveformChoices, Waveform::Sine);
         ui.Combo("Waveform", waveformParam);
+        */
 
         return true;
+    }
+
+    void CreateControls() override {
+        UiBuilder ui(*this);
+
+        auto rateParam = CreateFloatParameter(
+            "Rate", ControlMeta::kDefault, &rate_, 0.f, -6.64f, 4.32f, 0.01f);
+        ui.Knob("Rate", rateParam);
+
+        std::vector<EnumParameterT<Waveform>::Choice> waveformChoices = {
+            {Waveform::Sine, "Sine"},        {Waveform::Tri, "Tri"},
+            {Waveform::Square, "Square"},    {Waveform::SawUp, "Saw Up"},
+            {Waveform::SawDown, "Saw Down"}, {Waveform::SampleHold, "S&H"},
+        };
+        auto waveformParam =
+            CreateEnumParameter("Waveform", ControlMeta::kDefault, &waveform_,
+                                waveformChoices, Waveform::Sine);
+        ui.Combo("Waveform", waveformParam);
     }
 
     void Process() override {

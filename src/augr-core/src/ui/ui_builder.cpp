@@ -132,6 +132,26 @@ UiBuilder &UiBuilder::TextDisplay(const std::string &label,
 // Box layout
 // ---------------------------------------------------------------------------
 
+UiBuilder::BoxScope UiBuilder::VBox(const std::string &label) {
+    OpenVBox(label);
+    return BoxScope(*this);
+}
+
+UiBuilder::BoxScope UiBuilder::HBox(const std::string &label) {
+    OpenHBox(label);
+    return BoxScope(*this);
+}
+
+UiBuilder::BoxScope UiBuilder::TabBox(const std::string &label) {
+    OpenTabBox(label);
+    return BoxScope(*this);
+}
+
+UiBuilder::BoxScope UiBuilder::FrameBox(const std::string &label) {
+    OpenFrameBox(label);
+    return BoxScope(*this);
+}
+
 void UiBuilder::OpenFrameBox(const std::string &label) {
     PushModel(*new augr::FrameBox(label));
 }

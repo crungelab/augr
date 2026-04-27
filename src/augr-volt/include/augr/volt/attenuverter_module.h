@@ -20,7 +20,7 @@ public:
 
         cv_out_ = new VoltageOutput(*this, "cv_out");
         AddOutput(*cv_out_);
-
+        /*
         UiBuilder ui(*this);
 
         // Bipolar amount: negative inverts, zero silences, positive scales up.
@@ -34,8 +34,25 @@ public:
         auto offsetParam = CreateFloatParameter(
             "Offset", ControlMeta::kDefault, &offset_, 0.f, -5.f, 5.f, 0.01f);
         ui.Knob("Offset", offsetParam);
+        */
 
         return true;
+    }
+
+    void CreateControls() override {
+        UiBuilder ui(*this);
+
+        // Bipolar amount: negative inverts, zero silences, positive scales up.
+        auto amountParam = CreateFloatParameter(
+            "Amount", ControlMeta::kDefault, &amount_, 1.f, -5.f, 5.f, 0.01f);
+        ui.Knob("Amount", amountParam);
+
+        // DC offset added after scaling. Useful for biasing a unipolar CV into
+        // bipolar range (or vice versa), or for manual CV when nothing is
+        // patched.
+        auto offsetParam = CreateFloatParameter(
+            "Offset", ControlMeta::kDefault, &offset_, 0.f, -5.f, 5.f, 0.01f);
+        ui.Knob("Offset", offsetParam);
     }
 
     void Process() override {

@@ -28,13 +28,20 @@ public:
 
         audio_out_ = new AudioOutput(*this, "audio_out", ChannelLayout::kMono);
         AddOutput(*audio_out_);
-
+        /*
         UiBuilder ui(*this);
         auto gainParam = CreateFloatParameter("Gain", ControlMeta::kDefault,
                                               &gain_, 1.f, 0.f, 1.f, 0.01f);
         ui.Knob("Gain", gainParam);
-
+        */
         return true;
+    }
+
+    void CreateControls() override {
+        UiBuilder ui(*this);
+        auto gainParam = CreateFloatParameter("Gain", ControlMeta::kDefault,
+                                              &gain_, 1.f, 0.f, 1.f, 0.01f);
+        ui.Knob("Gain", gainParam);
     }
 
     void Process() override {

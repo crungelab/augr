@@ -32,7 +32,7 @@ public:
 
         audio_out_ = new AudioOutput(*this, "audio_out", ChannelLayout::kMono);
         AddOutput(*audio_out_);
-
+        /*
         UiBuilder ui(*this);
 
         auto detuneParam = CreateFloatParameter("Detune", ControlMeta::kSemitones, &detune_, 0.f, -24.f, 24.f, 0.01f);
@@ -49,8 +49,27 @@ public:
         };
         auto waveformParam = CreateEnumParameter("Waveform", ControlMeta::kDefault, &waveform_, waveformChoices, Waveform::Saw);
         ui.Combo("Waveform", waveformParam);
-
+        */
         return true;
+    }
+
+    void CreateControls() override {
+        UiBuilder ui(*this);
+
+        auto detuneParam = CreateFloatParameter("Detune", ControlMeta::kSemitones, &detune_, 0.f, -24.f, 24.f, 0.01f);
+        ui.Knob("Detune", detuneParam);
+
+        auto fmDepthParam = CreateFloatParameter("FM Depth", ControlMeta::kDefault, &fm_depth_, 0.f, 0.f, 4.f, 0.01f);
+        ui.Knob("FM Depth", fmDepthParam);
+
+        std::vector<EnumParameterT<Waveform>::Choice> waveformChoices = {
+            {Waveform::Saw, "Saw"},
+            {Waveform::Square, "Square"},
+            {Waveform::Tri, "Tri"},
+            {Waveform::Sine, "Sine"}
+        };
+        auto waveformParam = CreateEnumParameter("Waveform", ControlMeta::kDefault, &waveform_, waveformChoices, Waveform::Saw);
+        ui.Combo("Waveform", waveformParam);
     }
 
     void Process() override {

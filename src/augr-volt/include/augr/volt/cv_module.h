@@ -19,12 +19,18 @@ public:
 
         cv_out_ = new VoltageOutput(*this, "cv_out");
         AddOutput(*cv_out_);
-
+        /*
         UiBuilder ui(*this);
         auto param = CreateFloatParameter("Voltage", ControlMeta::kDefault, &voltage_, 0.f, -4.f, 4.f, 0.01f);
         ui.Knob("Voltage", param);
-
+        */
         return true;
+    }
+
+    void CreateControls() override {
+        UiBuilder ui(*this);
+        auto param = CreateFloatParameter("Voltage", ControlMeta::kDefault, &voltage_, 0.f, -4.f, 4.f, 0.01f);
+        ui.Knob("Voltage", param);
     }
 
     void Process() override {

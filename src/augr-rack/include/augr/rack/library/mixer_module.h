@@ -27,7 +27,7 @@ public:
 
         audio_out_ = new AudioOutput(*this, "audio_out", ChannelLayout::kMono);
         AddOutput(*audio_out_);
-
+        /*
         UiBuilder ui(*this);
 
         for (int ch = 0; ch < kNumChannels; ++ch) {
@@ -38,8 +38,22 @@ public:
 
         auto masterParam = CreateFloatParameter("Master", ControlMeta::kDefault, &master_, 1.f, 0.f, 1.f, 0.01f);
         ui.Knob("Master", masterParam);
+        */
 
         return true;
+    }
+
+    void CreateControls() override {
+        UiBuilder ui(*this);
+
+        for (int ch = 0; ch < kNumChannels; ++ch) {
+            const std::string label = "Ch " + std::to_string(ch + 1);
+            auto param = CreateFloatParameter(label, ControlMeta::kDefault, &levels_[ch], 1.f, -1.f, 1.f, 0.01f);
+            ui.Knob(label, param);
+        }
+
+        auto masterParam = CreateFloatParameter("Master", ControlMeta::kDefault, &master_, 1.f, 0.f, 1.f, 0.01f);
+        ui.Knob("Master", masterParam);        
     }
 
     void Process() override {

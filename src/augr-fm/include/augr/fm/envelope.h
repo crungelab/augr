@@ -15,6 +15,8 @@ public:
     enum class Stage { kIdle, kR1, kR2, kR3, kR4 };
 
     bool Create(Part &owner) override;
+    void CreateControls() override;
+
     void Process() override;
 
     // Rates are 0..99 DX-style (log-curved internally).

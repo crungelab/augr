@@ -35,7 +35,7 @@ bool Envelope::Create(Part &owner) {
     AddInput(*gate_in_);
     cv_out_ = new VoltageOutput(*this, "cv");
     AddOutput(*cv_out_);
-
+    /*
     UiBuilder ui(*this);
 
     auto r1 = CreateFloatParameter("R1", ControlMeta::kDefault, &rates_[0],  99.f, 0.f, 99.f, 1.f);
@@ -49,8 +49,24 @@ bool Envelope::Create(Part &owner) {
     auto l3 = CreateFloatParameter("L3", ControlMeta::kDefault, &levels_[2], 50.f, 0.f, 99.f, 1.f);
     auto l4 = CreateFloatParameter("L4", ControlMeta::kDefault, &levels_[3],  0.f, 0.f, 99.f, 1.f);
     ui.Knob("L1", l1); ui.Knob("L2", l2); ui.Knob("L3", l3); ui.Knob("L4", l4);
-
+    */
     return true;
+}
+
+void Envelope::CreateControls() {
+    UiBuilder ui(*this);
+
+    auto r1 = CreateFloatParameter("R1", ControlMeta::kDefault, &rates_[0],  99.f, 0.f, 99.f, 1.f);
+    auto r2 = CreateFloatParameter("R2", ControlMeta::kDefault, &rates_[1],  50.f, 0.f, 99.f, 1.f);
+    auto r3 = CreateFloatParameter("R3", ControlMeta::kDefault, &rates_[2],  50.f, 0.f, 99.f, 1.f);
+    auto r4 = CreateFloatParameter("R4", ControlMeta::kDefault, &rates_[3],  50.f, 0.f, 99.f, 1.f);
+    ui.Knob("R1", r1); ui.Knob("R2", r2); ui.Knob("R3", r3); ui.Knob("R4", r4);
+
+    auto l1 = CreateFloatParameter("L1", ControlMeta::kDefault, &levels_[0], 99.f, 0.f, 99.f, 1.f);
+    auto l2 = CreateFloatParameter("L2", ControlMeta::kDefault, &levels_[1], 75.f, 0.f, 99.f, 1.f);
+    auto l3 = CreateFloatParameter("L3", ControlMeta::kDefault, &levels_[2], 50.f, 0.f, 99.f, 1.f);
+    auto l4 = CreateFloatParameter("L4", ControlMeta::kDefault, &levels_[3],  0.f, 0.f, 99.f, 1.f);
+    ui.Knob("L1", l1); ui.Knob("L2", l2); ui.Knob("L3", l3); ui.Knob("L4", l4);
 }
 
 void Envelope::Process() {

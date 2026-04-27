@@ -15,6 +15,8 @@ namespace augr {
 class Module : public Node {
 public:
     bool Create(Part &owner) override;
+    virtual void CreateControls() {}
+
     virtual Audio ProcessAudio(Audio &input) { return Audio(); }
     virtual void Process() {}
 
