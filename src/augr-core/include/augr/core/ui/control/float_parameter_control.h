@@ -23,21 +23,4 @@ public:
     REFLECT_ENABLE(ParameterControl<FloatParameter>)
 };
 
-/*
-class FloatParameterControl : public Control {
-public:
-    FloatParameterControl() = default;
-    explicit FloatParameterControl(std::string label, FloatParameter *param)
-        : Control(std::move(label), param->meta()), param_(param) {}
-
-    FloatParameter *param() { return param_; }
-    const FloatParameter *param() const { return param_; }
-
-    REFLECT_ENABLE(Control)
-
-private:
-    FloatParameter *param_; // non-owning — Parameter lives in Module
-};
-*/
-
 } // namespace augr
