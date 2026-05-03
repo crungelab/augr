@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.15)
 
-project(daw LANGUAGES CXX)
+project(rawdaw LANGUAGES CXX)
 set(THIS ${PROJECT_NAME})
 set(THIS_DIR ${CMAKE_CURRENT_SOURCE_DIR})
 
@@ -10,10 +10,10 @@ file(GLOB EXE_INCLUDES ${THIS_DIR}/*.h)
 add_executable(${THIS} "main.cpp" ${CMN_SOURCES} ${CMN_INCLUDES} ${EXE_SOURCES} ${EXE_INCLUDES})
 target_include_directories(${THIS} PRIVATE ${PROJECT_ROOT})
 
-include(${AUGR_CMAKE}/ExeApp.cmake)
-include(${THIS_DIR}/../../cmake/Common.cmake)
+include(${AUGR_CMAKE}/AugrFaust.cmake)
 include(${AUGR_CMAKE}/AugrExe.cmake)
+include(${AUGR_CMAKE}/ExeApp.cmake)
 
-USES_EXE_APP(${THIS})
-USES_COMMON(${THIS})
 USES_AUGR_EXE(${THIS})
+USES_AUGR_FAUST(${THIS})
+USES_EXE_APP(${THIS})

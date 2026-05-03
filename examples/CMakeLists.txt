@@ -36,4 +36,6 @@ add_subdirectory(multi)
 
 add_subdirectory(bubble)
 
+add_subdirectory(rawdaw)
+
 add_subdirectory(daw)
