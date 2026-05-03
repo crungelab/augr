@@ -83,7 +83,7 @@ bool App::PostCreate(CreateParams params) {
     init_info.PresentMode = SDL_GPU_PRESENTMODE_VSYNC;
     ImGui_ImplSDLGPU3_Init(&init_info);
 
-    return X11Window::PostCreate(params);
+    return Window::PostCreate(params);
 }
 
 void App::Render() {
@@ -130,14 +130,6 @@ void App::Render() {
                                          render_pass);
 
         SDL_EndGPURenderPass(render_pass);
-    }
-
-    // Update and Render additional Platform Windows
-    ImGuiIO &io = ImGui::GetIO();
-    (void)io;
-    if (io.ConfigFlags & ImGuiConfigFlags_ViewportsEnable) {
-        ImGui::UpdatePlatformWindows();
-        ImGui::RenderPlatformWindowsDefault();
     }
 
     //  Submit the command buffer

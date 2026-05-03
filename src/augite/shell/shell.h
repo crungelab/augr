@@ -3,7 +3,7 @@
 #ifdef SHELL_HEADER
 #include SHELL_HEADER
 #else
-#include "window.h"
+#include "base_window.h"
 #endif
 
 namespace augr {
@@ -11,7 +11,7 @@ namespace augr {
 #ifdef SHELL_CLASS
 using Window = SHELL_CLASS;
 #else
-using Window = WindowBase;
+using Window = BaseWindow;
 #endif
 
 } // namespace augr
