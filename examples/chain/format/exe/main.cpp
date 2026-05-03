@@ -24,7 +24,7 @@ public:
   MyApp()
   {
     ChainDsp &m = ModelFactoryT<ChainDspImpl>::Make(rack_);
-    rack_.AddChild(m);
+    rack_.AddModule(m);
     view_ = new RackView(rack_);
   }
 

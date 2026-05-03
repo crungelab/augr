@@ -215,15 +215,15 @@ void RackView::DrawModuleCatalog() {
 
             if (ImGui::Selectable(it->name_.c_str())) {
                 // Model& node = *it->Produce(*model_);
-                Node &node = dynamic_cast<Node &>(*it->Produce(*model_));
-                model_->AddChild(node);
+                Module &module = dynamic_cast<Module &>(*it->Produce(*model_));
+                model_->AddModule(module);
 
                 WidgetBuilder builder;
-                Widget *widget = builder.Build(node);
+                Widget *widget = builder.Build(module);
                 root_->AddChild(widget);
-                widget_map_[node.id_] = widget;
+                widget_map_[module.id_] = widget;
 
-                ImNodes::SetNodeScreenSpacePos(node.id_, pending_spawn_pos);
+                ImNodes::SetNodeScreenSpacePos(module.id_, pending_spawn_pos);
 
                 // 5) If user was dragging a link, try to auto-connect
                 if (pending_link_start_attr != -1) {
@@ -238,13 +238,13 @@ void RackView::DrawModuleCatalog() {
                         // Find first input
                         output =
                             model_->output_map_[pending_link_start_attr];
-                        if (!node.inport_.pins_.empty()) {
-                            input = node.inport_.pins_[0];
+                        if (!module.inport_.pins_.empty()) {
+                            input = module.inport_.pins_[0];
                         }
                     } else {
                         // Find first output
-                        if (!node.outport_.pins_.empty()) {
-                            output = node.outport_.pins_[0];
+                        if (!module.outport_.pins_.empty()) {
+                            output = module.outport_.pins_[0];
                         }
                         input = model_->input_map_[pending_link_start_attr];
                     }

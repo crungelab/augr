@@ -17,9 +17,11 @@ public:
 
     void Render() override;
 
+    // Accessors
+    static App &singleton() { return *singleton_; }
+
     // Data members
-    bool show_demo_window = true;
-    bool show_another_window = false;
+    static App *singleton_;
 };
 
 } // namespace augr

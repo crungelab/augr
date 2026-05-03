@@ -218,35 +218,6 @@ private:
     std::vector<T> queue_;
     mutable std::mutex mutex_;
 };
-/*
-// QueueInputT — single-connection input; queues incoming values for later
-// retrieval
-template <typename T, typename TBase>
-class QueueInputT : public MonoInputT<T, TBase> {
-    using TConnection = ConnectionT<T>;
-    using TOutput = OutputT<T, TBase>;
-
-public:
-    template <typename... Args>
-    QueueInputT(Node &node, std::string name, Args &&...args)
-        : MonoInputT<T, TBase>(node, name, std::forward<Args>(args)...) {}
-
-    void Write(T value) override {
-        MonoInputT<T, TBase>::Write(value);
-        queue_.push_back(value);
-    }
-    T Read() {
-        if (queue_.empty())
-            return T{};
-        T value = queue_.front();
-        queue_.erase(queue_.begin());
-        return value;
-    }
-    bool Empty() const { return queue_.empty(); }
-    // Data members
-    std::vector<T> queue_;
-};
-*/
 
 // PolyInputT — multi-connection input; mixes all sources via Reduce()
 template <typename T, typename TBase> class PolyInputT : public PinT<T, TBase> {

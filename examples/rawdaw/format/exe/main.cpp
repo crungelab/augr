@@ -10,10 +10,10 @@
 #include <augite/view/rack_view.h>
 #include <augite/widget/widget_manufacturer.h>
 
+#include "flanger_dsp.h"
+#include "freeverb_dsp.h"
 #include "frenchbell_dsp.h"
 #include "osc_dsp.h"
-#include "freeverb_dsp.h"
-#include "flanger_dsp.h"
 #include "phaser_dsp.h"
 
 using namespace augr;
@@ -47,20 +47,6 @@ DEFINE_MODEL_FACTORY(PhaserDspImpl, "Phaser", "Effect")
 class MyApp final : public App {
 public:
     MyApp() {
-        /*
-        OscDsp &m = ModelFactoryT<OscDspImpl>::Make(rack_);
-        rack_.AddChild(m);
-
-        FreeVerbDsp &m2 = ModelFactoryT<FreeVerbDspImpl>::Make(rack_);
-        rack_.AddChild(m2);
-
-        FlangerDsp &m3 = ModelFactoryT<FlangerDspImpl>::Make(rack_);
-        rack_.AddChild(m3);
-
-        PhaserDsp &m4 = ModelFactoryT<PhaserDspImpl>::Make(rack_);
-        rack_.AddChild(m4);
-        */
-
         REGISTER_MODEL_FACTORY(FrenchBellDspImpl);
         REGISTER_MODEL_FACTORY(OscDspImpl);
         REGISTER_MODEL_FACTORY(FreeVerbDspImpl);

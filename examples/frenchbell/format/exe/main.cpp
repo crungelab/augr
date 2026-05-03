@@ -22,7 +22,7 @@ class MyApp : public App {
 public:
     MyApp() {
         FrenchBellDsp &m = ModelFactoryT<FrenchBellDspImpl>::Make(rack_);
-        rack_.AddChild(m);
+        rack_.AddModule(m);
         view_ = new RackView(rack_);
     }
 

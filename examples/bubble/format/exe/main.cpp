@@ -25,7 +25,8 @@ public:
   MyApp()
   {
     BubbleDsp &m = ModelFactoryT<BubbleDspImpl>::Make(rack_);
-    rack_.AddChild(m);
+    rack_.AddModule(m);
+
     view_ = new RackView(rack_);
   }
 

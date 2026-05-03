@@ -3,14 +3,14 @@
 #include <list>
 #include <map>
 
-#include <augr/core/model.h>
+#include <augr/rack/module/module.h>
 
 namespace augr {
 
 class Wire;
 class Pin;
 
-class Graph : public Model {
+class Graph : public Module {
 public:
     Graph() {}
     //

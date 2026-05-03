@@ -24,7 +24,7 @@ public:
   MyApp()
   {
     OscDsp &m = ModelFactoryT<OscDspImpl>::Make(rack_);
-    rack_.AddChild(m);
+    rack_.AddModule(m);
     view_ = new RackView(rack_);
   }
 

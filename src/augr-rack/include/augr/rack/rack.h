@@ -13,7 +13,7 @@ public:
     Rack() { singleton_ = this; }
     virtual ~Rack() {}
     //
-    void AddModule(Module &m) { modules_.push_back(&m); }
+    void AddModule(Module &m) { AddChild(m); modules_.push_back(&m); }
 
     void EnqueueAction(std::function<void()> action,
                        std::function<void()> update_action = nullptr);

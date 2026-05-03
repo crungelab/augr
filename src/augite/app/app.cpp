@@ -17,7 +17,11 @@
 
 namespace augr {
 
-App::App() {};
+App *App::singleton_;
+
+App::App() {
+    singleton_ = this;
+};
 
 bool App::DoCreate(CreateParams params) {
 

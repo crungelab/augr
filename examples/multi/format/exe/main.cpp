@@ -31,8 +31,8 @@ public:
   {
     OscDsp &m = ModelFactoryT<OscDspImpl>::Make(rack_);
     FreeVerbDsp &m2 = ModelFactoryT<FreeVerbDspImpl>::Make(rack_);
-    rack_.AddChild(m);
-    rack_.AddChild(m2);
+    rack_.AddModule(m);
+    rack_.AddModule(m2);
     view_ = new RackView(rack_);
   }
 
