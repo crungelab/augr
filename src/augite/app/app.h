@@ -2,12 +2,13 @@
 
 #include <augite/shell/shell.h>
 
+#include <augite/app/clipboard.h>
+
 namespace augr {
 
 class App : public Window {
 public:
     App();
-    // virtual ~App();
 
     void CreateContext() override;
 
@@ -19,9 +20,11 @@ public:
 
     // Accessors
     static App &singleton() { return *singleton_; }
+    Clipboard &clipboard() { return clipboard_; }
 
     // Data members
     static App *singleton_;
+    Clipboard clipboard_;
 };
 
 } // namespace augr

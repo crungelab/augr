@@ -44,6 +44,8 @@ bool App::DoCreate(CreateParams params) {
     REGISTER_WIDGET_FACTORY(VBarGraphWidget)
     REGISTER_WIDGET_FACTORY(KnobWidget)
 
+    clipboard_ = Clipboard();
+    
     return success;
 }
 

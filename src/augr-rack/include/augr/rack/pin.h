@@ -40,10 +40,22 @@ public:
     TCallback callback_;
 };
 
+enum class PinKind {
+    Output,
+    MonoInput,
+    QueueInput,
+    PolyInput,
+};
+
 // Base pin — wiring, name, node ref
 class Pin : public Part {
 public:
     Pin(Node &node, std::string name) : name_(name) {}
+
+    virtual PinKind kind() const = 0;
+
+    bool is_input() const { return kind() != PinKind::Output; }
+    bool is_output() const { return kind() == PinKind::Output; }
 
     virtual void AddWire(Wire &wire) { wires_.push_back(&wire); }
     virtual void RemoveWire(Wire &wire) {
@@ -95,6 +107,8 @@ public:
     OutputT(Node &node, std::string name, Args &&...args)
         : PinT<T, TBase>(node, name, std::forward<Args>(args)...) {}
 
+    PinKind kind() const override { return PinKind::Output; }
+
     Connection *Connect(Pin &input) override {
         // Connection is initiated from the input side
         return nullptr;
@@ -143,6 +157,8 @@ public:
     MonoInputT(Node &node, std::string name, Args &&...args)
         : PinT<T, TBase>(node, name, std::forward<Args>(args)...) {}
 
+    PinKind kind() const override { return PinKind::MonoInput; }
+
     Connection *Connect(Pin &_output) override {
         if (connection_)
             return nullptr;
@@ -184,6 +200,8 @@ public:
     template <typename... Args>
     QueueInputT(Node &node, std::string name, Args &&...args)
         : MonoInputT<T, TBase>(node, name, std::forward<Args>(args)...) {}
+
+    PinKind kind() const override { return PinKind::QueueInput; }
 
     Connection *Connect(Pin &_output) override {
         if (this->connection_)
@@ -227,6 +245,8 @@ public:
     template <typename... Args>
     PolyInputT(Node &node, std::string name, Args &&...args)
         : PinT<T, TBase>(node, name, std::forward<Args>(args)...) {}
+
+    PinKind kind() const override { return PinKind::PolyInput; }
 
     Connection *Connect(Pin &_output) override {
         TOutput *output = dynamic_cast<TOutput *>(&_output);
