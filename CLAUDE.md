@@ -49,7 +49,7 @@ All third-party libraries live in `depot/` (vendored, not committed).
 - **`Model : Part`** — adds `children_` vector; forms the composite data tree.
 - **`Graph : Model`** — adds `Wire` management and `Connect`/`Disconnect` API. `graph_dirty_` triggers execution-order rebuild.
 - **`Node : Model`** — has `Inport` and `Outport` `Pin` collections.
-- **`Module : Node`** — the core DSP unit. Has typed audio/MIDI pins, `parameters_` (`FloatParameter`/`EnumParameter`), and virtual `Process()`/`ProcessAudio()`. Modules declare UI inside `Create()` via `UiBuilder`.
+- **`Module : Node`** — the core DSP unit. Has typed audio/MIDI pins, `parameters_` (`FloatParameter`/`EnumParameter`), and virtual `Process()`. Modules declare UI inside `Create()` via `UiBuilder`.
 - **`Rack : Graph`** — singleton DSP graph. Holds `modules_` and `sorted_modules_` (Kahn's topological sort). Thread-safe `pending_actions_` / `pending_update_actions_` queues decouple UI thread from audio thread.
 - **`ExeRack : Rack`** — standalone-app rack owning `AudioSystem` (RtAudio) and `MidiSystem` (RtMidi). `ProcessAudio()` is the RtAudio callback.
 

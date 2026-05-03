@@ -19,7 +19,6 @@ public:
     virtual void CreateControls() {}
     virtual void CreatePins() {}
 
-    virtual Audio ProcessAudio(Audio &input) { return Audio(); }
     virtual void Process() {}
 
     // -- Parameters -------------------------------------------------

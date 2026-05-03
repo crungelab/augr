@@ -70,6 +70,11 @@ public:
     T Read() const { return value_; }
     virtual void Write(T value) { value_ = value; }
 
+    // Hook for subclasses to coerce incoming values (format conversion,
+    // clamping, quantization, etc.). Called by input pins inside the
+    // delivery callback before the value is stored. Identity by default.
+    virtual T Transform(T value) { return value; }
+
     T value_{};
 };
 
@@ -139,7 +144,6 @@ public:
         : PinT<T, TBase>(node, name, std::forward<Args>(args)...) {}
 
     Connection *Connect(Pin &_output) override {
-        // Reject if already connected
         if (connection_)
             return nullptr;
 
@@ -147,8 +151,9 @@ public:
         if (!output)
             return nullptr;
 
-        connection_ = output->CreateConnection(
-            *this, nullptr, [this](T value) { this->value_ = value; });
+        connection_ = output->CreateConnection(*this, nullptr, [this](T value) {
+            this->value_ = this->Transform(value);
+        });
 
         return connection_;
     }
@@ -158,13 +163,10 @@ public:
             return;
 
         connection.output_->Disconnect(connection);
-        // connection_ was deleted by OutputT::DestroyConnection
         connection_ = nullptr;
 
         this->value_ = T{};
     }
-
-    // Read() inherited from PinT — value_ is written directly by the callback
 
     bool connected() const { return connection_ != nullptr; }
 
@@ -173,8 +175,6 @@ protected:
 };
 
 // QueueInputT — single-connection input that accumulates incoming values
-// for later batch retrieval. Intended for event streams like MIDI where
-// multiple messages can arrive within a single audio buffer.
 template <typename T, typename TBase>
 class QueueInputT : public MonoInputT<T, TBase> {
     using TConnection = ConnectionT<T>;
@@ -196,12 +196,11 @@ public:
         this->connection_ =
             output->CreateConnection(*this, nullptr, [this](T value) {
                 std::lock_guard<std::mutex> lock(mutex_);
-                queue_.push_back(value);
+                queue_.push_back(this->Transform(value));
             });
         return this->connection_;
     }
 
-    // Drain all queued values. Returns the batch; internal queue becomes empty.
     std::vector<T> Drain() {
         std::vector<T> out;
         std::lock_guard<std::mutex> lock(mutex_);
@@ -238,7 +237,7 @@ public:
         slots_.push_back(slot);
 
         return output->CreateConnection(*this, slot, [this, slot](T value) {
-            slot->Write(value);
+            slot->Write(this->Transform(value));
             dirty_ = true;
         });
     }
@@ -284,7 +283,7 @@ public:
 
     std::vector<SlotT<T> *> slots_;
 
-private:
+protected:
     bool dirty_ = false;
 };
 
