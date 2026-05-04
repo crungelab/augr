@@ -1,5 +1,4 @@
 #include <augr/core/model_manufacturer.h>
-#include <augr/core/model_factory.h>
 
 #include <augr/rack/library/mixer_module.h>
 #include <augr/rack/library/scope_module.h>

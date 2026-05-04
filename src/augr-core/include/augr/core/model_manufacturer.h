@@ -5,9 +5,11 @@
 #include <typeindex>
 #include <vector>
 
+#include "model_factory.h"
+
 namespace augr {
 
-class ModelFactory;
+//class ModelFactory;
 
 class ModelManufacturer {
 public:

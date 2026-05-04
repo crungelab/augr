@@ -2,6 +2,8 @@
 
 #include <map>
 
+#include "imgui.h"
+
 #include "model_view.h"
 
 namespace augr {

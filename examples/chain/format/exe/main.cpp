@@ -1,13 +1,14 @@
-#include <augr/exe/rack/exe_rack.h>
+#include <augr/core/model_factory.h>
 #include <augr/rack/module/module.h>
 #include <augr/faust/faust_dsp.h>
 #include <augr/faust/faust_dsp_ui.h>
 
-#include <augite/app/app.h>
+#include <augr/exe/rack/exe_rack.h>
 
 #include <augite/view/rack_view.h>
 #include <augite/widget/widget.h>
 #include <augite/widget/widget_manufacturer.h>
+#include <augite/app/app.h>
 
 #include "chain_dsp.h"
 
@@ -43,6 +44,6 @@ int main(int, char **)
   ExeRack &rack = app.rack_;
   rack.Create();
   rack.Start();
-  app.Run();
+  app.Run(augr::Window::RunParams("Augr Chain"));
   rack.Stop();
 }
