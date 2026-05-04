@@ -20,7 +20,7 @@ public:
 
     // Produce a new archiver bound to the given model. The factory
     // constructs the archiver and calls Create(model) before returning.
-    virtual Archiver* Produce(Model &model) = 0;
+    virtual Archiver *Produce(Model &model) = 0;
 
     [[nodiscard]] virtual std::type_index ModelType() const = 0;
 
@@ -35,7 +35,11 @@ class ArchiverFactoryT final : public ArchiverFactory {
 public:
     using ArchiverFactory::ArchiverFactory;
 
-    Archiver *Produce(Model &model) override { return new ArchiverT((ModelT &)model); }
+    Archiver *Produce(Model &model) override {
+        ArchiverT *archiver = new ArchiverT();
+        archiver->Create(model);
+        return archiver;
+    }
 
     [[nodiscard]] std::type_index ModelType() const override {
         return typeid(ModelT);

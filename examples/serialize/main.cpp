@@ -30,12 +30,8 @@ public:
     REFLECT_ENABLE(BubbleDsp)
 };
 
-class BubbleDspArchiver : public ModuleArchiver {
-public:
-    BubbleDspArchiver(Module &model) : ModuleArchiver(model) {}
-};
+class BubbleDspArchiver : public ModuleArchiver {};
 DEFINE_ARCHIVER_FACTORY(BubbleDspArchiver, BubbleDspImpl, "BubbleDsp")
-// DEFINE_ARCHIVER_FACTORY(ModuleArchiver, Module, "Module")
 
 class MyApp : public App {
 public:

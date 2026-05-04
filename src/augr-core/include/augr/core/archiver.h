@@ -19,7 +19,7 @@ class Model;
 class Archiver {
 public:
     virtual ~Archiver() = default;
-
+    virtual void Create(Model &model) = 0;
     virtual void Save(Archive &archive) const = 0;
     virtual void Load(Archive &archive) = 0;
 
@@ -31,7 +31,7 @@ public:
 // see their Model as T& without writing static_casts.
 template <typename T> class ArchiverT : public Archiver {
 public:
-    ArchiverT(T &model) : model_(&model) {}
+    void Create(Model &model) override { model_ = &dynamic_cast<T &>(model); }
     Model *model_ptr() override { return model_; }
     T &model() { return *model_; }
     const T &model() const { return *model_; }
