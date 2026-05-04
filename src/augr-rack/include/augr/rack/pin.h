@@ -50,7 +50,7 @@ enum class PinKind {
 // Base pin — wiring, name, node ref
 class Pin : public Part {
 public:
-    Pin(Node &node, std::string name) : name_(name) {}
+    Pin(Node &node, std::string name) : name_(std::move(name)) {}
 
     virtual PinKind kind() const = 0;
 
@@ -66,8 +66,13 @@ public:
     virtual Connection *Connect(Pin &other) = 0;
     virtual void Disconnect(Connection &connection) = 0;
 
+    // Accessors
     Node &node() { return *(Node *)owner_; }
+    const Node &node() const { return *(const Node *)owner_; }
+    std::string name() const { return name_; }
+    std::vector<Wire *> wires() const { return wires_; }
 
+    // Data members
     std::string name_;
     std::vector<Wire *> wires_;
 };

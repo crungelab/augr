@@ -8,6 +8,7 @@
 #include <augr/rack/archiver/graph_archiver.h>
 #include <augr/rack/archiver/rack_archiver.h>
 #include <augr/rack/module/module.h>
+#include <augr/rack/module/audio_device.h>
 
 #include <augr/faust/faust_dsp.h>
 #include <augr/faust/faust_dsp_ui.h>
@@ -44,7 +45,6 @@ public:
         BubbleDsp &m = ModelFactoryT<BubbleDspImpl>::Make(rack_);
         rack_.AddModule(m);
         bubble_ = &m;
-
         view_ = new RackView(rack_);
     }
 
@@ -91,8 +91,11 @@ int main(int, char **) {
     REGISTER_ARCHIVER_FACTORY(ExeRackArchiver);
 
     MyApp &app = *new MyApp();
-    // ExeRack &rack = app.rack_;
-    // rack.Create();
+    ExeRack &rack = app.rack_;
+    rack.Create();
+
+    rack.Connect(*app.bubble_->audio_out_, *rack.audio_output_device_->audio_in_);
+
     // rack.Start();
 
     // Serialize the bubble module before entering the run loop.

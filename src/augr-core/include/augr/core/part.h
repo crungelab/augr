@@ -22,7 +22,7 @@ public:
     Part &owner() { return *owner_; }
     //
     // Data members
-    Part *owner_;
+    Part *owner_ = nullptr;
     static int instanceCounter_;
     int id_ = 0;
     REFLECT_ENABLE()

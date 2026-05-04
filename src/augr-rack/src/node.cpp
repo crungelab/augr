@@ -6,11 +6,13 @@ namespace augr {
 Node::Node(Graph &graph) : Model(graph) {}
 
 void Node::AddInput(Pin &input) {
+    input.owner_ = this;
     inport_.AddPin(input);
     graph().AddInput(input);
 }
 
 void Node::AddOutput(Pin &output) {
+    output.owner_ = this;
     outport_.AddPin(output);
     graph().AddOutput(output);
 }

@@ -9,6 +9,8 @@ class Graph;
 class GraphArchiver : public ArchiverT<Graph, ModuleArchiver> {
 public:
     void Save(Archive &archive) const override;
+    void SaveChildren(Archive &archive) const;
+    void SaveWires(Archive &archive) const;
     void Load(Archive &archive) override;
 };
 
