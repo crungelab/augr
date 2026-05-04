@@ -8,7 +8,9 @@
 #include <augr/rack/archiver/graph_archiver.h>
 #include <augr/rack/archiver/rack_archiver.h>
 #include <augr/rack/module/module.h>
+
 #include <augr/rack/module/audio_device.h>
+#include <augr/rack/module/midi_device.h>
 
 #include <augr/faust/faust_dsp.h>
 #include <augr/faust/faust_dsp_ui.h>
@@ -38,6 +40,18 @@ DEFINE_ARCHIVER_FACTORY(BubbleDspArchiver, BubbleDspImpl, "BubbleDsp")
 
 class ExeRackArchiver : public RackArchiver {};
 DEFINE_ARCHIVER_FACTORY(ExeRackArchiver, ExeRack, "ExeRack")
+
+class AudioInputDeviceArchiver : public ModuleArchiver {};
+DEFINE_ARCHIVER_FACTORY(AudioInputDeviceArchiver, AudioInputDevice, "AudioInputDevice")
+
+class AudioOutputDeviceArchiver : public ModuleArchiver {};
+DEFINE_ARCHIVER_FACTORY(AudioOutputDeviceArchiver, AudioOutputDevice, "AudioOutputDevice")
+
+class MidiInputDeviceArchiver : public ModuleArchiver {};
+DEFINE_ARCHIVER_FACTORY(MidiInputDeviceArchiver, MidiInputDevice, "MidiInputDevice")
+
+class MidiOutputDeviceArchiver : public ModuleArchiver {};
+DEFINE_ARCHIVER_FACTORY(MidiOutputDeviceArchiver, MidiOutputDevice, "MidiOutputDevice")
 
 class MyApp : public App {
 public:
@@ -89,6 +103,10 @@ void SerializeModule(Module &module) {
 int main(int, char **) {
     REGISTER_ARCHIVER_FACTORY(BubbleDspArchiver);
     REGISTER_ARCHIVER_FACTORY(ExeRackArchiver);
+    REGISTER_ARCHIVER_FACTORY(AudioInputDeviceArchiver);
+    REGISTER_ARCHIVER_FACTORY(AudioOutputDeviceArchiver);
+    REGISTER_ARCHIVER_FACTORY(MidiInputDeviceArchiver);
+    REGISTER_ARCHIVER_FACTORY(MidiOutputDeviceArchiver);
 
     MyApp &app = *new MyApp();
     ExeRack &rack = app.rack_;
