@@ -36,4 +36,18 @@ Archiver* ArchiverManufacturer::MakeArchiver(
     return factory ? factory->Produce(model) : nullptr;
 }
 
+void ArchiverManufacturer::Serialize(Archive &archive, Model &model) const {
+    auto *factory = FindFactory(std::type_index(typeid(model)));
+    if (!factory) { /* error */ return; }
+    Archiver *archiver = factory->Produce(model);
+    if (archiver) {
+        archiver->Save(archive);
+        delete archiver;
+    }
+}
+
+void ArchiverManufacturer::Deserialize(Archive &archive, Model &model) const {
+    // mirror for Load
+}
+
 } // namespace augr

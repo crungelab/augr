@@ -9,37 +9,30 @@
 
 namespace augr {
 
-void SerializeModel(Archive &archive, Model &model) {
-    auto &manufacturer = ArchiverManufacturer::singleton();
-
-    // Look up the archiver factory for this module's dynamic type.
-    auto *factory = manufacturer.FindFactory(std::type_index(typeid(model)));
-    if (!factory) {
-        std::cerr << "No archiver factory registered for type "
-                  << typeid(model).name() << "\n";
-        return;
-    }
-
-    // Produce an archiver bound to this module.
-    auto archiver = factory->Produce(model);
-    if (!archiver) {
-        std::cerr << "Failed to construct archiver\n";
-        return;
-    }
-
-    archiver->Save(archive);
-    delete archiver;
-}
-
 void GraphArchiver::Save(Archive &archive) const {
     ModuleArchiver::Save(archive);
 
-    for (auto &child : model().children_) {
-        nlohmann::json j_child;
-        Archive child_archive(j_child, archive.version());
-        SerializeModel(child_archive, *child);
-        archive.json()["children"].push_back(j_child);
+    auto &j = archive.json();
+    const Graph &graph = model();
+
+    if (graph.children_.empty())
+        return;
+
+    // Push graph context so connections in this graph resolve correctly.
+    GraphScope graph_scope(archive,
+                           graph.children_); // copy of children pointers
+
+    auto &j_children = j["children"] = nlohmann::json::array();
+    for (auto *child : graph.children_) {
+        nlohmann::json j_child = nlohmann::json::object();
+        {
+            JsonScope json_scope(archive, j_child);
+            ArchiverManufacturer::singleton().Serialize(archive, *child);
+        }
+        j_children.push_back(std::move(j_child));
     }
+
+    // Connections would be saved here, using archive.IndexOf(...).
 }
 
 void GraphArchiver::Load(Archive &archive) {

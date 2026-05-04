@@ -8,6 +8,7 @@
 
 namespace augr {
 
+class Archive;
 class Archiver;
 class ArchiverFactory;
 class Model;
@@ -33,6 +34,9 @@ public:
     [[nodiscard]] Archiver* MakeArchiver(Model &model) const;
     [[nodiscard]] Archiver* MakeArchiver(
         const std::string &type_name, Model &model) const;
+
+    void Serialize(Archive &archive, Model &model) const;
+    void Deserialize(Archive &archive, Model &model) const;
 
     [[nodiscard]] const std::vector<ArchiverFactory *> &factories() const {
         return factories_;
