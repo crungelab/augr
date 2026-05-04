@@ -24,16 +24,16 @@ ArchiverFactory *ArchiverManufacturer::FindFactory(
     return it == by_name_.end() ? nullptr : it->second;
 }
 
-std::unique_ptr<Archiver> ArchiverManufacturer::MakeArchiver(
+Archiver* ArchiverManufacturer::MakeArchiver(
     Model &model) const {
-    auto *factory = FindFactory(std::type_index(typeid(model)));
-    return factory ? factory->Make(model) : nullptr;
+    auto factory = FindFactory(std::type_index(typeid(model)));
+    return factory ? factory->Produce(model) : nullptr;
 }
 
-std::unique_ptr<Archiver> ArchiverManufacturer::MakeArchiver(
+Archiver* ArchiverManufacturer::MakeArchiver(
     const std::string &type_name, Model &model) const {
-    auto *factory = FindFactory(type_name);
-    return factory ? factory->Make(model) : nullptr;
+    auto factory = FindFactory(type_name);
+    return factory ? factory->Produce(model) : nullptr;
 }
 
 } // namespace augr

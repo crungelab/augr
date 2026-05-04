@@ -46,30 +46,25 @@ private:
 // the Model) lives here.
 class Archiver {
 public:
-    Archiver(Archive &archive, Model &model) : archive_(&archive), model_(&model) {}
     virtual ~Archiver() = default;
 
     virtual void Save(Archive &archive) const = 0;
     virtual void Load(Archive &archive) = 0;
 
-protected:
-    [[nodiscard]] Model &model() const { return *model_; }
-
-private:
-    Archive *archive_;
-    Model *model_ = nullptr;
+    // Accessors
+    virtual Model *model_ptr() = 0;
 };
 
 // ArchiverT — typed convenience layer. Subclasses of ArchiverT<T>
 // see their Model as T& without writing static_casts.
 template <typename T> class ArchiverT : public Archiver {
 public:
-    ArchiverT(T &model) : Archiver(model) {}
-
-protected:
-    [[nodiscard]] T &model() const {
-        return static_cast<T &>(Archiver::model());
-    }
+    ArchiverT(T &model) : model_(&model) {}
+    Model *model_ptr() override { return model_; }
+    T &model() { return *model_; }
+    const T &model() const { return *model_; }
+    // Data members
+    T *model_;
 };
 
 } // namespace augr

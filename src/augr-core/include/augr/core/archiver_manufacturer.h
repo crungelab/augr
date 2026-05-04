@@ -30,8 +30,8 @@ public:
 
     // Convenience: find the factory and produce an archiver in one call.
     // Returns nullptr if no factory matches.
-    [[nodiscard]] std::unique_ptr<Archiver> MakeArchiver(Model &model) const;
-    [[nodiscard]] std::unique_ptr<Archiver> MakeArchiver(
+    [[nodiscard]] Archiver* MakeArchiver(Model &model) const;
+    [[nodiscard]] Archiver* MakeArchiver(
         const std::string &type_name, Model &model) const;
 
     [[nodiscard]] const std::vector<ArchiverFactory *> &factories() const {

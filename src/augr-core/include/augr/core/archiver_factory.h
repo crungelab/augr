@@ -20,7 +20,7 @@ public:
 
     // Produce a new archiver bound to the given model. The factory
     // constructs the archiver and calls Create(model) before returning.
-    virtual std::unique_ptr<Archiver> Make(Model &model) = 0;
+    virtual Archiver* Produce(Model &model) = 0;
 
     [[nodiscard]] virtual std::type_index ModelType() const = 0;
 
@@ -30,16 +30,12 @@ private:
     std::string type_name_;
 };
 
-template <typename ArchiverT_, typename ModelT>
+template <typename ArchiverT, typename ModelT>
 class ArchiverFactoryT final : public ArchiverFactory {
 public:
     using ArchiverFactory::ArchiverFactory;
 
-    std::unique_ptr<Archiver> Make(Model &model) override {
-        auto archiver = std::make_unique<ArchiverT_>();
-        archiver->Create(model);
-        return archiver;
-    }
+    Archiver *Produce(Model &model) override { return new ArchiverT((ModelT &)model); }
 
     [[nodiscard]] std::type_index ModelType() const override {
         return typeid(ModelT);
