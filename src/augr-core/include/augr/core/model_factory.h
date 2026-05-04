@@ -7,30 +7,10 @@
 
 #include <augr/core/part.h>
 
+#include "model.h"
+
 namespace augr {
 
-class Model : public Part {
-public:
-    Model() = default;
-    void AddChild(Model &model) { children_.push_back(&model); }
-    void RemoveChild(Model &model) {
-        OnRemovingChild(model);
-        children_.erase(std::remove(children_.begin(), children_.end(), &model),
-                        children_.end());
-    }
-    // Accessors
-    [[nodiscard]] Model &parent() const {
-        return *dynamic_cast<Model *>(owner_);
-    }
-protected:
-    virtual void OnRemovingChild(Model& model) {}
-public:
-    // Data members
-    std::vector<Model *> children_;
-
-    REFLECT_ENABLE(Part)
-};
-/*
 // Factory
 class ModelFactory {
 public:
@@ -60,5 +40,5 @@ public:
 #define DEFINE_MODEL_FACTORY(T, NAME, CATEGORY)                                \
     ModelFactoryT<T> T##Factory(NAME, CATEGORY);                               \
     ModelFactory *Get##T##Factory() { return &T##Factory; }
-*/
+
 } // namespace augr

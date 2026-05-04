@@ -20,6 +20,10 @@ add_subdirectory(${FMT_ROOT})
 add_subdirectory(${SPDLOG_ROOT})
 #SPDLOG END
 
+#JSON BEGIN
+add_subdirectory(${JSON_ROOT})
+#JSON END
+
 #RTAUDIO BEGIN
 set(RTAUDIO_BUILD_TESTING OFF CACHE BOOL "" FORCE)
 add_subdirectory(${RTAUDIO_ROOT})

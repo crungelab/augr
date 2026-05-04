@@ -6,6 +6,8 @@
 #include "imnodes.h"
 
 #include <augr/core/model_manufacturer.h>
+#include <augr/core/model_factory.h>
+
 #include <augr/rack/module/module.h>
 
 #include <augr/rack/pin.h>

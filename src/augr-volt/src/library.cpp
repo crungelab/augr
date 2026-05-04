@@ -1,4 +1,5 @@
 #include <augr/core/model_manufacturer.h>
+#include <augr/core/model_factory.h>
 
 #include <augr/volt/cv_module.h>
 #include <augr/volt/midi_cv_module.h>

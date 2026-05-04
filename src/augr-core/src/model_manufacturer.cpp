@@ -2,6 +2,7 @@
 #include <augr/core/reflect.h>
 #include <augr/core/model_manufacturer.h>
 #include <augr/core/model.h>
+#include <augr/core/model_factory.h>
 
 namespace augr {
 

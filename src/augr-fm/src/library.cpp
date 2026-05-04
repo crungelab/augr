@@ -1,4 +1,5 @@
 #include <augr/core/model_manufacturer.h>
+#include <augr/core/model_factory.h>
 
 #include <augr/fm/operator.h>
 #include <augr/fm/envelope.h>

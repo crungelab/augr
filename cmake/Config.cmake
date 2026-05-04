@@ -18,6 +18,7 @@ set(AUGR_FM_ROOT ${AUGR_SRC}/augr-fm)
 
 set(FMT_ROOT ${AUGR_DEPOT}/fmt)
 set(SPDLOG_ROOT ${AUGR_DEPOT}/spdlog)
+set(JSON_ROOT ${AUGR_DEPOT}/json)
 
 set(RTTR_ROOT ${AUGR_DEPOT}/rttr)
 set(RTAUDIO_ROOT ${AUGR_DEPOT}/rtaudio)
