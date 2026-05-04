@@ -1,29 +1,23 @@
 #pragma once
 
+#include <algorithm>
 #include <typeindex>
 #include <vector>
-#include <algorithm>
-
 
 namespace augr {
 
 class Model;
-class Widget;
 
-class WidgetContainer {
+class Widget {
 public:
-    virtual ~WidgetContainer() = default;
-    void AddChild(Widget* widget) { children_.push_back(widget); }
+    virtual ~Widget() = default;
+
+    void AddChild(Widget *widget) { children_.push_back(widget); }
     void RemoveChild(Widget &model) {
         children_.erase(std::remove(children_.begin(), children_.end(), &model),
                         children_.end());
     }
-    // Data members
-    std::vector<Widget *> children_;
-};
 
-class Widget : public WidgetContainer {
-public:
     virtual void Draw() { DrawChildren(); }
     void DrawChildren() {
         for (auto child : children_)
@@ -33,6 +27,7 @@ public:
     // Accessors
     virtual Model *model() = 0;
     // Data members
+    std::vector<Widget *> children_;
 };
 
 template <typename T, typename TBase = Widget> class WidgetT : public TBase {
@@ -53,13 +48,11 @@ public:
 template <typename T, typename N = Model>
 class WidgetFactoryT : public WidgetFactory {
     Widget *Produce(Model &model) override { return new T((N &)model); }
-    std::type_index GetKey() override {
-        return std::type_index(typeid(N));
-    }
+    std::type_index GetKey() override { return std::type_index(typeid(N)); }
     // Data members
 };
 
-#define DEFINE_WIDGET_FACTORY(T, N)                                                    \
+#define DEFINE_WIDGET_FACTORY(T, N)                                            \
     WidgetFactoryT<T, N> T##Factory;                                           \
     WidgetFactory *Get##T##Factory() { return &T##Factory; }
 
