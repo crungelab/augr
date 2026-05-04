@@ -37,7 +37,7 @@ public:
 
     Archiver *Produce(Model &model) override {
         ArchiverT *archiver = new ArchiverT();
-        archiver->Create(model);
+        archiver->Create(*this, model);
         return archiver;
     }
 

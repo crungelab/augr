@@ -1,12 +1,12 @@
 #pragma once
 
-#include <augr/rack/archiver/graph_archiver.h>
+#include <augr/rack/archiver/module_archiver.h>
 
 namespace augr {
 
-class Rack;
+class Graph;
 
-class RackArchiver : public ArchiverT<Rack, GraphArchiver> {
+class GraphArchiver : public ArchiverT<Graph, ModuleArchiver> {
 public:
     void Save(Archive &archive) const override;
     void Load(Archive &archive) override;

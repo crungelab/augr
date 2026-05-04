@@ -9,16 +9,16 @@ namespace augr {
 
 void ModuleArchiver::Save(Archive &archive) const {
     auto &j = archive.json();
-    nlohmann::json j_module;
     const Module &module = model();
 
-    for (const auto &param : module.parameters()) {
-        nlohmann::json j_param;
-        j_param["label"] = param->label();
-        j_param["value"] = param->GetNormalized();
-        j_module["parameters"].push_back(j_param);
+    j["type"] = factory_->type_name();
+
+    if (!module.parameters().empty()) {
+        auto &j_params = j["parameters"];
+        for (const auto &param : module.parameters()) {
+            j_params[param->label()] = param->GetNormalized();
+        }
     }
-    j["modules"].push_back(j_module);
 }
 
 void ModuleArchiver::Load(Archive &archive) {

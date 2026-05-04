@@ -10,6 +10,7 @@
 
 namespace augr {
 
+class ArchiverFactory;
 class Model;
 
 // Archiver is instantiated per Model. Each Model has its own archiver,
@@ -19,24 +20,31 @@ class Model;
 class Archiver {
 public:
     virtual ~Archiver() = default;
-    virtual void Create(Model &model) = 0;
+    virtual void Create(ArchiverFactory &factory, Model &model) = 0;
     virtual void Save(Archive &archive) const = 0;
     virtual void Load(Archive &archive) = 0;
 
     // Accessors
-    virtual Model *model_ptr() = 0;
+    //virtual Model *model_ptr() = 0;
+
+protected:
+    Model *model_ = nullptr;
+    ArchiverFactory *factory_ = nullptr;
 };
 
 // ArchiverT — typed convenience layer. Subclasses of ArchiverT<T>
 // see their Model as T& without writing static_casts.
-template <typename T> class ArchiverT : public Archiver {
+template <typename T, typename TBase = Archiver> class ArchiverT : public TBase {
 public:
-    void Create(Model &model) override { model_ = &dynamic_cast<T &>(model); }
-    Model *model_ptr() override { return model_; }
-    T &model() { return *model_; }
-    const T &model() const { return *model_; }
+    void Create(ArchiverFactory &factory, Model &model) override {
+        this->factory_ = &factory;
+        this->model_ = &dynamic_cast<T &>(model);
+    }
+    //Model *model_ptr() override { return model_; }
+    T &model() { return *(T*)this->model_; }
+    const T &model() const { return *(T*)this->model_; }
     // Data members
-    T *model_;
+    //T *model_;
 };
 
 } // namespace augr

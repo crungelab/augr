@@ -5,6 +5,8 @@
 #include <augr/core/model_factory.h>
 
 #include <augr/rack/archiver/module_archiver.h>
+#include <augr/rack/archiver/graph_archiver.h>
+#include <augr/rack/archiver/rack_archiver.h>
 #include <augr/rack/module/module.h>
 
 #include <augr/faust/faust_dsp.h>
@@ -33,6 +35,9 @@ public:
 class BubbleDspArchiver : public ModuleArchiver {};
 DEFINE_ARCHIVER_FACTORY(BubbleDspArchiver, BubbleDspImpl, "BubbleDsp")
 
+class ExeRackArchiver : public RackArchiver {};
+DEFINE_ARCHIVER_FACTORY(ExeRackArchiver, ExeRack, "ExeRack")
+
 class MyApp : public App {
 public:
     MyApp() {
@@ -53,7 +58,7 @@ public:
     BubbleDsp *bubble_;
 };
 
-void SerializeBubble(Module &module) {
+void SerializeModule(Module &module) {
     auto &manufacturer = ArchiverManufacturer::singleton();
 
     // Look up the archiver factory for this module's dynamic type.
@@ -83,6 +88,7 @@ void SerializeBubble(Module &module) {
 
 int main(int, char **) {
     REGISTER_ARCHIVER_FACTORY(BubbleDspArchiver);
+    REGISTER_ARCHIVER_FACTORY(ExeRackArchiver);
 
     MyApp &app = *new MyApp();
     // ExeRack &rack = app.rack_;
@@ -90,7 +96,9 @@ int main(int, char **) {
     // rack.Start();
 
     // Serialize the bubble module before entering the run loop.
-    SerializeBubble(*app.bubble_);
+    //SerializeModule(*app.bubble_);
+    SerializeModule(app.rack_);
+
 
     // app.Run(augr::Window::RunParams("Augr Bubble"));
     // rack.Stop();
