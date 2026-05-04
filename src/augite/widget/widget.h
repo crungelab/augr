@@ -11,7 +11,6 @@ class Model;
 class Widget {
 public:
     virtual ~Widget() = default;
-
     void AddChild(Widget *widget) { children_.push_back(widget); }
     void RemoveChild(Widget &model) {
         children_.erase(std::remove(children_.begin(), children_.end(), &model),

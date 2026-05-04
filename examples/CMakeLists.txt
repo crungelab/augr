@@ -13,10 +13,6 @@ add_executable(xtbuffer xtbuffer.cpp ${AUGR_HEADERS})
 USES_RTAUDIO(xtbuffer)
 USES_AUGR_CORE(xtbuffer)
 
-add_executable(ports ports.cpp ${AUGR_HEADERS})
-USES_RTAUDIO(ports)
-USES_AUGR_CORE(ports)
-
 add_executable(app app.cpp ${AUGR_HEADERS})
 USES_EXE_APP(app)
 

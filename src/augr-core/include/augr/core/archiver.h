@@ -10,29 +10,19 @@ namespace augr {
 
 class Model;
 
-// Archive carries context that travels with a save or load operation.
-// Most access goes through json(); the other accessors provide context
-// that doesn't fit naturally inside the JSON itself (format version,
-// module resolution table for connections).
+// Archive — same as before. Carries context that travels with a save
+// or load operation; archivers reach through it for the underlying JSON
+// plus version and module-resolution context.
 class Archive {
 public:
     explicit Archive(nlohmann::json &json, int version = 1)
         : json_(json), version_(version) {}
 
-    // Direct access to the underlying JSON. This is the primary API.
     [[nodiscard]] nlohmann::json &json() { return json_; }
     [[nodiscard]] const nlohmann::json &json() const { return json_; }
 
-    // Format version of the file being loaded (or written).
-    // Archivers can branch on this to handle migrations.
     [[nodiscard]] int version() const { return version_; }
 
-    // Resolve a module reference by its index in the file.
-    // Populated by Rack load before per-connection archivers run.
-    // Returns nullptr if the index is out of range — connection
-    // archivers can treat null as "drop this connection," which is
-    // also how the clipboard subset case handles connections to
-    // modules outside the copied set.
     [[nodiscard]] Model *ResolveModule(int index) const {
         if (index < 0 || index >= static_cast<int>(resolved_modules_.size())) {
             return nullptr;
@@ -50,42 +40,36 @@ private:
     std::vector<Model *> resolved_modules_;
 };
 
-// Archiver is the base class for per-Model-type serialization logic.
-// Each Model subclass T has a corresponding ArchiverT<T> subclass that
-// implements SaveT / LoadT. Archivers are owned by ArchiverManufacturer
-// and looked up by Model type at runtime.
+// Archiver is instantiated per Model. Each Model has its own archiver,
+// produced by an ArchiverFactory and bound to that Model at construction.
+// Per-instance state (caches, intermediate values, references back to
+// the Model) lives here.
 class Archiver {
 public:
+    Archiver(Archive &archive, Model &model) : archive_(&archive), model_(&model) {}
     virtual ~Archiver() = default;
 
-    virtual void Save(const Model &model, Archive &archive) const = 0;
-    virtual void Load(Model &model, Archive &archive) const = 0;
-
-    // The Model type this archiver handles. Used as the key in
-    // ArchiverManufacturer's by-type map for save lookups.
-    [[nodiscard]] virtual std::type_index ModelType() const = 0;
-};
-
-// ArchiverT downcasts Model& to T& and forwards to type-safe SaveT/LoadT
-// methods that subclasses implement. Subclasses don't need to write
-// static_casts in every method — they receive T& directly.
-template <typename T> class ArchiverT : public Archiver {
-public:
-    void Save(const Model &model, Archive &archive) const override {
-        SaveT(static_cast<const T &>(model), archive);
-    }
-
-    void Load(Model &model, Archive &archive) const override {
-        LoadT(static_cast<T &>(model), archive);
-    }
-
-    [[nodiscard]] std::type_index ModelType() const override {
-        return typeid(T);
-    }
+    virtual void Save(Archive &archive) const = 0;
+    virtual void Load(Archive &archive) = 0;
 
 protected:
-    virtual void SaveT(const T &model, Archive &archive) const = 0;
-    virtual void LoadT(T &model, Archive &archive) const = 0;
+    [[nodiscard]] Model &model() const { return *model_; }
+
+private:
+    Archive *archive_;
+    Model *model_ = nullptr;
+};
+
+// ArchiverT — typed convenience layer. Subclasses of ArchiverT<T>
+// see their Model as T& without writing static_casts.
+template <typename T> class ArchiverT : public Archiver {
+public:
+    ArchiverT(T &model) : Archiver(model) {}
+
+protected:
+    [[nodiscard]] T &model() const {
+        return static_cast<T &>(Archiver::model());
+    }
 };
 
 } // namespace augr
