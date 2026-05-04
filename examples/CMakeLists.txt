@@ -35,3 +35,5 @@ add_subdirectory(bubble)
 add_subdirectory(rawdaw)
 
 add_subdirectory(daw)
+
+add_subdirectory(serialize)

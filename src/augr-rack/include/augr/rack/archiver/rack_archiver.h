@@ -5,9 +5,9 @@
 
 namespace augr {
 
-class ModuleArchiver : public ArchiverT<Module> {
+class RackArchiver : public ArchiverT<Module> {
 public:
-    ModuleArchiver(Module &model) : ArchiverT<Module>(model) {}
+    RackArchiver(Module &model) : ArchiverT<Module>(model) {}
     void Save(Archive &archive) const override;
     void Load(Archive &archive) override;
 };

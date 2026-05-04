@@ -46,4 +46,8 @@ private:
     std::map<std::string, ArchiverFactory *> by_name_;
 };
 
+#define REGISTER_ARCHIVER_FACTORY(T)                                             \
+    extern ArchiverFactory *Get##T##Factory();                                   \
+    ArchiverManufacturer::singleton().AddFactory(*Get##T##Factory());
+
 } // namespace augr

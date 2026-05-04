@@ -1,14 +1,13 @@
 // ModuleArchiver.cpp
-
-#include <augr/rack/archiver/module_archiver.h>
+#include <augr/rack/archiver/rack_archiver.h>
 
 #include <augr/core/archiver_factory.h>
 #include <nlohmann/json.hpp>
 
 namespace augr {
 
-void ModuleArchiver::Save(Archive &archive) const {
-    auto &j = archive.json();
+void RackArchiver::Save(Archive &archive) const {
+    //auto &j = archive.json();
     nlohmann::json j_module;
     const Module &module = model();
 
@@ -18,10 +17,9 @@ void ModuleArchiver::Save(Archive &archive) const {
         j_param["value"] = param->GetNormalized();
         j_module["parameters"].push_back(j_param);
     }
-    j["modules"].push_back(j_module);
 }
 
-void ModuleArchiver::Load(Archive &archive) {
+void RackArchiver::Load(Archive &archive) {
     const auto &j = archive.json();
     Module &module = model();
 }
@@ -30,4 +28,4 @@ void ModuleArchiver::Load(Archive &archive) {
 
 using namespace augr;
 
-DEFINE_ARCHIVER_FACTORY(ModuleArchiver, Module, "Module")
+DEFINE_ARCHIVER_FACTORY(RackArchiver, Module, "Module")
