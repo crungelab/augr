@@ -56,29 +56,25 @@ void ExeRack::EnqueueMidiMessage(MidiMessage message) {
 // ---------------------------------------------------------------------------
 
 bool ExeRack::CreateAudioInputDevice() {
-    AudioInputDevice &m = ModelFactoryT<AudioInputDevice>::Make(*this);
-    AddChild(m);
+    AudioInputDevice &m = ModelFactoryT<AudioInputDevice>::Make(this);
     audio_input_device_ = &m;
     return true;
 }
 
 bool ExeRack::CreateAudioOutputDevice() {
-    AudioOutputDevice &m = ModelFactoryT<AudioOutputDevice>::Make(*this);
-    AddChild(m);
+    AudioOutputDevice &m = ModelFactoryT<AudioOutputDevice>::Make(this);
     audio_output_device_ = &m;
     return true;
 }
 
 bool ExeRack::CreateMidiInputDevice() {
-    MidiInputDevice &m = ModelFactoryT<MidiInputDevice>::Make(*this);
-    AddChild(m);
+    MidiInputDevice &m = ModelFactoryT<MidiInputDevice>::Make(this);
     midi_input_device_ = &m;
     return true;
 }
 
 bool ExeRack::CreateMidiOutputDevice() {
-    MidiOutputDevice &m = ModelFactoryT<MidiOutputDevice>::Make(*this);
-    AddChild(m);
+    MidiOutputDevice &m = ModelFactoryT<MidiOutputDevice>::Make(this);
     midi_output_device_ = &m;
     return true;
 }
@@ -87,14 +83,15 @@ bool ExeRack::CreateMidiOutputDevice() {
 // Lifecycle
 // ---------------------------------------------------------------------------
 
-bool ExeRack::Create() {
+void ExeRack::Create(Part *owner) {
+    Rack::Create(owner);
+
     AudioConfig config;
     config.enableInput = false;
     config.sample_rate = 48000;
     config.frames = 512;
 
-    if (!audio_system_.Create(config))
-        return false;
+    audio_system_.Create(config);
 
     devNumInChans_ = audio_system_.num_in_chans();
     devNumOutChans_ = audio_system_.num_out_chans();
@@ -108,8 +105,6 @@ bool ExeRack::Create() {
 
     CreateMidiInputDevice();
     //CreateMidiOutputDevice();
-
-    return true;
 }
 
 bool ExeRack::Start() { return audio_system_.Start(); }

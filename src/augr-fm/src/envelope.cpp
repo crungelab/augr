@@ -26,11 +26,9 @@ float LevelToAmplitude(float level_0_99) {
 
 } // namespace
 
-bool Envelope::Create(Part &owner) {
-    if (!Module::Create(owner))
-        return false;
+void Envelope::Create(Part *owner) {
+    Module::Create(owner);
     label_ = "Envelope";
-    return true;
 }
 
 void Envelope::CreateControls() {

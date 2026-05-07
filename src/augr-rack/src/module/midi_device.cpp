@@ -2,10 +2,9 @@
 
 namespace augr {
 
-bool MidiInputDevice::Create(Part &owner) {
+void MidiInputDevice::Create(Part *owner) {
     Device::Create(owner);
     label_ = "Midi Input Device";
-    return true;
 }
 
 void MidiInputDevice::CreatePins() {
@@ -13,10 +12,9 @@ void MidiInputDevice::CreatePins() {
     AddOutput(*midi_out_);
 }
 
-bool MidiOutputDevice::Create(Part &owner) {
+void MidiOutputDevice::Create(Part *owner) {
     Device::Create(owner);
     label_ = "Midi Output Device";
-    return true;
 }
 
 void MidiOutputDevice::CreatePins() {

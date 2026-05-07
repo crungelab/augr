@@ -13,10 +13,9 @@ namespace augr {
 
 class CvModule : public Module {
 public:
-    bool Create(Part &owner) override {
+    void Create(Part *owner = nullptr) override {
         Module::Create(owner);
         label_ = "CV";
-        return true;
     }
 
     void CreateControls() override {

@@ -2,11 +2,10 @@
 
 namespace augr {
 
-bool AudioInputDevice::Create(Part &owner)
+void AudioInputDevice::Create(Part *owner)
 {
   Device::Create(owner);
   label_ = "Audio Input Device";
-  return true;
 }
 
 void AudioInputDevice::CreatePins()
@@ -15,11 +14,10 @@ void AudioInputDevice::CreatePins()
   AddOutput(*audio_out_);
 }
 
-bool AudioOutputDevice::Create(Part &owner)
+void AudioOutputDevice::Create(Part *owner)
 {
   Device::Create(owner);
   label_ = "Audio Output Device";
-  return true;
 }
 
 void AudioOutputDevice::CreatePins()

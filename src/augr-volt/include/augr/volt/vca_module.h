@@ -16,10 +16,9 @@ namespace augr {
 
 class VcaModule : public Module {
 public:
-    bool Create(Part &owner) override {
+    void Create(Part *owner = nullptr) override {
         Module::Create(owner);
         label_ = "VCA";
-        return true;
     }
 
     void CreateControls() override {

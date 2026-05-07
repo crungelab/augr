@@ -215,9 +215,7 @@ void RackView::DrawModuleCatalog() {
                 continue;
 
             if (ImGui::Selectable(it->name_.c_str())) {
-                // Model& node = *it->Produce(*model_);
-                Module &module = dynamic_cast<Module &>(*it->Produce(*model_));
-                model_->AddModule(module);
+                Module &module = dynamic_cast<Module &>(*it->Produce(model_));
 
                 WidgetBuilder builder;
                 Widget *widget = builder.Build(module);

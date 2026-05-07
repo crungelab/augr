@@ -15,11 +15,9 @@ class MixerModule : public Module {
 public:
     static constexpr int kNumChannels = 4;
 
-    bool Create(Part &owner) override {
+    void Create(Part *owner = nullptr) override {
         Module::Create(owner);
         label_ = "Mixer";
-
-        return true;
     }
 
     void CreateControls() override {

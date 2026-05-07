@@ -20,11 +20,9 @@ namespace augr {
 
 class VcfModule : public Module {
 public:
-    bool Create(Part &owner) override {
+    void Create(Part *owner = nullptr) override {
         Module::Create(owner);
         label_ = "VCF";
-
-        return true;
     }
 
     void CreateControls() override {

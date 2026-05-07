@@ -13,7 +13,12 @@ public:
     Rack() { singleton_ = this; }
     virtual ~Rack() {}
     //
+    void OnAddingChild(Model &model) override;
+    void OnRemovingChild(Model &model) override;
+    /*
     void AddModule(Module &m) { AddChild(m); modules_.push_back(&m); }
+    void RemoveModule(Module &m) { RemoveChild(m); modules_.erase(std::remove(modules_.begin(), modules_.end(), &m), modules_.end()); }
+    */
 
     void EnqueueAction(std::function<void()> action,
                        std::function<void()> update_action = nullptr);
@@ -35,6 +40,11 @@ public:
     std::vector<std::function<void()>> pending_update_actions_;
 
     REFLECT_ENABLE(Graph)
+
+private:
+    void AddModule(Module &m) { modules_.push_back(&m); }
+    void RemoveModule(Module &m) { modules_.erase(std::remove(modules_.begin(), modules_.end(), &m), modules_.end()); }
+
 };
 
 } // namespace augr

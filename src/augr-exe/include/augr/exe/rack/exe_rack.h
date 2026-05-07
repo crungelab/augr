@@ -17,7 +17,7 @@ class MidiOutputDevice;
 class ExeRack : public Rack {
 public:
     REFLECT_ENABLE(Rack)
-    bool Create() override;
+    void Create(Part *owner = nullptr) override;
     bool Start();
     void Stop();
 

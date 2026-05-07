@@ -1,6 +1,7 @@
 #include <queue>
 #include <unordered_set>
 
+#include <augr/rack/module/device.h>
 #include <augr/rack/module/module.h>
 #include <augr/rack/rack.h>
 #include <augr/rack/wire.h>
@@ -8,6 +9,52 @@
 namespace augr {
 
 Rack *Rack::singleton_;
+
+/*
+void Rack::OnAddingChild(Model &model) {
+    Graph::OnAddingChild(model);
+
+    if (dynamic_cast<Device *>(&model)) {
+        // Devices are owned by the rack but not added to modules_.
+        // The rack drives them directly via the audio callback.
+        //graph_dirty_ = true;
+        return;
+    }
+
+    if (auto *m = dynamic_cast<Module *>(&model)) {
+        AddModule(*m);
+        graph_dirty_ = true;
+    }
+}
+*/
+
+/*
+void Rack::OnAddingChild(Model &model) {
+    Graph::OnAddingChild(model);
+    if (auto *m = dynamic_cast<Module *>(&model)) {
+        EnqueueAction([this, m]{
+            AddModule(*m);
+            graph_dirty_ = true;
+        });
+    }
+}
+*/
+
+void Rack::OnAddingChild(Model &model) {
+    Graph::OnAddingChild(model);
+    if (auto *m = dynamic_cast<Module *>(&model)) {
+        AddModule(*m);
+        graph_dirty_ = true;
+    }
+}
+
+void Rack::OnRemovingChild(Model &model) {
+    Graph::OnRemovingChild(model);
+    if (auto *m = dynamic_cast<Module *>(&model)) {
+        RemoveModule(*m);
+        graph_dirty_ = true;
+    }
+}
 
 void Rack::EnqueueAction(std::function<void()> action,
                          std::function<void()> update_action) {
@@ -29,7 +76,8 @@ void Rack::ProcessActions() {
         std::lock_guard lock(mutex_);
         std::swap(actions, pending_actions_);
     }
-    for (auto &a : actions) a();
+    for (auto &a : actions)
+        a();
 }
 
 void Rack::ProcessUpdateActions() {
@@ -38,7 +86,8 @@ void Rack::ProcessUpdateActions() {
         std::lock_guard lock(mutex_);
         std::swap(actions, pending_update_actions_);
     }
-    for (auto &a : actions) a();
+    for (auto &a : actions)
+        a();
 }
 
 void Rack::RebuildExecutionOrder() {

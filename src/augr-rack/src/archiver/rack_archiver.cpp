@@ -12,8 +12,7 @@ void RackArchiver::Save(Archive &archive) const {
 }
 
 void RackArchiver::Load(Archive &archive) {
-    const auto &j = archive.json();
-    Module &module = model();
+    GraphArchiver::Load(archive);
 }
 
 } // namespace augr

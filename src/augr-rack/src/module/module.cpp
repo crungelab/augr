@@ -2,13 +2,11 @@
 
 namespace augr {
 
-bool Module::Create(Part &owner) {
+void Module::Create(Part *owner) {
     Node::Create(owner);
 
     CreateControls();
     CreatePins();
-
-    return true;
 }
 
 } // namespace augr

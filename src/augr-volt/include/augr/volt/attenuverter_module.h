@@ -11,10 +11,9 @@ namespace augr {
 
 class AttenuverterModule : public Module {
 public:
-    bool Create(Part &owner) override {
+    void Create(Part *owner = nullptr) override {
         Module::Create(owner);
         label_ = "Atten";
-        return true;
     }
 
     void CreateControls() override {

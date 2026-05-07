@@ -17,10 +17,9 @@ class VcoModule : public Module {
 public:
     enum class Waveform { Saw, Square, Tri, Sine };
 
-    bool Create(Part &owner) override {
+    void Create(Part *owner = nullptr) override {
         Module::Create(owner);
         label_ = "VCO";
-        return true;
     }
 
     void CreateControls() override {

@@ -17,7 +17,7 @@ public:
     virtual ~ModelFactory() = default;
     ModelFactory(std::string name, std::string category)
         : name_(std::move(name)), category_(std::move(category)) {}
-    virtual Model *Produce(Model &model) = 0;
+    virtual Model *Produce(Model *parent = nullptr) = 0;
     virtual std::type_index GetKey() = 0;
     // Data members
     std::string name_;
@@ -27,12 +27,12 @@ public:
 template <typename T> class ModelFactoryT final : public ModelFactory {
 public:
     using ModelFactory::ModelFactory;
-    static T &Make(Model &parent) {
+    static T &Make(Model *parent = nullptr) {
         T &model = *new T();
         model.Create(parent);
         return model;
     }
-    Model *Produce(Model &parent) override { return &Make(parent); }
+    Model *Produce(Model *parent = nullptr) override { return &Make(parent); }
     std::type_index GetKey() override { return std::type_index(typeid(T)); }
     // Data members
 };

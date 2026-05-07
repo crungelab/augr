@@ -12,17 +12,27 @@ namespace augr {
 class Model : public Part {
 public:
     Model() = default;
-    void AddChild(Model &model) { children_.push_back(&model); }
-    void RemoveChild(Model &model) {
-        OnRemovingChild(model);
-        children_.erase(std::remove(children_.begin(), children_.end(), &model),
+    void Create(Part *parent = nullptr) override {
+        Part::Create(parent);
+        if (parent) {
+            dynamic_cast<Model *>(parent)->AddChild(*this);
+        }
+    }
+    void AddChild(Model &child) {
+        OnAddingChild(child);
+        children_.push_back(&child);
+    }
+    void RemoveChild(Model &child) {
+        OnRemovingChild(child);
+        children_.erase(std::remove(children_.begin(), children_.end(), &child),
                         children_.end());
     }
     // Accessors
     Model &parent() const { return *dynamic_cast<Model *>(owner_); }
 
 protected:
-    virtual void OnRemovingChild(Model &model) {}
+    virtual void OnAddingChild(Model &child) {}
+    virtual void OnRemovingChild(Model &child) {}
 
 public:
     // Data members

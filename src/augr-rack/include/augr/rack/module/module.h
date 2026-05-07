@@ -14,7 +14,7 @@ namespace augr {
 
 class Module : public Node {
 public:
-    bool Create(Part &owner) override;
+    void Create(Part *owner = nullptr) override;
 
     virtual void CreateControls() {}
     virtual void CreatePins() {}

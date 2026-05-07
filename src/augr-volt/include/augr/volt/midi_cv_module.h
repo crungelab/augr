@@ -15,10 +15,9 @@ namespace augr {
 
 class MidiCvModule : public Module {
 public:
-    bool Create(Part &owner) override {
+    void Create(Part *owner = nullptr) override {
         Module::Create(owner);
         label_ = "MIDI/CV";
-        return true;
     }
 
     void CreatePins() override {

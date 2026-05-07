@@ -34,6 +34,7 @@ class BubbleDspImpl : public BubbleDsp {
 public:
     REFLECT_ENABLE(BubbleDsp)
 };
+DEFINE_MODEL_FACTORY(BubbleDspImpl, "BubbleDsp", "Faust")
 
 class BubbleDspArchiver : public ModuleArchiver {};
 DEFINE_ARCHIVER_FACTORY(BubbleDspArchiver, BubbleDspImpl, "BubbleDsp")
@@ -57,12 +58,18 @@ class MidiOutputDeviceArchiver : public ModuleArchiver {};
 DEFINE_ARCHIVER_FACTORY(MidiOutputDeviceArchiver, MidiOutputDevice,
                         "MidiOutputDevice")
 
+DEFINE_MODEL_FACTORY(ExeRack, "ExeRack", "Rack")
+DEFINE_MODEL_FACTORY(AudioInputDevice, "AudioInputDevice", "Rack")
+DEFINE_MODEL_FACTORY(AudioOutputDevice, "AudioOutputDevice", "Rack")
+DEFINE_MODEL_FACTORY(MidiInputDevice, "MidiInputDevice", "Rack")
+DEFINE_MODEL_FACTORY(MidiOutputDevice, "MidiOutputDevice", "Rack")
+
+
 class MyApp : public App {
 public:
     MyApp() {
         rack_ = new ExeRack();
-        BubbleDsp &m = ModelFactoryT<BubbleDspImpl>::Make(rack());
-        rack().AddModule(m);
+        BubbleDsp &m = ModelFactoryT<BubbleDspImpl>::Make(rack_);
         bubble_ = &m;
         view_ = new RackView(rack());
     }
@@ -79,45 +86,40 @@ public:
     BubbleDsp *bubble_;
 };
 
-std::string SerializeModule(Module &module) {
+// Serialize a rack to JSON and print it.
+nlohmann::json SerializeRack(ExeRack &rack) {
     auto &manufacturer = ArchiverManufacturer::singleton();
-
-    // Look up the archiver factory for this module's dynamic type.
-    auto *factory = manufacturer.FindFactory(std::type_index(typeid(module)));
+    auto *factory = manufacturer.FindFactory(std::type_index(typeid(rack)));
     if (!factory) {
         std::cerr << "No archiver factory registered for type "
-                  << typeid(module).name() << "\n";
-        return "";
+                  << typeid(rack).name() << "\n";
+        return nlohmann::json();
     }
 
-    // Produce an archiver bound to this module.
-    auto archiver = factory->Produce(module);
+    auto *archiver = factory->Produce(rack);
     if (!archiver) {
         std::cerr << "Failed to construct archiver\n";
-        return "";
+        return nlohmann::json();
     }
 
-    // Build the JSON object the archiver will populate.
     nlohmann::json j;
     Archive archive(j);
-
     archiver->Save(archive);
+    delete archiver;
 
-    // Pretty-print to stdout.
-    auto result = j.dump(2);
-    std::cout << result << "\n";
-    return result;
+    std::cout << j.dump(2) << "\n";
+    return j;
 }
 
-Module *DeserializeModule(Graph &parent, const nlohmann::json &j) {
+// Deserialize JSON into a fresh rack constructed as a root (no parent).
+ExeRack *DeserializeRack(const nlohmann::json &j) {
     if (!j.contains("type")) {
         std::cerr << "JSON missing 'type' field\n";
         return nullptr;
     }
     std::string type_name = j["type"].get<std::string>();
 
-    // Construct the Model via its factory. Produce attaches it to the
-    // parent graph.
+    // Construct the rack as a root via its model factory.
     auto &model_manufacturer = ModelManufacturer::singleton();
     ModelFactory *model_factory = model_manufacturer.FindFactory(type_name);
     if (!model_factory) {
@@ -126,41 +128,39 @@ Module *DeserializeModule(Graph &parent, const nlohmann::json &j) {
         return nullptr;
     }
 
-    Module *module = dynamic_cast<Module *>(model_factory->Produce(parent));
-    if (!module) {
-        std::cerr << "Factory produced a non-Module for type '" << type_name
+    ExeRack *rack = dynamic_cast<ExeRack *>(model_factory->Produce(nullptr));
+    if (!rack) {
+        std::cerr << "Factory produced a non-ExeRack for type '" << type_name
                   << "'\n";
         return nullptr;
     }
 
-    // Now find the archiver and have it populate the module from JSON.
+    // Run the archiver to populate state from JSON.
     auto &archiver_manufacturer = ArchiverManufacturer::singleton();
     ArchiverFactory *archiver_factory =
         archiver_manufacturer.FindFactory(type_name);
     if (!archiver_factory) {
         std::cerr << "No archiver factory registered for type '" << type_name
                   << "'\n";
-        return module; // Module exists but won't have its state loaded.
+        return rack;
     }
 
-    Archiver *archiver = archiver_factory->Produce(*module);
-    if (!archiver) {
-        std::cerr << "Failed to construct archiver for type '" << type_name
-                  << "'\n";
-        return module;
-    }
-
-    // Build the Archive over the JSON. const_cast because Archive's
-    // json stack stores non-const pointers — load reads but the API
-    // is shared with save.
+    Archiver *archiver = archiver_factory->Produce(*rack);
     Archive archive(const_cast<nlohmann::json &>(j));
     archiver->Load(archive);
     delete archiver;
 
-    return module;
+    return rack;
 }
 
 int main(int, char **) {
+    REGISTER_MODEL_FACTORY(ExeRack);
+    REGISTER_MODEL_FACTORY(AudioInputDevice);
+    REGISTER_MODEL_FACTORY(AudioOutputDevice);
+    REGISTER_MODEL_FACTORY(MidiInputDevice);
+    REGISTER_MODEL_FACTORY(MidiOutputDevice);
+    REGISTER_MODEL_FACTORY(BubbleDspImpl);
+
     REGISTER_ARCHIVER_FACTORY(BubbleDspArchiver);
     REGISTER_ARCHIVER_FACTORY(ExeRackArchiver);
     REGISTER_ARCHIVER_FACTORY(AudioInputDeviceArchiver);
@@ -168,22 +168,31 @@ int main(int, char **) {
     REGISTER_ARCHIVER_FACTORY(MidiInputDeviceArchiver);
     REGISTER_ARCHIVER_FACTORY(MidiOutputDeviceArchiver);
 
-    MyApp app = *new MyApp();
-    auto &rack = app.rack();
+    MyApp *app = new MyApp();
+    auto &rack = app->rack();
     rack.Create();
 
-    rack.Connect(*app.bubble_->audio_out_,
+    rack.Connect(*app->bubble_->audio_out_,
                  *rack.audio_output_device_->audio_in_);
 
-    // rack.Start();
+    // Round-trip test: serialize the rack, deserialize into a fresh
+    // rack, re-serialize. The two outputs should match if save/load
+    // is consistent.
+    std::cout << "=== Original rack ===\n";
+    nlohmann::json original_json = SerializeRack(rack);
 
-    // Serialize the bubble module before entering the run loop.
-    // SerializeModule(*app.bubble_);
-    auto json = SerializeModule(rack);
-    app.rack_ = (ExeRack*)(DeserializeModule(rack, json));
+    ExeRack *reloaded = DeserializeRack(original_json);
+    if (reloaded) {
+        std::cout << "\n=== Reloaded rack ===\n";
+        nlohmann::json reloaded_json = SerializeRack(*reloaded);
 
-    app.Run(augr::Window::RunParams("Augr Bubble"));
-    // rack.Stop();
+        std::cout << "\nRound-trip match: "
+                  << (original_json == reloaded_json ? "yes" : "no") << "\n";
+
+        delete reloaded;
+    }
+
+    app->Run(augr::Window::RunParams("Augr Bubble"));
 
     return 0;
 }
