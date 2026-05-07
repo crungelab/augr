@@ -22,9 +22,9 @@ public:
     // constructs the archiver and calls Create(model) before returning.
     virtual Archiver *Produce(Model &model) = 0;
 
-    [[nodiscard]] virtual std::type_index ModelType() const = 0;
+    virtual std::type_index ModelType() const = 0;
 
-    [[nodiscard]] const std::string &type_name() const { return type_name_; }
+    const std::string &type_name() const { return type_name_; }
 
 private:
     std::string type_name_;
@@ -41,9 +41,7 @@ public:
         return archiver;
     }
 
-    [[nodiscard]] std::type_index ModelType() const override {
-        return typeid(ModelT);
-    }
+    std::type_index ModelType() const override { return typeid(ModelT); }
 };
 
 #define DEFINE_ARCHIVER_FACTORY(ArchiverT, ModelT, NAME)                       \

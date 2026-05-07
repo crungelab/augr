@@ -12,6 +12,8 @@ public:
     void SaveChildren(Archive &archive) const;
     void SaveWires(Archive &archive) const;
     void Load(Archive &archive) override;
+    void LoadChildren(Archive &archive);
+    void LoadWires(Archive &archive);
 };
 
 } // namespace augr

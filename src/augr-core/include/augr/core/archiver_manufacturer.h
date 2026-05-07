@@ -26,19 +26,18 @@ public:
 
     void AddFactory(ArchiverFactory &factory);
 
-    [[nodiscard]] ArchiverFactory *FindFactory(const std::type_index &type) const;
-    [[nodiscard]] ArchiverFactory *FindFactory(const std::string &type_name) const;
+    ArchiverFactory *FindFactory(const std::type_index &type) const;
+    ArchiverFactory *FindFactory(const std::string &type_name) const;
 
     // Convenience: find the factory and produce an archiver in one call.
     // Returns nullptr if no factory matches.
-    [[nodiscard]] Archiver* MakeArchiver(Model &model) const;
-    [[nodiscard]] Archiver* MakeArchiver(
-        const std::string &type_name, Model &model) const;
+    Archiver *MakeArchiver(Model &model) const;
+    Archiver *MakeArchiver(const std::string &type_name, Model &model) const;
 
     void Serialize(Archive &archive, Model &model) const;
     void Deserialize(Archive &archive, Model &model) const;
 
-    [[nodiscard]] const std::vector<ArchiverFactory *> &factories() const {
+    const std::vector<ArchiverFactory *> &factories() const {
         return factories_;
     }
 
@@ -46,12 +45,12 @@ private:
     ArchiverManufacturer() = default;
 
     std::vector<ArchiverFactory *> factories_;
-    std::map<std::type_index, ArchiverFactory *> by_type_;
-    std::map<std::string, ArchiverFactory *> by_name_;
+    std::map<std::type_index, ArchiverFactory *> factory_type_map_;
+    std::map<std::string, ArchiverFactory *> factory_name_map_;
 };
 
-#define REGISTER_ARCHIVER_FACTORY(T)                                             \
-    extern ArchiverFactory *Get##T##Factory();                                   \
+#define REGISTER_ARCHIVER_FACTORY(T)                                           \
+    extern ArchiverFactory *Get##T##Factory();                                 \
     ArchiverManufacturer::singleton().AddFactory(*Get##T##Factory());
 
 } // namespace augr

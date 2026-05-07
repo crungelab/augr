@@ -61,7 +61,7 @@ public:
         ImNodes::BeginNode(this->model_->id_);
 
         ImNodes::BeginNodeTitleBar();
-        ImGui::TextUnformatted(this->model_->label_);
+        ImGui::TextUnformatted(this->model_->label_.c_str());
         ImNodes::EndNodeTitleBar();
 
         for (auto input : this->model_->inport_.pins_) {

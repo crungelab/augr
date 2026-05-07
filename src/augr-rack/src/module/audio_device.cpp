@@ -11,7 +11,7 @@ bool AudioInputDevice::Create(Part &owner)
 
 void AudioInputDevice::CreatePins()
 {
-  audio_out_ = new AudioOutput(*this, "audio_out_", ChannelLayout::kStereo);
+  audio_out_ = new AudioOutput(*this, "audio_out", ChannelLayout::kStereo);
   AddOutput(*audio_out_);
 }
 
@@ -24,7 +24,7 @@ bool AudioOutputDevice::Create(Part &owner)
 
 void AudioOutputDevice::CreatePins()
 {
-  audio_in_ = new AudioInput(*this, "audio_in_", ChannelLayout::kStereo);
+  audio_in_ = new AudioInput(*this, "audio_in", ChannelLayout::kStereo);
   AddInput(*audio_in_);
 }
 

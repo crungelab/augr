@@ -20,7 +20,7 @@ public:
     WidgetFactory *FindFactory(const std::type_index &type);
     // Data members
     std::vector<WidgetFactory *> factories_;
-    std::map<std::type_index, WidgetFactory *> factory_map_;
+    std::map<std::type_index, WidgetFactory *> factory_type_map_;
 };
 
 #define REGISTER_WIDGET_FACTORY(T)                                             \

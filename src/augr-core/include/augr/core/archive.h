@@ -18,12 +18,10 @@ public:
         json_stack_.push_back(&root);
     }
 
-    [[nodiscard]] nlohmann::json &json() { return *json_stack_.back(); }
-    [[nodiscard]] const nlohmann::json &json() const {
-        return *json_stack_.back();
-    }
+    nlohmann::json &json() { return *json_stack_.back(); }
+    const nlohmann::json &json() const { return *json_stack_.back(); }
 
-    [[nodiscard]] int version() const { return version_; }
+    int version() const { return version_; }
 
     void PushJson(nlohmann::json &j) { json_stack_.push_back(&j); }
     void PopJson() { json_stack_.pop_back(); }
@@ -33,7 +31,7 @@ public:
     }
     void PopGraph() { graph_stack_.pop_back(); }
 
-    [[nodiscard]] Model *ResolveModule(int index) const {
+    Model *ResolveModule(int index) const {
         if (graph_stack_.empty())
             return nullptr;
         const auto &current = graph_stack_.back();
@@ -43,7 +41,7 @@ public:
         return current[index];
     }
 
-    [[nodiscard]] int IndexOf(const Model *model) const {
+    int IndexOf(const Model *model) const {
         if (graph_stack_.empty())
             return -1;
         const auto &current = graph_stack_.back();

@@ -8,20 +8,20 @@ namespace augr {
 
 void ArchiverManufacturer::AddFactory(ArchiverFactory &factory) {
     factories_.push_back(&factory);
-    by_type_[factory.ModelType()] = &factory;
-    by_name_[factory.type_name()] = &factory;
+    factory_type_map_[factory.ModelType()] = &factory;
+    factory_name_map_[factory.type_name()] = &factory;
 }
 
 ArchiverFactory *ArchiverManufacturer::FindFactory(
     const std::type_index &type) const {
-    auto it = by_type_.find(type);
-    return it == by_type_.end() ? nullptr : it->second;
+    auto it = factory_type_map_.find(type);
+    return it == factory_type_map_.end() ? nullptr : it->second;
 }
 
 ArchiverFactory *ArchiverManufacturer::FindFactory(
     const std::string &type_name) const {
-    auto it = by_name_.find(type_name);
-    return it == by_name_.end() ? nullptr : it->second;
+    auto it = factory_name_map_.find(type_name);
+    return it == factory_name_map_.end() ? nullptr : it->second;
 }
 
 Archiver* ArchiverManufacturer::MakeArchiver(

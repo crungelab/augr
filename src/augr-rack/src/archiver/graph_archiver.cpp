@@ -1,5 +1,6 @@
 // ModuleArchiver.cpp
 #include <augr/core/archiver_manufacturer.h>
+#include <augr/core/model_manufacturer.h>
 
 #include <augr/rack/graph.h>
 #include <augr/rack/wire.h>
@@ -84,8 +85,113 @@ void GraphArchiver::SaveWires(Archive &archive) const {
 }
 
 void GraphArchiver::Load(Archive &archive) {
+    ModuleArchiver::Load(archive);
+
+    Graph &graph = model();
     const auto &j = archive.json();
-    Module &module = model();
+
+    LoadChildren(archive);
+
+    // Push graph context so wire indices resolve against the children
+    // we just loaded. Note: LoadChildren has populated graph.children_,
+    // so we push that as the resolution table. Symmetric with Save.
+    GraphScope graph_scope(archive, graph.children_);
+
+    LoadWires(archive);
+}
+
+void GraphArchiver::LoadChildren(Archive &archive) {
+    const auto &j = archive.json();
+    Graph &graph = model();
+
+    if (!j.contains("children"))
+        return;
+    const auto &j_children = j["children"];
+    if (!j_children.is_array())
+        return;
+
+    auto &model_manufacturer = ModelManufacturer::singleton();
+    auto &archiver_manufacturer = ArchiverManufacturer::singleton();
+
+    for (const auto &j_child : j_children) {
+        if (!j_child.contains("type")) {
+            std::cerr << "Child missing 'type' field — skipping\n";
+            continue;
+        }
+        auto type_name = j_child["type"].get<std::string>();
+
+        // Construct the Model via its factory.
+        ModelFactory *factory = model_manufacturer.FindFactory(type_name);
+        if (!factory) {
+            std::cerr << "Unknown module type '" << type_name
+                      << "' — skipping\n";
+            continue;
+        }
+
+        Model &child = *factory->Produce(graph);
+        // Produce already calls Create(parent) and registers the child
+        // with the graph in your existing setup, so child is now in
+        // graph.children_ at the next available index.
+
+        // Deserialize the child's contents using its own archiver.
+        // const_cast is needed because Archive's json stack stores
+        // non-const pointers; load only reads but the API is shared.
+        JsonScope json_scope(archive, const_cast<nlohmann::json &>(j_child));
+        archiver_manufacturer.Deserialize(archive, child);
+    }
+}
+
+void GraphArchiver::LoadWires(Archive &archive) {
+    const auto &j = archive.json();
+    Graph &graph = model();
+
+    if (!j.contains("wires"))
+        return;
+    const auto &j_wires = j["wires"];
+    if (!j_wires.is_array())
+        return;
+
+    for (const auto &j_wire : j_wires) {
+        if (!j_wire.is_array() || j_wire.size() != 2)
+            continue;
+        const auto &j_from = j_wire[0];
+        const auto &j_to = j_wire[1];
+        if (!j_from.is_array() || j_from.size() != 2)
+            continue;
+        if (!j_to.is_array() || j_to.size() != 2)
+            continue;
+
+        int from_idx = j_from[0].get<int>();
+        std::string from_pin_name = j_from[1].get<std::string>();
+        int to_idx = j_to[0].get<int>();
+        std::string to_pin_name = j_to[1].get<std::string>();
+
+        Model *from_module = archive.ResolveModule(from_idx);
+        Model *to_module = archive.ResolveModule(to_idx);
+        if (!from_module || !to_module) {
+            // Index out of range — drop the wire silently per policy.
+            continue;
+        }
+
+        // Cast to Node — wires connect Nodes, not arbitrary Models.
+        Node *from_node = dynamic_cast<Node *>(from_module);
+        Node *to_node = dynamic_cast<Node *>(to_module);
+        if (!from_node || !to_node) {
+            std::cerr << "Wire endpoint is not a Node — skipping\n";
+            continue;
+        }
+
+        Pin *from_pin = from_node->outport_.FindPin(from_pin_name);
+        Pin *to_pin = to_node->inport_.FindPin(to_pin_name);
+        if (!from_pin || !to_pin) {
+            std::cerr << "Wire references unknown pin "
+                      << (from_pin ? to_pin_name : from_pin_name)
+                      << " — skipping\n";
+            continue;
+        }
+
+        graph.Connect(*from_pin, *to_pin);
+    }
 }
 
 } // namespace augr

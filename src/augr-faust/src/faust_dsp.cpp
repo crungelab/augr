@@ -22,14 +22,14 @@ void FaustDsp::CreatePins() {
     int nInputs = getNumInputs();
     if (nInputs > 0) {
         ChannelLayout inputLayout = Audio::ChannelCountToLayout(nInputs);
-        audio_in_ = new AudioInput(*this, "audio_in_", inputLayout);
+        audio_in_ = new AudioInput(*this, "audio_in", inputLayout);
         AddInput(*audio_in_);
     }
     //
     int nOutputs = getNumOutputs();
     if (nOutputs > 0) {
         ChannelLayout outputLayout = Audio::ChannelCountToLayout(nOutputs);
-        audio_out_ = new AudioOutput(*this, "audio_out_", outputLayout);
+        audio_out_ = new AudioOutput(*this, "audio_out", outputLayout);
         AddOutput(*audio_out_);
     }
 }

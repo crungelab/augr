@@ -1,9 +1,9 @@
 #pragma once
 
+#include <algorithm>
 #include <string>
 #include <utility>
 #include <vector>
-#include <algorithm>
 
 #include <augr/core/part.h>
 
@@ -19,11 +19,11 @@ public:
                         children_.end());
     }
     // Accessors
-    [[nodiscard]] Model &parent() const {
-        return *dynamic_cast<Model *>(owner_);
-    }
+    Model &parent() const { return *dynamic_cast<Model *>(owner_); }
+
 protected:
-    virtual void OnRemovingChild(Model& model) {}
+    virtual void OnRemovingChild(Model &model) {}
+
 public:
     // Data members
     std::vector<Model *> children_;

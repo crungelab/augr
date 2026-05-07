@@ -8,7 +8,7 @@ namespace augr {
 
 void WidgetManufacturer::AddFactory(WidgetFactory& factory) {
   factories_.push_back(&factory);
-  factory_map_[factory.GetKey()] = &factory;
+  factory_type_map_[factory.GetKey()] = &factory;
 }
 
 WidgetFactory* WidgetManufacturer::GetFactory(std::type_index& key) {
@@ -17,7 +17,7 @@ WidgetFactory* WidgetManufacturer::GetFactory(std::type_index& key) {
 
 WidgetFactory* WidgetManufacturer::FindFactory(const std::type_index& t) {
   // exact match
-  if (const auto it = factory_map_.find(t); it != factory_map_.end())
+  if (const auto it = factory_type_map_.find(t); it != factory_type_map_.end())
     return it->second;
 
   // search bases (depth-first)
