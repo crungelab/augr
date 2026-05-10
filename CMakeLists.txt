@@ -51,6 +51,11 @@ add_subdirectory(${XTENSOR_ROOT})
 add_subdirectory(${KISSFFT_ROOT})
 #KISSFFT END
 
+#PFD BEGIN
+set(CMAKE_POLICY_VERSION_MINIMUM 3.5 CACHE STRING "" FORCE)
+add_subdirectory(${PFD_ROOT})
+#PFD END
+
 #IMGUI BEGIN
 add_subdirectory(${AUGR_ROOT}/src/imgui)
 #IMGUI END

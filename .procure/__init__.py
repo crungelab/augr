@@ -78,6 +78,10 @@ class KissFFT(GitSolution):
     path = "depot/kissfft"
     url = "https://github.com/mborgerding/kissfft"
 
+class Pfd(GitSolution):
+    path = "depot/portable-file-dialogs"
+    url = "https://github.com/samhocevar/portable-file-dialogs"
+
 
 solutions = [
     Faust,
@@ -95,4 +99,5 @@ solutions = [
     Xtensor,
     Xtl,
     KissFFT,
+    Pfd,
 ]

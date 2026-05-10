@@ -8,6 +8,7 @@
 #include <augr/rack/archiver/module_archiver.h>
 #include <augr/rack/archiver/rack_archiver.h>
 #include <augr/rack/module/module.h>
+#include <augr/rack/rack_doc.h>
 
 #include <augr/rack/module/audio_device.h>
 #include <augr/rack/module/midi_device.h>
@@ -23,8 +24,11 @@
 #include <augite/widget/widget_manufacturer.h>
 
 #include <nlohmann/json.hpp>
+#include <portable-file-dialogs.h>
 
+#include <filesystem>
 #include <iostream>
+#include <memory>
 
 #include "bubble_dsp.h"
 
@@ -40,7 +44,6 @@ class BubbleDspArchiver : public ModuleArchiver {};
 DEFINE_ARCHIVER_FACTORY(BubbleDspArchiver, BubbleDspImpl, "BubbleDsp")
 
 class ExeRackArchiver : public RackArchiver {};
-//DEFINE_ARCHIVER_FACTORY(ExeRackArchiver, ExeRack, "ExeRack")
 DEFINE_ARCHIVER_FACTORY(ExeRackArchiver, ExeRack, "Rack")
 
 class AudioInputDeviceArchiver : public ModuleArchiver {};
@@ -59,98 +62,230 @@ class MidiOutputDeviceArchiver : public ModuleArchiver {};
 DEFINE_ARCHIVER_FACTORY(MidiOutputDeviceArchiver, MidiOutputDevice,
                         "MidiOutputDevice")
 
-//DEFINE_MODEL_FACTORY(ExeRack, "ExeRack", "Rack")
 DEFINE_MODEL_FACTORY(ExeRack, "Rack", "Rack")
 DEFINE_MODEL_FACTORY(AudioInputDevice, "AudioInputDevice", "Rack")
 DEFINE_MODEL_FACTORY(AudioOutputDevice, "AudioOutputDevice", "Rack")
 DEFINE_MODEL_FACTORY(MidiInputDevice, "MidiInputDevice", "Rack")
 DEFINE_MODEL_FACTORY(MidiOutputDevice, "MidiOutputDevice", "Rack")
 
-
 class MyApp : public App {
 public:
     MyApp() {
-        rack_ = new ExeRack();
-        view_ = new RackView(rack());
+        doc_ = std::make_unique<RackDoc>();
+        doc_->NewDocument();
+        RebuildView();
     }
 
     void Draw() override {
+        PollPendingDialog();
+        DrawMenuBar();
+        DrawUnsavedModal();
         view_->Draw();
         App::Draw();
     }
-    // Accessors
-    ExeRack &rack() { return *rack_; }
-    // Data members
-    ExeRack *rack_;
-    RackView *view_;
+
+    void DrawMenuBar() {
+        if (ImGui::BeginMainMenuBar()) {
+            if (ImGui::BeginMenu("File")) {
+                if (ImGui::MenuItem("New", "Ctrl+N")) {
+                    if (doc().IsModified()) {
+                        pending_ = PendingAction::NewAfterPrompt;
+                        show_unsaved_modal_ = true;
+                    } else {
+                        DoNew();
+                    }
+                }
+                if (ImGui::MenuItem("Open...", "Ctrl+O")) {
+                    if (doc().IsModified()) {
+                        pending_ = PendingAction::OpenAfterPrompt;
+                        show_unsaved_modal_ = true;
+                    } else {
+                        StartOpenDialog();
+                    }
+                }
+                ImGui::Separator();
+                bool can_save = doc().IsModified() || !doc().Path();
+                if (ImGui::MenuItem("Save", "Ctrl+S", false, can_save)) {
+                    if (doc().Path()) {
+                        DoSave();
+                    } else {
+                        StartSaveAsDialog();
+                    }
+                }
+                if (ImGui::MenuItem("Save As...", "Ctrl+Shift+S")) {
+                    StartSaveAsDialog();
+                }
+                ImGui::Separator();
+                if (ImGui::MenuItem("Quit", "Ctrl+Q")) {
+                    // similar dirty-check pattern; left as exercise
+                }
+                ImGui::EndMenu();
+            }
+            ImGui::EndMainMenuBar();
+        }
+    }
+
+    // ---------- Dialog launchers ----------
+
+    void StartOpenDialog() {
+        std::string default_dir = doc().Path()
+                                      ? doc().Path()->parent_path().string()
+                                      : pfd::path::home();
+
+        open_dialog_ = std::make_unique<pfd::open_file>(
+            "Open Rack", default_dir,
+            std::vector<std::string>{"Augr Rack (*.augr)", "*.augr",
+                                     "All Files", "*"},
+            pfd::opt::none);
+    }
+
+    void StartSaveAsDialog() {
+        std::string default_path =
+            doc().Path() ? doc().Path()->string() : "untitled.augr";
+
+        save_dialog_ = std::make_unique<pfd::save_file>(
+            "Save Rack As", default_path,
+            std::vector<std::string>{"Augr Rack (*.augr)", "*.augr"},
+            pfd::opt::force_overwrite);
+    }
+
+    // ---------- Dialog polling ----------
+
+    void PollPendingDialog() {
+        if (open_dialog_ && open_dialog_->ready(0)) {
+            auto result = open_dialog_->result();
+            open_dialog_.reset();
+            if (!result.empty()) {
+                DoOpen(result.front());
+            }
+        }
+        if (save_dialog_ && save_dialog_->ready(0)) {
+            auto result = save_dialog_->result();
+            save_dialog_.reset();
+            if (!result.empty()) {
+                std::filesystem::path p = result;
+                if (p.extension().empty())
+                    p.replace_extension(".augr");
+                DoSaveAs(p);
+
+                // If a save was the prelude to another action, fire it now.
+                if (pending_ == PendingAction::OpenAfterPrompt) {
+                    StartOpenDialog();
+                } else if (pending_ == PendingAction::NewAfterPrompt) {
+                    DoNew();
+                }
+                pending_ = PendingAction::None;
+            } else {
+                // User cancelled save — also cancel any pending follow-up.
+                pending_ = PendingAction::None;
+            }
+        }
+    }
+
+    // ---------- Document operations ----------
+
+    void DoNew() {
+        doc().NewDocument();
+        RebuildView();
+    }
+
+    void DoOpen(const std::filesystem::path &p) {
+        if (doc().Load(p)) {
+            RebuildView();
+        } else {
+            pfd::message("Load Failed", "Could not load: " + p.string(),
+                         pfd::choice::ok, pfd::icon::error);
+        }
+    }
+
+    void DoSave() {
+        if (!doc().Path())
+            return; // guarded by menu logic, but be safe
+        DoSaveAs(*doc().Path());
+    }
+
+    void DoSaveAs(const std::filesystem::path &p) {
+        if (!doc().Save(p)) {
+            pfd::message("Save Failed", "Could not save: " + p.string(),
+                         pfd::choice::ok, pfd::icon::error);
+        }
+    }
+
+    // ---------- Unsaved-changes modal ----------
+
+    void DrawUnsavedModal() {
+        if (show_unsaved_modal_) {
+            ImGui::OpenPopup("Unsaved Changes");
+            show_unsaved_modal_ = false;
+        }
+        if (ImGui::BeginPopupModal("Unsaved Changes", nullptr,
+                                   ImGuiWindowFlags_AlwaysAutoResize)) {
+            ImGui::Text("You have unsaved changes. Discard them?");
+            ImGui::Separator();
+            if (ImGui::Button("Save First")) {
+                ImGui::CloseCurrentPopup();
+                if (doc().Path()) {
+                    DoSave();
+                    if (pending_ == PendingAction::OpenAfterPrompt) {
+                        StartOpenDialog();
+                    } else if (pending_ == PendingAction::NewAfterPrompt) {
+                        DoNew();
+                    }
+                    pending_ = PendingAction::None;
+                } else {
+                    // No path yet — kick off SaveAs; PollPendingDialog handles
+                    // the follow-up using `pending_`.
+                    StartSaveAsDialog();
+                }
+            }
+            ImGui::SameLine();
+            if (ImGui::Button("Discard")) {
+                ImGui::CloseCurrentPopup();
+                if (pending_ == PendingAction::OpenAfterPrompt) {
+                    StartOpenDialog();
+                } else if (pending_ == PendingAction::NewAfterPrompt) {
+                    DoNew();
+                }
+                pending_ = PendingAction::None;
+            }
+            ImGui::SameLine();
+            if (ImGui::Button("Cancel")) {
+                ImGui::CloseCurrentPopup();
+                pending_ = PendingAction::None;
+            }
+            ImGui::EndPopup();
+        }
+    }
+
+    // ---------- Accessors ----------
+
+    Rack &rack() { return doc_->rack(); }
+    RackDoc &doc() { return *doc_; }
+
+    // ---------- Data members ----------
+
+    // RackDoc *doc_ = nullptr;
+    // RackView *view_ = nullptr;
+private:
+    void RebuildView() { view_ = std::make_unique<RackView>(doc_->rack()); }
+
+    std::unique_ptr<RackDoc> doc_;
+    std::unique_ptr<RackView> view_;
+
+    enum class PendingAction {
+        None,
+        Open,
+        SaveAs,
+        NewAfterPrompt,
+        OpenAfterPrompt
+    };
+
+    std::unique_ptr<pfd::open_file> open_dialog_;
+    std::unique_ptr<pfd::save_file> save_dialog_;
+
+    PendingAction pending_ = PendingAction::None;
+    bool show_unsaved_modal_ = false;
 };
-
-// Serialize a rack to JSON and print it.
-nlohmann::json SerializeRack(ExeRack &rack) {
-    auto &manufacturer = ArchiverManufacturer::singleton();
-    auto *factory = manufacturer.FindFactory(std::type_index(typeid(rack)));
-    if (!factory) {
-        std::cerr << "No archiver factory registered for type "
-                  << typeid(rack).name() << "\n";
-        return nlohmann::json();
-    }
-
-    auto *archiver = factory->Produce(rack);
-    if (!archiver) {
-        std::cerr << "Failed to construct archiver\n";
-        return nlohmann::json();
-    }
-
-    nlohmann::json j;
-    Archive archive(j);
-    archiver->Save(archive);
-    delete archiver;
-
-    std::cout << j.dump(2) << "\n";
-    return j;
-}
-
-// Deserialize JSON into a fresh rack constructed as a root (no parent).
-ExeRack *DeserializeRack(const nlohmann::json &j) {
-    if (!j.contains("type")) {
-        std::cerr << "JSON missing 'type' field\n";
-        return nullptr;
-    }
-    std::string type_name = j["type"].get<std::string>();
-
-    // Construct the rack as a root via its model factory.
-    auto &model_manufacturer = ModelManufacturer::singleton();
-    ModelFactory *model_factory = model_manufacturer.FindFactory(type_name);
-    if (!model_factory) {
-        std::cerr << "No model factory registered for type '" << type_name
-                  << "'\n";
-        return nullptr;
-    }
-
-    ExeRack *rack = dynamic_cast<ExeRack *>(model_factory->Produce(nullptr));
-    if (!rack) {
-        std::cerr << "Factory produced a non-ExeRack for type '" << type_name
-                  << "'\n";
-        return nullptr;
-    }
-
-    // Run the archiver to populate state from JSON.
-    auto &archiver_manufacturer = ArchiverManufacturer::singleton();
-    ArchiverFactory *archiver_factory =
-        archiver_manufacturer.FindFactory(type_name);
-    if (!archiver_factory) {
-        std::cerr << "No archiver factory registered for type '" << type_name
-                  << "'\n";
-        return rack;
-    }
-
-    Archiver *archiver = archiver_factory->Produce(*rack);
-    Archive archive(const_cast<nlohmann::json &>(j));
-    archiver->Load(archive);
-    delete archiver;
-
-    return rack;
-}
 
 int main(int, char **) {
     REGISTER_MODEL_FACTORY(ExeRack);
@@ -167,34 +302,19 @@ int main(int, char **) {
     REGISTER_ARCHIVER_FACTORY(MidiInputDeviceArchiver);
     REGISTER_ARCHIVER_FACTORY(MidiOutputDeviceArchiver);
 
-    MyApp *app = new MyApp();
+    auto *app = new MyApp();
     auto &rack = app->rack();
-    rack.Create();
-    rack.CreateDefaultDevices();
 
-    auto bubble = ModelFactoryT<BubbleDspImpl>::Make(&rack);
-
-    rack.Connect(*bubble->audio_out_,
-                 *rack.audio_output_device_->audio_in_);
-
-    // Round-trip test: serialize the rack, deserialize into a fresh
-    // rack, re-serialize. The two outputs should match if save/load
-    // is consistent.
-    std::cout << "=== Original rack ===\n";
-    nlohmann::json original_json = SerializeRack(rack);
-
-    ExeRack *reloaded = DeserializeRack(original_json);
-    if (reloaded) {
-        std::cout << "\n=== Reloaded rack ===\n";
-        nlohmann::json reloaded_json = SerializeRack(*reloaded);
-
-        std::cout << "\nRound-trip match: "
-                  << (original_json == reloaded_json ? "yes" : "no") << "\n";
-
-        delete reloaded;
+    /*
+    bool success = rack.Start();
+    if (!success) {
+        spdlog::error("Failed to start the rack.");
+        return 1;
     }
+    */
 
     app->Run(augr::Window::RunParams("Augr Bubble"));
+    //rack.Stop();
 
     return 0;
 }

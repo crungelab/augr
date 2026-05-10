@@ -24,9 +24,6 @@ public:
 private:
     AudioSystem audio_system_{*this};
     MidiSystem midi_system_{*this};
-
-    unsigned int devNumInChans_ = 0;
-    unsigned int devNumOutChans_ = 0;
 };
 
 } // namespace augr

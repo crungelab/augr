@@ -66,22 +66,6 @@ Rack *DeserializeRack(const nlohmann::json &j) {
     std::string type_name = j["type"].get<std::string>();
 
     // Construct the rack as a root via its model factory.
-    /*
-    auto &model_manufacturer = ModelManufacturer::singleton();
-    ModelFactory *model_factory = model_manufacturer.FindFactory(type_name);
-    if (!model_factory) {
-        std::cerr << "No model factory registered for type '" << type_name
-                  << "'\n";
-        return nullptr;
-    }
-
-    Rack *rack = dynamic_cast<Rack *>(model_factory->Produce(nullptr));
-    if (!rack) {
-        std::cerr << "Factory produced a non-Rack for type '" << type_name
-                  << "'\n";
-        return nullptr;
-    }
-    */
     Rack *rack = NewRack(type_name);
     if (!rack) {
         std::cerr << "Failed to construct rack of type '" << type_name << "'\n";
@@ -140,6 +124,7 @@ void RackDoc::NewDocument() {
     ClearPath();
     MarkClean();
     rack_ = NewRack("Rack");
+    rack_->CreateDefaultDevices();
 }
 
 

@@ -15,10 +15,6 @@ public:
     void CreateContext() override;
 
     bool DoCreate(CreateParams params) override;
-    //bool PostCreate(CreateParams params) override;
-    //void Destroy() override;
-
-    //void Render() override;
 
     // Accessors
     static App &singleton() { return *singleton_; }

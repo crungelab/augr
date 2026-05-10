@@ -31,7 +31,7 @@ int ExeRack::ProcessAudio(double streamTime, void *inbuf, void *outbuf,
     if (output.layout() != ChannelLayout::kNull) {
         output.WritePlanar(static_cast<fy_buffer_t>(outbuf), SCALE);
     } else {
-        std::fill_n(static_cast<fy_real *>(outbuf), frames * devNumOutChans_,
+        std::fill_n(static_cast<fy_real *>(outbuf), frames * config_.audio_output_channels,
                     0.0f);
     }
 
@@ -66,25 +66,6 @@ void ExeRack::Create(Part *owner) {
 
     Rack::Create(owner);
 }
-
-/*
-void ExeRack::Create(Part *owner) {
-    Rack::Create(owner);
-
-    AudioConfig config;
-    config.enableInput = false;
-    config.sample_rate = 48000;
-    config.frames = 512;
-
-    audio_system_.Create(config);
-
-    devNumInChans_ = audio_system_.num_in_chans();
-    devNumOutChans_ = audio_system_.num_out_chans();
-
-    // MIDI is best-effort; don't fail the rack if no ports exist
-    midi_system_.Create();
-}
-*/
 
 bool ExeRack::Start() { return audio_system_.Start(); }
 

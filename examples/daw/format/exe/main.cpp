@@ -52,7 +52,12 @@ int main(int, char**) {
     ExeRack &rack = app.rack_;
     rack.Create();
     rack.CreateDefaultDevices();
-    rack.Start();
+
+    bool success = rack.Start();
+    if (!success) {
+        spdlog::error("Failed to start the rack.");
+        return 1;
+    }
     app.Run();
     rack.Stop();
 }
