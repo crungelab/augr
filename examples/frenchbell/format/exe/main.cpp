@@ -23,8 +23,6 @@ public:
 class MyApp : public App {
 public:
     MyApp() {
-        FrenchBellDsp &m = ModelFactoryT<FrenchBellDspImpl>::Make(rack_);
-        rack_.AddModule(m);
         view_ = new RackView(rack_);
     }
 
@@ -41,8 +39,12 @@ int main(int, char **) {
     MyApp &app = *new MyApp();
     ExeRack &rack = app.rack_;
     rack.Create();
+    rack.CreateDefaultDevices();
+
+    ModelFactoryT<FrenchBellDspImpl>::Make(&rack);
+
     rack.Start();
-    app.Run();
+    app.Run(augr::Window::RunParams("Augr French Bell"));
     rack.Stop();
 
     return 0;

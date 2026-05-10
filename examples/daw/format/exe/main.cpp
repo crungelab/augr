@@ -51,6 +51,7 @@ int main(int, char**) {
     MyApp &app = *new MyApp();
     ExeRack &rack = app.rack_;
     rack.Create();
+    rack.CreateDefaultDevices();
     rack.Start();
     app.Run();
     rack.Stop();

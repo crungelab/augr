@@ -69,8 +69,6 @@ class MyApp : public App {
 public:
     MyApp() {
         rack_ = new ExeRack();
-        BubbleDsp &m = ModelFactoryT<BubbleDspImpl>::Make(rack_);
-        bubble_ = &m;
         view_ = new RackView(rack());
     }
 
@@ -83,7 +81,6 @@ public:
     // Data members
     ExeRack *rack_;
     RackView *view_;
-    BubbleDsp *bubble_;
 };
 
 // Serialize a rack to JSON and print it.
@@ -171,8 +168,11 @@ int main(int, char **) {
     MyApp *app = new MyApp();
     auto &rack = app->rack();
     rack.Create();
+    rack.CreateDefaultDevices();
 
-    rack.Connect(*app->bubble_->audio_out_,
+    auto bubble = ModelFactoryT<BubbleDspImpl>::Make(&rack);
+
+    rack.Connect(*bubble->audio_out_,
                  *rack.audio_output_device_->audio_in_);
 
     // Round-trip test: serialize the rack, deserialize into a fresh

@@ -21,12 +21,7 @@ public:
 
 class MyApp : public App {
 public:
-    MyApp() {
-        BubbleDsp &m = ModelFactoryT<BubbleDspImpl>::Make(rack_);
-        rack_.AddModule(m);
-
-        view_ = new RackView(rack_);
-    }
+    MyApp() { view_ = new RackView(rack_); }
 
     void Draw() override {
         view_->Draw();
@@ -41,6 +36,10 @@ int main(int, char **) {
     MyApp &app = *new MyApp();
     ExeRack &rack = app.rack_;
     rack.Create();
+    rack.CreateDefaultDevices();
+
+    ModelFactoryT<BubbleDspImpl>::Make(&rack);
+
     rack.Start();
     app.Run(augr::Window::RunParams("Augr Bubble"));
     rack.Stop();

@@ -5,6 +5,7 @@
 
 #include <augr/rack/module/audio_device.h>
 #include <augr/rack/module/midi_device.h>
+
 #include <augr/exe/rack/exe_rack.h>
 
 #define SCALE 1.0
@@ -39,50 +40,34 @@ int ExeRack::ProcessAudio(double streamTime, void *inbuf, void *outbuf,
 }
 
 // ---------------------------------------------------------------------------
-// MIDI thread entry point — just enqueue; processed on the audio thread
-// ---------------------------------------------------------------------------
-
-void ExeRack::EnqueueMidiMessage(MidiMessage message) {
-    EnqueueAction([this, message = std::move(message)]() {
-        // TODO: route to MidiInputDevice's MidiOutput pin
-        // e.g. midi_input_device_->midi_out_->Write(message);
-        //(void)message;
-        midi_input_device_->midi_out_->Write(message);
-    });
-}
-
-// ---------------------------------------------------------------------------
-// Device module helpers
-// ---------------------------------------------------------------------------
-
-bool ExeRack::CreateAudioInputDevice() {
-    AudioInputDevice &m = ModelFactoryT<AudioInputDevice>::Make(this);
-    audio_input_device_ = &m;
-    return true;
-}
-
-bool ExeRack::CreateAudioOutputDevice() {
-    AudioOutputDevice &m = ModelFactoryT<AudioOutputDevice>::Make(this);
-    audio_output_device_ = &m;
-    return true;
-}
-
-bool ExeRack::CreateMidiInputDevice() {
-    MidiInputDevice &m = ModelFactoryT<MidiInputDevice>::Make(this);
-    midi_input_device_ = &m;
-    return true;
-}
-
-bool ExeRack::CreateMidiOutputDevice() {
-    MidiOutputDevice &m = ModelFactoryT<MidiOutputDevice>::Make(this);
-    midi_output_device_ = &m;
-    return true;
-}
-
-// ---------------------------------------------------------------------------
 // Lifecycle
 // ---------------------------------------------------------------------------
 
+void ExeRack::Create(Part *owner) {
+    AudioConfig audio_cfg;
+    audio_cfg.sample_rate = config_.sample_rate;
+    audio_cfg.frames = config_.frames;
+    audio_cfg.enableInput = (config_.audio_input_channels > 0);
+    audio_system_.Create(audio_cfg);
+
+    midi_system_.Create();
+
+    // Backend may have settled on different values than we requested.
+    // Reflect the actual values back into config_ so subsequent
+    // AddDefaultDevices uses correct channel counts and rates.
+    config_.sample_rate = audio_cfg.sample_rate;
+    config_.frames = audio_cfg.frames;
+    if (config_.audio_input_channels > 0) {
+        config_.audio_input_channels = audio_system_.num_in_chans();
+    }
+    if (config_.audio_output_channels == 0) {
+        config_.audio_output_channels = audio_system_.num_out_chans();
+    }
+
+    Rack::Create(owner);
+}
+
+/*
 void ExeRack::Create(Part *owner) {
     Rack::Create(owner);
 
@@ -96,16 +81,10 @@ void ExeRack::Create(Part *owner) {
     devNumInChans_ = audio_system_.num_in_chans();
     devNumOutChans_ = audio_system_.num_out_chans();
 
-    if (config.enableInput)
-        CreateAudioInputDevice();
-    CreateAudioOutputDevice();
-
     // MIDI is best-effort; don't fail the rack if no ports exist
     midi_system_.Create();
-
-    CreateMidiInputDevice();
-    //CreateMidiOutputDevice();
 }
+*/
 
 bool ExeRack::Start() { return audio_system_.Start(); }
 
