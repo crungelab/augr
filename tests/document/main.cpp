@@ -40,7 +40,8 @@ class BubbleDspArchiver : public ModuleArchiver {};
 DEFINE_ARCHIVER_FACTORY(BubbleDspArchiver, BubbleDspImpl, "BubbleDsp")
 
 class ExeRackArchiver : public RackArchiver {};
-DEFINE_ARCHIVER_FACTORY(ExeRackArchiver, ExeRack, "ExeRack")
+//DEFINE_ARCHIVER_FACTORY(ExeRackArchiver, ExeRack, "ExeRack")
+DEFINE_ARCHIVER_FACTORY(ExeRackArchiver, ExeRack, "Rack")
 
 class AudioInputDeviceArchiver : public ModuleArchiver {};
 DEFINE_ARCHIVER_FACTORY(AudioInputDeviceArchiver, AudioInputDevice,
@@ -58,7 +59,8 @@ class MidiOutputDeviceArchiver : public ModuleArchiver {};
 DEFINE_ARCHIVER_FACTORY(MidiOutputDeviceArchiver, MidiOutputDevice,
                         "MidiOutputDevice")
 
-DEFINE_MODEL_FACTORY(ExeRack, "ExeRack", "Rack")
+//DEFINE_MODEL_FACTORY(ExeRack, "ExeRack", "Rack")
+DEFINE_MODEL_FACTORY(ExeRack, "Rack", "Rack")
 DEFINE_MODEL_FACTORY(AudioInputDevice, "AudioInputDevice", "Rack")
 DEFINE_MODEL_FACTORY(AudioOutputDevice, "AudioOutputDevice", "Rack")
 DEFINE_MODEL_FACTORY(MidiInputDevice, "MidiInputDevice", "Rack")

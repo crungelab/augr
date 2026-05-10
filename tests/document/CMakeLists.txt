@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.15)
 
-project(serialize LANGUAGES CXX)
+project(document_test LANGUAGES CXX)
 set(THIS ${PROJECT_NAME})
 set(THIS_DIR ${CMAKE_CURRENT_SOURCE_DIR})
 

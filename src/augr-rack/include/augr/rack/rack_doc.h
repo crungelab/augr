@@ -13,12 +13,9 @@ public:
     bool Save(const std::filesystem::path &p) override;
     bool Load(const std::filesystem::path &p) override;
 
-    void NewDocument() override {
-        ClearPath();
-        MarkClean();
-    }
+    void NewDocument() override;
 
-    std::string TypeName() const override { return "Augr Rack"; }
+    std::string TypeName() const override { return "Rack"; }
     std::vector<std::string> Extensions() const override { return {".augr"}; }
 
 protected:

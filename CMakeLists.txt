@@ -111,5 +111,8 @@ add_subdirectory(src/augr-exe)
 #Augite
 add_subdirectory(src/augite)
 
+#Tests
+add_subdirectory(tests)
+
 #Examples
 add_subdirectory(examples)

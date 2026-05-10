@@ -1,7 +1,5 @@
 cmake_minimum_required(VERSION 3.15)
 
-include(${AUGR_CMAKE}/RtAudio.cmake)
-
 include(${AUGR_CMAKE}/AugrCore.cmake)
 include(${AUGR_CMAKE}/ExeApp.cmake)
 include(${AUGR_CMAKE}/ImNodes.cmake)
@@ -35,5 +33,3 @@ add_subdirectory(bubble)
 add_subdirectory(rawdaw)
 
 add_subdirectory(daw)
-
-add_subdirectory(serialize)
