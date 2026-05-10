@@ -27,7 +27,7 @@ void MidiSystem::Callback(double timestamp,
   data->system->rack_.EnqueueMidiMessage(std::move(message));
 }
 
-bool MidiSystem::Create() {
+bool MidiSystem::Configure() {
     std::unique_ptr<RtMidiIn> probe;
     try {
         probe =

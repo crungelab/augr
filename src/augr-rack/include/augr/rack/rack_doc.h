@@ -1,25 +1,51 @@
+// rack_doc.h (sketch — adjust to your actual layout)
 #pragma once
 
-#include <augr/core/document.h>
-
-#include "rack.h"
+#include <filesystem>
+#include <memory>
+#include <optional>
+#include <string>
 
 namespace augr {
 
-class RackDoc : public Document {
+class Rack;
+
+class RackDoc {
 public:
-    Rack &rack() { return *rack_; } // RackView gets a ref to this
+    RackDoc() = default;
+    ~RackDoc(); // out-of-line because Rack is forward-declared
 
-    bool Save(const std::filesystem::path &p) override;
-    bool Load(const std::filesystem::path &p) override;
+    bool Save(const std::filesystem::path &p);
+    bool Load(const std::filesystem::path& p, bool auto_start = true);
+    void NewDocument(bool auto_start = true);
 
-    void NewDocument() override;
+    // Audio lifecycle for the current rack.
+    bool Start();          // returns false if no rack or start failed
+    void Stop();
+    bool IsRunning() const;
 
-    std::string TypeName() const override { return "Rack"; }
-    std::vector<std::string> Extensions() const override { return {".augr"}; }
+    Rack &rack() { return *rack_; }
+    const Rack &rack() const { return *rack_; }
+    bool HasRack() const { return rack_ != nullptr; }
+
+    const std::optional<std::filesystem::path> &Path() const { return path_; }
+    bool IsModified() const { return modified_; }
+    void MarkModified() { modified_ = true; }
+
+    std::string DisplayName() const {
+        std::string base = path_ ? path_->filename().string() : "Untitled";
+        return modified_ ? base + "*" : base;
+    }
 
 protected:
-    Rack *rack_;
+    void SetPath(std::filesystem::path p) { path_ = std::move(p); }
+    void ClearPath() { path_.reset(); }
+    void MarkClean() { modified_ = false; }
+
+private:
+    std::unique_ptr<Rack> rack_;
+    std::optional<std::filesystem::path> path_;
+    bool modified_ = false;
 };
 
 } // namespace augr

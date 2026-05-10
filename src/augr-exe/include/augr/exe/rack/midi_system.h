@@ -17,7 +17,7 @@ public:
     explicit MidiSystem(ExeRack &rack);
     ~MidiSystem();
 
-    bool Create();
+    bool Configure();
     void Stop();
 
     unsigned int port_count() const;

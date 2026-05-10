@@ -43,10 +43,11 @@ public:
 
     void RebuildExecutionOrder();
     //
-    virtual bool Start() { return true; }
-    virtual void Stop() {}
+    virtual bool Start() { running_ = true; return true; }
+    virtual void Stop() { running_ = false; }
     // Accessors
     static Rack &singleton() { return *singleton_; }
+    bool IsRunning() const { return running_; }
     // Data members
     static Rack *singleton_;
     RackConfig config_;
@@ -79,6 +80,8 @@ private:
         modules_.erase(std::remove(modules_.begin(), modules_.end(), &m),
                        modules_.end());
     }
+    // Data members
+    bool running_ = false;
 };
 
 } // namespace augr

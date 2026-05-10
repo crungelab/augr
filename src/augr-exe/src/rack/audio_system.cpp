@@ -5,20 +5,13 @@
 
 namespace augr {
 
-#define FORMAT RTAUDIO_FLOAT32
-#define SCALE  1.0
+namespace {
+constexpr RtAudioFormat kFormat = RTAUDIO_FLOAT32;
+}
 
 AudioSystem::AudioSystem(ExeRack &rack) : rack_(rack) {}
 
-AudioSystem::~AudioSystem() {
-    Stop();
-    if (dac_) {
-        if (dac_->isStreamOpen())
-            dac_->closeStream();
-        delete dac_;
-        dac_ = nullptr;
-    }
-}
+AudioSystem::~AudioSystem() { Stop(); }
 
 int AudioSystem::Callback(void *outputBuffer, void *inputBuffer,
                           unsigned int nBufferFrames, double streamTime,
@@ -27,78 +20,118 @@ int AudioSystem::Callback(void *outputBuffer, void *inputBuffer,
         streamTime, inputBuffer, outputBuffer, nBufferFrames);
 }
 
-bool AudioSystem::Create(AudioConfig &config) {
-    dac_ = new RtAudio(
-        RtAudio::Api::UNSPECIFIED,
-        [](RtAudioErrorType type, const std::string &errorText) {
-            spdlog::error("RtAudio error type={} message={}",
-                          static_cast<int>(type), errorText);
-        });
+bool AudioSystem::Configure(AudioConfig &config) {
+    // Configure resolves the device IDs, channel counts, sample rate,
+    // and frame size. We do not open a stream here — that happens in Start().
+    RtAudio probe(RtAudio::Api::UNSPECIFIED,
+                  [](RtAudioErrorType type, const std::string &msg) {
+                      spdlog::error("RtAudio probe error type={} message={}",
+                                    static_cast<int>(type), msg);
+                  });
 
-    if (dac_->getDeviceCount() < 1) {
+    if (probe.getDeviceCount() < 1) {
         spdlog::error("AudioSystem: no audio devices found");
         return false;
     }
 
-    AudioConfigurator configurator(*dac_);
+    AudioConfigurator configurator(probe);
     if (!configurator.configure(config)) {
         spdlog::error("AudioSystem: failed to configure audio devices");
         return false;
     }
 
-    RtAudio::StreamParameters oParams{};
-    oParams.deviceId    = config.outputDeviceId;
-    oParams.nChannels   = config.outputChannels;
-    oParams.firstChannel = 0;
-
-    RtAudio::StreamParameters iParams{};
-    if (config.enableInput) {
-        iParams.deviceId     = config.inputDeviceId;
-        iParams.nChannels    = config.inputChannels;
-        iParams.firstChannel = 0;
-    }
-
-    num_in_chans_  = config.enableInput ? config.inputChannels : 0;
-    num_out_chans_ = config.outputChannels;
-
-    RtAudio::StreamOptions options{};
-    if (config.nonInterleaved)
-        options.flags |= RTAUDIO_NONINTERLEAVED;
-
-    unsigned int frames = config.frames;
-
-    RtAudioErrorType e = dac_->openStream(
-        &oParams,
-        config.enableInput ? &iParams : nullptr,
-        FORMAT,
-        config.sample_rate,
-        &frames,
-        &AudioSystem::Callback,
-        &rack_,
-        &options);
-
-    if (e != RTAUDIO_NO_ERROR) {
-        spdlog::error("AudioSystem: openStream failed");
-        return false;
-    }
-
-    // Feed back the actual negotiated values
-    config.frames = frames;
-
-    Audio::set_frames(frames);
-    Audio::set_sample_rate(config.sample_rate);
-
+    config_ = config; // remember the resolved config for Start()
+    configured_ = true;
     return true;
 }
 
 bool AudioSystem::Start() {
-    if (!dac_) return false;
-    return dac_->startStream() == RTAUDIO_NO_ERROR;
+    if (!configured_) {
+        spdlog::error(
+            "AudioSystem::Start: not configured; call Configure() first");
+        return false;
+    }
+    if (dac_) {
+        // Already running. Idempotent.
+        return true;
+    }
+
+    dac_ = std::make_unique<RtAudio>(
+        RtAudio::Api::UNSPECIFIED,
+        [](RtAudioErrorType type, const std::string &msg) {
+            spdlog::error("RtAudio error type={} message={}",
+                          static_cast<int>(type), msg);
+        });
+
+    RtAudio::StreamParameters oParams{};
+    oParams.deviceId = config_.outputDeviceId;
+    oParams.nChannels = config_.outputChannels;
+    oParams.firstChannel = 0;
+
+    RtAudio::StreamParameters iParams{};
+    if (config_.enableInput) {
+        iParams.deviceId = config_.inputDeviceId;
+        iParams.nChannels = config_.inputChannels;
+        iParams.firstChannel = 0;
+    }
+
+    num_in_chans_ = config_.enableInput ? config_.inputChannels : 0;
+    num_out_chans_ = config_.outputChannels;
+
+    RtAudio::StreamOptions options{};
+    if (config_.nonInterleaved) {
+        options.flags |= RTAUDIO_NONINTERLEAVED;
+    }
+
+    unsigned int frames = config_.frames;
+
+    auto err = dac_->openStream(
+        &oParams, config_.enableInput ? &iParams : nullptr, kFormat,
+        config_.sample_rate, &frames, &AudioSystem::Callback, &rack_, &options);
+
+    if (err != RTAUDIO_NO_ERROR) {
+        spdlog::error("AudioSystem::Start: openStream failed: {}",
+                      dac_->getErrorText());
+        dac_.reset();
+        return false;
+    }
+
+    // Feed back the actual negotiated values.
+    config_.frames = frames;
+    Audio::set_frames(frames);
+    Audio::set_sample_rate(config_.sample_rate);
+
+    err = dac_->startStream();
+    if (err != RTAUDIO_NO_ERROR) {
+        spdlog::error("AudioSystem::Start: startStream failed: {}",
+                      dac_->getErrorText());
+        dac_->closeStream();
+        dac_.reset();
+        return false;
+    }
+
+    spdlog::info("AudioSystem: started, sample_rate={} frames={} out_chans={}",
+                 config_.sample_rate, frames, num_out_chans_);
+    return true;
 }
 
 void AudioSystem::Stop() {
-    if (dac_ && dac_->isStreamRunning())
-        dac_->stopStream();
+    if (!dac_)
+        return;
+
+    if (dac_->isStreamRunning()) {
+        auto err = dac_->stopStream();
+        if (err != RTAUDIO_NO_ERROR) {
+            spdlog::error("AudioSystem::Stop: stopStream failed: {}",
+                          dac_->getErrorText());
+        }
+    }
+    if (dac_->isStreamOpen()) {
+        dac_->closeStream();
+    }
+    dac_.reset();
 }
+
+bool AudioSystem::IsRunning() const { return dac_ && dac_->isStreamRunning(); }
 
 } // namespace augr

@@ -263,9 +263,6 @@ public:
     RackDoc &doc() { return *doc_; }
 
     // ---------- Data members ----------
-
-    // RackDoc *doc_ = nullptr;
-    // RackView *view_ = nullptr;
 private:
     void RebuildView() { view_ = std::make_unique<RackView>(doc_->rack()); }
 

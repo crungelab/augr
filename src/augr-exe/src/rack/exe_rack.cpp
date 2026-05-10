@@ -31,8 +31,8 @@ int ExeRack::ProcessAudio(double streamTime, void *inbuf, void *outbuf,
     if (output.layout() != ChannelLayout::kNull) {
         output.WritePlanar(static_cast<fy_buffer_t>(outbuf), SCALE);
     } else {
-        std::fill_n(static_cast<fy_real *>(outbuf), frames * config_.audio_output_channels,
-                    0.0f);
+        std::fill_n(static_cast<fy_real *>(outbuf),
+                    frames * config_.audio_output_channels, 0.0f);
     }
 
     ProcessUpdateActions();
@@ -48,9 +48,9 @@ void ExeRack::Create(Part *owner) {
     audio_cfg.sample_rate = config_.sample_rate;
     audio_cfg.frames = config_.frames;
     audio_cfg.enableInput = (config_.audio_input_channels > 0);
-    audio_system_.Create(audio_cfg);
+    audio_system_.Configure(audio_cfg);
 
-    midi_system_.Create();
+    midi_system_.Configure();
 
     // Backend may have settled on different values than we requested.
     // Reflect the actual values back into config_ so subsequent
@@ -67,9 +67,14 @@ void ExeRack::Create(Part *owner) {
     Rack::Create(owner);
 }
 
-bool ExeRack::Start() { return audio_system_.Start(); }
+bool ExeRack::Start() {
+    bool success = Rack::Start();
+    audio_system_.Start();
+    return success;
+}
 
 void ExeRack::Stop() {
+    Rack::Stop();
     audio_system_.Stop();
     midi_system_.Stop();
 }
