@@ -14,8 +14,8 @@ public:
     ExeRack() = default;
     REFLECT_ENABLE(Rack)
     void Create(Part *owner = nullptr) override;
-    bool Start();
-    void Stop();
+    bool Start() override;
+    void Stop() override;
 
     // Called by AudioSystem::Callback on the audio thread
     int ProcessAudio(double streamTime, void *inbuf, void *outbuf,

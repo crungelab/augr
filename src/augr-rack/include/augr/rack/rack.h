@@ -42,6 +42,9 @@ public:
     void ProcessUpdateActions();
 
     void RebuildExecutionOrder();
+    //
+    virtual bool Start() { return true; }
+    virtual void Stop() {}
     // Accessors
     static Rack &singleton() { return *singleton_; }
     // Data members

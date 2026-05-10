@@ -1,30 +1,34 @@
 #pragma once
 
-#include <augite/shell/shell.h>
-
 #include <augite/app/clipboard.h>
+
+#include "base_app.h"
 
 namespace augr {
 
-class App : public Window {
+class Rack;
+
+class App : public BaseApp {
 public:
     App();
 
     void CreateContext() override;
 
     bool DoCreate(CreateParams params) override;
-    bool PostCreate(CreateParams params) override;
-    void Destroy() override;
+    //bool PostCreate(CreateParams params) override;
+    //void Destroy() override;
 
-    void Render() override;
+    //void Render() override;
 
     // Accessors
     static App &singleton() { return *singleton_; }
     Clipboard &clipboard() { return clipboard_; }
+    Rack& rack() { return *rack_; }
 
     // Data members
     static App *singleton_;
     Clipboard clipboard_;
+    Rack* rack_ = nullptr;
 };
 
 } // namespace augr
