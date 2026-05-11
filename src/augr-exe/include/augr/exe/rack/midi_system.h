@@ -7,6 +7,7 @@
 #include <RtMidi.h>
 
 #include <augr/core/midi/midi_message.h>
+#include <augr/exe/rack/midi_configurator.h>
 
 namespace augr {
 
@@ -17,8 +18,10 @@ public:
     explicit MidiSystem(ExeRack &rack);
     ~MidiSystem();
 
-    bool Configure();
+    bool Configure(MidiConfig &config);
+    bool Start();
     void Stop();
+    bool IsRunning() const;
 
     unsigned int port_count() const;
 
@@ -35,6 +38,10 @@ private:
     ExeRack &rack_;
     std::vector<std::unique_ptr<RtMidiIn>> inputs_;
     std::vector<std::unique_ptr<PortCallbackData>> callback_data_;
+
+    MidiConfig config_{};
+    std::vector<std::string> port_names_;
+    bool configured_ = false;
 };
 
 } // namespace augr

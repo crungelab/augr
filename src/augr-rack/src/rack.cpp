@@ -14,6 +14,10 @@ namespace augr {
 
 Rack *Rack::singleton_;
 
+Rack::~Rack() {
+    Stop();
+}
+
 void Rack::CreateDefaultDevices() {
     if (config_.audio_input_channels > 0)
         CreateAudioInputDevice();
@@ -24,12 +28,6 @@ void Rack::CreateDefaultDevices() {
         CreateMidiOutputDevice();
 }
 
-/*
-void Rack::CreateDefaultDevices() {
-    CreateAudioOutputDevice();
-    CreateMidiInputDevice();
-}
-*/
 
 /*
 void Rack::OnAddingChild(Model &model) {

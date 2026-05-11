@@ -12,22 +12,20 @@ MidiSystem::MidiSystem(ExeRack &rack) : rack_(rack) {}
 
 MidiSystem::~MidiSystem() { Stop(); }
 
-void MidiSystem::Callback(double timestamp,
-                          std::vector<unsigned char>* raw,
-                          void* userdata) {
-  if (!raw || raw->empty()) return;
+void MidiSystem::Callback(double timestamp, std::vector<unsigned char> *raw,
+                          void *userdata) {
+    if (!raw || raw->empty())
+        return;
 
-  MidiMessage message = MidiMessage::FromBytes(
-      raw->data(),
-      static_cast<uint8_t>(raw->size()),
-      timestamp);
+    MidiMessage message = MidiMessage::FromBytes(
+        raw->data(), static_cast<uint8_t>(raw->size()), timestamp);
 
-  auto* data = static_cast<PortCallbackData*>(userdata);
-  LogMidiMessage(message, data->port_name);
-  data->system->rack_.EnqueueMidiMessage(std::move(message));
+    auto *data = static_cast<PortCallbackData *>(userdata);
+    LogMidiMessage(message, data->port_name);
+    data->system->rack_.EnqueueMidiMessage(std::move(message));
 }
 
-bool MidiSystem::Configure() {
+bool MidiSystem::Configure(MidiConfig &config) {
     std::unique_ptr<RtMidiIn> probe;
     try {
         probe =
@@ -38,16 +36,37 @@ bool MidiSystem::Configure() {
         return false;
     }
 
-    MidiConfig config;
-    config.openAllDevicePorts = true;
-
     MidiConfigurator configurator(*probe);
     if (!configurator.configure(config)) {
         return false;
     }
 
-    for (unsigned int port_index : config.inputPortIndices) {
-        std::string name = probe->getPortName(port_index);
+    // Cache the resolved config (port indices + names) for Start().
+    config_ = config;
+    // Capture port names now while the probe is alive, so Start() doesn't
+    // need to re-probe.
+    port_names_.clear();
+    for (unsigned int idx : config_.inputPortIndices) {
+        port_names_.push_back(probe->getPortName(idx));
+    }
+    configured_ = true;
+    return true;
+}
+
+bool MidiSystem::Start() {
+    if (!configured_) {
+        spdlog::error(
+            "MidiSystem::Start: not configured; call Configure() first");
+        return false;
+    }
+    if (!inputs_.empty()) {
+        return true; // already started; idempotent
+    }
+
+    for (size_t i = 0; i < config_.inputPortIndices.size(); ++i) {
+        unsigned int port_index = config_.inputPortIndices[i];
+        const std::string &name = port_names_[i];
+
         try {
             auto midi_in = std::make_unique<RtMidiIn>(
                 RtMidi::LINUX_ALSA, "augr-midi-" + std::to_string(port_index));
@@ -75,7 +94,6 @@ bool MidiSystem::Configure() {
     if (inputs_.empty()) {
         spdlog::warn("MidiSystem: no usable MIDI input ports opened");
     }
-
     return true;
 }
 
@@ -89,6 +107,8 @@ void MidiSystem::Stop() {
     inputs_.clear();
     callback_data_.clear();
 }
+
+bool MidiSystem::IsRunning() const { return !inputs_.empty(); }
 
 unsigned int MidiSystem::port_count() const {
     return static_cast<unsigned int>(inputs_.size());

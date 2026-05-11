@@ -50,7 +50,10 @@ void ExeRack::Create(Part *owner) {
     audio_cfg.enableInput = (config_.audio_input_channels > 0);
     audio_system_.Configure(audio_cfg);
 
-    midi_system_.Configure();
+    MidiConfig midi_config;
+    midi_config.openAllDevicePorts = true;
+
+    midi_system_.Configure(midi_config);
 
     // Backend may have settled on different values than we requested.
     // Reflect the actual values back into config_ so subsequent
@@ -70,6 +73,7 @@ void ExeRack::Create(Part *owner) {
 bool ExeRack::Start() {
     bool success = Rack::Start();
     audio_system_.Start();
+    midi_system_.Start();
     return success;
 }
 

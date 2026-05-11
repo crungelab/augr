@@ -19,7 +19,7 @@ class MidiOutputDevice;
 class Rack : public Graph {
 public:
     Rack() { singleton_ = this; }
-    virtual ~Rack() {}
+    virtual ~Rack();
     //
     void CreateDefaultDevices();
     //
