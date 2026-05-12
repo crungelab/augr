@@ -44,34 +44,18 @@ class PhaserDspImpl final : public PhaserDsp {
 };
 DEFINE_MODEL_FACTORY(PhaserDspImpl, "Phaser", "Effect")
 
-class MyApp final : public App {
-public:
-    MyApp() {
-        REGISTER_MODEL_FACTORY(FrenchBellDspImpl);
-        REGISTER_MODEL_FACTORY(OscDspImpl);
-        REGISTER_MODEL_FACTORY(FreeVerbDspImpl);
-        REGISTER_MODEL_FACTORY(FlangerDspImpl);
-        REGISTER_MODEL_FACTORY(PhaserDspImpl);
-
-        view_ = new RackView(rack_);
-    }
-
-    void Draw() override {
-        App::Draw();
-        view_->Draw();
-    }
-    // Data members
-    ExeRack rack_;
-    RackView *view_;
-};
-
 int main(int, char **) {
-    MyApp &app = *new MyApp();
-    ExeRack &rack = app.rack_;
-    rack.Create();
-    rack.CreateDefaultDevices();
+    REGISTER_MODEL_FACTORY(ExeRack);
 
-    rack.Start();
-    app.Run();
-    rack.Stop();
+    REGISTER_MODEL_FACTORY(FrenchBellDspImpl);
+    REGISTER_MODEL_FACTORY(OscDspImpl);
+    REGISTER_MODEL_FACTORY(FreeVerbDspImpl);
+    REGISTER_MODEL_FACTORY(FlangerDspImpl);
+    REGISTER_MODEL_FACTORY(PhaserDspImpl);
+
+    App &app = *new App();
+
+    app.Run(augr::Window::RunParams("Augr Raw DAW"));
+
+    return 0;
 }

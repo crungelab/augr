@@ -1,45 +1,26 @@
-#include <spdlog/spdlog.h>
 #include <spdlog/sinks/stdout_color_sinks.h>
+#include <spdlog/spdlog.h>
 
 #include <augr/core/model_manufacturer.h>
 
 #include <augr/exe/rack/exe_rack.h>
-#include <augr/faust/faust_dsp.h>
-#include <augr/faust/faust_dsp_ui.h>
-#include <augr/rack/module/module.h>
 
-#include <augite/app/app.h>
-
-#include <augite/view/rack_view.h>
-#include <augite/widget/widget_manufacturer.h>
+#include <augite/app/rack_app.h>
 
 using namespace augr;
 
-class MyApp final : public App {
-public:
-    MyApp() {
-        extern void InitAugrRackLibrary();
-        InitAugrRackLibrary();
-        extern void InitAugrVoltLibrary();
-        InitAugrVoltLibrary();
-        extern void InitAugrFmLibrary();
-        InitAugrFmLibrary();
-        extern void InitFaustDspLibrary();
-        InitFaustDspLibrary();
-        // Create the rack view
-        view_ = new RackView(rack_);
-    }
+int main(int, char **) {
+    REGISTER_MODEL_FACTORY(ExeRack);
+    
+    extern void InitAugrRackLibrary();
+    InitAugrRackLibrary();
+    extern void InitAugrVoltLibrary();
+    InitAugrVoltLibrary();
+    extern void InitAugrFmLibrary();
+    InitAugrFmLibrary();
+    extern void InitFaustDspLibrary();
+    InitFaustDspLibrary();
 
-    void Draw() override {
-        App::Draw();
-        view_->Draw();
-    }
-    // Data members
-    ExeRack rack_;
-    RackView *view_;
-};
-
-int main(int, char**) {
     auto logger = spdlog::stdout_color_mt("console");
     spdlog::set_default_logger(logger);
 
@@ -48,16 +29,6 @@ int main(int, char**) {
 
     spdlog::debug("This message should be displayed.");
 
-    MyApp &app = *new MyApp();
-    ExeRack &rack = app.rack_;
-    rack.Create();
-    rack.CreateDefaultDevices();
-
-    bool success = rack.Start();
-    if (!success) {
-        spdlog::error("Failed to start the rack.");
-        return 1;
-    }
-    app.Run();
-    rack.Stop();
+    RackApp app;
+    app.Run(augr::Window::RunParams("Augr DAW"));
 }

@@ -22,7 +22,6 @@ X11Window::X11Window()
 
 X11Window::~X11Window()
 {
-    Destroy();
 }
 
 void X11Window::NativeAttachTo(void* nativeParent)

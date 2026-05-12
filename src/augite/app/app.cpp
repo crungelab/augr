@@ -1,6 +1,4 @@
 #include "imgui.h"
-#include <backends/imgui_impl_sdl3.h>
-#include <backends/imgui_impl_sdlgpu3.h>
 
 #include "imnodes.h"
 #include "implot.h"
@@ -53,6 +51,11 @@ void App::CreateContext() {
     system_container_.Add(new ImPlotSystem());
     system_container_.Add(new ImNodesSystem());
     system_container_.Create();
+}
+
+void App::Draw() {
+    view_->Draw();
+    BaseApp::Draw();
 }
 
 } // namespace augr

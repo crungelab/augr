@@ -62,7 +62,7 @@ class MidiOutputDeviceArchiver : public ModuleArchiver {};
 DEFINE_ARCHIVER_FACTORY(MidiOutputDeviceArchiver, MidiOutputDevice,
                         "MidiOutputDevice")
 
-DEFINE_MODEL_FACTORY(ExeRack, "Rack", "Rack")
+//DEFINE_MODEL_FACTORY(ExeRack, "Rack", "Rack")
 DEFINE_MODEL_FACTORY(AudioInputDevice, "AudioInputDevice", "Rack")
 DEFINE_MODEL_FACTORY(AudioOutputDevice, "AudioOutputDevice", "Rack")
 DEFINE_MODEL_FACTORY(MidiInputDevice, "MidiInputDevice", "Rack")
@@ -81,7 +81,7 @@ public:
         DrawMenuBar();
         DrawUnsavedModal();
         view_->Draw();
-        App::Draw();
+        //App::Draw();
     }
 
     void DrawMenuBar() {
@@ -302,16 +302,7 @@ int main(int, char **) {
     auto *app = new MyApp();
     auto &rack = app->rack();
 
-    /*
-    bool success = rack.Start();
-    if (!success) {
-        spdlog::error("Failed to start the rack.");
-        return 1;
-    }
-    */
-
     app->Run(augr::Window::RunParams("Augr Bubble"));
-    //rack.Stop();
 
     return 0;
 }

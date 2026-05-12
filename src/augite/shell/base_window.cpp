@@ -20,7 +20,6 @@ BaseWindow::BaseWindow()
 
 BaseWindow::~BaseWindow()
 {
-    Destroy();
 }
 
 bool BaseWindow::DoCreate(CreateParams params)

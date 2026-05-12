@@ -24,7 +24,8 @@ public:
     }
     virtual void DrawChild(Widget &child) { child.Draw(); }
     // Accessors
-    virtual Model *model() = 0;
+    //virtual Model *model() = 0;
+    virtual Model *model() { return nullptr; }
     // Data members
     std::vector<Widget *> children_;
 };

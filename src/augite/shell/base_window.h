@@ -4,12 +4,11 @@
 #include <memory>
 #include <string>
 
-// #include <mutex>
-// #include <queue>
-
 #include "imgui.h"
 
 #include "../system/system.h"
+
+#include "../widget/widget.h"
 
 struct SDL_Window;
 struct SDL_GPUDevice;
@@ -17,7 +16,7 @@ union SDL_Event;
 
 namespace augr {
 
-class BaseWindow {
+class BaseWindow : public Widget {
 public:
     struct Point {
         unsigned int x;
@@ -134,7 +133,6 @@ public:
 
     //
     virtual void Render() {}
-    virtual void Draw() {}
     // Events
     virtual void OnWindowRefresh() { Render(); }
     virtual void OnWindowSize(int width, int height) {}

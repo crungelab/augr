@@ -3,10 +3,9 @@
 #include <augite/app/clipboard.h>
 
 #include "base_app.h"
+#include "../view/view.h"
 
 namespace augr {
-
-class Rack;
 
 class App : public BaseApp {
 public:
@@ -15,16 +14,16 @@ public:
     void CreateContext() override;
 
     bool DoCreate(CreateParams params) override;
+    void Draw() override;
 
     // Accessors
     static App &singleton() { return *singleton_; }
     Clipboard &clipboard() { return clipboard_; }
-    Rack& rack() { return *rack_; }
 
     // Data members
     static App *singleton_;
+    View* view_;
     Clipboard clipboard_;
-    Rack* rack_ = nullptr;
 };
 
 } // namespace augr

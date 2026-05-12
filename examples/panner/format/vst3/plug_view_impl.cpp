@@ -42,7 +42,6 @@ void PlugViewImpl::Run()
 
 tresult PLUGIN_API PlugViewImpl::removed()
 {
-    //app_->Destroy();
     app_->RequestClose();
     running_ = false;
     if (renderThread_.joinable())
