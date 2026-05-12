@@ -5,9 +5,9 @@
 
 namespace augr {
 
-class NumEntryWidget : public WidgetT<NumEntry> {
+class NumEntryWidget : public ModelWidgetT<NumEntry> {
 public:
-    NumEntryWidget(NumEntry &model) : WidgetT<NumEntry>(model) {}
+    NumEntryWidget(NumEntry &model) : ModelWidgetT<NumEntry>(model) {}
 
     void Draw() override {
         FloatParameter *param = model_->param();
@@ -17,6 +17,6 @@ public:
             param->set_value(static_cast<fy_real>(value));
     }
 };
-DEFINE_WIDGET_FACTORY(NumEntryWidget, NumEntry)
+DEFINE_MODEL_WIDGET_FACTORY(NumEntryWidget, NumEntry)
 
 } // namespace augr

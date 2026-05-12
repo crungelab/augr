@@ -127,6 +127,6 @@ private:
     }
 };
 
-DEFINE_WIDGET_FACTORY(HBoxWidget, HBox)
+DEFINE_MODEL_WIDGET_FACTORY(HBoxWidget, HBox)
 
 } // namespace augr

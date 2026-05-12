@@ -103,6 +103,6 @@ void SpectralWidget::DrawContent() {
     }
 }
 
-DEFINE_WIDGET_FACTORY(SpectralWidget, SpectralModule)
+DEFINE_MODEL_WIDGET_FACTORY(SpectralWidget, SpectralModule)
 
 } // namespace augr

@@ -5,6 +5,6 @@
 
 namespace augr {
 
-DEFINE_WIDGET_FACTORY(RackWidget, Rack)
+DEFINE_MODEL_WIDGET_FACTORY(RackWidget, Rack)
 
 } // namespace augr

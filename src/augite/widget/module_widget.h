@@ -11,12 +11,8 @@ namespace augr {
 
 class Module;
 
-class ModuleWidget : public Widget {
+class ModuleWidget : public ModelWidget {
 public:
-    //void Draw() override;
-    //virtual void DrawNode();
-    //virtual void DrawWindow();
-
     void ShowWindow() { is_open_ = true; }
     void HideWindow() { is_open_ = false; }
 
@@ -25,9 +21,9 @@ public:
     std::string window_name_;
 };
 
-template <typename T> class ModuleWidgetT : public WidgetT<T, ModuleWidget> {
+template <typename T> class ModuleWidgetT : public ModelWidgetT<T, ModuleWidget> {
 public:
-    explicit ModuleWidgetT(T &model) : WidgetT<T, ModuleWidget>(model) {
+    explicit ModuleWidgetT(T &model) : ModelWidgetT<T, ModuleWidget>(model) {
         this->window_name_ = std::string(this->model_->label_) + "###module_" +
                              std::to_string(this->model_->id_);
     }
@@ -84,9 +80,9 @@ public:
 using DefaultModuleWidget = ModuleWidgetT<Module>;
 
 /*
-class ModuleWidget : public WidgetT<Module> {
+class ModuleWidget : public ModelWidgetT<Module> {
 public:
-    ModuleWidget(Module &model) : WidgetT<Module>(model) {
+    ModuleWidget(Module &model) : ModelWidgetT<Module>(model) {
         window_name_ = std::string(model_->label_) + "###module_" +
                        std::to_string(model_->id_);
     }

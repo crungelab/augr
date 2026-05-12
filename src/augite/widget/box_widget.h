@@ -4,9 +4,9 @@
 
 namespace augr {
 
-template <typename T> class BoxWidgetT : public WidgetT<T> {
+template <typename T> class BoxWidgetT : public ModelWidgetT<T> {
 public:
-    BoxWidgetT(T &model) : WidgetT<T>(model) {}
+    BoxWidgetT(T &model) : ModelWidgetT<T>(model) {}
 
     void DrawHeader() {
         if (!this->model_->is_top_level_) {

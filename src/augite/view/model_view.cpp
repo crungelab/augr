@@ -8,8 +8,8 @@
 namespace augr {
 
 void ModelView::Build() {
-  WidgetBuilder builder;
-  root_ = builder.Build(*model());
+    ModelWidgetBuilder builder;
+    root_ = builder.Build(*model());
 }
 
 } // namespace augr

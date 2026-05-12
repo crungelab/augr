@@ -6,9 +6,9 @@ namespace augr {
 
 class Rack;
 
-class RackWidget : public WidgetT<Rack> {
+class RackWidget : public ModelWidgetT<Rack> {
 public:
-  RackWidget(Rack& model) : WidgetT<Rack>(model) {}
+  RackWidget(Rack& model) : ModelWidgetT<Rack>(model) {}
   //virtual void Draw();
 };
 

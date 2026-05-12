@@ -43,11 +43,10 @@ void RackView::PopulateWidgetMap(Widget *widget) {
     if (!widget)
         return;
 
-    if (widget->model()) {
-        widget_map_[widget->model()->id_] = widget;
+    if (auto *mw = dynamic_cast<ModelWidget *>(widget)) {
+        widget_map_[mw->model()->id_] = mw;
     }
 
-    // Recursively process children
     for (auto *child : widget->children_) {
         PopulateWidgetMap(child);
     }
@@ -217,7 +216,7 @@ void RackView::DrawModuleCatalog() {
             if (ImGui::Selectable(it->name_.c_str())) {
                 Module &module = dynamic_cast<Module &>(*it->Produce(model_));
 
-                WidgetBuilder builder;
+                ModelWidgetBuilder builder;
                 Widget *widget = builder.Build(module);
                 root_->AddChild(widget);
                 widget_map_[module.id_] = widget;

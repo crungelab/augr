@@ -3,11 +3,11 @@
 namespace augr {
 
 class Model;
-class Widget;
+class ModelWidget;
 
-class WidgetBuilder {
+class ModelWidgetBuilder {
 public:
-  virtual Widget* Build(Model& model);
+    virtual ModelWidget *Build(Model &model);
 };
 
 } // namespace augr

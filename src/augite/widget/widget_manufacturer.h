@@ -7,24 +7,24 @@
 
 namespace augr {
 
-class WidgetFactory;
+class ModelWidgetFactory;
 
-class WidgetManufacturer {
+class ModelWidgetManufacturer {
 public:
-    static WidgetManufacturer &singleton() noexcept {
-        static WidgetManufacturer *self = new WidgetManufacturer();
+    static ModelWidgetManufacturer &singleton() noexcept {
+        static ModelWidgetManufacturer *self = new ModelWidgetManufacturer();
         return *self;
     }
-    void AddFactory(WidgetFactory &factory);
-    WidgetFactory *GetFactory(std::type_index &key);
-    WidgetFactory *FindFactory(const std::type_index &type);
+    void AddFactory(ModelWidgetFactory &factory);
+    ModelWidgetFactory *GetFactory(std::type_index &key);
+    ModelWidgetFactory *FindFactory(const std::type_index &type);
     // Data members
-    std::vector<WidgetFactory *> factories_;
-    std::map<std::type_index, WidgetFactory *> factory_type_map_;
+    std::vector<ModelWidgetFactory *> factories_;
+    std::map<std::type_index, ModelWidgetFactory *> factory_type_map_;
 };
 
-#define REGISTER_WIDGET_FACTORY(T)                                             \
-    extern WidgetFactory *Get##T##Factory();                                   \
-    WidgetManufacturer::singleton().AddFactory(*Get##T##Factory());
+#define REGISTER_MODEL_WIDGET_FACTORY(T)                                       \
+    extern ModelWidgetFactory *Get##T##Factory();                              \
+    ModelWidgetManufacturer::singleton().AddFactory(*Get##T##Factory());
 
 } // namespace augr

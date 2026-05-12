@@ -5,9 +5,9 @@
 
 namespace augr {
 
-class ButtonWidget : public WidgetT<Button> {
+class ButtonWidget : public ModelWidgetT<Button> {
 public:
-    ButtonWidget(Button &model) : WidgetT<Button>(model) {}
+    ButtonWidget(Button &model) : ModelWidgetT<Button>(model) {}
 
     void Draw() override {
         FloatParameter *param = model_->param();
@@ -15,6 +15,6 @@ public:
         param->set_value(ImGui::IsItemActive() ? param->max() : param->min());
     }
 };
-DEFINE_WIDGET_FACTORY(ButtonWidget, Button)
+DEFINE_MODEL_WIDGET_FACTORY(ButtonWidget, Button)
 
 } // namespace augr

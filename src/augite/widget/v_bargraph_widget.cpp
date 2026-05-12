@@ -151,10 +151,10 @@ inline void DrawVBargraphCore(const char *label, float unit,
 // Widget
 // ---------------------------------------------------------------------------
 
-class VBarGraphWidget : public WidgetT<VBarGraph> {
+class VBarGraphWidget : public ModelWidgetT<VBarGraph> {
 public:
     explicit VBarGraphWidget(VBarGraph &model)
-        : WidgetT<VBarGraph>(model) {}
+        : ModelWidgetT<VBarGraph>(model) {}
 
     void Draw() override {
         FloatParameter *param = model_->param();
@@ -169,6 +169,6 @@ private:
     VBarPeakState peak_;
 };
 
-DEFINE_WIDGET_FACTORY(VBarGraphWidget, VBarGraph)
+DEFINE_MODEL_WIDGET_FACTORY(VBarGraphWidget, VBarGraph)
 
 } // namespace augr

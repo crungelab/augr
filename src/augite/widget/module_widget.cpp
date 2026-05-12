@@ -52,6 +52,6 @@ void ModuleWidget::DrawNode() {
 }
 */
 
-DEFINE_WIDGET_FACTORY(DefaultModuleWidget, Module)
+DEFINE_MODEL_WIDGET_FACTORY(DefaultModuleWidget, Module)
 
 } // namespace augr

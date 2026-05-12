@@ -6,10 +6,10 @@
 
 namespace augr {
 
-class HBarGraphWidget : public WidgetT<HBarGraph> {
+class HBarGraphWidget : public ModelWidgetT<HBarGraph> {
 public:
     HBarGraphWidget(HBarGraph &model)
-        : WidgetT<HBarGraph>(model) {}
+        : ModelWidgetT<HBarGraph>(model) {}
 
     void Draw() override {
         FloatParameter *param = model_->param();
@@ -19,6 +19,6 @@ public:
         ImGui::ProgressBar(t, ImVec2(-FLT_MIN, 0), overlay.c_str());
     }
 };
-DEFINE_WIDGET_FACTORY(HBarGraphWidget, HBarGraph)
+DEFINE_MODEL_WIDGET_FACTORY(HBarGraphWidget, HBarGraph)
 
 } // namespace augr

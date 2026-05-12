@@ -214,6 +214,6 @@ ImVec2(ImGui::GetStyle().ItemSpacing.x, ImGui::GetStyle().ItemSpacing.y *
     */
 };
 
-DEFINE_WIDGET_FACTORY(VBoxWidget, VBox)
+DEFINE_MODEL_WIDGET_FACTORY(VBoxWidget, VBox)
 
 } // namespace augr

@@ -2,8 +2,8 @@
 
 #include "app.h"
 
-#include <augr/rack/rack_doc.h>
 #include <augr/rack/rack.h>
+#include <augr/rack/rack_doc.h>
 
 namespace augr {
 
@@ -14,8 +14,7 @@ public:
     RackApp();
 
     // Accessors
-    Rack& rack() { return doc_.rack(); }
-    Model *model() override { return &rack(); }
+    Rack &rack() { return doc_.rack(); }
 
     // Data members
     static RackApp *singleton_;

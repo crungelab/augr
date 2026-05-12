@@ -5,9 +5,9 @@
 
 namespace augr {
 
-class CheckButtonWidget : public WidgetT<CheckButton> {
+class CheckButtonWidget : public ModelWidgetT<CheckButton> {
 public:
-    CheckButtonWidget(CheckButton &model) : WidgetT<CheckButton>(model) {}
+    CheckButtonWidget(CheckButton &model) : ModelWidgetT<CheckButton>(model) {}
 
     void Draw() override {
         FloatParameter *param = model_->param();
@@ -17,6 +17,6 @@ public:
             param->set_value(checked ? param->max() : param->min());
     }
 };
-DEFINE_WIDGET_FACTORY(CheckButtonWidget, CheckButton)
+DEFINE_MODEL_WIDGET_FACTORY(CheckButtonWidget, CheckButton)
 
 } // namespace augr

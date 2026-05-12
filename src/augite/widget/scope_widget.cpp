@@ -98,6 +98,6 @@ void ScopeWidget::DrawContent() {
     ModuleWidgetT<ScopeModule>::DrawContent(); // draw parameters below the scope display
 }
 
-DEFINE_WIDGET_FACTORY(ScopeWidget, ScopeModule)
+DEFINE_MODEL_WIDGET_FACTORY(ScopeWidget, ScopeModule)
 
 } // namespace augr

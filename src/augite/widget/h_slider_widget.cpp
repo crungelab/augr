@@ -5,9 +5,9 @@
 
 namespace augr {
 
-class HSliderWidget : public WidgetT<HSlider> {
+class HSliderWidget : public ModelWidgetT<HSlider> {
 public:
-    HSliderWidget(HSlider &model) : WidgetT<HSlider>(model) {}
+    HSliderWidget(HSlider &model) : ModelWidgetT<HSlider>(model) {}
 
     void Draw() override {
         FloatParameter *param = model_->param();
@@ -23,6 +23,6 @@ public:
             ImGui::SetTooltip("%s", param->Format().c_str());
     }
 };
-DEFINE_WIDGET_FACTORY(HSliderWidget, HSlider)
+DEFINE_MODEL_WIDGET_FACTORY(HSliderWidget, HSlider)
 
 } // namespace augr

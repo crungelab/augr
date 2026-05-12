@@ -5,9 +5,9 @@
 
 namespace augr {
 
-class ComboWidget : public WidgetT<Combo> {
+class ComboWidget : public ModelWidgetT<Combo> {
 public:
-    ComboWidget(Combo &model) : WidgetT<Combo>(model) {}
+    ComboWidget(Combo &model) : ModelWidgetT<Combo>(model) {}
 
     void Draw() {
         auto *param = model_->param();
@@ -40,6 +40,6 @@ public:
     }
 };
 
-DEFINE_WIDGET_FACTORY(ComboWidget, Combo)
+DEFINE_MODEL_WIDGET_FACTORY(ComboWidget, Combo)
 
 } // namespace augr

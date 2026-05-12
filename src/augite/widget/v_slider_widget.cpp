@@ -5,9 +5,9 @@
 
 namespace augr {
 
-class VSliderWidget : public WidgetT<VSlider> {
+class VSliderWidget : public ModelWidgetT<VSlider> {
 public:
-    VSliderWidget(VSlider& model) : WidgetT<VSlider>(model) {}
+    VSliderWidget(VSlider& model) : ModelWidgetT<VSlider>(model) {}
 
     void Draw() override {
         ImVec2 size(64, 128);
@@ -25,6 +25,6 @@ public:
             ImGui::SetTooltip("%s", param->Format().c_str());
     }
 };
-DEFINE_WIDGET_FACTORY(VSliderWidget, VSlider)
+DEFINE_MODEL_WIDGET_FACTORY(VSliderWidget, VSlider)
 
 } // namespace augr

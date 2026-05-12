@@ -6,9 +6,9 @@
 
 namespace augr {
 
-class KnobWidget : public WidgetT<Knob> {
+class KnobWidget : public ModelWidgetT<Knob> {
 public:
-    KnobWidget(Knob &model) : WidgetT<Knob>(model) {}
+    KnobWidget(Knob &model) : ModelWidgetT<Knob>(model) {}
 
     void Draw() override {
         FloatParameter *param = model_->param();
@@ -41,12 +41,12 @@ public:
             param->ResetToInit();
     }
 };
-DEFINE_WIDGET_FACTORY(KnobWidget, Knob)
+DEFINE_MODEL_WIDGET_FACTORY(KnobWidget, Knob)
 
 /*
-class KnobWidget : public WidgetT<Knob> {
+class KnobWidget : public ModelWidgetT<Knob> {
 public:
-    KnobWidget(Knob &model) : WidgetT<Knob>(model) {}
+    KnobWidget(Knob &model) : ModelWidgetT<Knob>(model) {}
 
     void Draw() override {
         FloatParameter *param = model_->param();
@@ -61,7 +61,7 @@ public:
             param->ResetToInit();
     }
 };
-DEFINE_WIDGET_FACTORY(KnobWidget, Knob)
+DEFINE_MODEL_WIDGET_FACTORY(KnobWidget, Knob)
 */
 
 } // namespace augr

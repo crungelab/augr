@@ -9,6 +9,7 @@ class Widget;
 
 class ModelView : public View {
 public:
+    virtual Model *model() = 0;
     virtual void Build();
     // Data members
     Widget *root_ = nullptr;
