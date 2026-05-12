@@ -4,15 +4,16 @@
 
 #include "imgui.h"
 
-#include "model_view.h"
+#include "document_view.h"
 
 namespace augr {
 
 class Rack;
+class RackDoc;
 
-class RackView : public ModelViewT<Rack> {
+class RackView : public DocumentViewT<RackDoc> {
 public:
-    RackView(Rack &rack);
+    RackView(RackDoc &doc);
     ~RackView();
     void Build() override;
     void PopulateWidgetMap(Widget *widget);
@@ -21,7 +22,6 @@ public:
 
     void DrawMainDockspace();
     void DrawModuleCatalog();
-
 
     void CheckLinkCreated();
     void CheckLinkDestroyed();
@@ -35,13 +35,13 @@ private:
     void SaveEditorState();
 
     // Data members
+    Rack *rack_ = nullptr; // = &doc_->rack(), cached for convenience
     std::map<int, Widget *> widget_map_;
     bool is_editor_hovered_ = false;
     int hovered_node_id = -1;
     int pending_link_start_attr = -1;
     ImVec2 pending_spawn_pos = ImVec2(0, 0);
     std::vector<int> selected_nodes_;
-
 };
 
 } // namespace augr

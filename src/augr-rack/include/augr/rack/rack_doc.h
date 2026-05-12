@@ -6,11 +6,13 @@
 #include <optional>
 #include <string>
 
+#include <augr/core/document.h>
+
 namespace augr {
 
 class Rack;
 
-class RackDoc {
+class RackDoc : public DocumentT<Rack> {
 public:
     RackDoc() = default;
     ~RackDoc(); // out-of-line because Rack is forward-declared
@@ -24,28 +26,9 @@ public:
     void Stop();
     bool IsRunning() const;
 
-    Rack &rack() { return *rack_; }
-    const Rack &rack() const { return *rack_; }
-    bool HasRack() const { return rack_ != nullptr; }
-
-    const std::optional<std::filesystem::path> &Path() const { return path_; }
-    bool IsModified() const { return modified_; }
-    void MarkModified() { modified_ = true; }
-
-    std::string DisplayName() const {
-        std::string base = path_ ? path_->filename().string() : "Untitled";
-        return modified_ ? base + "*" : base;
-    }
-
-protected:
-    void SetPath(std::filesystem::path p) { path_ = std::move(p); }
-    void ClearPath() { path_.reset(); }
-    void MarkClean() { modified_ = false; }
-
-private:
-    std::unique_ptr<Rack> rack_;
-    std::optional<std::filesystem::path> path_;
-    bool modified_ = false;
+    Rack &rack() { return *model_; }
+    const Rack &rack() const { return *model_; }
+    bool HasRack() const { return model_ != nullptr; }
 };
 
 } // namespace augr

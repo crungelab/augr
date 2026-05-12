@@ -14,6 +14,7 @@ public:
     RackApp();
 
     // Accessors
+    RackDoc &doc() { return doc_; }
     Rack &rack() { return doc_.rack(); }
 
     // Data members

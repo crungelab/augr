@@ -93,7 +93,7 @@ RackDoc::~RackDoc() {
 bool RackDoc::Save(const std::filesystem::path &p) {
     try {
         nlohmann::json j;
-        if (!RackToJson(*rack_, j))
+        if (!RackToJson(rack(), j))
             return false;
         std::ofstream out(p);
         out << j.dump(2);
@@ -125,7 +125,7 @@ bool RackDoc::Load(const std::filesystem::path& p, bool auto_start) {
 
         // Stop old, swap, optionally start new.
         Stop();
-        rack_ = std::move(fresh);
+        model_ = std::move(fresh);
 
         SetPath(p);
         MarkClean();
@@ -149,7 +149,7 @@ void RackDoc::NewDocument(bool auto_start) {
     fresh->CreateDefaultDevices();
 
     Stop();
-    rack_ = std::move(fresh);
+    model_ = std::move(fresh);
     ClearPath();
     MarkClean();
 
@@ -159,10 +159,10 @@ void RackDoc::NewDocument(bool auto_start) {
 }
 
 bool RackDoc::Start() {
-    if (!rack_) return false;
-    if (rack_->IsRunning()) return true;
+    if (!model_) return false;
+    if (model_->IsRunning()) return true;
     try {
-        rack_->Start();
+        model_->Start();
         return true;
     } catch (const std::exception& e) {
         std::cerr << "RackDoc::Start failed: " << e.what() << "\n";
@@ -171,13 +171,13 @@ bool RackDoc::Start() {
 }
 
 void RackDoc::Stop() {
-    if (rack_ && rack_->IsRunning()) {
-        rack_->Stop();
+    if (model_ && model_->IsRunning()) {
+        model_->Stop();
     }
 }
 
 bool RackDoc::IsRunning() const {
-    return rack_ && rack_->IsRunning();
+    return model_ && model_->IsRunning();
 }
 
 } // namespace augr

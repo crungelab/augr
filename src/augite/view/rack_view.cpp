@@ -10,8 +10,9 @@
 #include <augr/rack/module/module.h>
 
 #include <augr/rack/pin.h>
-#include <augr/rack/rack.h>
 #include <augr/rack/wire.h>
+#include <augr/rack/rack.h>
+#include <augr/rack/rack_doc.h>
 
 #include <augite/widget/module_widget.h>
 #include <augite/widget/widget_builder.h>
@@ -20,7 +21,7 @@
 
 namespace augr {
 
-RackView::RackView(Rack &rack) : ModelViewT<Rack>(rack) {}
+RackView::RackView(RackDoc &doc) : DocumentViewT<RackDoc>(doc), rack_(&doc.rack()) {}
 
 RackView::~RackView() {
     if (root_) {
@@ -77,7 +78,7 @@ void RackView::Draw() {
 
     root_->Draw();
 
-    for (auto wire : model_->wires_) {
+    for (auto wire : rack_->wires_) {
         ImNodes::Link(wire->id_, wire->output_->id_, wire->input_->id_);
     }
 
@@ -109,18 +110,18 @@ void RackView::CheckLinkCreated() {
     int startId, endId;
     bool createdFromSnap;
     if (ImNodes::IsLinkCreated(&startId, &endId, &createdFromSnap)) {
-        Pin &output = *model_->output_map_[startId];
-        Pin &input = *model_->input_map_[endId];
-        model_->Connect(output, input);
+        Pin &output = *rack_->output_map_[startId];
+        Pin &input = *rack_->input_map_[endId];
+        rack_->Connect(output, input);
     }
 }
 
 void RackView::CheckLinkDestroyed() {
     int linkId;
     if (ImNodes::IsLinkDestroyed(&linkId)) {
-        auto wire = model_->wire_map_[linkId];
+        auto wire = rack_->wire_map_[linkId];
         spdlog::debug("Link destroyed: {}", linkId);
-        model_->Disconnect(*wire);
+        rack_->Disconnect(*wire);
     }
 }
 
@@ -188,7 +189,7 @@ void RackView::CheckNodeSelection() {
                 Widget *widget = it->second;
                 if (auto *module_widget =
                         dynamic_cast<ModuleWidget *>(widget)) {
-                    model_->RemoveChild(*module_widget->model());
+                    rack_->RemoveChild(*module_widget->model());
                     root_->RemoveChild(*widget);
                     widget_map_.erase(it);
                     delete widget;
@@ -214,7 +215,7 @@ void RackView::DrawModuleCatalog() {
                 continue;
 
             if (ImGui::Selectable(it->name_.c_str())) {
-                Module &module = dynamic_cast<Module &>(*it->Produce(model_));
+                Module &module = dynamic_cast<Module &>(*it->Produce(rack_));
 
                 ModelWidgetBuilder builder;
                 Widget *widget = builder.Build(module);
@@ -226,7 +227,7 @@ void RackView::DrawModuleCatalog() {
                 // 5) If user was dragging a link, try to auto-connect
                 if (pending_link_start_attr != -1) {
                     // Decide direction based on the starting pin’s kind
-                    bool start_is_output = model_->IsOutput(
+                    bool start_is_output = rack_->IsOutput(
                         pending_link_start_attr); // your helper
 
                     Pin *output = nullptr;
@@ -235,7 +236,7 @@ void RackView::DrawModuleCatalog() {
                     if (start_is_output) {
                         // Find first input
                         output =
-                            model_->output_map_[pending_link_start_attr];
+                            rack_->output_map_[pending_link_start_attr];
                         if (!module.inport_.pins_.empty()) {
                             input = module.inport_.pins_[0];
                         }
@@ -244,10 +245,10 @@ void RackView::DrawModuleCatalog() {
                         if (!module.outport_.pins_.empty()) {
                             output = module.outport_.pins_[0];
                         }
-                        input = model_->input_map_[pending_link_start_attr];
+                        input = rack_->input_map_[pending_link_start_attr];
                     }
                     if (output && input) {
-                        model_->Connect(*output, *input);
+                        rack_->Connect(*output, *input);
                     }
                     // pending_link_start_attr = -1;
                 }

@@ -23,7 +23,7 @@ RackApp::RackApp() {
     singleton_ = this;
     doc_.NewDocument();
 
-    view_ = new RackView(rack());
+    view_ = new RackView(doc());
 };
 
 } // namespace augr
