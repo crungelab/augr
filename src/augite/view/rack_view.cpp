@@ -66,13 +66,15 @@ void RackView::Draw() {
         Build();
     }
 
-    DrawMainDockspace();
+    //DrawMainDockspace();
 
+    /*
     ImGuiWindowFlags graph_flags =
         ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoScrollWithMouse |
         ImGuiWindowFlags_NoBringToFrontOnFocus; // <-- key
 
     ImGui::Begin("Graph", nullptr, graph_flags);
+    */
 
     ImNodes::BeginNodeEditor();
 
@@ -103,7 +105,7 @@ void RackView::Draw() {
         ImGui::EndPopup();
     }
 
-    ImGui::End();
+    //ImGui::End();
 }
 
 void RackView::CheckLinkCreated() {
@@ -211,6 +213,8 @@ void RackView::DrawModuleCatalog() {
                                  IM_ARRAYSIZE(filter));
 
         for (const auto &it : ModelManufacturer::singleton().factories_) {
+            if (it->category_ == "")
+                continue; // don't allow spawning models without category
             if (filter[0] && !strstr(it->name_.c_str(), filter))
                 continue;
 
@@ -262,6 +266,7 @@ void RackView::DrawModuleCatalog() {
     }
 }
 
+/*
 static bool s_built_dock = false;
 
 void RackView::DrawMainDockspace() {
@@ -315,5 +320,6 @@ void RackView::DrawMainDockspace() {
 
     ImGui::End(); // DockHost
 }
+*/
 
 } // namespace augr

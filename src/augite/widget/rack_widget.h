@@ -8,8 +8,7 @@ class Rack;
 
 class RackWidget : public ModelWidgetT<Rack> {
 public:
-  RackWidget(Rack& model) : ModelWidgetT<Rack>(model) {}
-  //virtual void Draw();
+    RackWidget(Rack &model) : ModelWidgetT<Rack>(model) {}
 };
 
 } // namespace augr

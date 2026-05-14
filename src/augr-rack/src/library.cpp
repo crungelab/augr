@@ -15,10 +15,20 @@ DEFINE_MODEL_FACTORY(ScopeModule, "ScopeModule", "Rack")
 DEFINE_MODEL_FACTORY(SpectralModule, "SpectralModule", "Rack")
 
 void InitAugrRackLibrary() {
+    REGISTER_MODEL_FACTORY(AudioInputDevice);
+    REGISTER_MODEL_FACTORY(AudioOutputDevice);
+    REGISTER_MODEL_FACTORY(MidiInputDevice);
+    REGISTER_MODEL_FACTORY(MidiOutputDevice);
+
     REGISTER_MODEL_FACTORY(MixerModule);
     REGISTER_MODEL_FACTORY(ScopeModule);
     REGISTER_MODEL_FACTORY(SpectralModule);
 
     REGISTER_ARCHIVER_FACTORY(ModuleArchiver);
     REGISTER_ARCHIVER_FACTORY(RackArchiver);
+
+    REGISTER_ARCHIVER_FACTORY(AudioInputDeviceArchiver);
+    REGISTER_ARCHIVER_FACTORY(AudioOutputDeviceArchiver);
+    REGISTER_ARCHIVER_FACTORY(MidiInputDeviceArchiver);
+    REGISTER_ARCHIVER_FACTORY(MidiOutputDeviceArchiver);
 }

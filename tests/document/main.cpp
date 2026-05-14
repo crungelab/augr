@@ -43,9 +43,12 @@ DEFINE_MODEL_FACTORY(BubbleDspImpl, "BubbleDsp", "Faust")
 class BubbleDspArchiver : public ModuleArchiver {};
 DEFINE_ARCHIVER_FACTORY(BubbleDspArchiver, BubbleDspImpl, "BubbleDsp")
 
+/*
 class ExeRackArchiver : public RackArchiver {};
 DEFINE_ARCHIVER_FACTORY(ExeRackArchiver, ExeRack, "Rack")
+*/
 
+/*
 class AudioInputDeviceArchiver : public ModuleArchiver {};
 DEFINE_ARCHIVER_FACTORY(AudioInputDeviceArchiver, AudioInputDevice,
                         "AudioInputDevice")
@@ -53,7 +56,9 @@ DEFINE_ARCHIVER_FACTORY(AudioInputDeviceArchiver, AudioInputDevice,
 class AudioOutputDeviceArchiver : public ModuleArchiver {};
 DEFINE_ARCHIVER_FACTORY(AudioOutputDeviceArchiver, AudioOutputDevice,
                         "AudioOutputDevice")
+*/
 
+/*
 class MidiInputDeviceArchiver : public ModuleArchiver {};
 DEFINE_ARCHIVER_FACTORY(MidiInputDeviceArchiver, MidiInputDevice,
                         "MidiInputDevice")
@@ -61,12 +66,14 @@ DEFINE_ARCHIVER_FACTORY(MidiInputDeviceArchiver, MidiInputDevice,
 class MidiOutputDeviceArchiver : public ModuleArchiver {};
 DEFINE_ARCHIVER_FACTORY(MidiOutputDeviceArchiver, MidiOutputDevice,
                         "MidiOutputDevice")
+*/
 
-//DEFINE_MODEL_FACTORY(ExeRack, "Rack", "Rack")
+/*
 DEFINE_MODEL_FACTORY(AudioInputDevice, "AudioInputDevice", "Rack")
 DEFINE_MODEL_FACTORY(AudioOutputDevice, "AudioOutputDevice", "Rack")
 DEFINE_MODEL_FACTORY(MidiInputDevice, "MidiInputDevice", "Rack")
 DEFINE_MODEL_FACTORY(MidiOutputDevice, "MidiOutputDevice", "Rack")
+*/
 
 class MyApp : public App {
 public:
@@ -264,7 +271,7 @@ public:
 
     // ---------- Data members ----------
 private:
-    void RebuildView() { view_ = std::make_unique<RackView>(doc_->rack()); }
+    void RebuildView() { view_ = std::make_unique<RackView>(doc()); }
 
     std::unique_ptr<RackDoc> doc_;
     std::unique_ptr<RackView> view_;
@@ -293,6 +300,7 @@ int main(int, char **) {
     REGISTER_MODEL_FACTORY(BubbleDspImpl);
 
     REGISTER_ARCHIVER_FACTORY(BubbleDspArchiver);
+
     REGISTER_ARCHIVER_FACTORY(ExeRackArchiver);
     REGISTER_ARCHIVER_FACTORY(AudioInputDeviceArchiver);
     REGISTER_ARCHIVER_FACTORY(AudioOutputDeviceArchiver);

@@ -2,11 +2,14 @@
 
 #include <augr/core/audio.h>
 #include <augr/core/model_factory.h>
+#include <augr/core/archiver_factory.h>
 
 #include <augr/rack/module/audio_device.h>
 #include <augr/rack/module/midi_device.h>
+#include <augr/rack/archiver/rack_archiver.h>
 
 #include <augr/exe/rack/exe_rack.h>
+
 
 #define SCALE 1.0
 
@@ -86,4 +89,8 @@ void ExeRack::Stop() {
 } // namespace augr
 
 using namespace augr;
-DEFINE_MODEL_FACTORY(ExeRack, "Rack", "Rack")
+//DEFINE_MODEL_FACTORY(ExeRack, "Rack", "Rack")
+DEFINE_MODEL_FACTORY(ExeRack, "Rack", "")
+
+class ExeRackArchiver : public RackArchiver {};
+DEFINE_ARCHIVER_FACTORY(ExeRackArchiver, ExeRack, "Rack")

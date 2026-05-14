@@ -6,6 +6,7 @@ set(THIS ${PROJECT_NAME})
 include(${AUGR_CMAKE}/Shell.cmake)
 include(${AUGR_CMAKE}/Widget.cmake)
 include(${AUGR_CMAKE}/View.cmake)
+include(${AUGR_CMAKE}/Frame.cmake)
 include(${AUGR_CMAKE}/System.cmake)
 
 file(GLOB APP_SRC ${CMAKE_CURRENT_SOURCE_DIR}/*.cpp)
@@ -19,4 +20,5 @@ add_library(${PROJECT_NAME} STATIC
 USES_SHELL(${THIS})
 USES_WIDGET(${THIS})
 USES_VIEW(${THIS})
+USES_FRAME(${THIS})
 USES_SYSTEM(${THIS})

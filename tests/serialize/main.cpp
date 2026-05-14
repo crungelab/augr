@@ -59,13 +59,12 @@ class MidiOutputDeviceArchiver : public ModuleArchiver {};
 DEFINE_ARCHIVER_FACTORY(MidiOutputDeviceArchiver, MidiOutputDevice,
                         "MidiOutputDevice")
 
-//DEFINE_MODEL_FACTORY(ExeRack, "ExeRack", "Rack")
-DEFINE_MODEL_FACTORY(ExeRack, "Rack", "Rack")
+/*
 DEFINE_MODEL_FACTORY(AudioInputDevice, "AudioInputDevice", "Rack")
 DEFINE_MODEL_FACTORY(AudioOutputDevice, "AudioOutputDevice", "Rack")
 DEFINE_MODEL_FACTORY(MidiInputDevice, "MidiInputDevice", "Rack")
 DEFINE_MODEL_FACTORY(MidiOutputDevice, "MidiOutputDevice", "Rack")
-
+*/
 
 class MyApp : public App {
 public:

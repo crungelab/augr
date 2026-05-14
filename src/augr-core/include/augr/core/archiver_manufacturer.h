@@ -6,11 +6,13 @@
 #include <typeindex>
 #include <vector>
 
+#include "archiver_factory.h"
+
 namespace augr {
 
 class Archive;
 class Archiver;
-class ArchiverFactory;
+//class ArchiverFactory;
 class Model;
 
 // ArchiverManufacturer owns the registry of ArchiverFactory instances

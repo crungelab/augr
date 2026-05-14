@@ -54,7 +54,7 @@ void App::CreateContext() {
 }
 
 void App::Draw() {
-    view_->Draw();
+    frame_->Draw();
     BaseApp::Draw();
 }
 

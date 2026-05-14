@@ -8,9 +8,11 @@
 
 #include <augr/core/document.h>
 
+#include "rack.h"
+
 namespace augr {
 
-class Rack;
+//class Rack;
 
 class RackDoc : public DocumentT<Rack> {
 public:

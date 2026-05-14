@@ -20,7 +20,7 @@ public:
 
     void Draw() override;
 
-    void DrawMainDockspace();
+    //void DrawMainDockspace();
     void DrawModuleCatalog();
 
     void CheckLinkCreated();

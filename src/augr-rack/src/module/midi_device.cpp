@@ -1,4 +1,9 @@
+
+#include <augr/core/model_factory.h>
+#include <augr/core/archiver_factory.h>
+
 #include <augr/rack/module/midi_device.h>
+#include <augr/rack/archiver/module_archiver.h>
 
 namespace augr {
 
@@ -23,3 +28,15 @@ void MidiOutputDevice::CreatePins() {
 }
 
 } // namespace augr
+
+using namespace augr;
+DEFINE_MODEL_FACTORY(MidiInputDevice, "MidiInputDevice", "")
+DEFINE_MODEL_FACTORY(MidiOutputDevice, "MidiOutputDevice", "")
+
+class MidiInputDeviceArchiver : public ModuleArchiver {};
+DEFINE_ARCHIVER_FACTORY(MidiInputDeviceArchiver, MidiInputDevice,
+                        "MidiInputDevice")
+
+class MidiOutputDeviceArchiver : public ModuleArchiver {};
+DEFINE_ARCHIVER_FACTORY(MidiOutputDeviceArchiver, MidiOutputDevice,
+                        "MidiOutputDevice")

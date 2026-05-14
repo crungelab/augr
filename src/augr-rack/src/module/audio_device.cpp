@@ -1,4 +1,8 @@
+#include <augr/core/model_factory.h>
+#include <augr/core/archiver_factory.h>
+
 #include <augr/rack/module/audio_device.h>
+#include <augr/rack/archiver/module_archiver.h>
 
 namespace augr {
 
@@ -27,3 +31,16 @@ void AudioOutputDevice::CreatePins()
 }
 
 } // namespace augr
+
+using namespace augr;
+
+DEFINE_MODEL_FACTORY(AudioInputDevice, "AudioInputDevice", "")
+DEFINE_MODEL_FACTORY(AudioOutputDevice, "AudioOutputDevice", "")
+
+class AudioInputDeviceArchiver : public ModuleArchiver {};
+DEFINE_ARCHIVER_FACTORY(AudioInputDeviceArchiver, AudioInputDevice,
+                        "AudioInputDevice")
+
+class AudioOutputDeviceArchiver : public ModuleArchiver {};
+DEFINE_ARCHIVER_FACTORY(AudioOutputDeviceArchiver, AudioOutputDevice,
+                        "AudioOutputDevice")

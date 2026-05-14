@@ -1,17 +1,11 @@
 #include <spdlog/sinks/stdout_color_sinks.h>
 #include <spdlog/spdlog.h>
 
-#include <augr/core/model_manufacturer.h>
-
-#include <augr/exe/rack/exe_rack.h>
-
 #include <augite/app/rack_app.h>
 
 using namespace augr;
 
 int main(int, char **) {
-    REGISTER_MODEL_FACTORY(ExeRack);
-    
     extern void InitAugrRackLibrary();
     InitAugrRackLibrary();
     extern void InitAugrVoltLibrary();
@@ -20,6 +14,9 @@ int main(int, char **) {
     InitAugrFmLibrary();
     extern void InitFaustDspLibrary();
     InitFaustDspLibrary();
+
+    extern void InitAugrExeLibrary();
+    InitAugrExeLibrary();
 
     auto logger = spdlog::stdout_color_mt("console");
     spdlog::set_default_logger(logger);

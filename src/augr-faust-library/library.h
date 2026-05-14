@@ -1,6 +1,10 @@
 #pragma once
 
 #include <augr/core/model_manufacturer.h>
+//#include <augr/core/archiver_factory.h>
+#include <augr/core/archiver_manufacturer.h>
+
+#include <augr/rack/archiver/module_archiver.h>
 
 #include <augr/faust/faust_dsp.h>
 #include <augr/faust/faust_dsp_ui.h>

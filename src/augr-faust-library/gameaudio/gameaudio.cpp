@@ -13,6 +13,9 @@ class BubbleDspImpl final : public BubbleDsp {
 };
 DEFINE_MODEL_FACTORY(BubbleDspImpl, "Bubble", "Generator")
 
+class BubbleDspArchiver : public ModuleArchiver {};
+DEFINE_ARCHIVER_FACTORY(BubbleDspArchiver, BubbleDspImpl, "Bubble")
+
 class RainDspImpl final : public RainDsp {
     REFLECT_ENABLE(FaustDsp)
 };
@@ -24,7 +27,9 @@ class ThunderDspImpl final : public ThunderDsp {
 DEFINE_MODEL_FACTORY(ThunderDspImpl, "Thunder", "Generator")
 
 void InitFaustDspLibrary_GameAudio() {
-    REGISTER_MODEL_FACTORY(BubbleDspImpl);
+    REGISTER_MODEL_FACTORY(BubbleDspImpl);    
     REGISTER_MODEL_FACTORY(RainDspImpl);
     REGISTER_MODEL_FACTORY(ThunderDspImpl);
+
+    REGISTER_ARCHIVER_FACTORY(BubbleDspArchiver);
 }

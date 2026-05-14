@@ -3,7 +3,7 @@
 #include <augite/app/clipboard.h>
 
 #include "base_app.h"
-#include "../view/view.h"
+#include "../frame/frame.h"
 
 namespace augr {
 
@@ -22,7 +22,7 @@ public:
 
     // Data members
     static App *singleton_;
-    View* view_;
+    Frame* frame_;
     Clipboard clipboard_;
 };
 
