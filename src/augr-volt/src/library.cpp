@@ -1,4 +1,7 @@
 #include <augr/core/model_manufacturer.h>
+#include <augr/core/archiver_manufacturer.h>
+
+#include <augr/rack/archiver/module_archiver.h>
 
 #include <augr/volt/cv_module.h>
 #include <augr/volt/midi_cv_module.h>
@@ -13,24 +16,24 @@
 
 using namespace augr;
 
-DEFINE_MODEL_FACTORY(CvModule, "CvModule", "Volt")
-DEFINE_MODEL_FACTORY(MidiCvModule, "MidiCvModule", "Volt")
-DEFINE_MODEL_FACTORY(VcoModule, "VcoModule", "Volt")
-DEFINE_MODEL_FACTORY(VcaModule, "VcaModule", "Volt")
-DEFINE_MODEL_FACTORY(AdsrModule, "AdsrModule", "Volt")
-DEFINE_MODEL_FACTORY(VcfModule, "VcfModule", "Volt")
-DEFINE_MODEL_FACTORY(AttenuverterModule, "AttenuverterModule", "Volt")
-DEFINE_MODEL_FACTORY(LfoModule, "LfoModule", "Volt")
-DEFINE_MODEL_FACTORY(NoiseModule, "NoiseModule", "Volt")
+DEFINE_MODULE(CvModule, "CvModule", "Volt")
+DEFINE_MODULE(MidiCvModule, "MidiCvModule", "Volt")
+DEFINE_MODULE(VcoModule, "VcoModule", "Volt")
+DEFINE_MODULE(VcaModule, "VcaModule", "Volt")
+DEFINE_MODULE(AdsrModule, "AdsrModule", "Volt")
+DEFINE_MODULE(VcfModule, "VcfModule", "Volt")
+DEFINE_MODULE(AttenuverterModule, "AttenuverterModule", "Volt")
+DEFINE_MODULE(LfoModule, "LfoModule", "Volt")
+DEFINE_MODULE(NoiseModule, "NoiseModule", "Volt")
 
 void InitAugrVoltLibrary() {
-    REGISTER_MODEL_FACTORY(CvModule);
-    REGISTER_MODEL_FACTORY(MidiCvModule);
-    REGISTER_MODEL_FACTORY(VcoModule);
-    REGISTER_MODEL_FACTORY(VcaModule);
-    REGISTER_MODEL_FACTORY(AdsrModule);
-    REGISTER_MODEL_FACTORY(VcfModule);
-    REGISTER_MODEL_FACTORY(AttenuverterModule);
-    REGISTER_MODEL_FACTORY(LfoModule);
-    REGISTER_MODEL_FACTORY(NoiseModule);
+    REGISTER_MODULE(CvModule);
+    REGISTER_MODULE(MidiCvModule);
+    REGISTER_MODULE(VcoModule);
+    REGISTER_MODULE(VcaModule);
+    REGISTER_MODULE(AdsrModule);
+    REGISTER_MODULE(VcfModule);
+    REGISTER_MODULE(AttenuverterModule);
+    REGISTER_MODULE(LfoModule);
+    REGISTER_MODULE(NoiseModule);
 }

@@ -5,19 +5,19 @@
 
 using namespace augr;
 
-// Game Audio
+// Phasing
 
 class FlangerDspImpl final : public FlangerDsp {
     REFLECT_ENABLE(FaustDsp)
 };
-DEFINE_MODEL_FACTORY(FlangerDspImpl, "Flanger", "Effect")
+DEFINE_MODULE(FlangerDspImpl, "Flanger", "Effect")
 
 class PhaserDspImpl final : public PhaserDsp {
     REFLECT_ENABLE(FaustDsp)
 };
-DEFINE_MODEL_FACTORY(PhaserDspImpl, "Phaser", "Effect")
+DEFINE_MODULE(PhaserDspImpl, "Phaser", "Effect")
 
 void InitFaustDspLibrary_Phasing() {
-    REGISTER_MODEL_FACTORY(FlangerDspImpl);
-    REGISTER_MODEL_FACTORY(PhaserDspImpl);
+    REGISTER_MODULE(FlangerDspImpl);
+    REGISTER_MODULE(PhaserDspImpl);
 }

@@ -10,9 +10,9 @@ class BlowBottleDspImpl : public BlowBottleDsp {
 public:
     REFLECT_ENABLE(FaustDsp)
 };
-DEFINE_MODEL_FACTORY(BlowBottleDspImpl, "Blow Bottle", "Instrument")
+DEFINE_MODULE(BlowBottleDspImpl, "Blow Bottle", "Instrument")
 
 
 void InitFaustDspLibrary_PhysicalModeling_FaustStk() {
-    REGISTER_MODEL_FACTORY(BlowBottleDspImpl);
+    REGISTER_MODULE(BlowBottleDspImpl);
 }

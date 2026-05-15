@@ -11,25 +11,21 @@ using namespace augr;
 class BubbleDspImpl final : public BubbleDsp {
     REFLECT_ENABLE(FaustDsp)
 };
-DEFINE_MODEL_FACTORY(BubbleDspImpl, "Bubble", "Generator")
-
-class BubbleDspArchiver : public ModuleArchiver {};
-DEFINE_ARCHIVER_FACTORY(BubbleDspArchiver, BubbleDspImpl, "Bubble")
+DEFINE_MODULE(BubbleDspImpl, "Bubble", "Generator")
 
 class RainDspImpl final : public RainDsp {
     REFLECT_ENABLE(FaustDsp)
 };
-DEFINE_MODEL_FACTORY(RainDspImpl, "Rain", "Generator")
+DEFINE_MODULE(RainDspImpl, "Rain", "Generator")
 
 class ThunderDspImpl final : public ThunderDsp {
     REFLECT_ENABLE(FaustDsp)
 };
-DEFINE_MODEL_FACTORY(ThunderDspImpl, "Thunder", "Generator")
+DEFINE_MODULE(ThunderDspImpl, "Thunder", "Generator")
 
 void InitFaustDspLibrary_GameAudio() {
-    REGISTER_MODEL_FACTORY(BubbleDspImpl);    
-    REGISTER_MODEL_FACTORY(RainDspImpl);
-    REGISTER_MODEL_FACTORY(ThunderDspImpl);
-
-    REGISTER_ARCHIVER_FACTORY(BubbleDspArchiver);
+    REGISTER_MODULE(BubbleDspImpl);    
+    REGISTER_MODULE(RainDspImpl);
+    REGISTER_MODULE(ThunderDspImpl);
 }
+

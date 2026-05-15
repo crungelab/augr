@@ -5,12 +5,6 @@
 
 namespace augr {
 
-/*
-void ModelManufacturer::AddFactory(ModelFactory& factory) {
-  factories_.push_back(&factory);
-  factory_type_map_[factory.GetKey()] = &factory;
-}
-*/
 void ModelManufacturer::AddFactory(ModelFactory &factory) {
     factories_.push_back(&factory);
     factory_type_map_[factory.GetKey()] = &factory;

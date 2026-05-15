@@ -13,22 +13,22 @@ class FrenchBellDspImpl : public FrenchBellDsp {
 public:
     REFLECT_ENABLE(FaustDsp)
 };
-DEFINE_MODEL_FACTORY(FrenchBellDspImpl, "French Bell", "Instrument")
+DEFINE_MODULE(FrenchBellDspImpl, "French Bell", "Instrument")
 
 class BrassMidiDspImpl : public BrassMidiDsp {
 public:
     REFLECT_ENABLE(FaustDsp)
 };
-DEFINE_MODEL_FACTORY(BrassMidiDspImpl, "Brass MIDI", "Instrument")
+DEFINE_MODULE(BrassMidiDspImpl, "Brass MIDI", "Instrument")
 
 class ClarinetMidiDspImpl : public ClarinetMidiDsp {
 public:
     REFLECT_ENABLE(FaustDsp)
 };
-DEFINE_MODEL_FACTORY(ClarinetMidiDspImpl, "Clarinet MIDI", "Instrument")
+DEFINE_MODULE(ClarinetMidiDspImpl, "Clarinet MIDI", "Instrument")
 
 void InitFaustDspLibrary_PhysicalModeling() {
-    REGISTER_MODEL_FACTORY(FrenchBellDspImpl);
-    REGISTER_MODEL_FACTORY(BrassMidiDspImpl);
-    REGISTER_MODEL_FACTORY(ClarinetMidiDspImpl);
+    REGISTER_MODULE(FrenchBellDspImpl);
+    REGISTER_MODULE(BrassMidiDspImpl);
+    REGISTER_MODULE(ClarinetMidiDspImpl);
 }

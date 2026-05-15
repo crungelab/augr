@@ -13,22 +13,22 @@ class DbMeterDspImpl : public DbMeterDsp {
 public:
     REFLECT_ENABLE(FaustDsp)
 };
-DEFINE_MODEL_FACTORY(DbMeterDspImpl, "Db Meter", "Analysis")
+DEFINE_MODULE(DbMeterDspImpl, "Db Meter", "Analysis")
 
 class SpectralLevelDspImpl : public SpectralLevelDsp {
 public:
     REFLECT_ENABLE(FaustDsp)
 };
-DEFINE_MODEL_FACTORY(SpectralLevelDspImpl, "Spectral Level", "Analysis")
+DEFINE_MODULE(SpectralLevelDspImpl, "Spectral Level", "Analysis")
 
 class VuMeterDspImpl : public VuMeterDsp {
 public:
     REFLECT_ENABLE(FaustDsp)
 };
-DEFINE_MODEL_FACTORY(VuMeterDspImpl, "Vu Meter", "Analysis")
+DEFINE_MODULE(VuMeterDspImpl, "Vu Meter", "Analysis")
 
 void InitFaustDspLibrary_Analysis() {
-    REGISTER_MODEL_FACTORY(DbMeterDspImpl);
-    REGISTER_MODEL_FACTORY(SpectralLevelDspImpl);
-    REGISTER_MODEL_FACTORY(VuMeterDspImpl);
+    REGISTER_MODULE(DbMeterDspImpl);
+    REGISTER_MODULE(SpectralLevelDspImpl);
+    REGISTER_MODULE(VuMeterDspImpl);
 }

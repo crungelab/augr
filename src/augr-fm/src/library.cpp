@@ -1,4 +1,7 @@
 #include <augr/core/model_manufacturer.h>
+#include <augr/core/archiver_manufacturer.h>
+
+#include <augr/rack/archiver/module_archiver.h>
 
 #include <augr/fm/operator.h>
 #include <augr/fm/envelope.h>
@@ -6,10 +9,10 @@
 using namespace augr;
 using namespace augr::fm;
 
-DEFINE_MODEL_FACTORY(Operator, "Operator", "Fm")
-DEFINE_MODEL_FACTORY(Envelope, "Envelope", "Fm")
+DEFINE_MODULE(Operator, "Operator", "Fm")
+DEFINE_MODULE(Envelope, "Envelope", "Fm")
 
 void InitAugrFmLibrary() {
-    REGISTER_MODEL_FACTORY(Operator);
-    REGISTER_MODEL_FACTORY(Envelope);
+    REGISTER_MODULE(Operator);
+    REGISTER_MODULE(Envelope);
 }

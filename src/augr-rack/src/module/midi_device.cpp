@@ -30,13 +30,6 @@ void MidiOutputDevice::CreatePins() {
 } // namespace augr
 
 using namespace augr;
-DEFINE_MODEL_FACTORY(MidiInputDevice, "MidiInputDevice", "")
-DEFINE_MODEL_FACTORY(MidiOutputDevice, "MidiOutputDevice", "")
 
-class MidiInputDeviceArchiver : public ModuleArchiver {};
-DEFINE_ARCHIVER_FACTORY(MidiInputDeviceArchiver, MidiInputDevice,
-                        "MidiInputDevice")
-
-class MidiOutputDeviceArchiver : public ModuleArchiver {};
-DEFINE_ARCHIVER_FACTORY(MidiOutputDeviceArchiver, MidiOutputDevice,
-                        "MidiOutputDevice")
+DEFINE_MODULE(MidiInputDevice, "MidiInputDevice", "")
+DEFINE_MODULE(MidiOutputDevice, "MidiOutputDevice", "")

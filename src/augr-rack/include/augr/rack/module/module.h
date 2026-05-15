@@ -3,8 +3,8 @@
 #include <memory>
 #include <vector>
 
-#include <augr/core/ui/control/float_parameter.h>
 #include <augr/core/ui/control/enum_parameter.h>
+#include <augr/core/ui/control/float_parameter.h>
 
 #include <augr/rack/audio_pin.h>
 #include <augr/rack/midi_pin.h>
@@ -80,5 +80,14 @@ public:
 private:
     std::vector<std::unique_ptr<Parameter>> parameters_;
 };
+
+#define DEFINE_MODULE(ImplType, TypeTag, Category)                             \
+    DEFINE_MODEL_FACTORY(ImplType, TypeTag, Category)                          \
+    class ImplType##Archiver : public ModuleArchiver {};                       \
+    DEFINE_ARCHIVER_FACTORY(ImplType##Archiver, ImplType, TypeTag)
+
+#define REGISTER_MODULE(ImplType)                                              \
+    REGISTER_MODEL_FACTORY(ImplType);                                          \
+    REGISTER_ARCHIVER_FACTORY(ImplType##Archiver)
 
 } // namespace augr

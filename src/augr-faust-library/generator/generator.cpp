@@ -13,33 +13,33 @@ using namespace augr;
 class ChurchOrganDspImpl final : public ChurchOrganDsp {
     REFLECT_ENABLE(FaustDsp)
 };
-DEFINE_MODEL_FACTORY(ChurchOrganDspImpl, "Church Organ", "Generator")
+DEFINE_MODULE(ChurchOrganDspImpl, "Church Organ", "Generator")
 
 class OscDspImpl final : public OscDsp {
     REFLECT_ENABLE(FaustDsp)
 };
-DEFINE_MODEL_FACTORY(OscDspImpl, "Oscillator", "Generator")
+DEFINE_MODULE(OscDspImpl, "Oscillator", "Generator")
 
 class SawtoothLabDspImpl final : public SawtoothLabDsp {
     REFLECT_ENABLE(FaustDsp)
 };
-DEFINE_MODEL_FACTORY(SawtoothLabDspImpl, "Sawtooth Lab", "Generator")
+DEFINE_MODULE(SawtoothLabDspImpl, "Sawtooth Lab", "Generator")
 
 class VirtualAnalogDspImpl final : public VirtualAnalogDsp {
     REFLECT_ENABLE(FaustDsp)
 };
-DEFINE_MODEL_FACTORY(VirtualAnalogDspImpl, "Virtual Analog", "Generator")
+DEFINE_MODULE(VirtualAnalogDspImpl, "Virtual Analog", "Generator")
 
 
 class VirtualAnalogLabDspImpl final : public VirtualAnalogLabDsp {
     REFLECT_ENABLE(FaustDsp)
 };
-DEFINE_MODEL_FACTORY(VirtualAnalogLabDspImpl, "Virtual Analog Lab", "Generator")
+DEFINE_MODULE(VirtualAnalogLabDspImpl, "Virtual Analog Lab", "Generator")
 
 void InitFaustDspLibrary_Generator() {
-    REGISTER_MODEL_FACTORY(ChurchOrganDspImpl);
-    REGISTER_MODEL_FACTORY(OscDspImpl);
-    REGISTER_MODEL_FACTORY(SawtoothLabDspImpl);
-    REGISTER_MODEL_FACTORY(VirtualAnalogDspImpl);
-    REGISTER_MODEL_FACTORY(VirtualAnalogLabDspImpl);
+    REGISTER_MODULE(ChurchOrganDspImpl);
+    REGISTER_MODULE(OscDspImpl);
+    REGISTER_MODULE(SawtoothLabDspImpl);
+    REGISTER_MODULE(VirtualAnalogDspImpl);
+    REGISTER_MODULE(VirtualAnalogLabDspImpl);
 }
