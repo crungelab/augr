@@ -5,6 +5,8 @@
 #include <imgui.h>
 #include <imnodes.h>
 
+#include <augr/core/math/vec2.h>
+
 #include "widget.h"
 
 namespace augr {
@@ -19,6 +21,10 @@ public:
     // Data members
     bool is_open_ = false;
     std::string window_name_;
+    //
+    Vec2 grid_position_ = {0.0f, 0.0f};
+    Vec2 window_position_ = {100.0f, 100.0f};
+    Vec2 window_size_ = {320.0f, 240.0f};
 };
 
 template <typename T> class ModuleWidgetT : public ModelWidgetT<T, ModuleWidget> {

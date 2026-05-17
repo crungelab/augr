@@ -8,13 +8,13 @@ set(THIS ${BINARY_NAME})
 file(GLOB RUNNER_SOURCES ${CMAKE_CURRENT_SOURCE_DIR}/*.cpp)
 file(GLOB RUNNER_INCLUDES ${CMAKE_CURRENT_SOURCE_DIR}/*.h)
 
-include(${AUGR_CMAKE}/App.cmake)
+include(${AUGR_CMAKE}/AugiteApp.cmake)
 
 add_executable(${THIS} "main.cpp" ${RUNNER_SOURCES} ${RUNNER_INCLUDES})
-USES_EXE_APP(${THIS})
+USES_AUGITE_EXE_APP(${THIS})
 
 add_library(${THIS}_lib ${RUNNER_SOURCES})
-USES_EXE_APP(${THIS}_lib)
+USES_AUGITE_EXE_APP(${THIS}_lib)
 
 target_compile_definitions(${THIS} PRIVATE "NOMINMAX" RACK_IMPL)
 

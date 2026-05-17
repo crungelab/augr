@@ -16,6 +16,6 @@ add_library(${THIS} STATIC
 )
 USES_AUGR_CORE(${THIS})
 USES_AUGITE(${THIS})
-USES_VST3SDK(${THIS})
+USES_AUGITE_VST3SDK(${THIS})
 
 #target_link_libraries(${THIS} D3d12 dxgi)

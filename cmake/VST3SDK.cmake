@@ -9,7 +9,7 @@ set(VST3SDK_LIB_BASE ${VST3SDK_LIB}/base.lib)
 set(VST3SDK_LIB_SDK ${VST3SDK_LIB}/sdk.lib)
 set(VST3SDK_LIB_SDK_COMMON ${VST3SDK_LIB}/sdk_common.lib)
 
-function(USES_VST3SDK THIS)
+function(USES_AUGITE_VST3SDK THIS)
   set(public_sdk_SOURCE_DIR ${AUGR_DEPOT}/vst3sdk/public.sdk)
   smtg_target_add_library_main(${THIS}) #from vst3sdk
   

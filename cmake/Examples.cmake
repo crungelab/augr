@@ -5,7 +5,7 @@ include(${CMAKE_CURRENT_LIST_DIR}/Shell.cmake)
 
 function(USES_EXAMPLES THIS)
     USES_AUGR_CORE(${THIS})
-    USES_SHELL(${THIS})
+    USES_AUGITE_SHELL(${THIS})
 
     target_include_directories(${THIS} PRIVATE
         ${AUGR_ROOT}

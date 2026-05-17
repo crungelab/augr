@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.15)
 
 include(${AUGR_CMAKE}/AugrCore.cmake)
-include(${AUGR_CMAKE}/ExeApp.cmake)
+include(${AUGR_CMAKE}/AugiteExeApp.cmake)
 include(${AUGR_CMAKE}/ImNodes.cmake)
 
 add_executable(rtplaysaw rtplaysaw.cpp)
@@ -12,10 +12,10 @@ USES_RTAUDIO(xtbuffer)
 USES_AUGR_CORE(xtbuffer)
 
 add_executable(app app.cpp ${AUGR_HEADERS})
-USES_EXE_APP(app)
+USES_AUGITE_EXE_APP(app)
 
 add_executable(graph graph.cpp ${AUGR_HEADERS})
-USES_EXE_APP(graph)
+USES_AUGITE_EXE_APP(graph)
 USES_IMNODES(graph)
 
 add_subdirectory(panner)

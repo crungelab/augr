@@ -10,7 +10,7 @@ add_library(${THIS} STATIC
   ${IMPL_INCLUDE}
 )
 
-include(${AUGR_CMAKE}/Vst3.cmake)
-USES_VST3(${THIS})
+include(${AUGR_CMAKE}/AugiteVst3.cmake)
+USES_AUGITE_VST3(${THIS})
 
 #target_include_directories(${THIS} ${CMAKE_CURRENT_SOURCE_DIR})
