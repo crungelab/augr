@@ -13,8 +13,8 @@ constexpr float kTwoPi = 6.28318530717958647692f;
 float cvToFreq(float cv) { return 261.6255653f * std::pow(2.f, cv); }
 } // namespace
 
-void Operator::Create(Part *owner) {
-    Module::Create(owner);
+void Operator::Create(Model *parent) {
+    Module::Create(parent);
     label_ = "Operator";
 }
 

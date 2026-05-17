@@ -13,7 +13,7 @@ class ExeRack : public Rack {
 public:
     ExeRack() = default;
     REFLECT_ENABLE(Rack)
-    void Create(Part *owner = nullptr) override;
+    void Create(Model *parent = nullptr) override;
     bool Start() override;
     void Stop() override;
 

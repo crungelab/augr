@@ -9,7 +9,7 @@ namespace augr {
 class FaustDsp : public Dsp {
 public:
     virtual ~FaustDsp() = default;
-    void Create(Part *owner = nullptr) override;
+    void Create(Model *parent = nullptr) override;
     void CreatePins() override;
     void CreateControls() override;
     void Process() override;

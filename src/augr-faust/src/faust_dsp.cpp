@@ -7,8 +7,8 @@
 
 namespace augr {
 
-void FaustDsp::Create(Part *owner) {
-    Dsp::Create(owner);
+void FaustDsp::Create(Model *parent) {
+    Dsp::Create(parent);
     init(Audio::sample_rate());
 }
 

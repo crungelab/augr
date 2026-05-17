@@ -5,19 +5,22 @@
 #include <utility>
 #include <vector>
 
-#include <augr/core/part.h>
+#include <augr/core/subject.h>
 
 namespace augr {
 
-class Model : public Part {
+class Model : public Subject {
 public:
-    Model() = default;
-    void Create(Part *parent = nullptr) override {
-        Part::Create(parent);
+    Model() {
+        id_ = next_id_++;
+    }
+    virtual void Create(Model *parent = nullptr)  {
+        parent_ = parent;
         if (parent) {
-            dynamic_cast<Model *>(parent)->AddChild(*this);
+            parent->AddChild(*this);
         }
     }
+    virtual void Destroy() {}
     void AddChild(Model &child) {
         OnAddingChild(child);
         children_.push_back(&child);
@@ -28,7 +31,7 @@ public:
                         children_.end());
     }
     // Accessors
-    Model &parent() const { return *dynamic_cast<Model *>(owner_); }
+    Model &parent() const { return *parent_; }
 
 protected:
     virtual void OnAddingChild(Model &child) {}
@@ -36,9 +39,13 @@ protected:
 
 public:
     // Data members
+    Model *parent_ = nullptr;
     std::vector<Model *> children_;
 
-    REFLECT_ENABLE(Part)
+    static int next_id_;
+    int id_ = 0;
+
+    REFLECT_ENABLE(Subject)
 };
 
 } // namespace augr

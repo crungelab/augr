@@ -17,8 +17,8 @@ class LfoModule : public Module {
 public:
     enum class Waveform { Sine, Tri, Square, SawUp, SawDown, SampleHold };
 
-    void Create(Part *owner = nullptr) override {
-        Module::Create(owner);
+    void Create(Model *parent = nullptr) override {
+        Module::Create(parent);
         label_ = "LFO";
     }
 

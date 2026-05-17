@@ -11,7 +11,7 @@ namespace augr::fm {
 // are structurally identical, distinguished only by how they're wired.
 class Operator : public Module {
 public:
-    void Create(Part *owner = nullptr) override;
+    void Create(Model *parent = nullptr) override;
     void CreateControls() override;
     void CreatePins() override;
     void Process() override;

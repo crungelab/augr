@@ -26,8 +26,8 @@ float LevelToAmplitude(float level_0_99) {
 
 } // namespace
 
-void Envelope::Create(Part *owner) {
-    Module::Create(owner);
+void Envelope::Create(Model *parent) {
+    Module::Create(parent);
     label_ = "Envelope";
 }
 

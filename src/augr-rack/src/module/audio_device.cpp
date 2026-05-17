@@ -6,9 +6,9 @@
 
 namespace augr {
 
-void AudioInputDevice::Create(Part *owner)
+void AudioInputDevice::Create(Model *parent)
 {
-  Device::Create(owner);
+  Device::Create(parent);
   label_ = "Audio Input Device";
 }
 
@@ -18,9 +18,9 @@ void AudioInputDevice::CreatePins()
   AddOutput(*audio_out_);
 }
 
-void AudioOutputDevice::Create(Part *owner)
+void AudioOutputDevice::Create(Model *parent)
 {
-  Device::Create(owner);
+  Device::Create(parent);
   label_ = "Audio Output Device";
 }
 

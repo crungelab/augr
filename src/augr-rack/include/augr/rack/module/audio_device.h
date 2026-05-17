@@ -12,7 +12,7 @@ class AudioInputDevice : public AudioDevice
 {
 public:
   virtual ~AudioInputDevice() {}
-  void Create(Part *owner = nullptr) override;
+  void Create(Model *parent = nullptr) override;
   void CreatePins() override;
   REFLECT_ENABLE(AudioDevice)
 };
@@ -21,7 +21,7 @@ class AudioOutputDevice : public AudioDevice
 {
 public:
   virtual ~AudioOutputDevice() {}
-  void Create(Part *owner = nullptr) override;
+  void Create(Model *parent = nullptr) override;
   void CreatePins() override;
   REFLECT_ENABLE(AudioDevice)
 };

@@ -25,8 +25,8 @@ public:
     static constexpr std::size_t kRingSize = 16384;
     //static constexpr std::size_t kRingSize = 32768;
 
-    void Create(Part *owner = nullptr) override {
-        Module::Create(owner);
+    void Create(Model *parent = nullptr) override {
+        Module::Create(parent);
         label_ = "Scope";
     }
 

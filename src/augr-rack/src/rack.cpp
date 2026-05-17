@@ -168,12 +168,12 @@ void Rack::RebuildExecutionOrder() {
         for (auto *out_pin : m->outport_.pins_) {
             for (auto *out_wire : out_pin->wires_) {
                 if (!out_wire || !out_wire->input_ ||
-                    !out_wire->input_->owner_) {
+                    !out_wire->input_->node_) {
                     continue;
                 }
 
                 Module *downstream =
-                    dynamic_cast<Module *>(out_wire->input_->owner_);
+                    dynamic_cast<Module *>(out_wire->input_->node_);
                 if (!downstream || downstream == m) {
                     continue;
                 }

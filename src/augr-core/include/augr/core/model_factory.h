@@ -5,8 +5,6 @@
 #include <vector>
 #include <algorithm>
 
-#include <augr/core/part.h>
-
 #include "model.h"
 
 namespace augr {

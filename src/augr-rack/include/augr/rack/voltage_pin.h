@@ -10,16 +10,16 @@ using Voltage = Audio;
 
 class VoltageInput : public AudioInput {
 public:
-    VoltageInput(Node &owner, const std::string &name)
-        : AudioInput(owner, name, ChannelLayout::kMono) {}
+    VoltageInput(Node &node, const std::string &name)
+        : AudioInput(node, name, ChannelLayout::kMono) {}
 
     REFLECT_ENABLE(AudioInput)
 };
 
 class VoltageOutput : public AudioOutput {
 public:
-    VoltageOutput(Node &owner, const std::string &name)
-        : AudioOutput(owner, name, ChannelLayout::kMono) {}
+    VoltageOutput(Node &node, const std::string &name)
+        : AudioOutput(node, name, ChannelLayout::kMono) {}
 
     REFLECT_ENABLE(AudioOutput)
 };

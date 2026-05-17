@@ -3,7 +3,10 @@
 
 namespace augr {
 
+int Wire::next_id_ = 0;
+
 Wire::Wire(Pin &output, Pin &input) : output_(&output), input_(&input) {
+    id_ = next_id_++;
     output.AddWire(*this);
     input.AddWire(*this);
 

@@ -17,7 +17,7 @@ public:
     void AddInput(Pin &input);
     void AddOutput(Pin &output);
     // Accessors
-    Graph &graph() { return *(Graph *)owner_; }
+    Graph &graph() { return *(Graph *)parent_; }
     // Data members
     // Pins
     Inport inport_;
