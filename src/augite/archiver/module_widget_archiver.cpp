@@ -36,8 +36,6 @@ void ModuleWidgetArchiver::Load(Archive& archive) {
     if (j.contains("window_open"))     w.is_open_ = j["window_open"].get<bool>();
 }
 
-} // namespace augr
-
-using namespace augr;
-
 DEFINE_ARCHIVER_FACTORY(ModuleWidgetArchiver, ModuleWidget, "Widget.Module")
+
+} // namespace augr

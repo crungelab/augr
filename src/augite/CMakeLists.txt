@@ -11,6 +11,7 @@ add_library(${PROJECT_NAME} STATIC
   ${AUGITE_INCLUDE}
 )
 
+add_subdirectory(archiver)
 add_subdirectory(shell)
 add_subdirectory(vst3)
 add_subdirectory(widget)

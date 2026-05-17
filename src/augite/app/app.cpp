@@ -3,6 +3,8 @@
 #include "imnodes.h"
 #include "implot.h"
 
+#include <augr/core/archiver_manufacturer.h>
+
 #include "../widget/widget_manufacturer.h"
 
 #include "../system/imgui_system.h"
@@ -24,6 +26,9 @@ App::App() {
 bool App::DoCreate(CreateParams params) {
 
     bool success = BaseApp::DoCreate(params);
+
+    REGISTER_ARCHIVER_FACTORY(ModuleWidgetArchiver);
+    REGISTER_ARCHIVER_FACTORY(RackViewArchiver);
 
     REGISTER_MODEL_WIDGET_FACTORY(RackWidget)
     REGISTER_MODEL_WIDGET_FACTORY(DefaultModuleWidget)

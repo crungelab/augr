@@ -3,6 +3,7 @@ cmake_minimum_required(VERSION 3.14)
 project(AugiteApp LANGUAGES CXX)
 set(THIS ${PROJECT_NAME})
 
+include(${AUGR_CMAKE}/AugiteArchiver.cmake)
 include(${AUGR_CMAKE}/AugiteShell.cmake)
 include(${AUGR_CMAKE}/AugiteWidget.cmake)
 include(${AUGR_CMAKE}/AugiteView.cmake)
@@ -17,6 +18,7 @@ add_library(${PROJECT_NAME} STATIC
   ${APP_INCLUDE}
 )
 
+USES_AUGITE_ARCHIVER(${THIS})
 USES_AUGITE_SHELL(${THIS})
 USES_AUGITE_WIDGET(${THIS})
 USES_AUGITE_VIEW(${THIS})
