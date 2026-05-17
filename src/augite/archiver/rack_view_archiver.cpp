@@ -15,15 +15,39 @@
 namespace augr {
 
 void RackViewArchiver::Save(Archive& archive) const {
+    const RackView& view = subject();
+
     auto& j = archive.json();
     j["type"] = factory_->type_name();
 
     // View-level state (pan, zoom, etc.) goes here in the future.
     // For now, just the widgets array.
 
-    SaveWidgets(archive);
+    //SaveWidgets(archive);
+    SaveWidgets(archive, view.root_->children_);
+
 }
 
+void RackViewArchiver::SaveWidgets(Archive& archive, const std::vector<Widget *> &widgets) const {
+    const RackView& view = subject();
+
+    auto& j = archive.json();
+
+    if (view.root_ == nullptr || view.root_->children_.empty()) return;
+
+    auto& j_widgets = j["widgets"] = nlohmann::json::array();
+
+    for (Widget* child : widgets) {
+        nlohmann::json j_widget = nlohmann::json::object();
+        {
+            JsonScope scope(archive, j_widget);
+            ArchiverManufacturer::singleton().Serialize(archive, *child);
+        }
+        j_widgets.push_back(std::move(j_widget));
+    }
+}
+
+/*
 void RackViewArchiver::SaveWidgets(Archive& archive) const {
     auto& j = archive.json();
     const RackView& view = subject();
@@ -41,6 +65,7 @@ void RackViewArchiver::SaveWidgets(Archive& archive) const {
         j_widgets.push_back(std::move(j_widget));
     }
 }
+*/
 
 void RackViewArchiver::Load(Archive& archive) {
     LoadWidgets(archive);

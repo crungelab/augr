@@ -26,8 +26,19 @@ public:
     void CheckLinkDestroyed();
     void CheckCreateNode();
     void CheckNodeSelection();
-
     void CheckMouse();
+    void CheckClipboard();
+
+    void HandleCopy();
+    void HandlePaste();
+    void HandleCut();
+    void HandleDuplicate();
+
+    std::vector<Model*> SelectedModules() const;
+    std::vector<Widget*> SelectedWidgets() const;
+
+    // Accessors
+    std::map<int, Widget *>& widget_map() { return widget_map_; }
 
 private:
     // Data members

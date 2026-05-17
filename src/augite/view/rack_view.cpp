@@ -18,6 +18,7 @@
 #include <augite/widget/widget_builder.h>
 
 #include "rack_view.h"
+#include "rack_selection.h"
 
 namespace augr {
 
@@ -76,6 +77,7 @@ void RackView::Draw() {
     CheckLinkDestroyed();
     CheckCreateNode();
     CheckNodeSelection();
+    CheckClipboard();
 
     DrawModuleCatalog();
 
@@ -86,6 +88,96 @@ void RackView::Draw() {
         }
         ImGui::EndPopup();
     }
+    selected_nodes_.clear();
+}
+
+std::vector<Model*> RackView::SelectedModules() const {
+    std::vector<Model*> result;
+    for (int id : selected_nodes_) {
+        auto it = widget_map_.find(id);
+        if (it == widget_map_.end()) continue;
+        if (auto* mw = dynamic_cast<ModelWidget*>(it->second)) {
+            if (auto* m = dynamic_cast<Module*>(mw->model())) {
+                result.push_back(m);
+            }
+        }
+    }
+    return result;
+}
+
+std::vector<Widget*> RackView::SelectedWidgets() const {
+    std::vector<Widget*> result;
+    for (int id : selected_nodes_) {
+        auto it = widget_map_.find(id);
+        if (it == widget_map_.end()) continue;
+        if (auto* mw = dynamic_cast<ModuleWidget*>(it->second)) {
+            result.push_back(mw);
+        }
+    }
+    return result;
+}
+
+void RackView::CheckClipboard() {
+    // Only act on shortcuts when the editor (not some other ImGui widget)
+    // has focus. is_editor_hovered_ is a reasonable proxy.
+    if (!is_editor_hovered_) return;
+
+    // Don't fire shortcuts while text input is active (e.g. catalog
+    // search field).
+    if (ImGui::GetIO().WantTextInput) return;
+
+    const bool ctrl = ImGui::GetIO().KeyCtrl;
+    if (!ctrl) return;
+
+    if (ImGui::IsKeyPressed(ImGuiKey_C, /*repeat=*/false)) {
+        HandleCopy();
+    } else if (ImGui::IsKeyPressed(ImGuiKey_V, /*repeat=*/false)) {
+        HandlePaste();
+    } else if (ImGui::IsKeyPressed(ImGuiKey_X, /*repeat=*/false)) {
+        HandleCut();   // copy + delete selection
+    } else if (ImGui::IsKeyPressed(ImGuiKey_D, /*repeat=*/false)) {
+        HandleDuplicate();  // copy + paste in one step with auto-offset
+    }
+}
+
+void RackView::HandleCopy() {
+    auto modules = SelectedModules();
+    auto widgets = SelectedWidgets();
+    if (modules.empty()) return;
+
+    RackSelection selection;
+    nlohmann::json j = selection.BuildSelectionJson(*rack_, *this, modules, widgets);
+    ImGui::SetClipboardText(j.dump().c_str());
+}
+
+void RackView::HandlePaste() {
+    const char* text = ImGui::GetClipboardText();
+    if (!text) return;
+    try {
+        nlohmann::json j = nlohmann::json::parse(text);
+        // Compute offset — for now, just a fixed nudge.
+        Vec2 offset = {20, 20};
+        RackSelection selection;
+        selection.MergeSelectionIntoRack(*rack_, *this, j, offset);
+    } catch (...) {
+        // Clipboard didn't contain valid selection JSON. Ignore.
+    }
+}
+
+void RackView::HandleCut() {
+    HandleCopy();
+}
+
+void RackView::HandleDuplicate() {
+    auto modules = SelectedModules();
+    auto widgets = SelectedWidgets();
+    if (modules.empty()) return;
+
+    RackSelection selection;
+    nlohmann::json j = selection.BuildSelectionJson(*rack_, *this, modules, widgets);
+    // Compute offset — for now, just a fixed nudge.
+    Vec2 offset = {20, 20};
+    selection.MergeSelectionIntoRack(*rack_, *this, j, offset);
 }
 
 void RackView::CheckLinkCreated() {
@@ -152,10 +244,6 @@ void RackView::CheckMouse() {
 }
 
 void RackView::CheckNodeSelection() {
-    // This is a placeholder for node selection logic, which can be implemented
-    // based on your specific requirements. You can use ImNodes functions to
-    // check for node selection and update the selected_nodes_ vector
-    // accordingly.
     const int num_selected_nodes = ImNodes::NumSelectedNodes();
     if (num_selected_nodes > 0) {
         selected_nodes_.resize(num_selected_nodes);
@@ -163,7 +251,7 @@ void RackView::CheckNodeSelection() {
     }
     if (ImGui::IsKeyPressed(ImGuiKey_Escape)) {
         ImNodes::ClearNodeSelection();
-        selected_nodes_.clear();
+        //selected_nodes_.clear();
     } else if (ImGui::IsKeyPressed(ImGuiKey_Delete)) {
         for (int node_id : selected_nodes_) {
             if (const auto it = widget_map_.find(node_id);
@@ -178,7 +266,7 @@ void RackView::CheckNodeSelection() {
                 }
             }
         }
-        selected_nodes_.clear();
+        //selected_nodes_.clear();
     }
 }
 

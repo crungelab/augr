@@ -1,4 +1,6 @@
 // ModuleArchiver.cpp
+#include <unordered_set>
+
 #include <augr/core/archiver_manufacturer.h>
 #include <augr/core/model_manufacturer.h>
 
@@ -21,10 +23,78 @@ void GraphArchiver::Save(Archive &archive) const {
     // both see this graph's children as the resolution table.
     GraphScope graph_scope(archive, graph.children_);
 
+    SaveChildren(archive, graph.children_);
+    SaveWires(archive, graph.children_);
+    /*
     SaveChildren(archive);
     SaveWires(archive);
+    */
 }
 
+// Refactored — takes the modules to emit.
+void GraphArchiver::SaveChildren(Archive &archive,
+                                 const std::vector<Model *> &children) const {
+    auto &j = archive.json();
+
+    if (children.empty())
+        return;
+
+    auto &j_children = j["children"] = nlohmann::json::array();
+    for (auto *child : children) {
+        nlohmann::json j_child = nlohmann::json::object();
+        {
+            JsonScope json_scope(archive, j_child);
+            ArchiverManufacturer::singleton().Serialize(archive, *child);
+        }
+        j_children.push_back(std::move(j_child));
+    }
+}
+
+// For SaveWires — emit only wires where both endpoints are in the set.
+void GraphArchiver::SaveWires(Archive &archive,
+                              const std::vector<Model *> &children) const {
+    const Graph &graph = subject();
+    if (graph.wires_.empty())
+        return;
+
+    // Push a GraphScope over the passed-in children list so IndexOf
+    // resolves to indices within that subset. For whole-graph save this
+    // is graph.children_; for selection save this is the subset.
+    GraphScope graph_scope(archive, children);
+
+    auto &j = archive.json();
+    auto &j_wires = j["wires"] = nlohmann::json::array();
+
+    for (const Wire *wire : graph.wires_) {
+        const Pin *out_pin = wire->output_;
+        const Pin *in_pin = wire->input_;
+
+        auto &out_module = out_pin->node();
+        auto &in_module = in_pin->node();
+
+        int out_idx = archive.IndexOf(&out_module);
+        int in_idx = archive.IndexOf(&in_module);
+
+        if (out_idx < 0 || in_idx < 0) {
+            // Endpoint not in the subset — drop it silently. For whole-
+            // graph save this means "dangling wire" (real anomaly); for
+            // selection save this means "wire crosses the selection
+            // boundary" (expected and correct).
+            continue;
+        }
+
+        nlohmann::json j_wire = nlohmann::json::array();
+        j_wire.push_back(nlohmann::json::array({out_idx, out_pin->name()}));
+        j_wire.push_back(nlohmann::json::array({in_idx, in_pin->name()}));
+        j_wires.push_back(std::move(j_wire));
+    }
+
+    if (j_wires.empty()) {
+        j.erase("wires");
+    }
+}
+
+/*
 void GraphArchiver::SaveChildren(Archive &archive) const {
 
     auto &j = archive.json();
@@ -83,6 +153,7 @@ void GraphArchiver::SaveWires(Archive &archive) const {
         j.erase("wires");
     }
 }
+*/
 
 void GraphArchiver::Load(Archive &archive) {
     ModuleArchiver::Load(archive);

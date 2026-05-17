@@ -11,8 +11,9 @@ public:
     void Save(Archive& archive) const override;
     void Load(Archive& archive) override;
 
-private:
-    void SaveWidgets(Archive& archive) const;
+//private:
+    //void SaveWidgets(Archive& archive) const;
+    void SaveWidgets(Archive& archive, const std::vector<Widget *> &widgets) const;
     void LoadWidgets(Archive& archive);
 };
 
