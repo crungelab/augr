@@ -66,16 +66,6 @@ void RackView::Draw() {
         Build();
     }
 
-    //DrawMainDockspace();
-
-    /*
-    ImGuiWindowFlags graph_flags =
-        ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoScrollWithMouse |
-        ImGuiWindowFlags_NoBringToFrontOnFocus; // <-- key
-
-    ImGui::Begin("Graph", nullptr, graph_flags);
-    */
-
     ImNodes::BeginNodeEditor();
 
     root_->Draw();
@@ -104,8 +94,6 @@ void RackView::Draw() {
         }
         ImGui::EndPopup();
     }
-
-    //ImGui::End();
 }
 
 void RackView::CheckLinkCreated() {

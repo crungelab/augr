@@ -31,6 +31,10 @@ bool Graph::IsInput(int id) const {
     return input_map_.find(id) != input_map_.end();
 }
 
+void Graph::OnAddingChild(Model &model) {
+    Model::OnAddingChild(model);
+}
+
 void Graph::OnRemovingChild(Model &model) {
     auto node = dynamic_cast<Node *>(&model);
     for (auto pin : node->inport_.pins_) {

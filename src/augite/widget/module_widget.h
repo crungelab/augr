@@ -40,7 +40,6 @@ public:
 
         if (ImGui::Begin(this->window_name_.c_str(), &this->is_open_)) {
             ImGui::PushID(this->model_->id_);
-            //this->DrawChildren();
             this->DrawContent();
             ImGui::PopID();
         }
@@ -78,25 +77,5 @@ public:
 };
 
 using DefaultModuleWidget = ModuleWidgetT<Module>;
-
-/*
-class ModuleWidget : public ModelWidgetT<Module> {
-public:
-    ModuleWidget(Module &model) : ModelWidgetT<Module>(model) {
-        window_name_ = std::string(model_->label_) + "###module_" +
-                       std::to_string(model_->id_);
-    }
-    void Draw() override;
-    virtual void DrawNode();
-    virtual void DrawWindow();
-
-    void ShowWindow() { is_open_ = true; }
-    void HideWindow() { is_open_ = false; }
-
-    // Data members
-    bool is_open_ = false;
-    std::string window_name_;
-};
-*/
 
 } // namespace augr

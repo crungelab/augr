@@ -23,6 +23,7 @@ public:
     bool IsInput(int id) const;
 
 protected:
+    void OnAddingChild(Model &model) override;
     void OnRemovingChild(Model &model) override;
 
 public:
