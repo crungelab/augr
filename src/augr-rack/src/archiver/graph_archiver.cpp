@@ -15,7 +15,7 @@ namespace augr {
 void GraphArchiver::Save(Archive &archive) const {
     ModuleArchiver::Save(archive);
 
-    const Graph &graph = model();
+    const Graph &graph = subject();
 
     // Push graph context so children iteration AND wire resolution
     // both see this graph's children as the resolution table.
@@ -28,7 +28,7 @@ void GraphArchiver::Save(Archive &archive) const {
 void GraphArchiver::SaveChildren(Archive &archive) const {
 
     auto &j = archive.json();
-    const Graph &graph = model();
+    const Graph &graph = subject();
 
     if (graph.children_.empty())
         return;
@@ -45,7 +45,7 @@ void GraphArchiver::SaveChildren(Archive &archive) const {
 }
 
 void GraphArchiver::SaveWires(Archive &archive) const {
-    const Graph &graph = model();
+    const Graph &graph = subject();
     if (graph.wires_.empty())
         return;
 
@@ -87,7 +87,7 @@ void GraphArchiver::SaveWires(Archive &archive) const {
 void GraphArchiver::Load(Archive &archive) {
     ModuleArchiver::Load(archive);
 
-    Graph &graph = model();
+    Graph &graph = subject();
     const auto &j = archive.json();
 
     LoadChildren(archive);
@@ -102,7 +102,7 @@ void GraphArchiver::Load(Archive &archive) {
 
 void GraphArchiver::LoadChildren(Archive &archive) {
     const auto &j = archive.json();
-    Graph &graph = model();
+    Graph &graph = subject();
 
     if (!j.contains("children"))
         return;
@@ -143,7 +143,7 @@ void GraphArchiver::LoadChildren(Archive &archive) {
 
 void GraphArchiver::LoadWires(Archive &archive) {
     const auto &j = archive.json();
-    Graph &graph = model();
+    Graph &graph = subject();
 
     if (!j.contains("wires"))
         return;

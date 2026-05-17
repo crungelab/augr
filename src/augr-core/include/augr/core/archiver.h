@@ -11,7 +11,7 @@
 namespace augr {
 
 class ArchiverFactory;
-class Model;
+class Subject;
 
 // Archiver is instantiated per Model. Each Model has its own archiver,
 // produced by an ArchiverFactory and bound to that Model at construction.
@@ -20,12 +20,12 @@ class Model;
 class Archiver {
 public:
     virtual ~Archiver() = default;
-    virtual void Create(ArchiverFactory &factory, Model &model) = 0;
+    virtual void Create(ArchiverFactory &factory, Subject &model) = 0;
     virtual void Save(Archive &archive) const = 0;
     virtual void Load(Archive &archive) = 0;
 
 protected:
-    Model *model_ = nullptr;
+    Subject *subject_ = nullptr;
     ArchiverFactory *factory_ = nullptr;
 };
 
@@ -33,12 +33,12 @@ protected:
 // see their Model as T& without writing static_casts.
 template <typename T, typename TBase = Archiver> class ArchiverT : public TBase {
 public:
-    void Create(ArchiverFactory &factory, Model &model) override {
+    void Create(ArchiverFactory &factory, Subject &subject) override {
         this->factory_ = &factory;
-        this->model_ = &dynamic_cast<T &>(model);
+        this->subject_ = &dynamic_cast<T &>(subject);
     }
-    T &model() { return *(T*)this->model_; }
-    const T &model() const { return *(T*)this->model_; }
+    T &subject() { return *static_cast<T *>(this->subject_); }
+    const T &subject() const { return *static_cast<T *>(this->subject_); }
 };
 
 } // namespace augr

@@ -9,7 +9,7 @@ namespace augr {
 
 void ModuleArchiver::Save(Archive &archive) const {
     auto &j = archive.json();
-    const Module &module = model();
+    const Module &module = subject();
 
     j["type"] = factory_->type_name();
 
@@ -23,7 +23,7 @@ void ModuleArchiver::Save(Archive &archive) const {
 
 void ModuleArchiver::Load(Archive &archive) {
     const auto &j = archive.json();
-    Module &module = model();
+    Module &module = subject();
 
     // Type tag is read by the caller (it's needed before we can construct
     // this Module), so we don't read it here.
@@ -42,7 +42,7 @@ void ModuleArchiver::Load(Archive &archive) {
 
     if (j.contains("parameters")) {
         const auto &j_params = j["parameters"];
-        for (auto &param : module.parameters()) {
+        for (auto &param : subject().parameters()) {
             const std::string &name = param->label();
             if (j_params.contains(name)) {
                 param->SetNormalized(j_params[name].get<float>());
