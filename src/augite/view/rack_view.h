@@ -20,7 +20,6 @@ public:
 
     void Draw() override;
 
-    //void DrawMainDockspace();
     void DrawModuleCatalog();
 
     void CheckLinkCreated();
@@ -31,9 +30,6 @@ public:
     void CheckMouse();
 
 private:
-    void LoadEditorState();
-    void SaveEditorState();
-
     // Data members
     Rack *rack_ = nullptr; // = &doc_->rack(), cached for convenience
     std::map<int, Widget *> widget_map_;

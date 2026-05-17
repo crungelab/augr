@@ -1,3 +1,7 @@
+#include <augr/core/archiver_manufacturer.h>
+#include <augr/core/archive.h>
+#include <augr/core/archiver.h>
+
 #include <augr/rack/rack_doc.h>
 
 #include "rack_frame.h"
@@ -7,11 +11,67 @@ namespace augr {
 RackFrame::RackFrame(const std::string &label)
     : FrameT<RackDoc, RackView>(label) {
     doc_ = std::make_unique<RackDoc>();
+
+    // Install view hooks BEFORE NewDocument, so the load-hook
+    // gets invoked on the initial document. RackFrame owns both doc_
+    // and view_, so the `this` captures are valid for the lifetime of
+    // the doc_.
+    save_view_token_ = doc_->AddSaveHook("view", [this]() {
+        return ViewToJson();
+    });
+    load_view_token_ = doc_->AddLoadHook("view", [this](const nlohmann::json &j) {
+        RebuildView();
+        if (!j.empty()) {
+            ViewFromJson(j);
+        }
+    });
+
     doc().NewDocument();
-    RebuildView();
+    // RebuildView is now triggered by the load hook on NewDocument.
 }
 
-void RackFrame::RebuildView() { view_ = std::make_unique<RackView>(doc()); }
+RackFrame::~RackFrame() {
+    if (doc_) {
+        doc_->RemoveSaveHook(save_view_token_);
+        doc_->RemoveLoadHook(load_view_token_);
+    }
+}
+
+//void RackFrame::RebuildView() { view_ = std::make_unique<RackView>(doc()); }
+
+void RackFrame::RebuildView() {
+    view_ = std::make_unique<RackView>(doc());
+    view().Build();  // construct widget tree now so view archiver has something to load into
+}
+
+nlohmann::json RackFrame::ViewToJson() {
+    if (!view_) return nlohmann::json();
+
+    auto &mfr = ArchiverManufacturer::singleton();
+    auto *factory = mfr.FindFactory(std::type_index(typeid(*view_)));
+    if (!factory) {
+        std::cerr << "No archiver factory for RackView\n";
+        return nlohmann::json();
+    }
+    std::unique_ptr<Archiver> archiver(factory->Produce(*view_));
+    nlohmann::json out;
+    Archive archive(out);
+    archiver->Save(archive);
+    return out;
+}
+
+void RackFrame::ViewFromJson(const nlohmann::json &j) {
+    if (!view_) return;
+
+    auto &mfr = ArchiverManufacturer::singleton();
+    auto *factory = mfr.FindFactory(std::type_index(typeid(*view_)));
+    if (!factory) return;
+
+    std::unique_ptr<Archiver> archiver(factory->Produce(*view_));
+    nlohmann::json local = j;
+    Archive archive(local);
+    archiver->Load(archive);
+}
 
 void RackFrame::Draw() {
     PollPendingDialog();
@@ -23,7 +83,7 @@ void RackFrame::Draw() {
 void RackFrame::Begin() {
     ImGuiWindowFlags graph_flags =
         ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoScrollWithMouse |
-        ImGuiWindowFlags_NoBringToFrontOnFocus; // <-- key
+        ImGuiWindowFlags_NoBringToFrontOnFocus;
 
     ImGui::Begin(label_.c_str(), nullptr, graph_flags);
 }
@@ -47,7 +107,6 @@ void RackFrame::PollPendingDialog() {
                 p.replace_extension(".augr");
             DoSaveAs(p);
 
-            // If a save was the prelude to another action, fire it now.
             if (pending_ == PendingAction::OpenAfterPrompt) {
                 StartOpenDialog();
             } else if (pending_ == PendingAction::NewAfterPrompt) {
@@ -55,7 +114,6 @@ void RackFrame::PollPendingDialog() {
             }
             pending_ = PendingAction::None;
         } else {
-            // User cancelled save — also cancel any pending follow-up.
             pending_ = PendingAction::None;
         }
     }
@@ -129,21 +187,20 @@ void RackFrame::StartSaveAsDialog() {
 
 void RackFrame::DoNew() {
     doc().NewDocument();
-    RebuildView();
+    // Load hook fires from inside NewDocument and rebuilds the view.
 }
 
 void RackFrame::DoOpen(const std::filesystem::path &p) {
-    if (doc().Load(p)) {
-        RebuildView();
-    } else {
+    if (!doc().Load(p)) {
         pfd::message("Load Failed", "Could not load: " + p.string(),
                      pfd::choice::ok, pfd::icon::error);
     }
+    // Load hook handles RebuildView and view JSON deserialization.
 }
 
 void RackFrame::DoSave() {
     if (!doc().Path())
-        return; // guarded by menu logic, but be safe
+        return;
     DoSaveAs(*doc().Path());
 }
 
@@ -176,8 +233,6 @@ void RackFrame::DrawUnsavedModal() {
                 }
                 pending_ = PendingAction::None;
             } else {
-                // No path yet — kick off SaveAs; PollPendingDialog handles
-                // the follow-up using `pending_`.
                 StartSaveAsDialog();
             }
         }

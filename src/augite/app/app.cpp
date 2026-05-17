@@ -21,11 +21,6 @@ App *App::singleton_;
 
 App::App() {
     singleton_ = this;
-};
-
-bool App::DoCreate(CreateParams params) {
-
-    bool success = BaseApp::DoCreate(params);
 
     REGISTER_ARCHIVER_FACTORY(ModuleWidgetArchiver);
     REGISTER_ARCHIVER_FACTORY(RackViewArchiver);
@@ -45,9 +40,13 @@ bool App::DoCreate(CreateParams params) {
     REGISTER_MODEL_WIDGET_FACTORY(HBarGraphWidget)
     REGISTER_MODEL_WIDGET_FACTORY(VBarGraphWidget)
     REGISTER_MODEL_WIDGET_FACTORY(KnobWidget)
+};
 
+bool App::DoCreate(CreateParams params) {
     clipboard_ = Clipboard();
-    
+
+    bool success = BaseApp::DoCreate(params);
+
     return success;
 }
 

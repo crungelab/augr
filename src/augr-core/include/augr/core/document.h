@@ -5,6 +5,8 @@
 #include <string>
 #include <vector>
 
+#include <nlohmann/json.hpp>
+
 namespace augr {
 
 class Model;
@@ -30,14 +32,34 @@ public:
         return modified_ ? base + "*" : base;
     }
 
+    // Hooks let subsystems persist data alongside the rack without
+    // RackDoc knowing about them. Each hook owns a top-level JSON key
+    // ("view", "midi_learn", etc.) and is invoked during Save/Load.
+    using SaveHookFn = std::function<nlohmann::json()>;
+    using LoadHookFn = std::function<void(const nlohmann::json&)>;
+
+    // Returns a token that can be used to remove the hook later.
+    using HookToken = int;
+    HookToken AddSaveHook(std::string key, SaveHookFn fn);
+    HookToken AddLoadHook(std::string key, LoadHookFn fn);
+
+    void RemoveSaveHook(HookToken token);
+    void RemoveLoadHook(HookToken token);
+
 protected:
     void SetPath(std::filesystem::path p) { path_ = std::move(p); }
     void ClearPath() { path_.reset(); }
     void MarkClean() { modified_ = false; }
 
-private:
     std::optional<std::filesystem::path> path_;
     bool modified_ = false;
+
+    struct SaveHook { HookToken token; std::string key; SaveHookFn fn; };
+    struct LoadHook { HookToken token; std::string key; LoadHookFn fn; };
+    std::vector<SaveHook> save_hooks_;
+    std::vector<LoadHook> load_hooks_;
+    HookToken next_token_ = 1;
+
 };
 
 template <typename T> class DocumentT : public Document {

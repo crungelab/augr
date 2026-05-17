@@ -9,10 +9,10 @@ void ImNodesSystem::Create() {
 
   ImNodesIO &io = ImNodes::GetIO();
   io.LinkDetachWithModifierClick.Modifier = &ImGui::GetIO().KeyCtrl;
-  ImNodes::LoadCurrentEditorStateFromIniFile("imnodes.ini");
+  //ImNodes::LoadCurrentEditorStateFromIniFile("imnodes.ini");
 }
 
 void ImNodesSystem::Destroy() {
-  ImNodes::SaveCurrentEditorStateToIniFile("imnodes.ini");
+  //ImNodes::SaveCurrentEditorStateToIniFile("imnodes.ini");
   ImNodes::DestroyContext();
 }

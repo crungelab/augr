@@ -1,6 +1,7 @@
 // rack_doc.cpp
 #include <augr/rack/rack_doc.h>
 
+#include <algorithm>
 #include <fstream>
 #include <iostream>
 
@@ -22,6 +23,11 @@ namespace {
 // own versioning concerns via GraphArchiver).
 constexpr const char *kDocumentFormatTag = "augr.document";
 constexpr int kDocumentFormatVersion = 1;
+
+// Reserved top-level envelope keys that hooks may not use.
+bool IsReservedEnvelopeKey(const std::string &key) {
+    return key == "format" || key == "version" || key == "rack";
+}
 
 // Pure: rack -> json (bare rack json, no envelope).
 bool RackToJson(Rack &rack, nlohmann::json &out_json) {
@@ -88,41 +94,16 @@ std::unique_ptr<Rack> RackFromJson(const nlohmann::json &j) {
     return rack;
 }
 
-// Wraps a rack-json subtree in the document envelope.
-nlohmann::json BuildEnvelope(nlohmann::json rack_json,
-                             const nlohmann::json &metadata) {
-    nlohmann::json doc = nlohmann::json::object();
-    doc["format"] = kDocumentFormatTag;
-    doc["version"] = kDocumentFormatVersion;
-    doc["rack"] = std::move(rack_json);
-    if (!metadata.empty()) {
-        // Spread metadata as top-level siblings of "rack". This keeps
-        // additions like "editor", "midi_learn", etc. at the top of the
-        // file rather than nested under a generic "metadata" key.
-        for (auto it = metadata.begin(); it != metadata.end(); ++it) {
-            // Don't let metadata clobber reserved envelope keys.
-            if (it.key() == "format" || it.key() == "version" ||
-                it.key() == "rack") {
-                std::cerr << "Skipping reserved metadata key '" << it.key()
-                          << "'\n";
-                continue;
-            }
-            doc[it.key()] = it.value();
-        }
-    }
-    return doc;
-}
-
-// Validates the envelope and extracts (rack_json, metadata). Returns false
-// on structural errors. Accepts legacy bare-rack files (no envelope) for
+// Validates the envelope and extracts the rack subtree. Returns false on
+// structural errors. Accepts legacy bare-rack files (no envelope) for
 // backward compatibility — detected by absence of the "format" tag.
+//
+// Hook subtrees aren't extracted here; load hooks read directly from the
+// full document JSON by their registered key.
 bool ParseEnvelope(const nlohmann::json &doc,
-                   const nlohmann::json *&out_rack_json,
-                   nlohmann::json &out_metadata) {
-    out_metadata = nlohmann::json::object();
-
+                   const nlohmann::json *&out_rack_json) {
     // Legacy path: file is just a bare rack (no envelope). Treat the
-    // whole document as the rack subtree and return empty metadata.
+    // whole document as the rack subtree.
     if (!doc.contains("format")) {
         out_rack_json = &doc;
         return true;
@@ -145,31 +126,12 @@ bool ParseEnvelope(const nlohmann::json &doc,
         return false;
     }
     out_rack_json = &doc["rack"];
-
-    // Everything except the reserved keys goes into metadata.
-    for (auto it = doc.begin(); it != doc.end(); ++it) {
-        if (it.key() == "format" || it.key() == "version" ||
-            it.key() == "rack") {
-            continue;
-        }
-        out_metadata[it.key()] = it.value();
-    }
     return true;
 }
 
 } // namespace
 
-RackDoc::~RackDoc() {
-    Stop();
-}
-
-nlohmann::json &RackDoc::MetadataSection(const std::string &key) {
-    auto it = metadata_.find(key);
-    if (it == metadata_.end() || !it->is_object()) {
-        metadata_[key] = nlohmann::json::object();
-    }
-    return metadata_[key];
-}
+RackDoc::~RackDoc() { Stop(); }
 
 bool RackDoc::Save(const std::filesystem::path &p) {
     try {
@@ -177,7 +139,28 @@ bool RackDoc::Save(const std::filesystem::path &p) {
         if (!RackToJson(rack(), rack_json))
             return false;
 
-        nlohmann::json doc = BuildEnvelope(std::move(rack_json), metadata_);
+        nlohmann::json doc = nlohmann::json::object();
+        doc["format"] = kDocumentFormatTag;
+        doc["version"] = kDocumentFormatVersion;
+        doc["rack"] = std::move(rack_json);
+
+        // Invoke save hooks. Each contributes its own top-level key.
+        for (const auto &hook : save_hooks_) {
+            if (IsReservedEnvelopeKey(hook.key)) {
+                std::cerr << "Save hook tried to use reserved key '"
+                          << hook.key << "' — skipping\n";
+                continue;
+            }
+            try {
+                nlohmann::json sub = hook.fn();
+                if (!sub.is_null()) {
+                    doc[hook.key] = std::move(sub);
+                }
+            } catch (const std::exception &e) {
+                std::cerr << "Save hook '" << hook.key
+                          << "' threw: " << e.what() << " — skipping\n";
+            }
+        }
 
         std::ofstream out(p);
         out << doc.dump(2);
@@ -205,20 +188,35 @@ bool RackDoc::Load(const std::filesystem::path &p, bool auto_start) {
         in >> doc;
 
         const nlohmann::json *rack_json = nullptr;
-        nlohmann::json metadata;
-        if (!ParseEnvelope(doc, rack_json, metadata)) {
+        if (!ParseEnvelope(doc, rack_json)) {
             return false;
         }
 
         auto fresh = RackFromJson(*rack_json);
-        if (!fresh) return false;
+        if (!fresh)
+            return false;
 
         Stop();
         model_ = std::move(fresh);
-        metadata_ = std::move(metadata);
 
         SetPath(p);
         MarkClean();
+
+        // Invoke load hooks after the rack swap. Each receives the JSON
+        // at its registered key, or an empty object if absent — so hooks
+        // have a single unconditional entry point regardless of whether
+        // their state was previously saved.
+        for (const auto &hook : load_hooks_) {
+            const nlohmann::json &sub =
+                doc.contains(hook.key) ? doc[hook.key]
+                                       : nlohmann::json::object();
+            try {
+                hook.fn(sub);
+            } catch (const std::exception &e) {
+                std::cerr << "Load hook '" << hook.key
+                          << "' threw: " << e.what() << "\n";
+            }
+        }
 
         if (auto_start) {
             Start();
@@ -240,9 +238,20 @@ void RackDoc::NewDocument(bool auto_start) {
 
     Stop();
     model_ = std::move(fresh);
-    metadata_ = nlohmann::json::object();
     ClearPath();
     MarkClean();
+
+    // Notify load hooks so they can reset their state to defaults. This
+    // gives subsystems a single notification point — "the document
+    // changed" — whether the change came from Load or NewDocument.
+    for (const auto &hook : load_hooks_) {
+        try {
+            hook.fn(nlohmann::json::object());
+        } catch (const std::exception &e) {
+            std::cerr << "Load hook '" << hook.key
+                      << "' threw on NewDocument: " << e.what() << "\n";
+        }
+    }
 
     if (auto_start) {
         Start();
@@ -250,8 +259,10 @@ void RackDoc::NewDocument(bool auto_start) {
 }
 
 bool RackDoc::Start() {
-    if (!model_) return false;
-    if (model_->IsRunning()) return true;
+    if (!model_)
+        return false;
+    if (model_->IsRunning())
+        return true;
     try {
         model_->Start();
         return true;
@@ -267,8 +278,6 @@ void RackDoc::Stop() {
     }
 }
 
-bool RackDoc::IsRunning() const {
-    return model_ && model_->IsRunning();
-}
+bool RackDoc::IsRunning() const { return model_ && model_->IsRunning(); }
 
 } // namespace augr
