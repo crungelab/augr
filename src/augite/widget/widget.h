@@ -4,6 +4,8 @@
 #include <typeindex>
 #include <vector>
 
+#include <augr/core/subject.h>
+
 namespace augr {
 
 class Model;
@@ -12,7 +14,7 @@ class Model;
 // children, but has no inherent association with a Model. Use this for
 // pure layout/structural widgets (containers, dividers, group boxes,
 // static labels, etc.).
-class Widget {
+class Widget : public Subject {
 public:
     virtual ~Widget() = default;
     void AddChild(Widget *widget) { children_.push_back(widget); }

@@ -1,4 +1,4 @@
-#include <augr/core/model.h>
+#include <augr/core/subject.h>
 #include <augr/core/archiver_manufacturer.h>
 
 #include <augr/core/archiver.h>
@@ -8,7 +8,7 @@ namespace augr {
 
 void ArchiverManufacturer::AddFactory(ArchiverFactory &factory) {
     factories_.push_back(&factory);
-    factory_type_map_[factory.ModelType()] = &factory;
+    factory_type_map_[factory.SubjectType()] = &factory;
     factory_name_map_[factory.type_name()] = &factory;
 }
 
@@ -25,28 +25,28 @@ ArchiverFactory *ArchiverManufacturer::FindFactory(
 }
 
 Archiver* ArchiverManufacturer::MakeArchiver(
-    Model &model) const {
-    auto factory = FindFactory(std::type_index(typeid(model)));
-    return factory ? factory->Produce(model) : nullptr;
+    Subject &subject) const {
+    auto factory = FindFactory(std::type_index(typeid(subject)));
+    return factory ? factory->Produce(subject) : nullptr;
 }
 
 Archiver* ArchiverManufacturer::MakeArchiver(
-    const std::string &type_name, Model &model) const {
+    const std::string &type_name, Subject &subject) const {
     auto factory = FindFactory(type_name);
-    return factory ? factory->Produce(model) : nullptr;
+    return factory ? factory->Produce(subject) : nullptr;
 }
 
-void ArchiverManufacturer::Serialize(Archive &archive, Model &model) const {
-    auto *factory = FindFactory(std::type_index(typeid(model)));
+void ArchiverManufacturer::Serialize(Archive &archive, Subject &subject) const {
+    auto *factory = FindFactory(std::type_index(typeid(subject)));
     if (!factory) { /* error */ return; }
-    Archiver *archiver = factory->Produce(model);
+    Archiver *archiver = factory->Produce(subject);
     if (archiver) {
         archiver->Save(archive);
         delete archiver;
     }
 }
 
-void ArchiverManufacturer::Deserialize(Archive &archive, Model &model) const {
+void ArchiverManufacturer::Deserialize(Archive &archive, Subject &subject) const {
     // mirror for Load
 }
 

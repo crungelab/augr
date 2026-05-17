@@ -12,12 +12,11 @@ namespace augr {
 
 class Archive;
 class Archiver;
-//class ArchiverFactory;
-class Model;
+class Subject;
 
 // ArchiverManufacturer owns the registry of ArchiverFactory instances
 // and produces archivers on demand. Lookup is by either std::type_index
-// (when saving — we have a live Model) or by string type tag (when
+// (when saving — we have a live Subject) or by string type tag (when
 // loading — we have a JSON tag).
 class ArchiverManufacturer {
 public:
@@ -33,11 +32,11 @@ public:
 
     // Convenience: find the factory and produce an archiver in one call.
     // Returns nullptr if no factory matches.
-    Archiver *MakeArchiver(Model &model) const;
-    Archiver *MakeArchiver(const std::string &type_name, Model &model) const;
+    Archiver *MakeArchiver(Subject &subject) const;
+    Archiver *MakeArchiver(const std::string &type_name, Subject &subject) const;
 
-    void Serialize(Archive &archive, Model &model) const;
-    void Deserialize(Archive &archive, Model &model) const;
+    void Serialize(Archive &archive, Subject &subject) const;
+    void Deserialize(Archive &archive, Subject &subject) const;
 
     const std::vector<ArchiverFactory *> &factories() const {
         return factories_;
