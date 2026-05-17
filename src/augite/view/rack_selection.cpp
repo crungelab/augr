@@ -17,7 +17,7 @@
 namespace augr {
 
 nlohmann::json
-RackSelection::BuildSelectionJson(Rack &rack, RackView &view,
+RackSelection::BuildJson(Rack &rack, RackView &view,
                                   const std::vector<Model *> &modules,
                                   const std::vector<Widget *> &widgets) {
     assert(modules.size() == widgets.size());
@@ -83,7 +83,7 @@ RackSelection::BuildSelectionJson(Rack &rack, RackView &view,
 }
 
 std::vector<Model *>
-RackSelection::MergeSelectionIntoRack(Rack &dest, RackView &view,
+RackSelection::MergeIntoRack(Rack &dest, RackView &view,
                                       const nlohmann::json &selection_json,
                                       Vec2 paste_offset) {
     if (selection_json.value("format", "") != "augr.selection")

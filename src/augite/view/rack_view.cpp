@@ -10,19 +10,20 @@
 #include <augr/rack/module/module.h>
 
 #include <augr/rack/pin.h>
-#include <augr/rack/wire.h>
 #include <augr/rack/rack.h>
 #include <augr/rack/rack_doc.h>
+#include <augr/rack/wire.h>
 
 #include <augite/widget/module_widget.h>
 #include <augite/widget/widget_builder.h>
 
-#include "rack_view.h"
 #include "rack_selection.h"
+#include "rack_view.h"
 
 namespace augr {
 
-RackView::RackView(RackDoc &doc) : DocumentViewT<RackDoc>(doc), rack_(&doc.rack()) {}
+RackView::RackView(RackDoc &doc)
+    : DocumentViewT<RackDoc>(doc), rack_(&doc.rack()) {}
 
 RackView::~RackView() {
     if (root_) {
@@ -91,13 +92,14 @@ void RackView::Draw() {
     selected_nodes_.clear();
 }
 
-std::vector<Model*> RackView::SelectedModules() const {
-    std::vector<Model*> result;
+std::vector<Model *> RackView::SelectedModules() const {
+    std::vector<Model *> result;
     for (int id : selected_nodes_) {
         auto it = widget_map_.find(id);
-        if (it == widget_map_.end()) continue;
-        if (auto* mw = dynamic_cast<ModelWidget*>(it->second)) {
-            if (auto* m = dynamic_cast<Module*>(mw->model())) {
+        if (it == widget_map_.end())
+            continue;
+        if (auto *mw = dynamic_cast<ModelWidget *>(it->second)) {
+            if (auto *m = dynamic_cast<Module *>(mw->model())) {
                 result.push_back(m);
             }
         }
@@ -105,12 +107,13 @@ std::vector<Model*> RackView::SelectedModules() const {
     return result;
 }
 
-std::vector<Widget*> RackView::SelectedWidgets() const {
-    std::vector<Widget*> result;
+std::vector<Widget *> RackView::SelectedWidgets() const {
+    std::vector<Widget *> result;
     for (int id : selected_nodes_) {
         auto it = widget_map_.find(id);
-        if (it == widget_map_.end()) continue;
-        if (auto* mw = dynamic_cast<ModuleWidget*>(it->second)) {
+        if (it == widget_map_.end())
+            continue;
+        if (auto *mw = dynamic_cast<ModuleWidget *>(it->second)) {
             result.push_back(mw);
         }
     }
@@ -120,64 +123,68 @@ std::vector<Widget*> RackView::SelectedWidgets() const {
 void RackView::CheckClipboard() {
     // Only act on shortcuts when the editor (not some other ImGui widget)
     // has focus. is_editor_hovered_ is a reasonable proxy.
-    if (!is_editor_hovered_) return;
+    if (!is_editor_hovered_)
+        return;
 
     // Don't fire shortcuts while text input is active (e.g. catalog
     // search field).
-    if (ImGui::GetIO().WantTextInput) return;
+    if (ImGui::GetIO().WantTextInput)
+        return;
 
     const bool ctrl = ImGui::GetIO().KeyCtrl;
-    if (!ctrl) return;
+    if (!ctrl)
+        return;
 
     if (ImGui::IsKeyPressed(ImGuiKey_C, /*repeat=*/false)) {
         HandleCopy();
     } else if (ImGui::IsKeyPressed(ImGuiKey_V, /*repeat=*/false)) {
         HandlePaste();
     } else if (ImGui::IsKeyPressed(ImGuiKey_X, /*repeat=*/false)) {
-        HandleCut();   // copy + delete selection
+        HandleCut(); // copy + delete selection
     } else if (ImGui::IsKeyPressed(ImGuiKey_D, /*repeat=*/false)) {
-        HandleDuplicate();  // copy + paste in one step with auto-offset
+        HandleDuplicate(); // copy + paste in one step with auto-offset
     }
 }
 
 void RackView::HandleCopy() {
     auto modules = SelectedModules();
     auto widgets = SelectedWidgets();
-    if (modules.empty()) return;
+    if (modules.empty())
+        return;
 
     RackSelection selection;
-    nlohmann::json j = selection.BuildSelectionJson(*rack_, *this, modules, widgets);
+    nlohmann::json j = selection.BuildJson(*rack_, *this, modules, widgets);
     ImGui::SetClipboardText(j.dump().c_str());
 }
 
 void RackView::HandlePaste() {
-    const char* text = ImGui::GetClipboardText();
-    if (!text) return;
+    const char *text = ImGui::GetClipboardText();
+    if (!text)
+        return;
     try {
         nlohmann::json j = nlohmann::json::parse(text);
         // Compute offset — for now, just a fixed nudge.
         Vec2 offset = {20, 20};
         RackSelection selection;
-        selection.MergeSelectionIntoRack(*rack_, *this, j, offset);
+        selection.MergeIntoRack(*rack_, *this, j, offset);
     } catch (...) {
         // Clipboard didn't contain valid selection JSON. Ignore.
     }
 }
 
-void RackView::HandleCut() {
-    HandleCopy();
-}
+void RackView::HandleCut() { HandleCopy(); }
 
 void RackView::HandleDuplicate() {
     auto modules = SelectedModules();
     auto widgets = SelectedWidgets();
-    if (modules.empty()) return;
+    if (modules.empty())
+        return;
 
     RackSelection selection;
-    nlohmann::json j = selection.BuildSelectionJson(*rack_, *this, modules, widgets);
+    nlohmann::json j = selection.BuildJson(*rack_, *this, modules, widgets);
     // Compute offset — for now, just a fixed nudge.
     Vec2 offset = {20, 20};
-    selection.MergeSelectionIntoRack(*rack_, *this, j, offset);
+    selection.MergeIntoRack(*rack_, *this, j, offset);
 }
 
 void RackView::CheckLinkCreated() {
@@ -251,7 +258,7 @@ void RackView::CheckNodeSelection() {
     }
     if (ImGui::IsKeyPressed(ImGuiKey_Escape)) {
         ImNodes::ClearNodeSelection();
-        //selected_nodes_.clear();
+        // selected_nodes_.clear();
     } else if (ImGui::IsKeyPressed(ImGuiKey_Delete)) {
         for (int node_id : selected_nodes_) {
             if (const auto it = widget_map_.find(node_id);
@@ -266,7 +273,7 @@ void RackView::CheckNodeSelection() {
                 }
             }
         }
-        //selected_nodes_.clear();
+        // selected_nodes_.clear();
     }
 }
 
@@ -294,21 +301,29 @@ void RackView::DrawModuleCatalog() {
                 root_->AddChild(widget);
                 widget_map_[module.id_] = widget;
 
+                // ImNodes::SetNodeScreenSpacePos(module.id_,
+                // pending_spawn_pos);
+
                 ImNodes::SetNodeScreenSpacePos(module.id_, pending_spawn_pos);
+                if (auto *mw = dynamic_cast<ModuleWidget *>(widget)) {
+                    ImVec2 grid_pos = ImNodes::GetNodeGridSpacePos(module.id_);
+                    mw->grid_position_ = ModuleWidget::FromImVec2(grid_pos);
+                    mw->position_dirty_ =
+                        false; // ImNodes is already authoritative — no re-push
+                }
 
                 // 5) If user was dragging a link, try to auto-connect
                 if (pending_link_start_attr != -1) {
                     // Decide direction based on the starting pin’s kind
-                    bool start_is_output = rack_->IsOutput(
-                        pending_link_start_attr); // your helper
+                    bool start_is_output =
+                        rack_->IsOutput(pending_link_start_attr); // your helper
 
                     Pin *output = nullptr;
                     Pin *input = nullptr;
 
                     if (start_is_output) {
                         // Find first input
-                        output =
-                            rack_->output_map_[pending_link_start_attr];
+                        output = rack_->output_map_[pending_link_start_attr];
                         if (!module.inport_.pins_.empty()) {
                             input = module.inport_.pins_[0];
                         }
