@@ -6,11 +6,13 @@
 
 #include "../view/rack_view.h"
 
+#include "../controller/rack_controller.h"
+
 #include "frame.h"
 
 namespace augr {
 
-class RackFrame : public FrameT<RackDoc, RackView> {
+class RackFrame : public FrameT<RackDoc, RackView, RackController> {
 public:
     RackFrame(const std::string &label = "");
     ~RackFrame();
@@ -41,6 +43,7 @@ public:
     Rack &rack() { return doc().rack(); }
     RackDoc &doc() { return FrameT::doc(); }
     RackView &view() { return FrameT::view(); }
+    RackController &controller() { return FrameT::controller(); }
 
     // Data members
     std::unique_ptr<pfd::open_file> open_dialog_;

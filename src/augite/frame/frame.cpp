@@ -6,9 +6,10 @@ namespace augr {
 
 void Frame::Draw() {
     ImGui::Begin(label_.c_str());
-    if (view_) {
-        view_->Draw();
-    }
+
+    if (view_) view_->Draw();
+    if (controller_) controller_->Control();
+
     DrawChildren();
     ImGui::End();
 }

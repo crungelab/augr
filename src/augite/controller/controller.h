@@ -20,7 +20,10 @@ public:
     ControllerT(TDoc& doc, TView& view) : Controller(doc, view) {}
     // Accessors
     TDoc &doc() { return *static_cast<TDoc *>(doc_); }
+    const TDoc &doc() const { return *static_cast<const TDoc *>(doc_); }
+
     TView &view() { return *static_cast<TView *>(view_); }
+    const TView &view() const { return *static_cast<const TView *>(view_); }
     //
     // Data members
 };

@@ -10,16 +10,15 @@
 #include "../widget/widget_builder.h"
 
 #include "../archiver/rack_view_archiver.h"
+#include "../view/rack_view.h"
 
 #include "rack_selection.h"
-#include "rack_view.h"
 
 namespace augr {
 
-nlohmann::json
-RackSelection::BuildJson(Rack &rack, RackView &view,
-                                  const std::vector<Model *> &modules,
-                                  const std::vector<Widget *> &widgets) {
+nlohmann::json RackSelection::BuildSelectionJson(Rack &rack, RackView &view,
+                                        const std::vector<Model *> &modules,
+                                        const std::vector<Widget *> &widgets) {
     assert(modules.size() == widgets.size());
 
     nlohmann::json doc = nlohmann::json::object();
@@ -84,8 +83,8 @@ RackSelection::BuildJson(Rack &rack, RackView &view,
 
 std::vector<Model *>
 RackSelection::MergeIntoRack(Rack &dest, RackView &view,
-                                      const nlohmann::json &selection_json,
-                                      Vec2 paste_offset) {
+                             const nlohmann::json &selection_json,
+                             Vec2 paste_offset) {
     if (selection_json.value("format", "") != "augr.selection")
         return {};
     if (selection_json.value("version", 0) != 1)
@@ -204,6 +203,25 @@ RackSelection::MergeIntoRack(Rack &dest, RackView &view,
             result.push_back(mod);
     }
     return result;
+}
+
+bool RackSelection::LooksLikeSelection(const nlohmann::json &payload) {
+    if (!payload.is_object())
+        return false;
+
+    auto fmt = payload.find("format");
+    if (fmt == payload.end() || !fmt->is_string())
+        return false;
+    if (fmt->get<std::string>() != "augr.selection")
+        return false;
+
+    auto ver = payload.find("version");
+    if (ver == payload.end() || !ver->is_number_integer())
+        return false;
+    if (ver->get<int>() != 1)
+        return false;
+
+    return true;
 }
 
 } // namespace augr

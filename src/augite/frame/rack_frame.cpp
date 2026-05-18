@@ -9,7 +9,7 @@
 namespace augr {
 
 RackFrame::RackFrame(const std::string &label)
-    : FrameT<RackDoc, RackView>(label) {
+    : FrameT<RackDoc, RackView, RackController>(label) {
     doc_ = std::make_unique<RackDoc>();
 
     // Install view hooks BEFORE NewDocument, so the load-hook
@@ -42,6 +42,7 @@ RackFrame::~RackFrame() {
 void RackFrame::RebuildView() {
     view_ = std::make_unique<RackView>(doc());
     view().Build();  // construct widget tree now so view archiver has something to load into
+    controller_ = std::make_unique<RackController>(doc(), view());
 }
 
 nlohmann::json RackFrame::ViewToJson() {
