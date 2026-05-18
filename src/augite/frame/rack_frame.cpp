@@ -9,7 +9,7 @@
 namespace augr {
 
 RackFrame::RackFrame(const std::string &label)
-    : FrameT<RackDoc, RackView, RackController>(label) {
+    : FrameT<RackDoc, SubrackView, SubrackController>(label) {
     doc_ = std::make_unique<RackDoc>();
 
     // Install view hooks BEFORE NewDocument, so the load-hook
@@ -37,12 +37,12 @@ RackFrame::~RackFrame() {
     }
 }
 
-//void RackFrame::RebuildView() { view_ = std::make_unique<RackView>(doc()); }
+//void RackFrame::RebuildView() { view_ = std::make_unique<SubrackView>(doc()); }
 
 void RackFrame::RebuildView() {
-    view_ = std::make_unique<RackView>(doc());
+    view_ = std::make_unique<SubrackView>(doc());
     view().Build();  // construct widget tree now so view archiver has something to load into
-    controller_ = std::make_unique<RackController>(doc(), view());
+    controller_ = std::make_unique<SubrackController>(doc(), view(), *this);
 }
 
 nlohmann::json RackFrame::ViewToJson() {
@@ -51,7 +51,7 @@ nlohmann::json RackFrame::ViewToJson() {
     auto &mfr = ArchiverManufacturer::singleton();
     auto *factory = mfr.FindFactory(std::type_index(typeid(*view_)));
     if (!factory) {
-        std::cerr << "No archiver factory for RackView\n";
+        std::cerr << "No archiver factory for SubrackView\n";
         return nlohmann::json();
     }
     std::unique_ptr<Archiver> archiver(factory->Produce(*view_));

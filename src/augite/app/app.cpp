@@ -23,7 +23,7 @@ App::App() {
     singleton_ = this;
 
     REGISTER_ARCHIVER_FACTORY(ModuleWidgetArchiver);
-    REGISTER_ARCHIVER_FACTORY(RackViewArchiver);
+    REGISTER_ARCHIVER_FACTORY(SubrackViewArchiver);
 
     REGISTER_MODEL_WIDGET_FACTORY(SubrackWidget)
     REGISTER_MODEL_WIDGET_FACTORY(RackWidget)

@@ -1,7 +1,7 @@
 // augite/archiver/rack_view_archiver.cpp
 #include <iostream>
 
-#include <augite/archiver/rack_view_archiver.h>
+#include <augite/archiver/subrack_view_archiver.h>
 
 #include <augr/core/archive.h>
 #include <augr/core/archiver_factory.h>
@@ -14,8 +14,8 @@
 
 namespace augr {
 
-void RackViewArchiver::Save(Archive& archive) const {
-    const RackView& view = subject();
+void SubrackViewArchiver::Save(Archive& archive) const {
+    const SubrackView& view = subject();
 
     auto& j = archive.json();
     j["type"] = factory_->type_name();
@@ -28,8 +28,8 @@ void RackViewArchiver::Save(Archive& archive) const {
 
 }
 
-void RackViewArchiver::SaveWidgets(Archive& archive, const std::vector<Widget *> &widgets) const {
-    const RackView& view = subject();
+void SubrackViewArchiver::SaveWidgets(Archive& archive, const std::vector<Widget *> &widgets) const {
+    const SubrackView& view = subject();
 
     auto& j = archive.json();
 
@@ -48,9 +48,9 @@ void RackViewArchiver::SaveWidgets(Archive& archive, const std::vector<Widget *>
 }
 
 /*
-void RackViewArchiver::SaveWidgets(Archive& archive) const {
+void SubrackViewArchiver::SaveWidgets(Archive& archive) const {
     auto& j = archive.json();
-    const RackView& view = subject();
+    const SubrackView& view = subject();
 
     if (view.root_ == nullptr || view.root_->children_.empty()) return;
 
@@ -67,19 +67,19 @@ void RackViewArchiver::SaveWidgets(Archive& archive) const {
 }
 */
 
-void RackViewArchiver::Load(Archive& archive) {
+void SubrackViewArchiver::Load(Archive& archive) {
     LoadWidgets(archive);
 }
 
-void RackViewArchiver::LoadWidgets(Archive& archive) {
+void SubrackViewArchiver::LoadWidgets(Archive& archive) {
     const auto& j = archive.json();
-    RackView& view = subject();
+    SubrackView& view = subject();
 
     if (!j.contains("widgets") || !j["widgets"].is_array()) return;
     const auto& j_widgets = j["widgets"];
 
     // Assumption: the rack has already been loaded, view.root_ has been
-    // built via RackView::Build() — so widgets already exist parallel to
+    // built via SubrackView::Build() — so widgets already exist parallel to
     // the rack's children. We just deserialize state into them.
     //
     // Sanity check: widget count must match. If not, log and load what
@@ -96,7 +96,7 @@ void RackViewArchiver::LoadWidgets(Archive& archive) {
         // Could mean: rack loaded different children than the view JSON
         // expected (file from an older format, or modules failed to load).
         // Load the overlap; warn.
-        std::cerr << "RackView load: widget count mismatch (have "
+        std::cerr << "SubrackView load: widget count mismatch (have "
                   << children.size() << ", json has " << j_widgets.size()
                   << "). Loading first " << n << ".\n";
     }
@@ -113,6 +113,6 @@ void RackViewArchiver::LoadWidgets(Archive& archive) {
     }
 }
 
-DEFINE_ARCHIVER_FACTORY(RackViewArchiver, RackView, "RackView")
+DEFINE_ARCHIVER_FACTORY(SubrackViewArchiver, SubrackView, "SubrackView")
 
 } // namespace augr

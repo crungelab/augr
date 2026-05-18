@@ -4,18 +4,18 @@
 
 #include <augr/rack/rack_doc.h>
 
-#include "../view/rack_view.h"
+#include "../view/subrack_view.h"
 
-#include "../controller/rack_controller.h"
+#include "../controller/subrack_controller.h"
 
 #include "frame.h"
 
 namespace augr {
 
-class RackFrame : public FrameT<RackDoc, RackView, RackController> {
+class RackFrame : public FrameT<RackDoc, SubrackView, SubrackController> {
 public:
-    RackFrame(const std::string &label = "");
-    ~RackFrame();
+    explicit RackFrame(const std::string &label = "");
+    ~RackFrame() override;
 
     void Draw() override;
     void Begin() override;
@@ -42,8 +42,9 @@ public:
     // Accessors
     Rack &rack() { return doc().rack(); }
     RackDoc &doc() { return FrameT::doc(); }
-    RackView &view() { return FrameT::view(); }
-    RackController &controller() { return FrameT::controller(); }
+    const RackDoc &doc() const { return FrameT::doc(); }
+    SubrackView &view() { return FrameT::view(); }
+    SubrackController &controller() { return FrameT::controller(); }
 
     // Data members
     std::unique_ptr<pfd::open_file> open_dialog_;

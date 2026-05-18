@@ -86,7 +86,7 @@ All UI mutations must go through `Rack::EnqueueAction()` — never write module 
 
 `BaseWindow` (SDL3 + ImGui) → `X11Window`/`Win32Window` → `App` (user-subclassed)
 
-- `RackView` is the ImNodes-based node editor; maps imnodes node IDs to `Widget` instances via `widget_map_`.
+- `SubrackView` is the ImNodes-based node editor; maps imnodes node IDs to `Widget` instances via `widget_map_`.
 - `Widget`/`WidgetT<T>` mirrors the `Model`/`ModelFactoryT<T>` factory pattern for the UI side.
 - `WidgetManufacturer` is the runtime singleton factory registry for widgets.
 

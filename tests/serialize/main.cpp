@@ -70,7 +70,7 @@ class MyApp : public App {
 public:
     MyApp() {
         rack_ = new ExeRack();
-        view_ = new RackView(rack());
+        view_ = new SubrackView(rack());
     }
 
     void Draw() override {
@@ -81,7 +81,7 @@ public:
     ExeRack &rack() { return *rack_; }
     // Data members
     ExeRack *rack_;
-    RackView *view_;
+    SubrackView *view_;
 };
 
 // Serialize a rack to JSON and print it.

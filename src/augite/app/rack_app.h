@@ -9,7 +9,7 @@
 
 namespace augr {
 
-//class RackView;
+//class SubrackView;
 
 class RackApp : public FrameAppT<RackFrame> {
 public:

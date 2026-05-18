@@ -8,21 +8,27 @@
 
 #include <augite/widget/module_widget.h>
 
-#include "rack_view.h"
+#include "subrack_view.h"
 
 namespace augr {
 
-RackView::RackView(RackDoc &doc)
-    : DocumentViewT<RackDoc>(doc), rack_(&doc.rack()) {}
+SubrackView::SubrackView(RackDoc &doc)
+    : DocumentViewT<RackDoc>(doc), subrack_(&doc.rack()) {
+        context_ = ImNodes::EditorContextCreate();
+    }
 
-RackView::~RackView() {
+SubrackView::~SubrackView() {
     if (root_) {
         delete root_;
         root_ = nullptr;
     }
+    if (context_) {
+        ImNodes::EditorContextFree(context_);
+        context_ = nullptr;
+    }
 }
 
-void RackView::Build() {
+void SubrackView::Build() {
     ModelView::Build();
 
     // After build completes, traverse root_ and populate widget_map_
@@ -31,7 +37,7 @@ void RackView::Build() {
     }
 }
 
-void RackView::PopulateWidgetMap(Widget *widget) {
+void SubrackView::PopulateWidgetMap(Widget *widget) {
     if (!widget)
         return;
 
@@ -44,7 +50,9 @@ void RackView::PopulateWidgetMap(Widget *widget) {
     }
 }
 
-void RackView::Draw() {
+void SubrackView::Draw() {
+    ImNodes::EditorContextSet(context_);
+
     if (root_ == nullptr) {
         Build();
     }
@@ -53,7 +61,7 @@ void RackView::Draw() {
 
     root_->Draw();
 
-    for (auto wire : rack_->wires_) {
+    for (auto wire : subrack_->wires_) {
         ImNodes::Link(wire->id_, wire->output_->id_, wire->input_->id_);
     }
 

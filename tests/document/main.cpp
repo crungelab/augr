@@ -271,10 +271,10 @@ public:
 
     // ---------- Data members ----------
 private:
-    void RebuildView() { view_ = std::make_unique<RackView>(doc()); }
+    void RebuildView() { view_ = std::make_unique<SubrackView>(doc()); }
 
     std::unique_ptr<RackDoc> doc_;
-    std::unique_ptr<RackView> view_;
+    std::unique_ptr<SubrackView> view_;
 
     enum class PendingAction {
         None,

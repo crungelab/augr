@@ -1,12 +1,12 @@
-// augite/archiver/rack_view_archiver.h
+// augite/archiver/subrack_view_archiver.h
 #pragma once
 
 #include <augr/core/archiver.h>
-#include <augite/view/rack_view.h>
+#include <augite/view/subrack_view.h>
 
 namespace augr {
 
-class RackViewArchiver : public ArchiverT<RackView> {
+class SubrackViewArchiver : public ArchiverT<SubrackView> {
 public:
     void Save(Archive& archive) const override;
     void Load(Archive& archive) override;

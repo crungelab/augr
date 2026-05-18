@@ -4,20 +4,20 @@
 #include <augr/core/model_manufacturer.h>
 
 #include <augr/rack/archiver/graph_archiver.h>
-#include <augr/rack/rack.h>
+#include <augr/rack/subrack.h>
 
 #include "../widget/module_widget.h"
 #include "../widget/widget_builder.h"
 
-#include "../archiver/rack_view_archiver.h"
-#include "../view/rack_view.h"
+#include "../archiver/subrack_view_archiver.h"
+#include "../view/subrack_view.h"
 
 #include "rack_selection.h"
 
 namespace augr {
 
 nlohmann::json
-RackSelection::BuildSelectionJson(Rack &rack, RackView &view,
+RackSelection::BuildSelectionJson(Subrack &subrack, SubrackView &view,
                                   const std::vector<Model *> &modules,
                                   const std::vector<Widget *> &widgets) {
     assert(modules.size() == widgets.size());
@@ -36,9 +36,9 @@ RackSelection::BuildSelectionJson(Rack &rack, RackView &view,
         // directly (not via the manufacturer) because we're calling its
         // subset variants, not its full Save().
         auto &mfr = ArchiverManufacturer::singleton();
-        auto *factory = mfr.FindFactory(std::type_index(typeid(rack)));
+        auto *factory = mfr.FindFactory(std::type_index(typeid(subrack)));
         if (factory) {
-            std::unique_ptr<Archiver> archiver(factory->Produce(rack));
+            std::unique_ptr<Archiver> archiver(factory->Produce(subrack));
             if (auto *graph_arc =
                     dynamic_cast<GraphArchiver *>(archiver.get())) {
                 graph_arc->SaveChildren(archive, modules);
@@ -48,7 +48,7 @@ RackSelection::BuildSelectionJson(Rack &rack, RackView &view,
                              "GraphArchiver\n";
             }
         } else {
-            std::cerr << "BuildSelectionJson: no archiver factory for rack\n";
+            std::cerr << "BuildSelectionJson: no archiver factory for subrack\n";
         }
 
         doc["rack"] = std::move(rack_json);
@@ -65,11 +65,11 @@ RackSelection::BuildSelectionJson(Rack &rack, RackView &view,
         if (factory) {
             std::unique_ptr<Archiver> archiver(factory->Produce(view));
             if (auto *view_arc =
-                    dynamic_cast<RackViewArchiver *>(archiver.get())) {
+                    dynamic_cast<SubrackViewArchiver *>(archiver.get())) {
                 view_arc->SaveWidgets(archive, widgets);
             } else {
                 std::cerr << "BuildSelectionJson: archiver is not a "
-                             "RackViewArchiver\n";
+                             "SubrackViewArchiver\n";
             }
         } else {
             std::cerr << "BuildSelectionJson: no archiver factory for "
@@ -104,7 +104,7 @@ RackSelection::BuildSelectionJson(Rack &rack, RackView &view,
 }
 
 std::vector<Model *>
-RackSelection::MergeIntoRack(Rack &dest, RackView &view,
+RackSelection::MergeIntoRack(Subrack &dest, SubrackView &view,
                              const nlohmann::json &selection_json,
                              Vec2 paste_offset) {
     if (selection_json.value("format", "") != "augr.selection")

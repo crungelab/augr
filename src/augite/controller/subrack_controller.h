@@ -9,19 +9,20 @@
 
 #include "controller.h"
 
-#include "../view/rack_view.h"
+#include "../view/subrack_view.h"
 
 namespace augr {
 
 class RackDoc;
-class Rack;
+class Subrack;
 class Model;
 class Module;
 class ModelWidget;
+class Frame;
 
-class RackController : public ControllerT<RackDoc, RackView> {
+class SubrackController : public ControllerT<RackDoc, SubrackView> {
 public:
-    RackController(RackDoc &doc, RackView &view);
+    SubrackController(RackDoc &doc, SubrackView &view, Frame &frame);
 
     // Polled once per frame from RackFrame::Draw, after view().Draw().
     void Control() override;
@@ -55,6 +56,14 @@ public:
     Module *SpawnModule(const std::string &type_name, Vec2 grid_pos,
                         int auto_connect_pin_id = -1);
 
+    // Accessors
+    // Retargets this controller at a different subrack. The default
+    // target (set by the constructor, when used with RackFrame) is the
+    // document's top-level rack. SubrackFrame calls this after
+    // construction to point the controller at the nested subrack it
+    // displays.
+    void set_subrack(Subrack &subrack) { subrack_ = &subrack; }
+
 private:
     // ---- Per-frame input polling (called from Control) ----
 
@@ -84,8 +93,8 @@ private:
     void DisconnectAllWires(Module &target);
 
     // Convenience accessors for the rack inside the document.
-    Rack &rack();
-    const Rack &rack() const;
+    Subrack &subrack();
+    const Subrack &subrack() const;
 
     // ---- State ----
 
@@ -97,6 +106,10 @@ private:
     int pending_link_start_attr_ = -1;
     ImVec2 pending_spawn_pos_ = {0, 0};
     bool catalog_popup_requested_ = false;
+
+// And add the field at the bottom with the other state:
+private:
+    Subrack *subrack_ = nullptr;  // owning rack if null — see subrack()
 };
 
 } // namespace augr
