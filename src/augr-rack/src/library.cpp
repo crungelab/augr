@@ -1,6 +1,7 @@
 #include <augr/core/model_manufacturer.h>
 #include <augr/core/archiver_manufacturer.h>
 
+#include <augr/rack/subrack.h>
 #include <augr/rack/library/mixer_module.h>
 #include <augr/rack/library/scope_module.h>
 #include <augr/rack/library/spectral_module.h>
@@ -20,6 +21,7 @@ void InitAugrRackLibrary() {
     REGISTER_MODULE(MidiInputDevice);
     REGISTER_MODULE(MidiOutputDevice);
 
+    REGISTER_MODULE(Subrack);
     REGISTER_MODULE(MixerModule);
     REGISTER_MODULE(ScopeModule);
     REGISTER_MODULE(SpectralModule);

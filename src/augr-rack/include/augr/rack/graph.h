@@ -36,7 +36,7 @@ public:
 
     bool graph_dirty_ = false;
 
-    REFLECT_ENABLE(Model)
+    REFLECT_ENABLE(Module)
 };
 
 } // namespace augr

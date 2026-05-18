@@ -82,6 +82,8 @@ public:
             ImNodes::EndInputAttribute();
         }
 
+        DrawNodeContent();
+        
         for (auto output : this->model_->outport_.pins_) {
             ImNodes::BeginOutputAttribute(output->id_);
             ImGui::Indent(40);
@@ -106,7 +108,7 @@ public:
 
         if (ImGui::Begin(this->window_name_.c_str(), &this->is_open_)) {
             ImGui::PushID(this->model_->id_);
-            this->DrawContent();
+            this->DrawDockContent();
             ImGui::PopID();
 
             // Pull current pose back so the next save sees latest.
@@ -118,7 +120,8 @@ public:
         ImGui::PopStyleVar();
     }
 
-    virtual void DrawContent() { this->DrawChildren(); }
+    virtual void DrawNodeContent() {}
+    virtual void DrawDockContent() { this->DrawChildren(); }
 };
 
 using DefaultModuleWidget = ModuleWidgetT<Module>;

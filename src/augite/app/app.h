@@ -18,6 +18,7 @@ public:
 
     // Accessors
     static App &singleton() { return *singleton_; }
+    Frame &frame() { return *frame_; }
     Clipboard &clipboard() { return clipboard_; }
 
     // Data members
