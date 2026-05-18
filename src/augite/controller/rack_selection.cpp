@@ -16,9 +16,10 @@
 
 namespace augr {
 
-nlohmann::json RackSelection::BuildSelectionJson(Rack &rack, RackView &view,
-                                        const std::vector<Model *> &modules,
-                                        const std::vector<Widget *> &widgets) {
+nlohmann::json
+RackSelection::BuildSelectionJson(Rack &rack, RackView &view,
+                                  const std::vector<Model *> &modules,
+                                  const std::vector<Widget *> &widgets) {
     assert(modules.size() == widgets.size());
 
     nlohmann::json doc = nlohmann::json::object();
@@ -76,6 +77,27 @@ nlohmann::json RackSelection::BuildSelectionJson(Rack &rack, RackView &view,
         }
 
         doc["view"] = std::move(view_json);
+    }
+
+    // After view subtree is built, before returning:
+    if (!widgets.empty()) {
+        bool first = true;
+        Vec2 origin{0.0f, 0.0f};
+        for (Widget *w : widgets) {
+            auto *mw = dynamic_cast<ModuleWidget *>(w);
+            if (!mw)
+                continue;
+            if (first) {
+                origin = mw->grid_position_;
+                first = false;
+            } else {
+                origin.x = std::min(origin.x, mw->grid_position_.x);
+                origin.y = std::min(origin.y, mw->grid_position_.y);
+            }
+        }
+        if (!first) {
+            doc["origin"] = nlohmann::json::array({origin.x, origin.y});
+        }
     }
 
     return doc;

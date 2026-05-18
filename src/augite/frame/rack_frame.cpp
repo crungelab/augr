@@ -157,6 +157,35 @@ void RackFrame::DrawMenuBar() {
             }
             ImGui::EndMenu();
         }
+
+        if (ImGui::BeginMenu("Edit")) {
+            const bool has_selection = controller().HasSelection();
+            const bool has_clipboard = controller().HasClipboardSelection();
+
+            if (ImGui::MenuItem("Cut", "Ctrl+X", false, has_selection)) {
+                controller().Cut();
+            }
+            if (ImGui::MenuItem("Copy", "Ctrl+C", false, has_selection)) {
+                controller().Copy();
+            }
+            if (ImGui::MenuItem("Paste", "Ctrl+V", false, has_clipboard)) {
+                controller().Paste();
+            }
+            if (ImGui::MenuItem("Duplicate", "Ctrl+D", false, has_selection)) {
+                controller().Duplicate();
+            }
+            ImGui::Separator();
+            if (ImGui::MenuItem("Delete", "Del", false, has_selection)) {
+                controller().DeleteSelection();
+            }
+            ImGui::Separator();
+            if (ImGui::MenuItem("Select All", "Ctrl+A")) {
+                controller().SelectAll();
+            }
+
+            ImGui::EndMenu();
+        }
+
         ImGui::EndMainMenuBar();
     }
 }

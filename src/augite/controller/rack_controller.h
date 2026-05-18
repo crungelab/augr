@@ -39,11 +39,14 @@ public:
 
     // ---- Actions (callable from menu items and Control loop) ----
 
+    void SelectAll();
     void Copy();
-    void Paste();
     void Cut();
-    void Duplicate();
+    void Paste(std::optional<Vec2> anchor_grid_pos = std::nullopt);
+    void Duplicate(std::optional<Vec2> anchor_grid_pos = std::nullopt);
+
     void DeleteSelection();
+    bool HasClipboardSelection() const;
 
     // Construct a new module of the named type at the given grid
     // position. If `auto_connect_pin_id` is non-negative, attempts to
@@ -56,24 +59,29 @@ private:
     // ---- Per-frame input polling (called from Control) ----
 
     void CheckMouse();
+    void CheckKeyboard();
     void CheckLinkCreated();
     void CheckLinkDestroyed();
     void CheckCreateNode();
     void CheckNodeSelection();
-    void CheckClipboard();
 
     // ---- Popup rendering (controller-owned in option 2) ----
 
     void DrawCatalogPopup();
     void DrawNodeContextMenu();
+    void DrawGridContextMenu();
 
     // ---- Helpers ----
-
+    Vec2 ScreenToGrid(ImVec2 screen_pos) const;
+    Vec2 ComputePasteOffset(const nlohmann::json &selection_json,
+                            std::optional<Vec2> anchor_grid_pos = std::nullopt) const;
     // After a paste/duplicate, update ImNodes selection to highlight
     // the newly-created modules so the user can immediately drag them.
-    //void SelectModelsInImNodes(const std::vector<Model *> &models);
     void SetPendingSelection(const std::vector<Model *> &models);
     void CheckPendingSelection();
+
+    void SelectOnlyTarget(int node_id);
+    void DisconnectAllWires(Module &target);
 
     // Convenience accessors for the rack inside the document.
     Rack &rack();

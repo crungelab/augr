@@ -32,13 +32,14 @@ const Rack &RackController::rack() const { return doc().rack(); }
 void RackController::Control() {
     CheckPendingSelection();
     CheckMouse();
+    CheckKeyboard();
     CheckLinkCreated();
     CheckLinkDestroyed();
     CheckCreateNode();
     CheckNodeSelection();
-    CheckClipboard();
     DrawCatalogPopup();
     DrawNodeContextMenu();
+    DrawGridContextMenu();
 }
 
 // ----- Selection -----
@@ -66,6 +67,13 @@ void RackController::CollectSelection(
 
 // ----- Actions -----
 
+void RackController::SelectAll() {
+    pending_selection_.clear();
+    for (Model *m : rack().children_) {
+        pending_selection_.push_back(m->id_);
+    }
+}
+
 void RackController::Copy() {
     std::vector<Model *> models;
     std::vector<Widget *> widgets;
@@ -78,18 +86,24 @@ void RackController::Copy() {
     ImGui::SetClipboardText(j.dump().c_str());
 }
 
-void RackController::Paste() {
+void RackController::Cut() {
+    if (!HasSelection())
+        return;
+    Copy();
+    DeleteSelection();
+}
+
+// In rack_controller.cpp:
+void RackController::Paste(std::optional<Vec2> anchor_grid_pos) {
     const char *text = ImGui::GetClipboardText();
     if (!text)
         return;
-
     try {
         nlohmann::json j = nlohmann::json::parse(text);
         if (!RackSelection::LooksLikeSelection(j))
             return;
 
-        // Fixed offset for now; cursor-anchored paste is a later enhancement.
-        Vec2 offset = {20.0f, 20.0f};
+        Vec2 offset = ComputePasteOffset(j, anchor_grid_pos);
         auto pasted = RackSelection::MergeIntoRack(rack(), view(), j, offset);
 
         SetPendingSelection(pasted);
@@ -99,14 +113,7 @@ void RackController::Paste() {
     }
 }
 
-void RackController::Cut() {
-    if (!HasSelection())
-        return;
-    Copy();
-    DeleteSelection();
-}
-
-void RackController::Duplicate() {
+void RackController::Duplicate(std::optional<Vec2> anchor_grid_pos) {
     if (!HasSelection())
         return;
 
@@ -117,11 +124,37 @@ void RackController::Duplicate() {
     nlohmann::json j =
         RackSelection::BuildSelectionJson(rack(), view(), models, widgets);
 
-    Vec2 offset = {20.0f, 20.0f};
+    Vec2 offset = ComputePasteOffset(j, anchor_grid_pos);
     auto pasted = RackSelection::MergeIntoRack(rack(), view(), j, offset);
 
     SetPendingSelection(pasted);
     doc().MarkModified();
+}
+
+Vec2 RackController::ComputePasteOffset(
+    const nlohmann::json &selection_json,
+    std::optional<Vec2> anchor_grid_pos) const {
+
+    // No anchor → fixed nudge (paste-near-source default behavior).
+    if (!anchor_grid_pos.has_value()) {
+        return Vec2{20.0f, 20.0f};
+    }
+
+    // Anchor specified — read origin from the clipboard JSON and
+    // compute the delta so the bbox-min lands at the anchor.
+    Vec2 origin{0.0f, 0.0f};
+    if (selection_json.contains("origin") &&
+        selection_json["origin"].is_array() &&
+        selection_json["origin"].size() == 2) {
+        origin.x = selection_json["origin"][0].get<float>();
+        origin.y = selection_json["origin"][1].get<float>();
+    }
+    // If "origin" is missing (older clipboard payload, e.g.), the anchor
+    // becomes the absolute paste position — that's a reasonable
+    // fallback. Pasted nodes will land near the cursor but their internal
+    // layout will start from (0,0) since they think they were copied
+    // from there.
+    return *anchor_grid_pos - origin;
 }
 
 void RackController::DeleteSelection() {
@@ -223,6 +256,33 @@ void RackController::CheckMouse() {
     }
 }
 
+void RackController::CheckKeyboard() {
+    if (!view().is_editor_hovered() || ImGui::GetIO().WantTextInput)
+        return;
+
+    if (ImGui::IsKeyPressed(ImGuiKey_Space, false)) {
+        pending_link_start_attr_ = -1;
+        pending_spawn_pos_ = ImGui::GetMousePos();
+        catalog_popup_requested_ = true;
+    }
+
+    const bool ctrl = ImGui::GetIO().KeyCtrl;
+    if (!ctrl)
+        return;
+
+    if (ImGui::IsKeyPressed(ImGuiKey_A, false)) {
+        SelectAll();
+    } else if (ImGui::IsKeyPressed(ImGuiKey_C, false)) {
+        Copy();
+    } else if (ImGui::IsKeyPressed(ImGuiKey_V, false)) {
+        Paste(ScreenToGrid(ImGui::GetMousePos()));
+    } else if (ImGui::IsKeyPressed(ImGuiKey_X, false)) {
+        Cut();
+    } else if (ImGui::IsKeyPressed(ImGuiKey_D, false)) {
+        Duplicate();
+    }
+}
+
 void RackController::CheckLinkCreated() {
     int start_id, end_id;
     bool from_snap;
@@ -250,19 +310,51 @@ void RackController::CheckLinkDestroyed() {
 void RackController::CheckCreateNode() {
     int dummy = -1;
 
+    // Link dropped into empty space → directly open catalog at cursor.
+    // This stays a one-step interaction because the user's already
+    // mid-gesture (dragging a link).
     if (ImNodes::IsLinkDropped(&pending_link_start_attr_,
                                /*including_detach=*/false)) {
         pending_spawn_pos_ = ImGui::GetMousePos();
         catalog_popup_requested_ = true;
     }
 
+    // Right-click on empty grid → open the grid context menu, not the
+    // catalog directly. The menu has an "Add Module..." item that
+    // triggers the catalog from there.
     if (ImGui::IsMouseReleased(ImGuiMouseButton_Right) &&
         view().is_editor_hovered() && !ImNodes::IsAnyAttributeActive() &&
         !ImGui::IsAnyItemHovered() && !ImNodes::IsNodeHovered(&dummy)) {
         pending_link_start_attr_ = -1;
         pending_spawn_pos_ = ImGui::GetMousePos();
+        ImGui::OpenPopup("grid_ctx");
+    }
+}
+
+void RackController::DrawGridContextMenu() {
+    if (!ImGui::BeginPopup("grid_ctx"))
+        return;
+
+    const bool has_clipboard = HasClipboardSelection();
+    const bool has_anything = !rack().children_.empty();
+
+    if (ImGui::MenuItem("Add Module...")) {
         catalog_popup_requested_ = true;
     }
+
+    ImGui::Separator();
+
+    if (ImGui::MenuItem("Paste Here", "Ctrl+V", false, has_clipboard)) {
+        Paste(ScreenToGrid(pending_spawn_pos_));
+    }
+
+    ImGui::Separator();
+
+    if (ImGui::MenuItem("Select All", "Ctrl+A", false, has_anything)) {
+        SelectAll();
+    }
+
+    ImGui::EndPopup();
 }
 
 void RackController::CheckNodeSelection() {
@@ -282,27 +374,6 @@ void RackController::CheckNodeSelection() {
     }
 }
 
-void RackController::CheckClipboard() {
-    if (!view().is_editor_hovered())
-        return;
-    if (ImGui::GetIO().WantTextInput)
-        return;
-
-    const bool ctrl = ImGui::GetIO().KeyCtrl;
-    if (!ctrl)
-        return;
-
-    if (ImGui::IsKeyPressed(ImGuiKey_C, /*repeat=*/false)) {
-        Copy();
-    } else if (ImGui::IsKeyPressed(ImGuiKey_V, /*repeat=*/false)) {
-        Paste();
-    } else if (ImGui::IsKeyPressed(ImGuiKey_X, /*repeat=*/false)) {
-        Cut();
-    } else if (ImGui::IsKeyPressed(ImGuiKey_D, /*repeat=*/false)) {
-        Duplicate();
-    }
-}
-
 // ----- Popups (controller-owned) -----
 
 void RackController::DrawCatalogPopup() {
@@ -311,60 +382,171 @@ void RackController::DrawCatalogPopup() {
         catalog_popup_requested_ = false;
     }
 
-    if (ImGui::BeginPopup("ModuleCatalog")) {
-        ImGui::SetWindowPos(pending_spawn_pos_, ImGuiCond_Appearing);
+    if (!ImGui::BeginPopup("ModuleCatalog")) return;
 
-        static char filter[64] = "";
-        ImGui::InputTextWithHint("##filter", "Search modules…", filter,
-                                 IM_ARRAYSIZE(filter));
+    ImGui::SetWindowPos(pending_spawn_pos_, ImGuiCond_Appearing);
 
-        auto &mm = ModelManufacturer::singleton();
-        for (const auto &f : mm.factories_) {
-            if (f->category_.empty())
-                continue;
-            if (filter[0] && !strstr(f->name_.c_str(), filter))
-                continue;
+    static char filter[64] = "";
+    ImGui::InputTextWithHint("##filter", "Search modules…", filter,
+                             IM_ARRAYSIZE(filter));
 
-            if (ImGui::Selectable(f->name_.c_str())) {
-                // Convert screen → grid by going through ImNodes once.
-                // (Same trick as the catalog spawn before this refactor.)
-                ImVec2 dummy_screen = pending_spawn_pos_;
-                Module *m =
-                    SpawnModule(f->name_, Vec2{0, 0}, pending_link_start_attr_);
-                if (m) {
-                    // Re-position via ImNodes' screen→grid round-trip.
-                    ImNodes::SetNodeScreenSpacePos(m->id_, dummy_screen);
-                    ImVec2 grid = ImNodes::GetNodeGridSpacePos(m->id_);
-                    auto &wmap = view().widget_map();
-                    if (auto it = wmap.find(m->id_); it != wmap.end()) {
-                        if (auto *mw =
-                                dynamic_cast<ModuleWidget *>(it->second)) {
-                            mw->grid_position_ = ModuleWidget::FromImVec2(grid);
-                            mw->position_dirty_ = false;
-                        }
-                    }
-                }
+    auto &mm = ModelManufacturer::singleton();
+    for (const auto &f : mm.factories_) {
+        if (f->category_.empty()) continue;
+        if (filter[0] && !strstr(f->name_.c_str(), filter)) continue;
 
-                pending_link_start_attr_ = -1;
-                ImGui::CloseCurrentPopup();
-            }
+        if (ImGui::Selectable(f->name_.c_str())) {
+            Vec2 grid_pos = ScreenToGrid(pending_spawn_pos_);
+            SpawnModule(f->name_, grid_pos, pending_link_start_attr_);
+            pending_link_start_attr_ = -1;
+            ImGui::CloseCurrentPopup();
         }
-
-        ImGui::EndPopup();
     }
+
+    ImGui::EndPopup();
 }
 
 void RackController::DrawNodeContextMenu() {
-    if (ImGui::BeginPopup("node_ctx")) {
-        ImGui::Text("Node %d", hovered_node_id_);
-        if (ImGui::MenuItem("Do thing")) {
-            // ...
+    if (!ImGui::BeginPopup("node_ctx"))
+        return;
+
+    // hovered_node_id_ was captured at the moment of right-click in
+    // CheckMouse. The popup outlives the hover state, so we keep using
+    // the captured id throughout the popup's lifetime.
+    const int target_id = hovered_node_id_;
+
+    // Resolve target widget/module for the action labels.
+    auto &wmap = view().widget_map();
+    auto it = wmap.find(target_id);
+    Module *target_module = nullptr;
+    ModuleWidget *target_widget = nullptr;
+    if (it != wmap.end()) {
+        target_widget = dynamic_cast<ModuleWidget *>(it->second);
+        if (target_widget) {
+            target_module = dynamic_cast<Module *>(target_widget->model());
         }
-        ImGui::EndPopup();
     }
+
+    if (!target_module) {
+        // Stale id — node was deleted while popup is open, or never
+        // resolvable. Close the popup gracefully.
+        ImGui::TextDisabled("(node unavailable)");
+        ImGui::EndPopup();
+        return;
+    }
+
+    // Header — non-interactive label identifying the target.
+    ImGui::TextDisabled("%s", target_module->label_.c_str());
+    ImGui::Separator();
+
+    // Whether the right-clicked node is part of a multi-selection.
+    // Most operations should act on the whole selection if so, otherwise
+    // on just the target.
+    const bool target_in_selection =
+        std::find(selected_nodes_.begin(), selected_nodes_.end(), target_id) !=
+        selected_nodes_.end();
+    const bool acts_on_selection =
+        target_in_selection && selected_nodes_.size() > 1;
+
+    // ----- Window visibility -----
+    if (target_widget) {
+        const char *label =
+            target_widget->is_open_ ? "Close Window" : "Open Window";
+        if (ImGui::MenuItem(label)) {
+            target_widget->is_open_ = !target_widget->is_open_;
+            target_widget->window_pose_dirty_ = true;
+        }
+    }
+
+    ImGui::Separator();
+
+    // ----- Standard edit actions -----
+    // If the target is part of the current selection, these operate on
+    // the whole selection. Otherwise, they implicitly act on just the
+    // target by treating it as a one-element selection.
+    if (ImGui::MenuItem("Cut", "Ctrl+X")) {
+        if (!target_in_selection)
+            SelectOnlyTarget(target_id);
+        Cut();
+    }
+    if (ImGui::MenuItem("Copy", "Ctrl+C")) {
+        if (!target_in_selection)
+            SelectOnlyTarget(target_id);
+        Copy();
+    }
+    if (ImGui::MenuItem("Duplicate", "Ctrl+D")) {
+        if (!target_in_selection)
+            SelectOnlyTarget(target_id);
+        Duplicate();
+    }
+
+    ImGui::Separator();
+
+    // ----- Disconnect -----
+    if (ImGui::MenuItem("Disconnect All Wires")) {
+        DisconnectAllWires(*target_module);
+    }
+
+    ImGui::Separator();
+
+    // ----- Delete -----
+    if (ImGui::MenuItem("Delete", "Del")) {
+        if (!target_in_selection)
+            SelectOnlyTarget(target_id);
+        DeleteSelection();
+    }
+
+    // If multi-selection, hint at it.
+    if (acts_on_selection) {
+        ImGui::Separator();
+        ImGui::TextDisabled("(applies to %zu selected nodes)",
+                            selected_nodes_.size());
+    }
+
+    ImGui::EndPopup();
 }
 
 // ----- Helpers -----
+Vec2 RackController::ScreenToGrid(ImVec2 screen_pos) const {
+    // Convert screen → grid using ImNodes' panning state.
+    // Editor space is screen space relative to the editor's top-left,
+    // grid space is editor space minus the pan offset.
+    //
+    // ImNodes provides GetNodeEditorSpacePos for nodes; we approximate
+    // for an arbitrary screen point.
+    ImVec2 panning = ImNodes::EditorContextGetPanning();
+
+    // We need to know where the editor begins on screen. The trick:
+    // any existing node gives us a screen↔grid reference point.
+    // Failing that, we fall back to assuming the editor starts at the
+    // host window's content min.
+    //
+    // Simplest reliable approach: pick the first node we have, get both
+    // its screen pos and grid pos, and use the delta to translate.
+    if (!rack().children_.empty()) {
+        if (auto *node = dynamic_cast<Node *>(rack().children_.front())) {
+            ImVec2 node_screen = ImNodes::GetNodeScreenSpacePos(node->id_);
+            ImVec2 node_grid = ImNodes::GetNodeGridSpacePos(node->id_);
+            return Vec2{node_grid.x + (screen_pos.x - node_screen.x),
+                        node_grid.y + (screen_pos.y - node_screen.y)};
+        }
+    }
+
+    // Fallback when there are no nodes to use as a reference point.
+    // Editor presumably starts at (0,0) with the current panning applied.
+    return Vec2{screen_pos.x - panning.x, screen_pos.y - panning.y};
+}
+
+bool RackController::HasClipboardSelection() const {
+    const char *text = ImGui::GetClipboardText();
+    if (!text || !*text)
+        return false;
+    // Cheap structural sniff — don't fully parse the JSON every frame.
+    // RackSelection has a string-overload version of LooksLikeSelection
+    // if you've added one; otherwise this inline check is fine.
+    return std::string_view(text).find("\"augr.selection\"") !=
+           std::string_view::npos;
+}
 
 void RackController::SetPendingSelection(const std::vector<Model *> &models) {
     pending_selection_.clear();
@@ -384,6 +566,32 @@ void RackController::CheckPendingSelection() {
     }
     selected_nodes_ = pending_selection_;
     pending_selection_.clear();
+}
+
+void RackController::SelectOnlyTarget(int node_id) {
+    ImNodes::ClearNodeSelection();
+    ImNodes::SelectNode(node_id);
+    selected_nodes_.clear();
+    selected_nodes_.push_back(node_id);
+}
+
+void RackController::DisconnectAllWires(Module &target) {
+    // Collect wires first to avoid iterator invalidation while Disconnecting.
+    std::vector<Wire *> to_disconnect;
+    auto collect = [&](const std::vector<Pin *> &pins) {
+        for (Pin *pin : pins) {
+            for (Wire *w : pin->wires_)
+                to_disconnect.push_back(w);
+        }
+    };
+    collect(target.inport_.pins_);
+    collect(target.outport_.pins_);
+
+    for (Wire *w : to_disconnect) {
+        rack().Disconnect(*w);
+    }
+    if (!to_disconnect.empty())
+        doc().MarkModified();
 }
 
 } // namespace augr
