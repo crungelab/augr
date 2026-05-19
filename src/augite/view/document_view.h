@@ -6,20 +6,24 @@
 
 namespace augr {
 
-//class Document;
-
 class DocumentView : public ModelView {
 public:
-    virtual Document *document() = 0;
+    explicit DocumentView(Document &doc)
+        : ModelView(*doc.model()), doc_(&doc) {}
+
+    Document *document() { return doc_; }
+    const Document *document() const { return doc_; }
+
+    // Data members
+    Document *doc_;
 };
 
 template <typename T> class DocumentViewT : public DocumentView {
 public:
-    DocumentViewT(T &doc) : doc_(&doc) {}
-    virtual Model *model() override { return doc_->model(); }
-    virtual Document *document() override { return doc_; }
-    // Data members
-    T *doc_;
+    explicit DocumentViewT(T &doc) : DocumentView(doc) {}
+
+    T *doc() { return static_cast<T *>(doc_); }
+    const T *doc() const { return static_cast<const T *>(doc_); }
 };
 
 } // namespace augr

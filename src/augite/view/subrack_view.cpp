@@ -13,7 +13,7 @@
 namespace augr {
 
 SubrackView::SubrackView(RackDoc &doc)
-    : DocumentViewT<RackDoc>(doc), subrack_(&doc.rack()) {
+    : DocumentViewT<RackDoc>(doc) {
         context_ = ImNodes::EditorContextCreate();
     }
 
@@ -41,6 +41,9 @@ void SubrackView::PopulateWidgetMap(Widget *widget) {
     if (!widget)
         return;
 
+    if (widget == root_)
+        return; // root_ is a dummy top-level widget, not in the map
+
     if (auto *mw = dynamic_cast<ModelWidget *>(widget)) {
         widget_map_[mw->model()->id_] = mw;
     }
@@ -61,7 +64,7 @@ void SubrackView::Draw() {
 
     root_->Draw();
 
-    for (auto wire : subrack_->wires_) {
+    for (auto wire : subrack()->wires_) {
         ImNodes::Link(wire->id_, wire->output_->id_, wire->input_->id_);
     }
 

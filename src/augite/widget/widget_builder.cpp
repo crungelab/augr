@@ -19,4 +19,10 @@ ModelWidget *ModelWidgetBuilder::Build(Model &model) {
     return widget;
 }
 
+void ModelWidgetBuilder::BuildChildren(Widget& widget, Model &model) {
+    for (const auto child : model.children_) {
+        widget.AddChild(Build(*child));
+    }
+}
+
 } // namespace augr

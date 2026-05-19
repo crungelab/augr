@@ -8,6 +8,7 @@
 
 #include <augr/rack/archiver/module_archiver.h>
 #include <augr/rack/archiver/rack_archiver.h>
+#include <augr/rack/archiver/subrack_archiver.h>
 
 using namespace augr;
 
@@ -21,7 +22,10 @@ void InitAugrRackLibrary() {
     REGISTER_MODULE(MidiInputDevice);
     REGISTER_MODULE(MidiOutputDevice);
 
-    REGISTER_MODULE(Subrack);
+    //REGISTER_MODULE(Subrack);
+    REGISTER_MODEL_FACTORY(Subrack);
+    REGISTER_ARCHIVER_FACTORY(SubrackArchiver)
+
     REGISTER_MODULE(MixerModule);
     REGISTER_MODULE(ScopeModule);
     REGISTER_MODULE(SpectralModule);

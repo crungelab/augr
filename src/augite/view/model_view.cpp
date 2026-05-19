@@ -9,7 +9,10 @@ namespace augr {
 
 void ModelView::Build() {
     ModelWidgetBuilder builder;
-    root_ = builder.Build(*model());
+    //root_ = builder.Build(*model());
+    root_ = new Widget(); // dummy root to hold the real root's children
+    AddChild(root_);
+    builder.BuildChildren(*root_, *model_);
 }
 
 } // namespace augr

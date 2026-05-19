@@ -7,7 +7,7 @@
 
 #include <augr/core/math/vec2.h>
 
-#include "controller.h"
+#include "document_controller.h"
 
 #include "../view/subrack_view.h"
 
@@ -20,7 +20,7 @@ class Module;
 class ModelWidget;
 class Frame;
 
-class SubrackController : public ControllerT<RackDoc, SubrackView> {
+class SubrackController : public DocumentController<RackDoc, SubrackView> {
 public:
     SubrackController(RackDoc &doc, SubrackView &view, Frame &frame);
 
@@ -57,12 +57,11 @@ public:
                         int auto_connect_pin_id = -1);
 
     // Accessors
-    // Retargets this controller at a different subrack. The default
-    // target (set by the constructor, when used with RackFrame) is the
-    // document's top-level rack. SubrackFrame calls this after
-    // construction to point the controller at the nested subrack it
-    // displays.
-    void set_subrack(Subrack &subrack) { subrack_ = &subrack; }
+    void set_subrack(Subrack &s) { set_model(s); }
+    Subrack &subrack() { return *static_cast<Subrack *>(model_); }
+    const Subrack &subrack() const {
+        return *static_cast<const Subrack *>(model_);
+    }
 
 private:
     // ---- Per-frame input polling (called from Control) ----
@@ -82,8 +81,9 @@ private:
 
     // ---- Helpers ----
     Vec2 ScreenToGrid(ImVec2 screen_pos) const;
-    Vec2 ComputePasteOffset(const nlohmann::json &selection_json,
-                            std::optional<Vec2> anchor_grid_pos = std::nullopt) const;
+    Vec2 ComputePasteOffset(
+        const nlohmann::json &selection_json,
+        std::optional<Vec2> anchor_grid_pos = std::nullopt) const;
     // After a paste/duplicate, update ImNodes selection to highlight
     // the newly-created modules so the user can immediately drag them.
     void SetPendingSelection(const std::vector<Model *> &models);
@@ -91,10 +91,6 @@ private:
 
     void SelectOnlyTarget(int node_id);
     void DisconnectAllWires(Module &target);
-
-    // Convenience accessors for the rack inside the document.
-    Subrack &subrack();
-    const Subrack &subrack() const;
 
     // ---- State ----
 
@@ -106,10 +102,6 @@ private:
     int pending_link_start_attr_ = -1;
     ImVec2 pending_spawn_pos_ = {0, 0};
     bool catalog_popup_requested_ = false;
-
-// And add the field at the bottom with the other state:
-private:
-    Subrack *subrack_ = nullptr;  // owning rack if null — see subrack()
 };
 
 } // namespace augr

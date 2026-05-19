@@ -25,20 +25,7 @@ namespace augr {
 
 SubrackController::SubrackController(RackDoc &doc, SubrackView &view,
                                      Frame &frame)
-    : ControllerT<RackDoc, SubrackView>(doc, view, frame) {}
-
-Subrack &SubrackController::subrack() {
-    return subrack_ ? *subrack_ : static_cast<Subrack &>(doc().rack());
-}
-
-const Subrack &SubrackController::subrack() const {
-    return subrack_ ? *subrack_ : static_cast<const Subrack &>(doc().rack());
-}
-
-/*
-Subrack &SubrackController::subrack() { return doc().rack(); }
-const Subrack &SubrackController::subrack() const { return doc().rack(); }
-*/
+    : DocumentController<RackDoc, SubrackView>(doc, view, frame) {}
 
 // ----- Per-frame entry point -----
 

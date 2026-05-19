@@ -168,4 +168,5 @@ void Subrack::EnqueueUpdateAction(std::function<void()> action) {
 } // namespace augr
 
 using namespace augr;
-DEFINE_MODULE(Subrack, "Subrack", "General")
+//DEFINE_MODULE(Subrack, "Subrack", "General")
+DEFINE_MODEL_FACTORY(Subrack, "Subrack", "General")
