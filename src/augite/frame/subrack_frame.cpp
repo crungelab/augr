@@ -32,7 +32,12 @@ void SubrackFrame::Begin() {
     std::snprintf(title, sizeof(title), "%s###subrack_%p",
                   label_.empty() ? "Subrack" : label_.c_str(),
                   static_cast<void *>(subrack_));
-    ImGui::Begin(title, nullptr, ImGuiWindowFlags_NoCollapse);
+    bool p_open = true;
+    ImGui::Begin(title, &p_open, ImGuiWindowFlags_NoCollapse);
+    if (!p_open) {
+        // User closed the window; close the frame.
+        parent_->RemoveChild(*this);
+    }
 }
 
 void SubrackFrame::Draw() {

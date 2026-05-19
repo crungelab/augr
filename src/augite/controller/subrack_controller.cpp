@@ -235,7 +235,28 @@ Module *SubrackController::SpawnModule(const std::string &type_name,
 }
 
 // ----- Input polling -----
+/*
+void SubrackController::CheckMouse() {
+    int node_id = -1;
+    if (ImNodes::IsNodeHovered(&node_id)) {
+        hovered_node_id_ = node_id;
 
+        if (ImGui::IsMouseDoubleClicked(ImGuiMouseButton_Left)) {
+            const auto &wmap = view().widget_map();
+            if (auto it = wmap.find(hovered_node_id_); it != wmap.end()) {
+                if (auto *mw = dynamic_cast<ModuleWidget *>(it->second)) {
+                    mw->is_open_ = !mw->is_open_;
+                    mw->window_pose_dirty_ = true;
+                }
+            }
+        }
+
+        if (ImGui::IsMouseClicked(ImGuiMouseButton_Right)) {
+            ImGui::OpenPopup("node_ctx");
+        }
+    }
+}
+*/
 void SubrackController::CheckMouse() {
     int node_id = -1;
     if (ImNodes::IsNodeHovered(&node_id)) {

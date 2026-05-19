@@ -17,8 +17,12 @@ class Model;
 class Widget : public Subject {
 public:
     virtual ~Widget() = default;
-    void AddChild(Widget *widget) { children_.push_back(widget); }
+    void AddChild(Widget *widget) {
+        widget->parent_ = this;
+        children_.push_back(widget);
+    }
     void RemoveChild(Widget &child) {
+        child.parent_ = nullptr;
         children_.erase(std::remove(children_.begin(), children_.end(), &child),
                         children_.end());
     }
@@ -31,6 +35,7 @@ public:
     virtual void DrawChild(Widget &child) { child.Draw(); }
 
     // Data members
+    Widget *parent_ = nullptr;
     std::vector<Widget *> children_;
 };
 
