@@ -36,9 +36,6 @@ const Subrack &SubrackController::subrack() const {
 }
 
 /*
-SubrackController::SubrackController(RackDoc &doc, SubrackView &view)
-    : ControllerT<RackDoc, SubrackView>(doc, view) {}
-
 Subrack &SubrackController::subrack() { return doc().rack(); }
 const Subrack &SubrackController::subrack() const { return doc().rack(); }
 */

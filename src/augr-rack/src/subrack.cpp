@@ -7,8 +7,6 @@
 
 #include <augr/rack/archiver/module_archiver.h>
 #include <augr/rack/module/module.h>
-#include <augr/rack/module/audio_device.h>
-#include <augr/rack/module/midi_device.h>
 #include <augr/rack/rack.h>
 #include <augr/rack/subrack.h>
 #include <augr/rack/wire.h>
@@ -122,68 +120,14 @@ void Subrack::OnAddingChild(Model &model) {
         AddModule(*m);
         graph_dirty_ = true;
     }
-    if (auto *d = dynamic_cast<Device *>(&model)) {
-        OnAddingDevice(*d);
-    }
 }
 
 void Subrack::OnRemovingChild(Model &model) {
-    if (auto *d = dynamic_cast<Device *>(&model)) {
-        OnRemovingDevice(*d);
-    }
     if (auto *m = dynamic_cast<Module *>(&model)) {
         RemoveModule(*m);
         graph_dirty_ = true;
     }
     Graph::OnRemovingChild(model);
-}
-
-void Subrack::OnAddingDevice(Device &device) {
-    if (auto *audio_input = dynamic_cast<AudioInputDevice *>(&device)) {
-        audio_input_device_ = audio_input;
-    } else if (auto *audio_output =
-                   dynamic_cast<AudioOutputDevice *>(&device)) {
-        audio_output_device_ = audio_output;
-    } else if (auto *midi_input = dynamic_cast<MidiInputDevice *>(&device)) {
-        midi_input_device_ = midi_input;
-    } else if (auto *midi_output = dynamic_cast<MidiOutputDevice *>(&device)) {
-        midi_output_device_ = midi_output;
-    }
-}
-
-void Subrack::OnRemovingDevice(Device &device) {
-    if (audio_input_device_ == &device)
-        audio_input_device_ = nullptr;
-    if (audio_output_device_ == &device)
-        audio_output_device_ = nullptr;
-    if (midi_input_device_ == &device)
-        midi_input_device_ = nullptr;
-    if (midi_output_device_ == &device)
-        midi_output_device_ = nullptr;
-}
-
-// ---------------------------------------------------------------------------
-// Device construction
-// ---------------------------------------------------------------------------
-
-bool Subrack::CreateAudioInputDevice() {
-    audio_input_device_ = ModelFactoryT<AudioInputDevice>::Make(this);
-    return true;
-}
-
-bool Subrack::CreateAudioOutputDevice() {
-    audio_output_device_ = ModelFactoryT<AudioOutputDevice>::Make(this);
-    return true;
-}
-
-bool Subrack::CreateMidiInputDevice() {
-    midi_input_device_ = ModelFactoryT<MidiInputDevice>::Make(this);
-    return true;
-}
-
-bool Subrack::CreateMidiOutputDevice() {
-    midi_output_device_ = ModelFactoryT<MidiOutputDevice>::Make(this);
-    return true;
 }
 
 // ---------------------------------------------------------------------------
@@ -219,14 +163,6 @@ void Subrack::EnqueueUpdateAction(std::function<void()> action) {
     if (Rack *r = OuterRack()) {
         r->EnqueueUpdateAction(std::move(action));
     }
-}
-
-void Subrack::EnqueueMidiMessage(MidiMessage message) {
-    EnqueueAction([this, message = std::move(message)]() {
-        if (midi_input_device_) {
-            midi_input_device_->midi_out_->Write(message);
-        }
-    });
 }
 
 } // namespace augr

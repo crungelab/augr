@@ -4,10 +4,16 @@
 #include <mutex>
 #include <vector>
 
-#include <augr/rack/subrack.h>
 #include <augr/rack/rack_config.h>
+#include <augr/rack/subrack.h>
 
 namespace augr {
+
+class Device;
+class AudioInputDevice;
+class AudioOutputDevice;
+class MidiInputDevice;
+class MidiOutputDevice;
 
 class Rack : public Subrack {
 public:
@@ -24,9 +30,18 @@ public:
     void EnqueueAction(std::function<void()> action,
                        std::function<void()> update_action = nullptr);
     void EnqueueUpdateAction(std::function<void()> action);
+    // Called from the MIDI thread; routes to the outer Rack's queue.
+    void EnqueueMidiMessage(MidiMessage message);
 
     void ProcessActions();
     void ProcessUpdateActions();
+
+    // -- Child management ----------------------------------------------
+    // Adds Module / Device branches on top of Graph's wire+pin bookkeeping.
+    void OnAddingChild(Model &model) override;
+    void OnRemovingChild(Model &model) override;
+    void OnAddingDevice(Device &device);
+    void OnRemovingDevice(Device &device);
 
     // -- Lifecycle -----------------------------------------------------
     virtual bool Start() {
@@ -47,7 +62,19 @@ public:
     std::vector<std::function<void()>> pending_actions_;
     std::vector<std::function<void()>> pending_update_actions_;
 
+    // Data members --- devices (virtual / boundary modules)
+    AudioInputDevice *audio_input_device_ = nullptr;
+    AudioOutputDevice *audio_output_device_ = nullptr;
+    MidiInputDevice *midi_input_device_ = nullptr;
+    MidiOutputDevice *midi_output_device_ = nullptr;
+
     REFLECT_ENABLE(Subrack)
+
+protected:
+    bool CreateAudioInputDevice();
+    bool CreateAudioOutputDevice();
+    bool CreateMidiInputDevice();
+    bool CreateMidiOutputDevice();
 
 private:
     bool running_ = false;
