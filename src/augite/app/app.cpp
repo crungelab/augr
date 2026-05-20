@@ -44,8 +44,6 @@ App::App() {
 };
 
 bool App::DoCreate(CreateParams params) {
-    clipboard_ = Clipboard();
-
     bool success = BaseApp::DoCreate(params);
 
     return success;
@@ -59,7 +57,7 @@ void App::CreateContext() {
 }
 
 void App::Draw() {
-    frame_->Draw();
+    root_frame_->Draw();
     BaseApp::Draw();
 }
 

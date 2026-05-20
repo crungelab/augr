@@ -11,9 +11,9 @@ public:
 template <typename TFrame> class FrameAppT : public FrameApp {
 public:
     FrameAppT() {
-        //frame_ = new TFrame("FrameApp");
     }
-    TFrame &frame() { return *static_cast<TFrame *>(frame_); }
+    TFrame &root_frame() { return *static_cast<TFrame *>(root_frame_.get()); }
+    TFrame *active_frame() { return static_cast<TFrame *>(active_frame_); }
 };
 
 } // namespace augr

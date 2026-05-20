@@ -2,8 +2,6 @@
 
 #include <augite/shell/shell.h>
 
-#include <augite/app/clipboard.h>
-
 namespace augr {
 
 class Rack;

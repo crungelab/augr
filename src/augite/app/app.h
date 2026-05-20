@@ -1,9 +1,7 @@
 #pragma once
 
-#include <augite/app/clipboard.h>
-
-#include "base_app.h"
 #include "../frame/frame.h"
+#include "base_app.h"
 
 namespace augr {
 
@@ -18,13 +16,14 @@ public:
 
     // Accessors
     static App &singleton() { return *singleton_; }
-    Frame &frame() { return *frame_; }
-    Clipboard &clipboard() { return clipboard_; }
+    Frame &root_frame() { return *root_frame_; }
+    Frame *active_frame() { return active_frame_; }
+    void set_active_frame(Frame *f) { active_frame_ = f; }
 
     // Data members
     static App *singleton_;
-    Frame* frame_;
-    Clipboard clipboard_;
+    std::unique_ptr<Frame> root_frame_;
+    Frame *active_frame_ = nullptr; // last frame to have focus};
 };
 
 } // namespace augr

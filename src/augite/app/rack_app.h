@@ -2,14 +2,10 @@
 
 #include "frame_app.h"
 
-//#include <augr/rack/rack.h>
-//#include <augr/rack/rack_doc.h>
-
 #include "../frame/rack_frame.h"
+#include "../controller/subrack_controller.h"
 
 namespace augr {
-
-//class SubrackView;
 
 class RackApp : public FrameAppT<RackFrame> {
 public:
@@ -17,12 +13,12 @@ public:
     void Draw() override;
     void DrawMainDockspace();
     // Accessors
-    RackDoc &doc() { return frame().doc(); }
-    Rack &rack() { return frame().rack(); }
+    RackDoc &doc() { return root_frame().doc(); }
+    Rack &rack() { return root_frame().rack(); }
+    SubrackController * active_controller() { return active_frame() ? &active_frame()->controller() : nullptr; }
 
     // Data members
     static RackApp *singleton_;
-    //RackDoc doc_;
 };
 
 } // namespace augr

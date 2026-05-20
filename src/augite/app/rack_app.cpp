@@ -11,7 +11,7 @@ RackApp *RackApp::singleton_;
 
 RackApp::RackApp() {
     singleton_ = this;
-    frame_ = new RackFrame("Graph");
+    root_frame_ = std::make_unique<RackFrame>("Rack");
 };
 
 void RackApp::Draw() {
@@ -64,7 +64,7 @@ void RackApp::DrawMainDockspace() {
         dock_bottom = ImGui::DockBuilderSplitNode(
             dock_main_id, ImGuiDir_Down, 0.30f, nullptr, &dock_main_id);
 
-        ImGui::DockBuilderDockWindow("Graph", dock_main_id);   // central
+        ImGui::DockBuilderDockWindow("Rack", dock_main_id);   // central
         ImGui::DockBuilderDockWindow("Inspector", dock_right); // right
         ImGui::DockBuilderDockWindow("Console", dock_bottom);  // bottom
         ImGui::DockBuilderFinish(dockspace_id);
