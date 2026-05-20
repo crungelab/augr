@@ -5,7 +5,7 @@ namespace augr {
 
 void Dock::Draw() {
     Begin();
-    DrawChildren();
+    //DrawChildren();
     End();
 }
 
@@ -14,6 +14,7 @@ void Dock::Begin() {
 }
 
 void Dock::End() {
+    DrawChildren();
     ImGui::End();
 }
 
