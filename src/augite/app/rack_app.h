@@ -13,6 +13,7 @@ public:
     void Draw() override;
     void DrawMainDockspace();
     // Accessors
+    static RackApp &singleton() { return *singleton_; }
     RackDoc &doc() { return root_frame().doc(); }
     Rack &rack() { return root_frame().rack(); }
     SubrackController * active_controller() { return active_frame() ? &active_frame()->controller() : nullptr; }

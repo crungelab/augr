@@ -29,7 +29,7 @@ public:
 
     void RebuildView();
 
-    void Draw() override;
+    //void Draw() override;
     void Begin() override;
 
     // Accessors

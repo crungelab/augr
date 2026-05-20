@@ -40,6 +40,7 @@ void SubrackFrame::Begin() {
     }
 }
 
+/*
 void SubrackFrame::Draw() {
     Begin();
 
@@ -50,5 +51,6 @@ void SubrackFrame::Draw() {
 
     ImGui::End();
 }
+*/
 
 } // namespace augr

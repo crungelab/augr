@@ -13,7 +13,8 @@ public:
     Frame(const std::string &label = "") : Dock(label) {}
     Frame(Document &doc, const std::string &label = "") : Dock(label), doc_(&doc) {}
     virtual ~Frame() = default;
-    void Draw() override;
+    //void Draw() override;
+    void End() override;
     // Accessors
     Document &doc() { return *doc_; }
     const Document &doc() const { return *doc_; }
