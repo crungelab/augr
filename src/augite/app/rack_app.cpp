@@ -1,9 +1,11 @@
 #include "imgui.h"
 #include "imgui_internal.h"
 
-#include "rack_app.h"
-
+#include <augr/rack/rack.h>
+#include <augr/rack/rack_doc.h>
 #include "../frame/rack_frame.h"
+
+#include "rack_app.h"
 
 namespace augr {
 
@@ -11,8 +13,10 @@ RackApp *RackApp::singleton_;
 
 RackApp::RackApp() {
     singleton_ = this;
-    root_frame_ = std::make_unique<RackFrame>("Rack");
-};
+    doc_ = std::make_unique<RackDoc>();
+    static_cast<RackDoc *>(doc_.get())->NewDocument();
+    root_frame_ = std::make_unique<RackFrame>(*static_cast<RackDoc *>(doc_.get()), *static_cast<Rack *>(doc_->model()), "Rack");
+}
 
 void RackApp::Draw() {
     DrawMainDockspace();

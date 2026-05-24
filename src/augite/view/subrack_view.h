@@ -20,10 +20,6 @@ public:
     void Draw() override;
 
     // Accessors
-    void set_subrack(Subrack &subrack) {
-        set_model(subrack);
-    }
-
     Subrack *subrack() { return static_cast<Subrack *>(model_); }
     const Subrack *subrack() const { return static_cast<const Subrack *>(model_); }
 

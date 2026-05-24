@@ -144,11 +144,17 @@ bool RackDoc::Save(const std::filesystem::path &p) {
         doc["version"] = kDocumentFormatVersion;
         doc["rack"] = std::move(rack_json);
 
+        nlohmann::json views_json = nlohmann::json::object();
+        for (const auto &[uuid, view_json] : views_) {
+            views_json[uuid] = view_json;
+        }
+        doc["views"] = std::move(views_json);
+
         // Invoke save hooks. Each contributes its own top-level key.
         for (const auto &hook : save_hooks_) {
             if (IsReservedEnvelopeKey(hook.key)) {
-                std::cerr << "Save hook tried to use reserved key '"
-                          << hook.key << "' — skipping\n";
+                std::cerr << "Save hook tried to use reserved key '" << hook.key
+                          << "' — skipping\n";
                 continue;
             }
             try {
@@ -196,6 +202,13 @@ bool RackDoc::Load(const std::filesystem::path &p, bool auto_start) {
         if (!fresh)
             return false;
 
+        views_.clear();
+        if (doc.contains("views") && doc["views"].is_object()) {
+            for (auto &[uuid, view_json] : doc["views"].items()) {
+                views_[uuid] = view_json;
+            }
+        }
+
         Stop();
         model_ = std::move(fresh);
 
@@ -207,9 +220,9 @@ bool RackDoc::Load(const std::filesystem::path &p, bool auto_start) {
         // have a single unconditional entry point regardless of whether
         // their state was previously saved.
         for (const auto &hook : load_hooks_) {
-            const nlohmann::json &sub =
-                doc.contains(hook.key) ? doc[hook.key]
-                                       : nlohmann::json::object();
+            const nlohmann::json &sub = doc.contains(hook.key)
+                                            ? doc[hook.key]
+                                            : nlohmann::json::object();
             try {
                 hook.fn(sub);
             } catch (const std::exception &e) {

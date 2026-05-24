@@ -57,7 +57,6 @@ public:
                         int auto_connect_pin_id = -1);
 
     // Accessors
-    void set_subrack(Subrack &s) { set_model(s); }
     Subrack &subrack() { return *static_cast<Subrack *>(model_); }
     const Subrack &subrack() const {
         return *static_cast<const Subrack *>(model_);

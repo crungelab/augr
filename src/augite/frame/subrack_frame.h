@@ -2,11 +2,13 @@
 
 #include <string>
 
+#include <portable-file-dialogs.h>
+
 #include <augr/rack/rack_doc.h>
 #include <augr/rack/subrack.h>
 
-#include "../view/subrack_view.h"
 #include "../controller/subrack_controller.h"
+#include "../view/subrack_view.h"
 
 #include "frame.h"
 
@@ -23,25 +25,45 @@ class SubrackFrame : public FrameT<RackDoc, SubrackView, SubrackController> {
 public:
     // doc: the project document (shared with the root RackFrame).
     // subrack: the specific Subrack this frame displays.
-    SubrackFrame(RackDoc &doc, Subrack &subrack,
-                 const std::string &label = "");
+    SubrackFrame(RackDoc &doc, Subrack &subrack, const std::string &label = "");
     ~SubrackFrame();
 
-    void RebuildView();
+    virtual void RebuildView();
 
-    //void Draw() override;
+    void Draw() override;
     void Begin() override;
+
+    void PollPendingDialog();
+    void DrawMenuBar();
+    void StartOpenDialog();
+    void StartSaveAsDialog();
+
+    void DoNew();
+    void DoOpen(const std::filesystem::path &p);
+    void DoSave();
+    void DoSaveAs(const std::filesystem::path &p);
+    void DrawUnsavedModal();
+
+    enum class PendingAction {
+        None,
+        Open,
+        SaveAs,
+        NewAfterPrompt,
+        OpenAfterPrompt
+    };
 
     // Accessors
     Subrack &subrack() { return *subrack_; }
     const Subrack &subrack() const { return *subrack_; }
-
-    RackDoc &doc() { return FrameT::doc(); }
-    SubrackView &view() { return FrameT::view(); }
-    SubrackController &controller() { return FrameT::controller(); }
-
+   
     // Data members
     Subrack *subrack_;
+
+    std::unique_ptr<pfd::open_file> open_dialog_;
+    std::unique_ptr<pfd::save_file> save_dialog_;
+
+    PendingAction pending_ = PendingAction::None;
+    bool show_unsaved_modal_ = false;
 };
 
 } // namespace augr

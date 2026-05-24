@@ -5,6 +5,7 @@
 #include <memory>
 #include <optional>
 #include <string>
+#include <unordered_map>
 
 #include <nlohmann/json.hpp>
 
@@ -42,6 +43,11 @@ class RackDoc : public DocumentT<Rack> {
     // for "editor", "midi_learn", etc. without callers having to remember
     // to ensure-object on first write.
     nlohmann::json &MetadataSection(const std::string &key);
+    // Per-subrack archived view state, keyed by Subrack::uuid().
+    // Populated when SubrackFrames close (or at save time for open
+    // frames), consumed when SubrackFrames open. Serialized as part
+    // of the document envelope.
+    std::unordered_map<std::string, nlohmann::json> views_;
 
  private:
     nlohmann::json metadata_ = nlohmann::json::object();

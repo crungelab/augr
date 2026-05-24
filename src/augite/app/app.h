@@ -1,5 +1,6 @@
 #pragma once
 
+#include "augr/core/document.h"
 #include "../frame/frame.h"
 #include "base_app.h"
 
@@ -22,6 +23,7 @@ public:
 
     // Data members
     static App *singleton_;
+    std::unique_ptr<Document> doc_;
     std::unique_ptr<Frame> root_frame_;
     Frame *active_frame_ = nullptr; // last frame to have focus};
 };
