@@ -16,6 +16,7 @@ set(AUGR_FAUST_ROOT ${AUGR_SRC}/augr-faust)
 set(AUGR_VOLT_ROOT ${AUGR_SRC}/augr-volt)
 set(AUGR_FM_ROOT ${AUGR_SRC}/augr-fm)
 
+set(STDUUID_ROOT ${AUGR_DEPOT}/stduuid)
 set(FMT_ROOT ${AUGR_DEPOT}/fmt)
 set(SPDLOG_ROOT ${AUGR_DEPOT}/spdlog)
 set(JSON_ROOT ${AUGR_DEPOT}/json)

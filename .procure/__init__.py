@@ -1,10 +1,9 @@
 from procure import GitSolution
 
 
-class Faust(GitSolution):
-    path = "depot/faust"
-    url = "https://github.com/grame-cncm/faust"
-    recursive = True
+class StdUuid(GitSolution):
+    path = "depot/std-uuid"
+    url = "https://github.com/mariusbancila/stduuid"
 
 
 class Fmt(GitSolution):
@@ -78,13 +77,20 @@ class KissFFT(GitSolution):
     path = "depot/kissfft"
     url = "https://github.com/mborgerding/kissfft"
 
+
 class Pfd(GitSolution):
     path = "depot/portable-file-dialogs"
     url = "https://github.com/samhocevar/portable-file-dialogs"
 
 
+class Faust(GitSolution):
+    path = "depot/faust"
+    url = "https://github.com/grame-cncm/faust"
+    recursive = True
+
+
 solutions = [
-    Faust,
+    StdUuid,
     Fmt,
     SpdLog,
     SDL,
@@ -100,4 +106,5 @@ solutions = [
     Xtl,
     KissFFT,
     Pfd,
+    Faust,
 ]
