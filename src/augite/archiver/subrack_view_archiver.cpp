@@ -23,7 +23,6 @@ void SubrackViewArchiver::Save(Archive& archive) const {
     // View-level state (pan, zoom, etc.) goes here in the future.
     // For now, just the widgets array.
 
-    //SaveWidgets(archive);
     SaveWidgets(archive, view.root_->children_);
 
 }
@@ -46,26 +45,6 @@ void SubrackViewArchiver::SaveWidgets(Archive& archive, const std::vector<Widget
         j_widgets.push_back(std::move(j_widget));
     }
 }
-
-/*
-void SubrackViewArchiver::SaveWidgets(Archive& archive) const {
-    auto& j = archive.json();
-    const SubrackView& view = subject();
-
-    if (view.root_ == nullptr || view.root_->children_.empty()) return;
-
-    auto& j_widgets = j["widgets"] = nlohmann::json::array();
-
-    for (Widget* child : view.root_->children_) {
-        nlohmann::json j_widget = nlohmann::json::object();
-        {
-            JsonScope scope(archive, j_widget);
-            ArchiverManufacturer::singleton().Serialize(archive, *child);
-        }
-        j_widgets.push_back(std::move(j_widget));
-    }
-}
-*/
 
 void SubrackViewArchiver::Load(Archive& archive) {
     LoadWidgets(archive);

@@ -17,6 +17,11 @@ class Model;
 class Widget : public Subject {
 public:
     virtual ~Widget() = default;
+    virtual void Create(Widget *parent = nullptr) {
+        if (parent) {
+            parent->AddChild(this);
+        }
+    }
     void AddChild(Widget *widget) {
         widget->parent_ = this;
         children_.push_back(widget);

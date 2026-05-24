@@ -23,21 +23,6 @@ public:
         label_ = "Subrack";
     }
 
-    // -- Identity -------------------------------------------------------
-    // Stable identifier that survives save/load and uniquely identifies
-    // this subrack within the project. Generated lazily on first call;
-    // serialized as part of the subrack's JSON. Used by view-state
-    // persistence, undo history, and anything else that needs to refer
-    // to a specific subrack across sessions.
-    const std::string &uuid() const;
-
-    // Reset to a fresh uuid. Called on paste so that the new copy
-    // doesn't collide with the original's identity.
-    void RegenerateUuid();
-
-    // For deserialization: set the uuid directly without generating.
-    void set_uuid(std::string uuid) { uuid_ = std::move(uuid); }
-
     // -- Execution ------------------------------------------------------
     // Rebuilds execution order if dirty, then walks sorted_modules_
     // in topological order calling Process() on each.
@@ -67,10 +52,6 @@ public:
     // Data members --- scheduling
     std::vector<Module *> modules_;
     std::vector<Module *> sorted_modules_; // cached execution order
-
-    // Data members --- identity
-    // Mutable to allow lazy initialization from const uuid() accessor.
-    mutable std::string uuid_;
 
     REFLECT_ENABLE(Graph)
 

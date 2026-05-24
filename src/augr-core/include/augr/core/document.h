@@ -35,13 +35,13 @@ public:
     // Hooks let subsystems persist data alongside the rack without
     // RackDoc knowing about them. Each hook owns a top-level JSON key
     // ("view", "midi_learn", etc.) and is invoked during Save/Load.
-    using SaveHookFn = std::function<nlohmann::json()>;
+    using SaveHookFn = std::function<void(nlohmann::json &)>;
     using LoadHookFn = std::function<void(const nlohmann::json&)>;
 
     // Returns a token that can be used to remove the hook later.
     using HookToken = int;
-    HookToken AddSaveHook(std::string key, SaveHookFn fn);
-    HookToken AddLoadHook(std::string key, LoadHookFn fn);
+    HookToken AddSaveHook(SaveHookFn fn);
+    HookToken AddLoadHook(LoadHookFn fn);
 
     void RemoveSaveHook(HookToken token);
     void RemoveLoadHook(HookToken token);
@@ -54,8 +54,8 @@ protected:
     std::optional<std::filesystem::path> path_;
     bool modified_ = false;
 
-    struct SaveHook { HookToken token; std::string key; SaveHookFn fn; };
-    struct LoadHook { HookToken token; std::string key; LoadHookFn fn; };
+    struct SaveHook { HookToken token; SaveHookFn fn; };
+    struct LoadHook { HookToken token; LoadHookFn fn; };
     std::vector<SaveHook> save_hooks_;
     std::vector<LoadHook> load_hooks_;
     HookToken next_token_ = 1;

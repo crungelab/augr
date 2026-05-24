@@ -24,6 +24,8 @@ App::App() {
 
     REGISTER_ARCHIVER_FACTORY(ModuleWidgetArchiver);
     REGISTER_ARCHIVER_FACTORY(SubrackViewArchiver);
+    REGISTER_ARCHIVER_FACTORY(SubrackWidgetArchiver);
+
 
     REGISTER_MODEL_WIDGET_FACTORY(SubrackWidget)
     REGISTER_MODEL_WIDGET_FACTORY(RackWidget)

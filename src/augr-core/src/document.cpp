@@ -4,15 +4,15 @@ namespace augr {
 
 // ---------- Hook registry ----------
 
-Document::HookToken Document::AddSaveHook(std::string key, SaveHookFn fn) {
+Document::HookToken Document::AddSaveHook(SaveHookFn fn) {
     HookToken token = next_token_++;
-    save_hooks_.push_back({token, std::move(key), std::move(fn)});
+    save_hooks_.push_back({token, std::move(fn)});
     return token;
 }
 
-Document::HookToken Document::AddLoadHook(std::string key, LoadHookFn fn) {
+Document::HookToken Document::AddLoadHook(LoadHookFn fn) {
     HookToken token = next_token_++;
-    load_hooks_.push_back({token, std::move(key), std::move(fn)});
+    load_hooks_.push_back({token, std::move(fn)});
     return token;
 }
 

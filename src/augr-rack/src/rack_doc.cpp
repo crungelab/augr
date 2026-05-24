@@ -24,11 +24,6 @@ namespace {
 constexpr const char *kDocumentFormatTag = "augr.document";
 constexpr int kDocumentFormatVersion = 1;
 
-// Reserved top-level envelope keys that hooks may not use.
-bool IsReservedEnvelopeKey(const std::string &key) {
-    return key == "format" || key == "version" || key == "rack";
-}
-
 // Pure: rack -> json (bare rack json, no envelope).
 bool RackToJson(Rack &rack, nlohmann::json &out_json) {
     auto &manufacturer = ArchiverManufacturer::singleton();
@@ -144,29 +139,21 @@ bool RackDoc::Save(const std::filesystem::path &p) {
         doc["version"] = kDocumentFormatVersion;
         doc["rack"] = std::move(rack_json);
 
+        // Fire save hooks before serializing views_, so frames can
+        // push their live state into views_ first.
+        for (const auto &hook : save_hooks_) {
+            try {
+                hook.fn(doc);
+            } catch (const std::exception &e) {
+                std::cerr << "Save hook threw: " << e.what() << "\n";
+            }
+        }
+
         nlohmann::json views_json = nlohmann::json::object();
         for (const auto &[uuid, view_json] : views_) {
             views_json[uuid] = view_json;
         }
         doc["views"] = std::move(views_json);
-
-        // Invoke save hooks. Each contributes its own top-level key.
-        for (const auto &hook : save_hooks_) {
-            if (IsReservedEnvelopeKey(hook.key)) {
-                std::cerr << "Save hook tried to use reserved key '" << hook.key
-                          << "' — skipping\n";
-                continue;
-            }
-            try {
-                nlohmann::json sub = hook.fn();
-                if (!sub.is_null()) {
-                    doc[hook.key] = std::move(sub);
-                }
-            } catch (const std::exception &e) {
-                std::cerr << "Save hook '" << hook.key
-                          << "' threw: " << e.what() << " — skipping\n";
-            }
-        }
 
         std::ofstream out(p);
         out << doc.dump(2);
@@ -215,19 +202,13 @@ bool RackDoc::Load(const std::filesystem::path &p, bool auto_start) {
         SetPath(p);
         MarkClean();
 
-        // Invoke load hooks after the rack swap. Each receives the JSON
-        // at its registered key, or an empty object if absent — so hooks
-        // have a single unconditional entry point regardless of whether
-        // their state was previously saved.
+        // Fire load hooks after the rack and views_ are in place.
+        // Hooks can pull from views_ via the doc reference.
         for (const auto &hook : load_hooks_) {
-            const nlohmann::json &sub = doc.contains(hook.key)
-                                            ? doc[hook.key]
-                                            : nlohmann::json::object();
             try {
-                hook.fn(sub);
+                hook.fn(doc);
             } catch (const std::exception &e) {
-                std::cerr << "Load hook '" << hook.key
-                          << "' threw: " << e.what() << "\n";
+                std::cerr << "Load hook threw: " << e.what() << "\n";
             }
         }
 
@@ -243,26 +224,29 @@ bool RackDoc::Load(const std::filesystem::path &p, bool auto_start) {
 
 void RackDoc::NewDocument(bool auto_start) {
     auto fresh = NewRack("Rack");
-    if (!fresh) {
-        std::cerr << "NewDocument: failed to construct default Rack\n";
-        return;
+    if (!fresh) { /* ... */
     }
     fresh->CreateDefaultDevices();
 
     Stop();
     model_ = std::move(fresh);
+    views_.clear();
     ClearPath();
     MarkClean();
 
-    // Notify load hooks so they can reset their state to defaults. This
-    // gives subsystems a single notification point — "the document
-    // changed" — whether the change came from Load or NewDocument.
+    // Notify load hooks with an empty envelope so subsystems reset to
+    // defaults. Synthesize a minimal doc-shaped json since we don't
+    // have a real envelope here.
+    nlohmann::json synthetic = nlohmann::json::object();
+    synthetic["format"] = kDocumentFormatTag;
+    synthetic["version"] = kDocumentFormatVersion;
+    synthetic["views"] = nlohmann::json::object();
+
     for (const auto &hook : load_hooks_) {
         try {
-            hook.fn(nlohmann::json::object());
+            hook.fn(synthetic);
         } catch (const std::exception &e) {
-            std::cerr << "Load hook '" << hook.key
-                      << "' threw on NewDocument: " << e.what() << "\n";
+            std::cerr << "Load hook threw on NewDocument: " << e.what() << "\n";
         }
     }
 

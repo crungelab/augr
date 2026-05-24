@@ -1,7 +1,12 @@
 #include "imgui.h"
 
-#include "subrack_widget.h"
 #include <augr/rack/subrack.h>
+
+#include "../archiver/module_widget_archiver.h"
+
+#include "subrack_widget.h"
+
+
 
 namespace augr {
 
@@ -11,5 +16,8 @@ void SubrackWidget::DrawNodeContent() {
 }
 
 DEFINE_MODEL_WIDGET_FACTORY(SubrackWidget, Subrack)
+
+class SubrackWidgetArchiver : public ModuleWidgetArchiver {};
+DEFINE_ARCHIVER_FACTORY(SubrackWidgetArchiver, SubrackWidget, "Widget.Subrack")
 
 } // namespace augr

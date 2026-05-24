@@ -1,13 +1,5 @@
 #pragma once
 
-//#include <portable-file-dialogs.h>
-
-#include <augr/rack/rack_doc.h>
-
-#include "../view/subrack_view.h"
-
-#include "../controller/subrack_controller.h"
-
 #include "subrack_frame.h"
 
 namespace augr {
@@ -25,13 +17,6 @@ public:
 
 private:
     void RebuildView() override;
-
-    // View serialization (called from doc hooks).
-    nlohmann::json ViewToJson();
-    void ViewFromJson(const nlohmann::json &j);
-
-    RackDoc::HookToken save_view_token_ = 0;
-    RackDoc::HookToken load_view_token_ = 0;
 };
 
 } // namespace augr

@@ -28,6 +28,8 @@ public:
     SubrackFrame(RackDoc &doc, Subrack &subrack, const std::string &label = "");
     ~SubrackFrame();
 
+    void Create(Widget *parent = nullptr) override;
+
     virtual void RebuildView();
 
     void Draw() override;
@@ -64,6 +66,14 @@ public:
 
     PendingAction pending_ = PendingAction::None;
     bool show_unsaved_modal_ = false;
+protected:
+    // View serialization (called from doc hooks).
+    nlohmann::json ViewToJson();
+    void ViewFromJson(const nlohmann::json &j);
+
+    RackDoc::HookToken save_view_token_ = 0;
+    RackDoc::HookToken load_view_token_ = 0;
+
 };
 
 } // namespace augr

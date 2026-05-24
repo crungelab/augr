@@ -270,7 +270,8 @@ void SubrackController::CheckMouse() {
                     auto *doc = dynamic_cast<RackDoc *>(doc_);
                     auto *child =
                         new SubrackFrame(*doc, *subrack, subrack->label_);
-                    this->frame().AddChild(child);
+                    //this->frame().AddChild(child);
+                    child->Create(&frame());
                 } else if (auto *mw =
                                dynamic_cast<ModuleWidget *>(it->second)) {
                     mw->is_open_ = !mw->is_open_;

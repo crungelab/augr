@@ -11,61 +11,21 @@ namespace augr {
 
 RackFrame::RackFrame(RackDoc &_doc, Rack &rack, const std::string &label)
     : SubrackFrame(_doc, rack, label) {
-    // Install view hooks BEFORE NewDocument, so the load-hook
-    // gets invoked on the initial document. RackFrame owns both doc_
-    // and view_, so the `this` captures are valid for the lifetime of
-    // the doc_.
-    save_view_token_ = doc_->AddSaveHook("view", [this]() {
-        return ViewToJson();
-    });
-    load_view_token_ = doc_->AddLoadHook("view", [this](const nlohmann::json &j) {
-        RebuildView();
-        if (!j.empty()) {
-            ViewFromJson(j);
-        }
-    });
 }
 
 RackFrame::~RackFrame() {
-    if (doc_) {
-        doc_->RemoveSaveHook(save_view_token_);
-        doc_->RemoveLoadHook(load_view_token_);
-    }
 }
 
 void RackFrame::RebuildView() {
     view_ = std::make_unique<SubrackView>(doc());
     view().Build();  // construct widget tree now so view archiver has something to load into
     controller_ = std::make_unique<SubrackController>(doc(), view(), *this);
-}
 
-nlohmann::json RackFrame::ViewToJson() {
-    if (!view_) return nlohmann::json();
-
-    auto &mfr = ArchiverManufacturer::singleton();
-    auto *factory = mfr.FindFactory(std::type_index(typeid(*view_)));
-    if (!factory) {
-        std::cerr << "No archiver factory for SubrackView\n";
-        return nlohmann::json();
+    // If we have a cached view state for this subrack, apply it.
+    auto it = doc().views_.find(rack().uuid());
+    if (it != doc().views_.end()) {
+        ViewFromJson(it->second);
     }
-    std::unique_ptr<Archiver> archiver(factory->Produce(*view_));
-    nlohmann::json out;
-    Archive archive(out);
-    archiver->Save(archive);
-    return out;
-}
-
-void RackFrame::ViewFromJson(const nlohmann::json &j) {
-    if (!view_) return;
-
-    auto &mfr = ArchiverManufacturer::singleton();
-    auto *factory = mfr.FindFactory(std::type_index(typeid(*view_)));
-    if (!factory) return;
-
-    std::unique_ptr<Archiver> archiver(factory->Produce(*view_));
-    nlohmann::json local = j;
-    Archive archive(local);
-    archiver->Load(archive);
 }
 
 void RackFrame::Begin() {

@@ -16,6 +16,7 @@ RackApp::RackApp() {
     doc_ = std::make_unique<RackDoc>();
     static_cast<RackDoc *>(doc_.get())->NewDocument();
     root_frame_ = std::make_unique<RackFrame>(*static_cast<RackDoc *>(doc_.get()), *static_cast<Rack *>(doc_->model()), "Rack");
+    root_frame_->Create();
 }
 
 void RackApp::Draw() {

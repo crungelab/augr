@@ -19,6 +19,12 @@ void GraphArchiver::Save(Archive &archive) const {
 
     const Graph &graph = subject();
 
+    auto &j = archive.json();
+
+    // Persist the graph's stable identity. Lazy-minted on first call,
+    // so accessing uuid() here ensures every saved graph has one.
+    j["uuid"] = graph.uuid();
+
     // Push graph context so children iteration AND wire resolution
     // both see this graph's children as the resolution table.
     GraphScope graph_scope(archive, graph.children_);
@@ -95,6 +101,14 @@ void GraphArchiver::Load(Archive &archive) {
 
     Graph &graph = subject();
     const auto &j = archive.json();
+
+    // Restore the graph's stable identity. If missing (legacy files),
+    // the uuid will be lazily minted on first access — which is fine
+    // for round-trip but means the loaded graph gets a new identity
+    // rather than preserving its original.
+    if (j.contains("uuid") && j["uuid"].is_string()) {
+        graph.set_uuid(j["uuid"].get<std::string>());
+    }
 
     LoadChildren(archive);
 

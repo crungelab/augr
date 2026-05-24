@@ -1,19 +1,59 @@
+#include <augr/core/archive.h>
+#include <augr/core/archiver.h>
+#include <augr/core/archiver_manufacturer.h>
+
 #include "subrack_frame.h"
 
 #include <imgui.h>
 
 namespace augr {
 
-SubrackFrame::SubrackFrame(RackDoc &doc, Subrack &subrack,
+SubrackFrame::SubrackFrame(RackDoc &_doc, Subrack &subrack,
                            const std::string &label)
-    : FrameT<RackDoc, SubrackView, SubrackController>(doc, label),
+    : FrameT<RackDoc, SubrackView, SubrackController>(_doc, label),
       subrack_(&subrack) {
+    // Install view hooks. The save hook pushes this frame's current
+    // view state into views_; the load hook pulls it back out after
+    // the doc has been replaced.
+    save_view_token_ = doc_->AddSaveHook([this](nlohmann::json &) {
+        doc().views_[subrack_->uuid()] = ViewToJson();
+    });
+    load_view_token_ =
+        doc_->AddLoadHook([this](const nlohmann::json &) { RebuildView(); });
+}
 
+// SubrackFrame::~SubrackFrame() = default;
+SubrackFrame::~SubrackFrame() {
+    if (doc_) {
+        // Capture final view state before going away. Closing a frame
+        // shouldn't discard its layout — the user might reopen this
+        // subrack later in the session.
+        doc().views_[subrack_->uuid()] = ViewToJson();
+
+        doc_->RemoveSaveHook(save_view_token_);
+        doc_->RemoveLoadHook(load_view_token_);
+    }
+}
+
+void SubrackFrame::Create(Widget *parent) {
+    Widget::Create(parent);
     RebuildView();
 }
 
-SubrackFrame::~SubrackFrame() = default;
+void SubrackFrame::RebuildView() {
+    view_ = std::make_unique<SubrackView>(doc());
+    view().set_model(subrack());
+    view().Build();
+    controller_ = std::make_unique<SubrackController>(doc(), view(), *this);
+    controller().set_model(subrack());
 
+    // If we have a cached view state for this subrack, apply it.
+    auto it = doc().views_.find(subrack_->uuid());
+    if (it != doc().views_.end()) {
+        ViewFromJson(it->second);
+    }
+}
+/*
 void SubrackFrame::RebuildView() {
     view_ = std::make_unique<SubrackView>(doc());
     view().set_model(subrack());
@@ -22,12 +62,13 @@ void SubrackFrame::RebuildView() {
     controller_ = std::make_unique<SubrackController>(doc(), view(), *this);
     controller().set_model(subrack());
 }
+*/
 
 void SubrackFrame::Draw() {
     PollPendingDialog();
     if (is_active()) {
         DrawMenuBar();
-    } 
+    }
     DrawUnsavedModal();
     Frame::Draw();
 }
@@ -242,6 +283,38 @@ void SubrackFrame::DrawUnsavedModal() {
         }
         ImGui::EndPopup();
     }
+}
+
+nlohmann::json SubrackFrame::ViewToJson() {
+    if (!view_)
+        return nlohmann::json();
+
+    auto &mfr = ArchiverManufacturer::singleton();
+    auto *factory = mfr.FindFactory(std::type_index(typeid(*view_)));
+    if (!factory) {
+        std::cerr << "No archiver factory for SubrackView\n";
+        return nlohmann::json();
+    }
+    std::unique_ptr<Archiver> archiver(factory->Produce(*view_));
+    nlohmann::json out;
+    Archive archive(out);
+    archiver->Save(archive);
+    return out;
+}
+
+void SubrackFrame::ViewFromJson(const nlohmann::json &j) {
+    if (!view_)
+        return;
+
+    auto &mfr = ArchiverManufacturer::singleton();
+    auto *factory = mfr.FindFactory(std::type_index(typeid(*view_)));
+    if (!factory)
+        return;
+
+    std::unique_ptr<Archiver> archiver(factory->Produce(*view_));
+    nlohmann::json local = j;
+    Archive archive(local);
+    archiver->Load(archive);
 }
 
 } // namespace augr
