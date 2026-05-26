@@ -30,6 +30,8 @@ public:
 
     void Create(Widget *parent = nullptr) override;
 
+    virtual void OnLoaded();
+    
     virtual void RebuildView();
 
     void Draw() override;

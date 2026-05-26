@@ -14,7 +14,7 @@ RackApp *RackApp::singleton_;
 RackApp::RackApp() {
     singleton_ = this;
     doc_ = std::make_unique<RackDoc>();
-    static_cast<RackDoc *>(doc_.get())->NewDocument();
+    document().NewDocument();
     root_frame_ = std::make_unique<RackFrame>(*static_cast<RackDoc *>(doc_.get()), *static_cast<Rack *>(doc_->model()), "Rack");
     root_frame_->Create();
     set_active_frame(root_frame_.get());

@@ -19,8 +19,7 @@ SubrackFrame::SubrackFrame(RackDoc &doc, Subrack &subrack,
         document().views_[subrack_->uuid()] = ViewToJson();
     });
     load_view_token_ = doc_->AddLoadHook([this](const nlohmann::json &) {
-        DestroyChildren();
-        RebuildView();
+        OnLoaded();
     });
 }
 
@@ -42,6 +41,11 @@ void SubrackFrame::Create(Widget *parent) {
     RebuildView();
 }
 
+void SubrackFrame::OnLoaded() {
+    DestroyChildren();
+    RebuildView();
+}
+
 void SubrackFrame::RebuildView() {
     view_ = std::make_unique<SubrackView>(document());
     view().set_model(subrack());
@@ -55,16 +59,6 @@ void SubrackFrame::RebuildView() {
         ViewFromJson(it->second);
     }
 }
-/*
-void SubrackFrame::RebuildView() {
-    view_ = std::make_unique<SubrackView>(document());
-    view().set_model(subrack());
-    view().Build(); // construct widget tree now so view archiver has something
-                    // to load into
-    controller_ = std::make_unique<SubrackController>(document(), view(), *this);
-    controller().set_model(subrack());
-}
-*/
 
 void SubrackFrame::Draw() {
     PollPendingDialog();
