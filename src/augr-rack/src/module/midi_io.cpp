@@ -23,10 +23,6 @@ void MidiInputModule::CreatePins() {
 }
 
 void MidiInputModule::Process() {
-    /*
-    MidiMessage midi = midi_in_->Read();
-    midi_out_->Write(midi);
-    */
     for (const MidiMessage &msg : midi_in_->Drain()) {
         midi_out_->Write(msg);
     }
@@ -46,10 +42,6 @@ void MidiOutputModule::CreatePins() {
 }
 
 void MidiOutputModule::Process() {
-    /*
-    MidiMessage midi = midi_in_->Read();
-    midi_out_->Write(midi);
-    */
     for (const MidiMessage &msg : midi_in_->Drain()) {
         midi_out_->Write(msg);
     }

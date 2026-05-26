@@ -5,8 +5,6 @@
 #include <string>
 #include <vector>
 
-#include <augr/core/midi/midi_message.h>
-
 #include <augr/rack/graph.h>
 
 namespace augr {

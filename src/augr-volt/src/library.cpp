@@ -3,7 +3,6 @@
 
 #include <augr/rack/archiver/module_archiver.h>
 
-#include <augr/volt/cv_io.h>
 #include <augr/volt/cv_module.h>
 #include <augr/volt/midi_cv_module.h>
 
@@ -28,8 +27,6 @@ DEFINE_MODULE(LfoModule, "LfoModule", "Volt")
 DEFINE_MODULE(NoiseModule, "NoiseModule", "Volt")
 
 void InitAugrVoltLibrary() {
-    REGISTER_MODULE(CvInputModule);
-    REGISTER_MODULE(CvOutputModule);
     REGISTER_MODULE(CvModule);
     REGISTER_MODULE(MidiCvModule);
     REGISTER_MODULE(VcoModule);

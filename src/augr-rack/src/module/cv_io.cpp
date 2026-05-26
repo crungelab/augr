@@ -4,7 +4,7 @@
 #include <augr/rack/archiver/module_archiver.h>
 #include <augr/rack/graph.h>
 
-#include <augr/volt/cv_io.h>
+#include <augr/rack/module/cv_io.h>
 
 
 namespace augr {

@@ -8,6 +8,8 @@
 
 #include <augr/rack/audio_pin.h>
 #include <augr/rack/midi_pin.h>
+#include <augr/rack/voltage_pin.h>
+
 #include <augr/rack/node.h>
 
 namespace augr {
