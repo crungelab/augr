@@ -48,7 +48,8 @@ RackSelection::BuildSelectionJson(Subrack &subrack, SubrackView &view,
                              "GraphArchiver\n";
             }
         } else {
-            std::cerr << "BuildSelectionJson: no archiver factory for subrack\n";
+            std::cerr
+                << "BuildSelectionJson: no archiver factory for subrack\n";
         }
 
         doc["rack"] = std::move(rack_json);
@@ -83,7 +84,7 @@ RackSelection::BuildSelectionJson(Subrack &subrack, SubrackView &view,
     if (!widgets.empty()) {
         bool first = true;
         Vec2 origin{0.0f, 0.0f};
-        for (Widget *w : widgets) {
+        for (auto &w : widgets) {
             auto *mw = dynamic_cast<ModuleWidget *>(w);
             if (!mw)
                 continue;
@@ -190,11 +191,12 @@ RackSelection::MergeIntoRack(Subrack &dest, SubrackView &view,
             loaded_widgets.push_back(nullptr);
             continue;
         }
-        Widget *w = builder.Build(*module);
-        view.root_->AddChild(w);
-        auto *mw = dynamic_cast<ModuleWidget *>(w);
-        if (mw)
+        auto w = builder.Build(*module);
+        auto *mw = dynamic_cast<ModuleWidget *>(w.get()); // observe before move
+        if (mw) {
             view.widget_map()[module->id_] = mw;
+        }
+        view.root_->AddChild(std::move(w));
         loaded_widgets.push_back(mw);
     }
 

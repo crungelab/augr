@@ -46,7 +46,7 @@ private:
             ImGui::TableNextRow();
             for (int c = 0; c < cols; ++c) {
                 ImGui::TableSetColumnIndex(c);
-                ImGui::PushID(children_[c]);
+                ImGui::PushID(children_[c].get());
                 ImGui::BeginGroup();
                 children_[c]->Draw();
                 ImGui::EndGroup();

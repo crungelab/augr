@@ -12,11 +12,12 @@ public:
     void Begin() override;
 
     // Accessors
-    Rack &rack() { return doc().rack(); }
+    Rack &rack() { return document().rack(); }
     // Data members
 
 private:
     void RebuildView() override;
+    RackDoc::HookToken load_subrack_token_ = 0;
 };
 
 } // namespace augr

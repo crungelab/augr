@@ -1,7 +1,9 @@
 #pragma once
 
 #include <algorithm>
+#include <memory>
 #include <typeindex>
+#include <utility>
 #include <vector>
 
 #include <augr/core/subject.h>
@@ -9,45 +11,151 @@
 namespace augr {
 
 class Model;
+class Widget;
+
+// Forward declaration of the deletion queue interface. Actual definition
+// lives with App; Widget only needs to schedule itself for destruction.
+class DestroyQueue {
+public:
+    virtual ~DestroyQueue() = default;
+    virtual void ScheduleDestroy(std::unique_ptr<Widget> widget) = 0;
+};
+
+// Returns the process-wide destroy queue. Typically forwards to
+// App::singleton().destroy_queue(). Defined in the .cpp / App module
+// so widget.h doesn't have to know about App.
+DestroyQueue &GetDestroyQueue();
 
 // Base widget: a node in the UI tree. Knows how to draw itself and its
 // children, but has no inherent association with a Model. Use this for
 // pure layout/structural widgets (containers, dividers, group boxes,
 // static labels, etc.).
+//
+// Ownership model: a parent owns its children via std::unique_ptr.
+// Top-level widgets (Frames) are owned by App. Destruction is
+// deferred: Destroy() detaches the widget from its parent synchronously
+// (so it stops drawing and receiving events immediately) and hands
+// ownership to the destroy queue, which deletes it at a safe point
+// in the main loop.
 class Widget : public Subject {
 public:
+    using Ptr = std::unique_ptr<Widget>;
+
     virtual ~Widget() = default;
+
+    // Attach this widget to a parent. Caller must have allocated *this
+    // with `new` and must not retain ownership after this call — the
+    // parent takes ownership. If parent is null, the widget is left as
+    // an orphan; the caller is responsible for handing ownership to App
+    // (for top-level widgets) or destroying it.
     virtual void Create(Widget *parent = nullptr) {
         if (parent) {
-            parent->AddChild(this);
+            parent->AddChild(Ptr(this));
         }
     }
-    void AddChild(Widget *widget) {
-        widget->parent_ = this;
-        children_.push_back(widget);
-    }
-    void RemoveChild(Widget &child) {
-        child.parent_ = nullptr;
-        children_.erase(std::remove(children_.begin(), children_.end(), &child),
-                        children_.end());
+
+    void AddChild(Ptr child) {
+        child->parent_ = this;
+        children_.push_back(std::move(child));
     }
 
-    virtual void Draw() { DrawChildren(); }
+    // Detach a child and return ownership to the caller. Returns nullptr
+    // if `child` is not actually a child of this widget.
+    Ptr RemoveChild(Widget &child) {
+        auto it = std::find_if(children_.begin(), children_.end(),
+                               [&](const Ptr &p) { return p.get() == &child; });
+        if (it == children_.end())
+            return nullptr;
+        Ptr owned = std::move(*it);
+        children_.erase(it);
+        owned->parent_ = nullptr;
+        return owned;
+    }
+
+    // Schedule this widget (and its subtree) for destruction at the next
+    // safe point in the main loop. Detaches from the parent immediately
+    // so the widget stops being drawn or receiving events. Safe to call
+    // from inside the widget's own event handlers.
+    virtual void Destroy() {
+        if (destroying_)
+            return;
+        destroying_ = true;
+
+        Ptr self;
+        if (parent_) {
+            self = parent_->RemoveChild(*this);
+        }
+        // If parent_ is null, this is either a top-level widget (App
+        // should override the path, see Frame::Destroy) or an orphan
+        // the caller already owns. In the latter case the caller must
+        // arrange for ScheduleDestroy itself; we can't take ownership
+        // of `this` without a unique_ptr.
+        if (self) {
+            GetDestroyQueue().ScheduleDestroy(std::move(self));
+        }
+    }
+
+    // Destroy a specific child. Equivalent to child.Destroy() but reads
+    // more naturally at the call site when you have the parent in hand.
+    // Returns true if `child` was actually a child of this widget.
+    bool DestroyChild(Widget &child) {
+        if (child.parent_ != this)
+            return false;
+        child.Destroy();
+        return true;
+    }
+
+    // Destroy all children. Drains the children vector in one shot and
+    // schedules each child for deletion directly, bypassing the usual
+    // Destroy() -> RemoveChild path to avoid O(n^2) erasure and
+    // iterator invalidation while mutating children_ mid-loop.
+    void DestroyChildren() {
+        std::vector<Ptr> doomed;
+        doomed.swap(children_);
+        auto &queue = GetDestroyQueue();
+        for (auto &child : doomed) {
+            if (child->destroying_)
+                continue;
+            child->destroying_ = true;
+            child->parent_ = nullptr;
+            queue.ScheduleDestroy(std::move(child));
+        }
+    }
+
+    virtual void Draw() {
+        if (destroying_)
+            return;
+        DrawChildren();
+    }
+
     void DrawChildren() {
-        for (auto child : children_)
+        for (auto &child : children_)
             DrawChild(*child);
     }
+
     virtual void DrawChild(Widget &child) { child.Draw(); }
+
+    // Accessors
+    std::vector<Widget *> child_pointers() const {
+        std::vector<Widget *> result;
+        result.reserve(children_.size());
+        for (const auto &c : children_)
+            result.push_back(c.get());
+        return result;
+    }
+    bool destroying() const { return destroying_; }
 
     // Data members
     Widget *parent_ = nullptr;
-    std::vector<Widget *> children_;
+    std::vector<Ptr> children_;
+    bool destroying_ = false;
 };
 
 // A widget bound to a Model. Adds the model() accessor that callers
 // (serialization, parameter binding, graph wiring, etc.) rely on.
 class ModelWidget : public Widget {
 public:
+    //using Ptr = std::unique_ptr<ModelWidget>;
     virtual Model *model() = 0;
 };
 
@@ -71,13 +179,17 @@ public:
 class ModelWidgetFactory {
 public:
     virtual ~ModelWidgetFactory() = default;
-    virtual ModelWidget *Produce(Model &model) = 0;
+    // Returns an owned widget. Caller is responsible for inserting it
+    // into the widget tree (typically via parent->AddChild(...)).
+    virtual ModelWidget::Ptr Produce(Model &model) = 0;
     virtual std::type_index GetKey() = 0;
 };
 
 template <typename T, typename N = Model>
 class ModelWidgetFactoryT : public ModelWidgetFactory {
-    ModelWidget *Produce(Model &model) override { return new T((N &)model); }
+    ModelWidget::Ptr Produce(Model &model) override {
+        return std::make_unique<T>(static_cast<N &>(model));
+    }
     std::type_index GetKey() override { return std::type_index(typeid(N)); }
 };
 

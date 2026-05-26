@@ -8,18 +8,20 @@
 
 namespace augr {
 
-SubrackFrame::SubrackFrame(RackDoc &_doc, Subrack &subrack,
+SubrackFrame::SubrackFrame(RackDoc &doc, Subrack &subrack,
                            const std::string &label)
-    : FrameT<RackDoc, SubrackView, SubrackController>(_doc, label),
+    : FrameT<RackDoc, SubrackView, SubrackController>(doc, label),
       subrack_(&subrack) {
     // Install view hooks. The save hook pushes this frame's current
     // view state into views_; the load hook pulls it back out after
     // the doc has been replaced.
     save_view_token_ = doc_->AddSaveHook([this](nlohmann::json &) {
-        doc().views_[subrack_->uuid()] = ViewToJson();
+        document().views_[subrack_->uuid()] = ViewToJson();
     });
-    load_view_token_ =
-        doc_->AddLoadHook([this](const nlohmann::json &) { RebuildView(); });
+    load_view_token_ = doc_->AddLoadHook([this](const nlohmann::json &) {
+        DestroyChildren();
+        RebuildView();
+    });
 }
 
 // SubrackFrame::~SubrackFrame() = default;
@@ -28,7 +30,7 @@ SubrackFrame::~SubrackFrame() {
         // Capture final view state before going away. Closing a frame
         // shouldn't discard its layout — the user might reopen this
         // subrack later in the session.
-        doc().views_[subrack_->uuid()] = ViewToJson();
+        document().views_[subrack_->uuid()] = ViewToJson();
 
         doc_->RemoveSaveHook(save_view_token_);
         doc_->RemoveLoadHook(load_view_token_);
@@ -41,25 +43,25 @@ void SubrackFrame::Create(Widget *parent) {
 }
 
 void SubrackFrame::RebuildView() {
-    view_ = std::make_unique<SubrackView>(doc());
+    view_ = std::make_unique<SubrackView>(document());
     view().set_model(subrack());
     view().Build();
-    controller_ = std::make_unique<SubrackController>(doc(), view(), *this);
+    controller_ = std::make_unique<SubrackController>(document(), view(), *this);
     controller().set_model(subrack());
 
     // If we have a cached view state for this subrack, apply it.
-    auto it = doc().views_.find(subrack_->uuid());
-    if (it != doc().views_.end()) {
+    auto it = document().views_.find(subrack_->uuid());
+    if (it != document().views_.end()) {
         ViewFromJson(it->second);
     }
 }
 /*
 void SubrackFrame::RebuildView() {
-    view_ = std::make_unique<SubrackView>(doc());
+    view_ = std::make_unique<SubrackView>(document());
     view().set_model(subrack());
     view().Build(); // construct widget tree now so view archiver has something
                     // to load into
-    controller_ = std::make_unique<SubrackController>(doc(), view(), *this);
+    controller_ = std::make_unique<SubrackController>(document(), view(), *this);
     controller().set_model(subrack());
 }
 */
@@ -85,7 +87,7 @@ void SubrackFrame::Begin() {
     ImGui::Begin(title, &p_open, ImGuiWindowFlags_NoCollapse);
     if (!p_open) {
         // User closed the window; close the frame.
-        parent_->RemoveChild(*this);
+        Destroy();
     }
 }
 
@@ -124,7 +126,7 @@ void SubrackFrame::DrawMenuBar() {
     if (ImGui::BeginMainMenuBar()) {
         if (ImGui::BeginMenu("File")) {
             if (ImGui::MenuItem("New", "Ctrl+N")) {
-                if (doc().IsModified()) {
+                if (document().IsModified()) {
                     pending_ = PendingAction::NewAfterPrompt;
                     show_unsaved_modal_ = true;
                 } else {
@@ -132,7 +134,7 @@ void SubrackFrame::DrawMenuBar() {
                 }
             }
             if (ImGui::MenuItem("Open...", "Ctrl+O")) {
-                if (doc().IsModified()) {
+                if (document().IsModified()) {
                     pending_ = PendingAction::OpenAfterPrompt;
                     show_unsaved_modal_ = true;
                 } else {
@@ -140,9 +142,9 @@ void SubrackFrame::DrawMenuBar() {
                 }
             }
             ImGui::Separator();
-            bool can_save = doc().IsModified() || !doc().Path();
+            bool can_save = document().IsModified() || !document().Path();
             if (ImGui::MenuItem("Save", "Ctrl+S", false, can_save)) {
-                if (doc().Path()) {
+                if (document().Path()) {
                     DoSave();
                 } else {
                     StartSaveAsDialog();
@@ -194,7 +196,7 @@ void SubrackFrame::DrawMenuBar() {
 
 void SubrackFrame::StartOpenDialog() {
     std::string default_dir =
-        doc().Path() ? doc().Path()->parent_path().string() : pfd::path::home();
+        document().Path() ? document().Path()->parent_path().string() : pfd::path::home();
 
     open_dialog_ = std::make_unique<pfd::open_file>(
         "Open Rack", default_dir,
@@ -205,7 +207,7 @@ void SubrackFrame::StartOpenDialog() {
 
 void SubrackFrame::StartSaveAsDialog() {
     std::string default_path =
-        doc().Path() ? doc().Path()->string() : "untitled.augr";
+        document().Path() ? document().Path()->string() : "untitled.augr";
 
     save_dialog_ = std::make_unique<pfd::save_file>(
         "Save Rack As", default_path,
@@ -216,12 +218,12 @@ void SubrackFrame::StartSaveAsDialog() {
 // ---------- Document operations ----------
 
 void SubrackFrame::DoNew() {
-    doc().NewDocument();
+    document().NewDocument();
     // Load hook fires from inside NewDocument and rebuilds the view.
 }
 
 void SubrackFrame::DoOpen(const std::filesystem::path &p) {
-    if (!doc().Load(p)) {
+    if (!document().Load(p)) {
         pfd::message("Load Failed", "Could not load: " + p.string(),
                      pfd::choice::ok, pfd::icon::error);
     }
@@ -229,13 +231,13 @@ void SubrackFrame::DoOpen(const std::filesystem::path &p) {
 }
 
 void SubrackFrame::DoSave() {
-    if (!doc().Path())
+    if (!document().Path())
         return;
-    DoSaveAs(*doc().Path());
+    DoSaveAs(*document().Path());
 }
 
 void SubrackFrame::DoSaveAs(const std::filesystem::path &p) {
-    if (!doc().Save(p)) {
+    if (!document().Save(p)) {
         pfd::message("Save Failed", "Could not save: " + p.string(),
                      pfd::choice::ok, pfd::icon::error);
     }
@@ -254,7 +256,7 @@ void SubrackFrame::DrawUnsavedModal() {
         ImGui::Separator();
         if (ImGui::Button("Save First")) {
             ImGui::CloseCurrentPopup();
-            if (doc().Path()) {
+            if (document().Path()) {
                 DoSave();
                 if (pending_ == PendingAction::OpenAfterPrompt) {
                     StartOpenDialog();

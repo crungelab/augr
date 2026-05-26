@@ -6,13 +6,13 @@
 
 namespace augr {
 
-ModelWidget *ModelWidgetBuilder::Build(Model &model) {
+Widget::Ptr ModelWidgetBuilder::Build(Model &model) {
     auto type = ::reflect::get_type(model);
 
     auto &manufacturer = ModelWidgetManufacturer::singleton();
 
     ModelWidgetFactory *factory = manufacturer.GetFactory(type);
-    ModelWidget *widget = factory->Produce(model);
+    Widget::Ptr widget = factory->Produce(model);
     for (const auto child : model.children_) {
         widget->AddChild(Build(*child));
     }

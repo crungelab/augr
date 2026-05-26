@@ -23,7 +23,7 @@ void SubrackViewArchiver::Save(Archive& archive) const {
     // View-level state (pan, zoom, etc.) goes here in the future.
     // For now, just the widgets array.
 
-    SaveWidgets(archive, view.root_->children_);
+    SaveWidgets(archive, view.root_->child_pointers());
 
 }
 
@@ -32,7 +32,7 @@ void SubrackViewArchiver::SaveWidgets(Archive& archive, const std::vector<Widget
 
     auto& j = archive.json();
 
-    if (view.root_ == nullptr || view.root_->children_.empty()) return;
+    // if (view.root_ == nullptr || view.root_->children_.empty()) return;
 
     auto& j_widgets = j["widgets"] = nlohmann::json::array();
 

@@ -10,8 +10,8 @@ public:
     DocumentController(TDoc &doc, TView &view, Frame &frame)
         : ModelController(*doc.model(), view, frame), doc_(&doc) {}
 
-    TDoc &doc() { return *doc_; }
-    const TDoc &doc() const { return *doc_; }
+    TDoc &document() { return *doc_; }
+    const TDoc &document() const { return *doc_; }
 
     TView &view() { return *static_cast<TView *>(view_); }
     const TView &view() const { return *static_cast<const TView *>(view_); }

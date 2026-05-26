@@ -11,7 +11,7 @@ void ModelView::Build() {
     ModelWidgetBuilder builder;
     //root_ = builder.Build(*model());
     root_ = new Widget(); // dummy root to hold the real root's children
-    AddChild(root_);
+    AddChild(Widget::Ptr(root_)); // take ownership of the dummy root
     builder.BuildChildren(*root_, *model_);
 }
 

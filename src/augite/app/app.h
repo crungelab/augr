@@ -1,10 +1,15 @@
 #pragma once
 
+#include <memory>
+#include <vector>
+
 #include "augr/core/document.h"
 #include "../frame/frame.h"
 #include "base_app.h"
 
 namespace augr {
+
+class Widget;
 
 class App : public BaseApp {
 public:
@@ -14,6 +19,16 @@ public:
 
     bool DoCreate(CreateParams params) override;
     void Draw() override;
+
+    // Schedule a widget (and its subtree) for destruction at the next
+    // safe point. Widget::Destroy() forwards here via GetDestroyQueue().
+    // Safe to call from inside event handlers and draw code.
+    void ScheduleDestroy(std::unique_ptr<Widget> widget);
+
+    // Drain the pending-destroy queue. Call once per frame at a safe
+    // boundary — typically between event dispatch and the next Draw(),
+    // or at the end of the frame after Draw() returns.
+    void ProcessPendingDestroy();
 
     // Accessors
     static App &singleton() { return *singleton_; }
@@ -25,7 +40,8 @@ public:
     static App *singleton_;
     std::unique_ptr<Document> doc_;
     std::unique_ptr<Frame> root_frame_;
-    Frame *active_frame_ = nullptr; // last frame to have focus};
+    Frame *active_frame_ = nullptr; // last frame to have focus
+    std::vector<std::unique_ptr<Widget>> pending_destroy_;
 };
 
 } // namespace augr

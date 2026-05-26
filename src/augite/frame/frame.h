@@ -16,8 +16,8 @@ public:
     //void Draw() override;
     void End() override;
     // Accessors
-    Document &doc() { return *doc_; }
-    const Document &doc() const { return *doc_; }
+    Document &document() { return *doc_; }
+    const Document &document() const { return *doc_; }
     View &view() { return *view_; }
     const View &view() const { return *view_; }
     Controller &controller() { return *controller_; }
@@ -38,8 +38,8 @@ public:
     //FrameT(const std::string &label = "") : Frame(label) {}
     FrameT(TDoc & doc, const std::string &label = "") : Frame(doc, label) {}
     // Accessors
-    TDoc &doc() { return *static_cast<TDoc *>(doc_); }
-    const TDoc &doc() const { return *static_cast<const TDoc *>(doc_); }
+    TDoc &document() { return *static_cast<TDoc *>(doc_); }
+    const TDoc &document() const { return *static_cast<const TDoc *>(doc_); }
     TView &view() { return *static_cast<TView *>(view_.get()); }
     TController &controller() {
         return *static_cast<TController *>(controller_.get());

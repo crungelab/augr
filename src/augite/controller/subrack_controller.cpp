@@ -108,7 +108,7 @@ void SubrackController::Paste(std::optional<Vec2> anchor_grid_pos) {
             RackSelection::MergeIntoRack(subrack(), view(), j, offset);
 
         SetPendingSelection(pasted);
-        doc().MarkModified();
+        document().MarkModified();
     } catch (const std::exception &e) {
         std::cerr << "Paste failed: " << e.what() << "\n";
     }
@@ -129,7 +129,7 @@ void SubrackController::Duplicate(std::optional<Vec2> anchor_grid_pos) {
     auto pasted = RackSelection::MergeIntoRack(subrack(), view(), j, offset);
 
     SetPendingSelection(pasted);
-    doc().MarkModified();
+    document().MarkModified();
 }
 
 Vec2 SubrackController::ComputePasteOffset(
@@ -163,7 +163,6 @@ void SubrackController::DeleteSelection() {
         return;
 
     auto &wmap = view().widget_map();
-    Widget *root = view().root_;
 
     for (int node_id : selected_nodes_) {
         auto it = wmap.find(node_id);
@@ -177,14 +176,12 @@ void SubrackController::DeleteSelection() {
         if (auto *mod = dynamic_cast<Module *>(mw->model())) {
             subrack().RemoveChild(*mod);
         }
-        if (root)
-            root->RemoveChild(*widget);
         wmap.erase(it);
-        delete widget;
+        widget->Destroy(); // detaches from parent and schedules deletion
     }
     selected_nodes_.clear();
     ImNodes::ClearNodeSelection();
-    doc().MarkModified();
+    document().MarkModified();
 }
 
 Module *SubrackController::SpawnModule(const std::string &type_name,
@@ -196,14 +193,16 @@ Module *SubrackController::SpawnModule(const std::string &type_name,
         return nullptr;
     }
 
-    Module &module = dynamic_cast<Module &>(*mf->Produce(&subrack()));
+    auto &module = dynamic_cast<Module &>(*mf->Produce(&subrack()));
 
     ModelWidgetBuilder builder;
-    Widget *widget = builder.Build(module);
+    auto widget = builder.Build(module);
+    auto *mw =
+        dynamic_cast<ModuleWidget *>(widget.get()); // observe before move
     if (view().root_) {
-        view().root_->AddChild(widget);
+        view().root_->AddChild(std::move(widget));
     }
-    if (auto *mw = dynamic_cast<ModuleWidget *>(widget)) {
+    if (mw) {
         view().widget_map()[module.id_] = mw;
         mw->grid_position_ = grid_pos;
         mw->position_dirty_ = true;
@@ -230,33 +229,12 @@ Module *SubrackController::SpawnModule(const std::string &type_name,
         }
     }
 
-    doc().MarkModified();
+    document().MarkModified();
     return &module;
 }
 
 // ----- Input polling -----
-/*
-void SubrackController::CheckMouse() {
-    int node_id = -1;
-    if (ImNodes::IsNodeHovered(&node_id)) {
-        hovered_node_id_ = node_id;
 
-        if (ImGui::IsMouseDoubleClicked(ImGuiMouseButton_Left)) {
-            const auto &wmap = view().widget_map();
-            if (auto it = wmap.find(hovered_node_id_); it != wmap.end()) {
-                if (auto *mw = dynamic_cast<ModuleWidget *>(it->second)) {
-                    mw->is_open_ = !mw->is_open_;
-                    mw->window_pose_dirty_ = true;
-                }
-            }
-        }
-
-        if (ImGui::IsMouseClicked(ImGuiMouseButton_Right)) {
-            ImGui::OpenPopup("node_ctx");
-        }
-    }
-}
-*/
 void SubrackController::CheckMouse() {
     int node_id = -1;
     if (ImNodes::IsNodeHovered(&node_id)) {
@@ -270,7 +248,7 @@ void SubrackController::CheckMouse() {
                     auto *doc = dynamic_cast<RackDoc *>(doc_);
                     auto *child =
                         new SubrackFrame(*doc, *subrack, subrack->label_);
-                    //this->frame().AddChild(child);
+                    // this->frame().AddChild(child);
                     child->Create(&frame());
                 } else if (auto *mw =
                                dynamic_cast<ModuleWidget *>(it->second)) {
@@ -321,7 +299,7 @@ void SubrackController::CheckLinkCreated() {
         Pin *in = subrack().input_map_[end_id];
         if (out && in) {
             subrack().Connect(*out, *in);
-            doc().MarkModified();
+            document().MarkModified();
         }
     }
 }
@@ -332,7 +310,7 @@ void SubrackController::CheckLinkDestroyed() {
         auto it = subrack().wire_map_.find(link_id);
         if (it != subrack().wire_map_.end()) {
             subrack().Disconnect(*it->second);
-            doc().MarkModified();
+            document().MarkModified();
         }
     }
 }
@@ -625,7 +603,7 @@ void SubrackController::DisconnectAllWires(Module &target) {
         subrack().Disconnect(*w);
     }
     if (!to_disconnect.empty())
-        doc().MarkModified();
+        document().MarkModified();
 }
 
 } // namespace augr

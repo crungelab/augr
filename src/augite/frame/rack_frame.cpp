@@ -9,21 +9,27 @@
 namespace augr {
 
 
-RackFrame::RackFrame(RackDoc &_doc, Rack &rack, const std::string &label)
-    : SubrackFrame(_doc, rack, label) {
+RackFrame::RackFrame(RackDoc &doc, Rack &rack, const std::string &label)
+    : SubrackFrame(doc, rack, label) {
+    load_subrack_token_ = doc_->AddLoadHook([this](const nlohmann::json &) {
+        subrack_ = &document().rack();
+    });
 }
 
 RackFrame::~RackFrame() {
+    if (doc_) {
+        doc_->RemoveLoadHook(load_subrack_token_);
+    }
 }
 
 void RackFrame::RebuildView() {
-    view_ = std::make_unique<SubrackView>(doc());
+    view_ = std::make_unique<SubrackView>(document());
     view().Build();  // construct widget tree now so view archiver has something to load into
-    controller_ = std::make_unique<SubrackController>(doc(), view(), *this);
+    controller_ = std::make_unique<SubrackController>(document(), view(), *this);
 
     // If we have a cached view state for this subrack, apply it.
-    auto it = doc().views_.find(rack().uuid());
-    if (it != doc().views_.end()) {
+    auto it = document().views_.find(rack().uuid());
+    if (it != document().views_.end()) {
         ViewFromJson(it->second);
     }
 }

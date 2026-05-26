@@ -58,9 +58,38 @@ void App::CreateContext() {
     system_container_.Create();
 }
 
+void App::ScheduleDestroy(std::unique_ptr<Widget> widget) {
+    if (!widget) return;
+    pending_destroy_.push_back(std::move(widget));
+}
+
+void App::ProcessPendingDestroy() {
+    // Swap-and-drain. Widgets whose destructors schedule further
+    // destruction land in the next frame's queue, not this one,
+    // which keeps iteration safe and bounds work per frame.
+    std::vector<std::unique_ptr<Widget>> to_delete;
+    to_delete.swap(pending_destroy_);
+    // unique_ptrs destruct here in order, cascading through subtrees.
+}
+
+// Bridge between widget.h's DestroyQueue interface and App's singleton,
+// so widget.h doesn't need to include app.h.
+namespace {
+class AppDestroyQueue : public DestroyQueue {
+public:
+    void ScheduleDestroy(std::unique_ptr<Widget> widget) override {
+        App::singleton().ScheduleDestroy(std::move(widget));
+    }
+};
+AppDestroyQueue g_destroy_queue;
+} // namespace
+
+DestroyQueue &GetDestroyQueue() { return g_destroy_queue; }
+
 void App::Draw() {
     root_frame_->Draw();
     BaseApp::Draw();
+    ProcessPendingDestroy();
 }
 
 } // namespace augr

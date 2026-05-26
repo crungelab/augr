@@ -22,8 +22,8 @@ template <typename T> class DocumentViewT : public DocumentView {
 public:
     explicit DocumentViewT(T &doc) : DocumentView(doc) {}
 
-    T *doc() { return static_cast<T *>(doc_); }
-    const T *doc() const { return static_cast<const T *>(doc_); }
+    T *document() { return static_cast<T *>(doc_); }
+    const T *document() const { return static_cast<const T *>(doc_); }
 };
 
 } // namespace augr

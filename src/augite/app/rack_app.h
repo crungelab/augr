@@ -14,7 +14,7 @@ public:
     void DrawMainDockspace();
     // Accessors
     static RackApp &singleton() { return *singleton_; }
-    RackDoc &doc() { return root_frame().doc(); }
+    RackDoc &document() { return root_frame().document(); }
     Rack &rack() { return root_frame().rack(); }
     SubrackController * active_controller() { return active_frame() ? &active_frame()->controller() : nullptr; }
 

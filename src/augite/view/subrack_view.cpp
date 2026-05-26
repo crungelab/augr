@@ -17,10 +17,12 @@ SubrackView::SubrackView(RackDoc &doc) : DocumentViewT<RackDoc>(doc) {
 }
 
 SubrackView::~SubrackView() {
+    /*
     if (root_) {
         delete root_;
         root_ = nullptr;
     }
+    */
     if (context_) {
         ImNodes::EditorContextFree(context_);
         context_ = nullptr;
@@ -46,8 +48,8 @@ void SubrackView::PopulateWidgetMap(Widget *widget) {
         }
     }
 
-    for (auto *child : widget->children_) {
-        PopulateWidgetMap(child);
+    for (auto &child : widget->children_) {
+        PopulateWidgetMap(child.get());
     }
 }
 

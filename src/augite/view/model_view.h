@@ -5,7 +5,6 @@
 namespace augr {
 
 class Model;
-class Widget;
 
 class ModelView : public View {
 public:
@@ -30,8 +29,8 @@ public:
     virtual void Build();
 
     // Data members
-    Model *model_;
-    Widget *root_ = nullptr;
+    Model *model_ = nullptr;
+    Widget* root_;
 };
 
 template <typename T> class ModelViewT : public ModelView {

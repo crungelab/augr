@@ -95,7 +95,7 @@ public:
         if (ImGui::BeginMainMenuBar()) {
             if (ImGui::BeginMenu("File")) {
                 if (ImGui::MenuItem("New", "Ctrl+N")) {
-                    if (doc().IsModified()) {
+                    if (document().IsModified()) {
                         pending_ = PendingAction::NewAfterPrompt;
                         show_unsaved_modal_ = true;
                     } else {
@@ -103,7 +103,7 @@ public:
                     }
                 }
                 if (ImGui::MenuItem("Open...", "Ctrl+O")) {
-                    if (doc().IsModified()) {
+                    if (document().IsModified()) {
                         pending_ = PendingAction::OpenAfterPrompt;
                         show_unsaved_modal_ = true;
                     } else {
@@ -111,9 +111,9 @@ public:
                     }
                 }
                 ImGui::Separator();
-                bool can_save = doc().IsModified() || !doc().Path();
+                bool can_save = document().IsModified() || !document().Path();
                 if (ImGui::MenuItem("Save", "Ctrl+S", false, can_save)) {
-                    if (doc().Path()) {
+                    if (document().Path()) {
                         DoSave();
                     } else {
                         StartSaveAsDialog();
@@ -135,8 +135,8 @@ public:
     // ---------- Dialog launchers ----------
 
     void StartOpenDialog() {
-        std::string default_dir = doc().Path()
-                                      ? doc().Path()->parent_path().string()
+        std::string default_dir = document().Path()
+                                      ? document().Path()->parent_path().string()
                                       : pfd::path::home();
 
         open_dialog_ = std::make_unique<pfd::open_file>(
@@ -148,7 +148,7 @@ public:
 
     void StartSaveAsDialog() {
         std::string default_path =
-            doc().Path() ? doc().Path()->string() : "untitled.augr";
+            document().Path() ? document().Path()->string() : "untitled.augr";
 
         save_dialog_ = std::make_unique<pfd::save_file>(
             "Save Rack As", default_path,
@@ -192,12 +192,12 @@ public:
     // ---------- Document operations ----------
 
     void DoNew() {
-        doc().NewDocument();
+        document().NewDocument();
         RebuildView();
     }
 
     void DoOpen(const std::filesystem::path &p) {
-        if (doc().Load(p)) {
+        if (document().Load(p)) {
             RebuildView();
         } else {
             pfd::message("Load Failed", "Could not load: " + p.string(),
@@ -206,13 +206,13 @@ public:
     }
 
     void DoSave() {
-        if (!doc().Path())
+        if (!document().Path())
             return; // guarded by menu logic, but be safe
-        DoSaveAs(*doc().Path());
+        DoSaveAs(*document().Path());
     }
 
     void DoSaveAs(const std::filesystem::path &p) {
-        if (!doc().Save(p)) {
+        if (!document().Save(p)) {
             pfd::message("Save Failed", "Could not save: " + p.string(),
                          pfd::choice::ok, pfd::icon::error);
         }
@@ -231,7 +231,7 @@ public:
             ImGui::Separator();
             if (ImGui::Button("Save First")) {
                 ImGui::CloseCurrentPopup();
-                if (doc().Path()) {
+                if (document().Path()) {
                     DoSave();
                     if (pending_ == PendingAction::OpenAfterPrompt) {
                         StartOpenDialog();
@@ -267,11 +267,11 @@ public:
     // ---------- Accessors ----------
 
     Rack &rack() { return doc_->rack(); }
-    RackDoc &doc() { return *doc_; }
+    RackDoc &document() { return *doc_; }
 
     // ---------- Data members ----------
 private:
-    void RebuildView() { view_ = std::make_unique<SubrackView>(doc()); }
+    void RebuildView() { view_ = std::make_unique<SubrackView>(document()); }
 
     std::unique_ptr<RackDoc> doc_;
     std::unique_ptr<SubrackView> view_;
