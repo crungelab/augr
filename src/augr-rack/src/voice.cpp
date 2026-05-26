@@ -24,6 +24,32 @@ void Voice::Create(Model *parent) {
     done_out_ = done_out_module_->cv_out_;
 }
 
+bool Voice::IsActive() const {
+    // High = done, low = still active.
+    //return done_out_->Value() < 0.5f;
+    auto voltage = done_out_->Read();
+    //auto value = voltage.array()[0];
+    fy_real value = 0;
+    if (!voltage.Empty()) {
+        value = voltage.array()[0];
+    }
+    return value < 0.5f;
+}
+
+/*
+bool Voice::IsActive() const {
+    // High = done, low = still active.
+    //return done_out_->Value() < 0.5f;
+    auto voltage = done_out_->Read();
+    //auto value = voltage.array()[0];
+    fy_real value = 0;
+    if (voltage.array().size() != 0) {
+        value = voltage.array()[0];
+    }
+    return value < 0.5f;
+}
+*/
+
 } // namespace augr
 
 using namespace augr;

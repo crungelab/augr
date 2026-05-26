@@ -12,13 +12,13 @@ class Voice : public Subrack {
 public:
     Voice() = default;
 
-    void Create(Model *parent) override;
+    void Create(Model *parent = nullptr) override;
 
     // -- Polyphony contract --------------------------------------------
     // The voicebank calls this. Default implementation reads done_in_
     // if anything is wired to it; otherwise falls back to a timeout
     // measured from the most recent note-off.
-    //virtual bool IsActive() const;
+    virtual bool IsActive() const;
 
     // Currently-assigned MIDI note, or -1 if free.
     int CurrentNote() const { return current_note_; }
@@ -32,7 +32,7 @@ public:
 
     REFLECT_ENABLE(Subrack)
 
-private:
+//private:
     MidiInputModule * midi_in_module_ = nullptr;
     MidiInput *midi_in_ = nullptr;
     MidiOutput *midi_out_ = nullptr;

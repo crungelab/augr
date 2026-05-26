@@ -10,6 +10,7 @@
 #include <augr/rack/archiver/rack_archiver.h>
 #include <augr/rack/archiver/subrack_archiver.h>
 #include <augr/rack/archiver/voice_archiver.h>
+#include <augr/rack/archiver/voicebank_archiver.h>
 
 using namespace augr;
 
@@ -36,6 +37,8 @@ void InitAugrRackLibrary() {
     REGISTER_MODEL_FACTORY(Voice);
     REGISTER_ARCHIVER_FACTORY(VoiceArchiver)
 
+    REGISTER_MODEL_FACTORY(Voicebank);
+    REGISTER_ARCHIVER_FACTORY(VoicebankArchiver)
 
     REGISTER_MODULE(MixerModule);
     REGISTER_MODULE(ScopeModule);
