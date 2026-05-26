@@ -38,33 +38,6 @@ public:
     Audio Transform(Audio audio) override {
         return audio.layout() != layout_ ? audio.Convert(layout_) : audio;
     }
-    /*
-    void Disconnect(Connection &connection) override {
-        PolyInputT<Audio, AudioPin>::Disconnect(connection);
-    }
-    */
 };
-
-/*
-class AudioInput : public PolyInputT<Audio, AudioPin> {
-public:
-    AudioInput(Node &node, std::string name,
-               ChannelLayout layout = ChannelLayout::kMono)
-        : PolyInputT<Audio, AudioPin>(node, name, layout) {}
-
-    void Disconnect(Connection &connection) override {
-        PolyInputT<Audio, AudioPin>::Disconnect(connection);
-        Write(Audio());
-    }
-
-    void Write(Audio audio) override {
-        if (audio.layout() != layout_) {
-            PolyInputT<Audio, AudioPin>::Write(audio.Convert(layout_));
-            return;
-        }
-        PolyInputT<Audio, AudioPin>::Write(audio);
-    }
-};
-*/
 
 } // namespace augr

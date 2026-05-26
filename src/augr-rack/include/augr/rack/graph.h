@@ -31,8 +31,8 @@ public:
     //
     void Connect(Pin &output, Pin &input);
     void Disconnect(Wire &wire);
-    void AddOutput(Pin &output);
-    void AddInput(Pin &input);
+    void MapOutput(Pin &output);
+    void MapInput(Pin &input);
     //
     bool IsOutput(int id) const;
     bool IsInput(int id) const;

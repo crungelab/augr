@@ -3,7 +3,8 @@
 
 namespace augr {
 
-class Device : public Module {
+class Io : public Module {
+public:
     REFLECT_ENABLE(Module)
 };
 

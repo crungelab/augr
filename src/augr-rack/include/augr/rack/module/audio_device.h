@@ -3,27 +3,24 @@
 
 namespace augr {
 
-class AudioDevice : public Device
-{
-  REFLECT_ENABLE(Device)
+class AudioDevice : public Device {
+    REFLECT_ENABLE(Device)
 };
 
-class AudioInputDevice : public AudioDevice
-{
+class AudioInputDevice : public AudioDevice {
 public:
-  virtual ~AudioInputDevice() {}
-  void Create(Model *parent = nullptr) override;
-  void CreatePins() override;
-  REFLECT_ENABLE(AudioDevice)
+    virtual ~AudioInputDevice() {}
+    void Create(Model *parent = nullptr) override;
+    void CreatePins() override;
+    REFLECT_ENABLE(AudioDevice)
 };
 
-class AudioOutputDevice : public AudioDevice
-{
+class AudioOutputDevice : public AudioDevice {
 public:
-  virtual ~AudioOutputDevice() {}
-  void Create(Model *parent = nullptr) override;
-  void CreatePins() override;
-  REFLECT_ENABLE(AudioDevice)
+    virtual ~AudioOutputDevice() {}
+    void Create(Model *parent = nullptr) override;
+    void CreatePins() override;
+    REFLECT_ENABLE(AudioDevice)
 };
 
 } // namespace augr

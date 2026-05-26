@@ -38,9 +38,9 @@ const std::string &Graph::uuid() const {
 
 void Graph::RegenerateUuid() { uuid_ = GenerateUuid(); }
 
-void Graph::AddOutput(Pin &output) { output_map_[output.id_] = &output; }
+void Graph::MapOutput(Pin &output) { output_map_[output.id_] = &output; }
 
-void Graph::AddInput(Pin &input) { input_map_[input.id_] = &input; }
+void Graph::MapInput(Pin &input) { input_map_[input.id_] = &input; }
 
 void Graph::Connect(Pin &output, Pin &input) {
     auto wire = new Wire(output, input);

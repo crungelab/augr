@@ -22,6 +22,9 @@ void InitAugrRackLibrary() {
     REGISTER_MODULE(MidiInputDevice);
     REGISTER_MODULE(MidiOutputDevice);
 
+    REGISTER_MODULE(AudioInputModule);
+    REGISTER_MODULE(AudioOutputModule);
+
     //REGISTER_MODULE(Subrack);
     REGISTER_MODEL_FACTORY(Subrack);
     REGISTER_ARCHIVER_FACTORY(SubrackArchiver)

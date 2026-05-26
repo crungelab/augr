@@ -8,13 +8,13 @@ Node::Node(Graph &graph) : Model(graph) {}
 void Node::AddInput(Pin &input) {
     input.node_ = this;
     inport_.AddPin(input);
-    graph().AddInput(input);
+    graph().MapInput(input);
 }
 
 void Node::AddOutput(Pin &output) {
     output.node_ = this;
     outport_.AddPin(output);
-    graph().AddOutput(output);
+    graph().MapOutput(output);
 }
 
 } // namespace augr
