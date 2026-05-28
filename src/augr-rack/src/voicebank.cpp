@@ -51,20 +51,6 @@ void Voicebank::SetVoiceCount(int n) {
 }
 
 void Voicebank::RebuildReplicas(int n) {
-    // ASSUMPTION: augr-core has a way to serialize a module subtree
-    // to JSON and deserialize it back. Based on the memory of the
-    // Archive/Archiver system, the rough shape is:
-    //
-    //   nlohmann::json j;
-    //   Archive ar(j);
-    //   ar.SerializeModule(master_);
-    //   ...
-    //   auto replica = std::make_unique<Voice>();
-    //   replica->Create(this);  // or whatever parent makes sense
-    //   ar.DeserializeModule(replica.get(), j);
-    //
-    // The exact API is yours; this is the placeholder.
-    //
     // Important: replicas are NOT added to modules_, so they do not
     // appear in the graph editor and do not participate in the
     // subrack's topological sort. They're driven manually below.
@@ -81,7 +67,6 @@ void Voicebank::RebuildReplicas(int n) {
         auto v = std::make_unique<Voice>();
         // v->Create(this);
         v->Create();
-        // DeserializeVoiceFromJson(v.get(), master_json);
         ArchiverManufacturer::singleton().Deserialize(master_archive, *v.get());
         replicas_.push_back(std::move(v));
     }
@@ -131,8 +116,6 @@ void Voicebank::Process() {
 }
 
 void Voicebank::HandleMidi(const MidiMessage &msg) {
-    // ASSUMPTION: MidiMessage exposes IsNoteOn(), IsNoteOff(), Note(),
-    // Velocity(). Names are best-guess; adjust.
     if (msg.IsNoteOn()) {
         // Velocity 0 note-on is conventionally a note-off.
         if (msg.velocity() == 0) {
@@ -155,14 +138,6 @@ void Voicebank::HandleNoteOn(const MidiMessage &msg) {
 
     Voice *v = replicas_[idx].get();
 
-    // ASSUMPTION: Voice exposes a way to inject a MIDI message into
-    // its own midi_in_module_, or has NoteOn(note, velocity) helpers.
-    // The cleanest route is to deliver the actual MidiMessage so the
-    // voice's internal MidiToCv (or whatever the user wired) handles
-    // it uniformly. Sketching as DeliverMidi:
-    //
-    // v->DeliverMidi(MidiMessage::NoteOn(note, velocity));
-    //
     // It also needs voicebank-side bookkeeping for stealing:
     // v->SetCurrentNote(note);
     // v->SetNoteOnTick(next_tick_++);
@@ -177,7 +152,6 @@ void Voicebank::HandleNoteOff(const MidiMessage &msg) {
     for (auto &v : replicas_) {
         if (v->CurrentNote() == msg.key()) {
             v->midi_in_->Write(msg);
-            // v->DeliverMidi(MidiMessage::NoteOff(note));
             // The voice's internal envelope sees gate fall and
             // starts release. IsActive() will return true until
             // release completes (or fixed timeout, depending on
@@ -244,10 +218,18 @@ void Voicebank::SumReplicasIntoOutput() {
     // If you have a buffer-pool with raw pointers (per the recent
     // direction in your audio buffer work), this becomes a straight
     // loop over fy_real* with += per sample.
+
+    auto mixed = replicas_[0]->audio_out_->Read();
+    for (size_t i = 1; i < replicas_.size(); ++i) {
+        mixed += replicas_[i]->audio_out_->Read();
+    }
+    audio_out_module_->audio_out_->Write(mixed);
+    /*
     for (auto &v : replicas_) {
         auto audio = v->audio_out_->Read();
         audio_out_module_->audio_out_->Write(audio);
     }
+    */
 }
 
 void Voicebank::OnMasterParameterChanged(/* path, value */) {

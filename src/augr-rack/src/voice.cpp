@@ -36,20 +36,6 @@ bool Voice::IsActive() const {
     return value < 0.5f;
 }
 
-/*
-bool Voice::IsActive() const {
-    // High = done, low = still active.
-    //return done_out_->Value() < 0.5f;
-    auto voltage = done_out_->Read();
-    //auto value = voltage.array()[0];
-    fy_real value = 0;
-    if (voltage.array().size() != 0) {
-        value = voltage.array()[0];
-    }
-    return value < 0.5f;
-}
-*/
-
 } // namespace augr
 
 using namespace augr;
