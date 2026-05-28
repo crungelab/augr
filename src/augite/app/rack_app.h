@@ -3,11 +3,11 @@
 #include "frame_app.h"
 
 #include "../controller/subrack_controller.h"
-#include "../frame/rack_frame.h"
+#include "../frame/rack_viewer.h"
 
 namespace augr {
 
-class RackApp : public FrameAppT<RackFrame> {
+class RackApp : public FrameAppT<RackViewer> {
 public:
     RackApp();
     void Draw() override;

@@ -2,15 +2,15 @@
 #include <augr/core/archiver.h>
 #include <augr/core/archiver_manufacturer.h>
 
-#include "subrack_frame.h"
+#include "subrack_viewer.h"
 
 #include <imgui.h>
 
 namespace augr {
 
-SubrackFrame::SubrackFrame(RackDoc &doc, Subrack &subrack,
+SubrackViewer::SubrackViewer(RackDoc &doc, Subrack &subrack,
                            const std::string &label)
-    : FrameT<RackDoc, SubrackView, SubrackController>(doc, label),
+    : DocumentViewerT<RackDoc, SubrackView, SubrackController>(label, doc),
       subrack_(&subrack) {
     // Install view hooks. The save hook pushes this frame's current
     // view state into views_; the load hook pulls it back out after
@@ -23,8 +23,8 @@ SubrackFrame::SubrackFrame(RackDoc &doc, Subrack &subrack,
     });
 }
 
-// SubrackFrame::~SubrackFrame() = default;
-SubrackFrame::~SubrackFrame() {
+// SubrackViewer::~SubrackViewer() = default;
+SubrackViewer::~SubrackViewer() {
     if (doc_) {
         // Capture final view state before going away. Closing a frame
         // shouldn't discard its layout — the user might reopen this
@@ -36,17 +36,17 @@ SubrackFrame::~SubrackFrame() {
     }
 }
 
-void SubrackFrame::Create(Widget *parent) {
+void SubrackViewer::Create(Widget *parent) {
     Widget::Create(parent);
     RebuildView();
 }
 
-void SubrackFrame::OnLoaded() {
+void SubrackViewer::OnLoaded() {
     DestroyChildren();
     RebuildView();
 }
 
-void SubrackFrame::RebuildView() {
+void SubrackViewer::RebuildView() {
     view_ = std::make_unique<SubrackView>(document());
     view().set_model(subrack());
     view().Build();
@@ -60,7 +60,7 @@ void SubrackFrame::RebuildView() {
     }
 }
 
-void SubrackFrame::Draw() {
+void SubrackViewer::Draw() {
     PollPendingDialog();
     if (is_active()) {
         DrawMenuBar();
@@ -69,7 +69,7 @@ void SubrackFrame::Draw() {
     Frame::Draw();
 }
 
-void SubrackFrame::Begin() {
+void SubrackViewer::Begin() {
     // Use a unique ImGui window ID per subrack so multiple frames
     // (different subracks) don't collide. The subrack pointer is stable
     // for the frame's lifetime.
@@ -87,7 +87,7 @@ void SubrackFrame::Begin() {
 
 // ---------- Dialog polling ----------
 
-void SubrackFrame::PollPendingDialog() {
+void SubrackViewer::PollPendingDialog() {
     if (open_dialog_ && open_dialog_->ready(0)) {
         auto result = open_dialog_->result();
         open_dialog_.reset();
@@ -116,7 +116,7 @@ void SubrackFrame::PollPendingDialog() {
     }
 }
 
-void SubrackFrame::DrawMenuBar() {
+void SubrackViewer::DrawMenuBar() {
     if (ImGui::BeginMainMenuBar()) {
         if (ImGui::BeginMenu("File")) {
             if (ImGui::MenuItem("New", "Ctrl+N")) {
@@ -188,7 +188,7 @@ void SubrackFrame::DrawMenuBar() {
 
 // ---------- Dialog launchers ----------
 
-void SubrackFrame::StartOpenDialog() {
+void SubrackViewer::StartOpenDialog() {
     std::string default_dir =
         document().Path() ? document().Path()->parent_path().string() : pfd::path::home();
 
@@ -199,7 +199,7 @@ void SubrackFrame::StartOpenDialog() {
         pfd::opt::none);
 }
 
-void SubrackFrame::StartSaveAsDialog() {
+void SubrackViewer::StartSaveAsDialog() {
     std::string default_path =
         document().Path() ? document().Path()->string() : "untitled.augr";
 
@@ -211,12 +211,12 @@ void SubrackFrame::StartSaveAsDialog() {
 
 // ---------- Document operations ----------
 
-void SubrackFrame::DoNew() {
+void SubrackViewer::DoNew() {
     document().NewDocument();
     // Load hook fires from inside NewDocument and rebuilds the view.
 }
 
-void SubrackFrame::DoOpen(const std::filesystem::path &p) {
+void SubrackViewer::DoOpen(const std::filesystem::path &p) {
     if (!document().Load(p)) {
         pfd::message("Load Failed", "Could not load: " + p.string(),
                      pfd::choice::ok, pfd::icon::error);
@@ -224,13 +224,13 @@ void SubrackFrame::DoOpen(const std::filesystem::path &p) {
     // Load hook handles RebuildView and view JSON deserialization.
 }
 
-void SubrackFrame::DoSave() {
+void SubrackViewer::DoSave() {
     if (!document().Path())
         return;
     DoSaveAs(*document().Path());
 }
 
-void SubrackFrame::DoSaveAs(const std::filesystem::path &p) {
+void SubrackViewer::DoSaveAs(const std::filesystem::path &p) {
     if (!document().Save(p)) {
         pfd::message("Save Failed", "Could not save: " + p.string(),
                      pfd::choice::ok, pfd::icon::error);
@@ -239,7 +239,7 @@ void SubrackFrame::DoSaveAs(const std::filesystem::path &p) {
 
 // ---------- Unsaved-changes modal ----------
 
-void SubrackFrame::DrawUnsavedModal() {
+void SubrackViewer::DrawUnsavedModal() {
     if (show_unsaved_modal_) {
         ImGui::OpenPopup("Unsaved Changes");
         show_unsaved_modal_ = false;
@@ -281,7 +281,7 @@ void SubrackFrame::DrawUnsavedModal() {
     }
 }
 
-nlohmann::json SubrackFrame::ViewToJson() {
+nlohmann::json SubrackViewer::ViewToJson() {
     if (!view_)
         return nlohmann::json();
 
@@ -298,7 +298,7 @@ nlohmann::json SubrackFrame::ViewToJson() {
     return out;
 }
 
-void SubrackFrame::ViewFromJson(const nlohmann::json &j) {
+void SubrackViewer::ViewFromJson(const nlohmann::json &j) {
     if (!view_)
         return;
 

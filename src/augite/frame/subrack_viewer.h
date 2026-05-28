@@ -10,23 +10,23 @@
 #include "../controller/subrack_controller.h"
 #include "../view/subrack_view.h"
 
-#include "frame.h"
+#include "document_viewer.h"
 
 namespace augr {
 
-// SubrackFrame is a lightweight nested graph-editor frame. Unlike RackFrame
+// SubrackViewer is a lightweight nested graph-editor frame. Unlike RackViewer
 // it does not own a document, manage files, or drive lifecycle — it borrows
 // a reference to the project's RackDoc (for MarkModified and the like) and
 // displays one Subrack within it.
 //
 // Created when the user drills into a Subrack node in a parent frame.
 // Parented in the widget tree to whichever Frame initiated the drill-in.
-class SubrackFrame : public FrameT<RackDoc, SubrackView, SubrackController> {
+class SubrackViewer : public DocumentViewerT<RackDoc, SubrackView, SubrackController> {
 public:
-    // doc: the project document (shared with the root RackFrame).
+    // doc: the project document (shared with the root RackViewer).
     // subrack: the specific Subrack this frame displays.
-    SubrackFrame(RackDoc &doc, Subrack &subrack, const std::string &label = "");
-    ~SubrackFrame();
+    SubrackViewer(RackDoc &doc, Subrack &subrack, const std::string &label = "");
+    ~SubrackViewer();
 
     void Create(Widget *parent = nullptr) override;
 

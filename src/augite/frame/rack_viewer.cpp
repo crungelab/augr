@@ -4,24 +4,24 @@
 
 #include <augr/rack/rack_doc.h>
 
-#include "rack_frame.h"
+#include "rack_viewer.h"
 
 namespace augr {
 
 
-RackFrame::RackFrame(RackDoc &doc, Rack &rack, const std::string &label)
-    : SubrackFrame(doc, rack, label) {
+RackViewer::RackViewer(RackDoc &doc, Rack &rack, const std::string &label)
+    : SubrackViewer(doc, rack, label) {
 }
 
-RackFrame::~RackFrame() {
+RackViewer::~RackViewer() {
 }
 
-void RackFrame::OnLoaded() {
+void RackViewer::OnLoaded() {
     subrack_ = &document().rack();
-    SubrackFrame::OnLoaded();
+    SubrackViewer::OnLoaded();
 }
 
-void RackFrame::Begin() {
+void RackViewer::Begin() {
     ImGuiWindowFlags graph_flags =
         ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoScrollWithMouse |
         ImGuiWindowFlags_NoBringToFrontOnFocus;

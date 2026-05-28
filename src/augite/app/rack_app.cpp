@@ -3,7 +3,7 @@
 
 #include <augr/rack/rack.h>
 #include <augr/rack/rack_doc.h>
-#include "../frame/rack_frame.h"
+#include "../frame/rack_viewer.h"
 
 #include "rack_app.h"
 
@@ -15,7 +15,7 @@ RackApp::RackApp() {
     singleton_ = this;
     doc_ = std::make_unique<RackDoc>();
     document().NewDocument();
-    root_frame_ = std::make_unique<RackFrame>(*static_cast<RackDoc *>(doc_.get()), *static_cast<Rack *>(doc_->model()), "Rack");
+    root_frame_ = std::make_unique<RackViewer>(*static_cast<RackDoc *>(doc_.get()), *static_cast<Rack *>(doc_->model()), "Rack");
     root_frame_->Create();
     set_active_frame(root_frame_.get());
 }

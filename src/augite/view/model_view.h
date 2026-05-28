@@ -19,7 +19,7 @@ public:
     // Retargets the view at a different model. Used by views like
     // SubrackView whose target is not known at the time DocumentViewT's
     // constructor runs (DocumentViewT initializes model_ to the doc's
-    // root; SubrackFrame calls set_model() afterwards to point the view
+    // root; SubrackViewer calls set_model() afterwards to point the view
     // at a specific nested subrack).
     //
     // Must be called before Build() runs, otherwise the widget tree

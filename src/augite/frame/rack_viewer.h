@@ -1,13 +1,13 @@
 #pragma once
 
-#include "subrack_frame.h"
+#include "subrack_viewer.h"
 
 namespace augr {
 
-class RackFrame : public SubrackFrame {
+class RackViewer : public SubrackViewer {
 public:
-    RackFrame(RackDoc &doc, Rack &rack, const std::string &label = "");
-    ~RackFrame() override;
+    RackViewer(RackDoc &doc, Rack &rack, const std::string &label = "");
+    ~RackViewer() override;
 
     void OnLoaded() override;
 

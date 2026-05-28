@@ -9,7 +9,7 @@
 
 namespace augr {
 
-void ScopeWidget::DrawDockContent() {
+void ScopeWidget::DrawView() {
     const std::size_t display_window = static_cast<std::size_t>(
         std::clamp(model_->window_samples_, 128.f, 8192.f));
 
@@ -95,7 +95,7 @@ void ScopeWidget::DrawDockContent() {
 
         ImPlot::EndPlot();
     }
-    ModuleWidgetT<ScopeModule>::DrawDockContent(); // draw parameters below the scope display
+    ModuleWidgetT<ScopeModule>::DrawView(); // draw parameters below the scope display
 }
 
 DEFINE_MODEL_WIDGET_FACTORY(ScopeWidget, ScopeModule)

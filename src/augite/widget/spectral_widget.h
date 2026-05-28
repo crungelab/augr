@@ -15,7 +15,7 @@ public:
 
     explicit SpectralWidget(SpectralModule& model);
 
-    void DrawDockContent() override;
+    void DrawView() override;
 
 private:
     void ComputeWindow();

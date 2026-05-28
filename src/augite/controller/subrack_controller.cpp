@@ -14,7 +14,7 @@
 #include <augr/rack/subrack.h>
 #include <augr/rack/wire.h>
 
-#include <augite/frame/subrack_frame.h>
+#include <augite/frame/subrack_viewer.h>
 #include <augite/widget/module_widget.h>
 #include <augite/widget/subrack_widget.h>
 #include <augite/widget/widget_builder.h>
@@ -247,7 +247,7 @@ void SubrackController::CheckMouse() {
                     auto *subrack = &dynamic_cast<Subrack &>(*mw->model());
                     auto *doc = dynamic_cast<RackDoc *>(doc_);
                     auto *child =
-                        new SubrackFrame(*doc, *subrack, subrack->label_);
+                        new SubrackViewer(*doc, *subrack, subrack->label_);
                     // this->frame().AddChild(child);
                     child->Create(&frame());
                 } else if (auto *mw =

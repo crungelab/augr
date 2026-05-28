@@ -24,7 +24,7 @@ class SubrackController : public DocumentController<RackDoc, SubrackView> {
 public:
     SubrackController(RackDoc &doc, SubrackView &view, Frame &frame);
 
-    // Polled once per frame from RackFrame::Draw, after view().Draw().
+    // Polled once per frame from RackViewer::Draw, after view().Draw().
     void Control() override;
 
     // ---- Selection queries (used by menu enable/disable, etc.) ----

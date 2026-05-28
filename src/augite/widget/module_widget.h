@@ -57,7 +57,7 @@ public:
         this->grid_position_ = ModuleWidget::FromImVec2(gp);
 
         if (this->is_open_) {
-            DrawWindow();
+            DrawViewer();
         }
     }
 
@@ -94,7 +94,7 @@ public:
         ImNodes::EndNode();
     }
 
-    void DrawWindow() {
+    void DrawViewer() {
         // Push persisted window pose on the first draw after load/open.
         if (this->window_pose_dirty_) {
             ImGui::SetNextWindowPos(
@@ -108,7 +108,7 @@ public:
 
         if (ImGui::Begin(this->window_name_.c_str(), &this->is_open_)) {
             ImGui::PushID(this->model_->id_);
-            this->DrawDockContent();
+            this->DrawView();
             ImGui::PopID();
 
             // Pull current pose back so the next save sees latest.
@@ -121,7 +121,7 @@ public:
     }
 
     virtual void DrawNodeContent() {}
-    virtual void DrawDockContent() { this->DrawChildren(); }
+    virtual void DrawView() { this->DrawChildren(); }
 };
 
 using DefaultModuleWidget = ModuleWidgetT<Module>;

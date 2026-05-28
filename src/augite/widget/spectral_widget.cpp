@@ -29,7 +29,7 @@ void SpectralWidget::ComputeWindow() {
     }
 }
 
-void SpectralWidget::DrawDockContent() {
+void SpectralWidget::DrawView() {
     // Rebuild bin frequency table if sample rate changed.
     const float sr = model_->SampleRate();
     if (sr != cached_sample_rate_) {
