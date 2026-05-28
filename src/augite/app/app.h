@@ -5,6 +5,8 @@
 
 #include "augr/core/document.h"
 #include "../frame/frame.h"
+#include "../inspector/inspector.h"
+
 #include "base_app.h"
 
 namespace augr {
@@ -36,12 +38,16 @@ public:
     Frame *active_frame() { return active_frame_; }
     void set_active_frame(Frame *f) { active_frame_ = f; }
 
+    Inspector &inspector() { return *inspector_; }
+    void set_inspector(std::unique_ptr<Inspector> insp) { inspector_ = std::move(insp); }
+
     // Data members
     static App *singleton_;
     std::unique_ptr<Document> doc_;
     std::unique_ptr<Frame> root_frame_;
     Frame *active_frame_ = nullptr; // last frame to have focus
     std::vector<std::unique_ptr<Widget>> pending_destroy_;
+    std::unique_ptr<Inspector> inspector_;
 };
 
 } // namespace augr

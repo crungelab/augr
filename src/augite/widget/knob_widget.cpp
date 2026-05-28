@@ -11,7 +11,8 @@ public:
     KnobWidget(Knob &model) : ModelWidgetT<Knob>(model) {}
 
     void Draw() override {
-        FloatParameter *param = model_->param();
+        auto &m = model();
+        FloatParameter *param = m.param();
         float value = static_cast<float>(param->value());
 
         auto min = static_cast<float>(param->min());

@@ -10,7 +10,8 @@ public:
     HSliderWidget(HSlider &model) : ModelWidgetT<HSlider>(model) {}
 
     void Draw() override {
-        FloatParameter *param = model_->param();
+        auto &m = model();
+        FloatParameter *param = m.param();
         float pos = static_cast<float>(param->GetNormalized());
 
         if (ImGui::SliderFloat(param->label().c_str(), &pos, 0.f, 1.f, ""))

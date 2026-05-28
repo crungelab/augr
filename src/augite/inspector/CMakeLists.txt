@@ -1,32 +1,30 @@
 cmake_minimum_required(VERSION 3.14)
 
-set(THIS AugiteController)
+set(THIS AugiteInspector)
 
 project(${THIS} CXX)
 
 include(${AUGR_CMAKE}/AugrRack.cmake)
 include(${AUGR_CMAKE}/Augite.cmake)
 include(${AUGR_CMAKE}/AugiteView.cmake)
-include(${AUGR_CMAKE}/AugiteFrame.cmake)
-include(${AUGR_CMAKE}/AugiteInspector.cmake)
+include(${AUGR_CMAKE}/AugiteController.cmake)
 
 include(${AUGR_CMAKE}/ImPlot.cmake)
 include(${AUGR_CMAKE}/ImNodes.cmake)
 include(${AUGR_CMAKE}/ImKnobs.cmake)
 
-file(GLOB CONTROLLER_SRC ${CMAKE_CURRENT_SOURCE_DIR}/*.cpp)
-file(GLOB CONTROLLER_INCLUDE ${CMAKE_CURRENT_SOURCE_DIR}/*.h)
+file(GLOB INSPECTOR_SRC ${CMAKE_CURRENT_SOURCE_DIR}/*.cpp)
+file(GLOB INSPECTOR_INCLUDE ${CMAKE_CURRENT_SOURCE_DIR}/*.h)
 
 add_library(${PROJECT_NAME} STATIC
-  ${CONTROLLER_SRC}
-  ${CONTROLLER_INCLUDE}
+  ${INSPECTOR_SRC}
+  ${INSPECTOR_INCLUDE}
 )
 
 USES_AUGR_RACK(${THIS})
 USES_AUGITE(${THIS})
 USES_AUGITE_VIEW(${THIS})
-USES_AUGITE_FRAME(${THIS})
-USES_AUGITE_INSPECTOR(${THIS})
+USES_AUGITE_CONTROLLER(${THIS})
 
 USES_IMPLOT(${THIS})
 USES_IMNODES(${THIS})

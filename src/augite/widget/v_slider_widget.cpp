@@ -10,8 +10,9 @@ public:
     VSliderWidget(VSlider& model) : ModelWidgetT<VSlider>(model) {}
 
     void Draw() override {
+        auto &m = model();
         ImVec2 size(64, 128);
-        FloatParameter* param = model_->param();
+        FloatParameter* param = m.param();
 
         float pos = static_cast<float>(param->GetNormalized());
 

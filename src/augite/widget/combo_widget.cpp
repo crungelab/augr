@@ -10,7 +10,8 @@ public:
     ComboWidget(Combo &model) : ModelWidgetT<Combo>(model) {}
 
     void Draw() {
-        auto *param = model_->param();
+        auto &m = model();
+        auto *param = m.param();
         const int current = param->CurrentIndex();
         const char *preview =
             (current >= 0 && current < static_cast<int>(param->size()))

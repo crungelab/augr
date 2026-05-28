@@ -12,7 +12,7 @@ public:
     void Draw() override {
         ImGui::PushID(model_);
 
-        if (!model_->is_top_level_) {
+        if (!model().is_top_level_) {
             DrawAsFramedPanel();
         } else {
             DrawAsPlainRow();

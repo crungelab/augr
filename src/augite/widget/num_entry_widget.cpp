@@ -10,7 +10,8 @@ public:
     NumEntryWidget(NumEntry &model) : ModelWidgetT<NumEntry>(model) {}
 
     void Draw() override {
-        FloatParameter *param = model_->param();
+        auto &m = model();
+        FloatParameter *param = m.param();
         float value = static_cast<float>(param->value());
 
         if (ImGui::InputFloat(param->label().c_str(), &value, 0.f, 0.f,

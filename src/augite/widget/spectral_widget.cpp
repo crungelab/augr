@@ -30,8 +30,9 @@ void SpectralWidget::ComputeWindow() {
 }
 
 void SpectralWidget::DrawView() {
+    auto &m = model();
     // Rebuild bin frequency table if sample rate changed.
-    const float sr = model_->SampleRate();
+    const float sr = m.SampleRate();
     if (sr != cached_sample_rate_) {
         cached_sample_rate_ = sr;
         for (std::size_t i = 0; i < kNumBins; ++i) {
@@ -43,7 +44,7 @@ void SpectralWidget::DrawView() {
     // Snapshot the most recent kFftSize samples.
     static thread_local std::vector<float> capture;
     capture.resize(kFftSize);
-    const std::size_t n = model_->Snapshot(capture.data(), capture.size());
+    const std::size_t n = m.Snapshot(capture.data(), capture.size());
 
     if (n >= kFftSize) {
         // Apply Hann window and convert to kiss_fft_scalar.
@@ -62,7 +63,7 @@ void SpectralWidget::DrawView() {
         // Convert to dB with smoothing. Normalize by kFftSize/2 so a full-
         // scale sine reads close to 0 dB. Add tiny epsilon to avoid log(0).
         const float norm = 2.f / static_cast<float>(kFftSize);
-        const float alpha = std::clamp(model_->smoothing_, 0.f, 0.99f);
+        const float alpha = std::clamp(m.smoothing_, 0.f, 0.99f);
         for (std::size_t i = 0; i < kNumBins; ++i) {
             const float re = spectrum[i].r;
             const float im = spectrum[i].i;
@@ -73,7 +74,7 @@ void SpectralWidget::DrawView() {
     }
 
     // Plot. Log-frequency x-axis is the standard for audio spectrum displays.
-    const float floor_db = model_->floor_db_;
+    const float floor_db = m.floor_db_;
     const float ceil_db = 6.f;
 
     if (ImPlot::BeginPlot("##spectral", ImVec2(-1, 200),

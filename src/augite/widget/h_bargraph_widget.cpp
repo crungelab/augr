@@ -12,7 +12,8 @@ public:
         : ModelWidgetT<HBarGraph>(model) {}
 
     void Draw() override {
-        FloatParameter *param = model_->param();
+        auto &m = model();
+        FloatParameter *param = m.param();
         float t = static_cast<float>(param->GetNormalized());
 
         std::string overlay = param->label() + ": " + param->Format();

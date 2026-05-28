@@ -6,17 +6,30 @@
 #include <imnodes.h>
 
 #include <augr/core/math/vec2.h>
+#include <augr/rack/module/module.h>
 
 #include "widget.h"
 
 namespace augr {
 
-class Module;
+// class Module;
 
 class ModuleWidget : public ModelWidget {
 public:
+    explicit ModuleWidget(Module &model) : ModelWidget(model) {
+        window_name_ = std::string(model.label_) + "###module_" +
+                       std::to_string(model.id_);
+    }
     void ShowWindow() { is_open_ = true; }
     void HideWindow() { is_open_ = false; }
+
+    void DrawInspector();
+
+    virtual void DrawInspectorContent();
+
+    // Accessors
+    Module &model() { return *static_cast<Module *>(model_); }
+    const Module &model() const { return *static_cast<const Module *>(model_); }
 
     // Conversion helpers — keep Vec2 (ImGui-free) at the data layer
     // and only touch ImVec2 at the draw boundary.
@@ -41,10 +54,7 @@ public:
 template <typename T>
 class ModuleWidgetT : public ModelWidgetT<T, ModuleWidget> {
 public:
-    explicit ModuleWidgetT(T &model) : ModelWidgetT<T, ModuleWidget>(model) {
-        this->window_name_ = std::string(this->model_->label_) + "###module_" +
-                             std::to_string(this->model_->id_);
-    }
+    explicit ModuleWidgetT(T &model) : ModelWidgetT<T, ModuleWidget>(model) { }
 
     void Draw() override {
         DrawNode();
@@ -53,7 +63,7 @@ public:
         // serialization sees current values. Cheap; runs every frame.
         // (Pulled here rather than at editor level so each widget owns
         // its own state.)
-        ImVec2 gp = ImNodes::GetNodeGridSpacePos(this->model_->id_);
+        ImVec2 gp = ImNodes::GetNodeGridSpacePos(this->model().id_);
         this->grid_position_ = ModuleWidget::FromImVec2(gp);
 
         if (this->is_open_) {
@@ -65,26 +75,26 @@ public:
         // Push persisted position on the first draw after load/spawn.
         if (this->position_dirty_) {
             ImNodes::SetNodeGridSpacePos(
-                this->model_->id_,
+                this->model().id_,
                 ModuleWidget::ToImVec2(this->grid_position_));
             this->position_dirty_ = false;
         }
 
-        ImNodes::BeginNode(this->model_->id_);
+        ImNodes::BeginNode(this->model().id_);
 
         ImNodes::BeginNodeTitleBar();
-        ImGui::TextUnformatted(this->model_->label_.c_str());
+        ImGui::TextUnformatted(this->model().label_.c_str());
         ImNodes::EndNodeTitleBar();
 
-        for (auto input : this->model_->inport_.pins_) {
+        for (auto input : this->model().inport_.pins_) {
             ImNodes::BeginInputAttribute(input->id_);
             ImGui::TextUnformatted(input->name_.c_str());
             ImNodes::EndInputAttribute();
         }
 
         DrawNodeContent();
-        
-        for (auto output : this->model_->outport_.pins_) {
+
+        for (auto output : this->model().outport_.pins_) {
             ImNodes::BeginOutputAttribute(output->id_);
             ImGui::Indent(40);
             ImGui::TextUnformatted(output->name_.c_str());
@@ -112,8 +122,10 @@ public:
             ImGui::PopID();
 
             // Pull current pose back so the next save sees latest.
-            this->window_position_ = ModuleWidget::FromImVec2(ImGui::GetWindowPos());
-            this->window_size_ = ModuleWidget::FromImVec2(ImGui::GetWindowSize());
+            this->window_position_ =
+                ModuleWidget::FromImVec2(ImGui::GetWindowPos());
+            this->window_size_ =
+                ModuleWidget::FromImVec2(ImGui::GetWindowSize());
         }
 
         ImGui::End();

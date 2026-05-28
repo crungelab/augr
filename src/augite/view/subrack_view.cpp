@@ -44,7 +44,7 @@ void SubrackView::PopulateWidgetMap(Widget *widget) {
 
     if (widget != root_) {
         if (auto *mw = dynamic_cast<ModelWidget *>(widget)) {
-            widget_map_[mw->model()->id_] = mw;
+            widget_map_[mw->model().id_] = mw;
         }
     }
 

@@ -20,17 +20,18 @@ public:
     VBoxWidget(VBox &model) : BoxWidgetT<VBox>(model) {}
 
     void Draw() override {
+        auto &m = model();
         // You can wire this up to metadata on your VBox if you have it
         VBoxStyle style_cfg{};
-        // e.g. read from model_->zone_ / metadata if your Faust wrapper exposes
-        // it style_cfg.framed = model_->is_framed(); style_cfg.collapsible =
-        // model_->is_collapsible();
+        // e.g. read from model.zone_ / metadata if your Faust wrapper exposes
+        // it style_cfg.framed = m.is_framed(); style_cfg.collapsible =
+        // m.is_collapsible();
         // ...
 
-        ImGui::PushID(model_); // ensure stable IDs even with duplicate labels
+        ImGui::PushID(&m); // ensure stable IDs even with duplicate labels
 
         const char *label =
-            !model_->label_.empty() ? model_->label_.c_str() : nullptr;
+            !m.label_.empty() ? m.label_.c_str() : nullptr;
 
         /*
         if (style_cfg.collapsible) {
@@ -41,7 +42,7 @@ public:
             DrawAsPlainGroup(label, style_cfg);
         }
         */
-        if (!model_->is_top_level_) {
+        if (!m.is_top_level_) {
             DrawAsFramedPanel(label, style_cfg);
         } else {
             DrawAsPlainGroup(label, style_cfg);

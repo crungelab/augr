@@ -25,6 +25,34 @@ void RackApp::Draw() {
     App::Draw();
 }
 
+void RackApp::DrawMainDockspace() {
+    ImGuiID dockspace_id = ImGui::GetID("MainDockspace");
+    ImGuiViewport *vp = ImGui::GetMainViewport();
+
+    // Build default layout once
+    if (ImGui::DockBuilderGetNode(dockspace_id) == nullptr) {
+        ImGui::DockBuilderAddNode(dockspace_id, ImGuiDockNodeFlags_DockSpace);
+        ImGui::DockBuilderSetNodeSize(dockspace_id, vp->WorkSize);
+
+        ImGuiID dock_main_id = dockspace_id;
+        ImGuiID dock_right, dock_bottom;
+        ImGui::DockBuilderSplitNode(dock_main_id, ImGuiDir_Right, 0.25f,
+                                    &dock_right, &dock_main_id);
+        ImGui::DockBuilderSplitNode(dock_main_id, ImGuiDir_Down, 0.30f,
+                                    &dock_bottom, &dock_main_id);
+
+        ImGui::DockBuilderDockWindow("Rack", dock_main_id);
+        ImGui::DockBuilderDockWindow("Inspector", dock_right);
+        ImGui::DockBuilderDockWindow("Console", dock_bottom);
+        ImGui::DockBuilderFinish(dockspace_id);
+    }
+
+    // Submit dockspace
+    ImGui::DockSpaceOverViewport(dockspace_id, vp,
+                                 ImGuiDockNodeFlags_PassthruCentralNode);
+}
+
+/*
 static bool s_built_dock = false;
 
 void RackApp::DrawMainDockspace() {
@@ -78,6 +106,7 @@ void RackApp::DrawMainDockspace() {
 
     ImGui::End(); // DockHost
 }
+*/
 
 
 } // namespace augr

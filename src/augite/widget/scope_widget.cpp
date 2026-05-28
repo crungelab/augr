@@ -10,20 +10,21 @@
 namespace augr {
 
 void ScopeWidget::DrawView() {
+    auto &m = model();
     const std::size_t display_window = static_cast<std::size_t>(
-        std::clamp(model_->window_samples_, 128.f, 8192.f));
+        std::clamp(m.window_samples_, 128.f, 8192.f));
 
     // Capture extra so the trigger search has room on both sides.
     const std::size_t capture_window = display_window * kCaptureMultiplier;
 
     static thread_local std::vector<float> capture;
     capture.resize(capture_window);
-    const std::size_t n = model_->Snapshot(capture.data(), capture.size());
+    const std::size_t n = m.Snapshot(capture.data(), capture.size());
 
     // Find the rising edge closest to the middle of the capture. Using the
     // middle (rather than the first crossing) keeps the trigger selection
     // stable frame to frame, even as the ring's write pointer advances.
-    const float level = model_->trigger_level_;
+    const float level = m.trigger_level_;
     const std::size_t search_center = n / kCaptureMultiplier;
 
     std::size_t best_edge = 0;

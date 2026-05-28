@@ -19,6 +19,9 @@
 #include <augite/widget/subrack_widget.h>
 #include <augite/widget/widget_builder.h>
 
+#include <augite/inspector/inspector.h>
+#include <augite/app/app.h>
+
 #include "rack_selection.h"
 
 namespace augr {
@@ -37,9 +40,11 @@ void SubrackController::Control() {
     CheckLinkDestroyed();
     CheckCreateNode();
     CheckNodeSelection();
+
     DrawCatalogPopup();
     DrawNodeContextMenu();
     DrawGridContextMenu();
+    DrawInspectorDock();
 }
 
 // ----- Selection -----
@@ -57,7 +62,7 @@ void SubrackController::CollectSelection(
         auto *mw = dynamic_cast<ModelWidget *>(it->second);
         if (!mw)
             continue;
-        Model *m = mw->model();
+        Model *m = &mw->model();
         if (!m)
             continue;
         out_models.push_back(m);
@@ -173,7 +178,7 @@ void SubrackController::DeleteSelection() {
         if (!mw)
             continue;
 
-        if (auto *mod = dynamic_cast<Module *>(mw->model())) {
+        if (auto mod = dynamic_cast<Module *>(&mw->model())) {
             subrack().RemoveChild(*mod);
         }
         wmap.erase(it);
@@ -244,7 +249,7 @@ void SubrackController::CheckMouse() {
             const auto &wmap = view().widget_map();
             if (auto it = wmap.find(hovered_node_id_); it != wmap.end()) {
                 if (auto *mw = dynamic_cast<SubrackWidget *>(it->second)) {
-                    auto *subrack = &dynamic_cast<Subrack &>(*mw->model());
+                    auto *subrack = &dynamic_cast<Subrack &>(mw->model());
                     auto *doc = dynamic_cast<RackDoc *>(doc_);
                     auto *child =
                         new SubrackViewer(*doc, *subrack, subrack->label_);
@@ -365,6 +370,28 @@ void SubrackController::DrawGridContextMenu() {
     ImGui::EndPopup();
 }
 
+/*
+void SubrackController::DrawInspectorDock() {
+    auto num = selected_nodes_.size();
+    if (num == 1) {
+        auto widget = view().widget_map()[selected_nodes_[0]];
+        auto *mw = dynamic_cast<ModuleWidget *>(widget);
+        if (mw) {
+            mw->DrawInspector();
+        }
+    }
+}
+*/
+
+void SubrackController::DrawInspectorDock() {
+    auto num = selected_nodes_.size();
+    if (num == 1) {
+        App::singleton().set_inspector(std::make_unique<Inspector>());
+    } else {
+        App::singleton().set_inspector(nullptr);
+    }
+}
+
 void SubrackController::CheckNodeSelection() {
     const int num = ImNodes::NumSelectedNodes();
     if (num > 0) {
@@ -434,7 +461,7 @@ void SubrackController::DrawNodeContextMenu() {
     if (it != wmap.end()) {
         target_widget = dynamic_cast<ModuleWidget *>(it->second);
         if (target_widget) {
-            target_module = dynamic_cast<Module *>(target_widget->model());
+            target_module = dynamic_cast<Module *>(&target_widget->model());
         }
     }
 

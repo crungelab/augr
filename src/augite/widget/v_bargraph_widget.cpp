@@ -157,7 +157,8 @@ public:
         : ModelWidgetT<VBarGraph>(model) {}
 
     void Draw() override {
-        FloatParameter *param = model_->param();
+        auto &m = model();
+        FloatParameter *param = m.param();
         const float unit = static_cast<float>(param->GetNormalized());
         const ImVec2 size(24.0f, 120.0f);
 

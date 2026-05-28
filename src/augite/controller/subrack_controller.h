@@ -77,6 +77,7 @@ private:
     void DrawCatalogPopup();
     void DrawNodeContextMenu();
     void DrawGridContextMenu();
+    void DrawInspectorDock();
 
     // ---- Helpers ----
     Vec2 ScreenToGrid(ImVec2 screen_pos) const;

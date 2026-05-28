@@ -88,6 +88,7 @@ DestroyQueue &GetDestroyQueue() { return g_destroy_queue; }
 
 void App::Draw() {
     root_frame_->Draw();
+    if (inspector_) inspector_->Draw();
     BaseApp::Draw();
     ProcessPendingDestroy();
 }

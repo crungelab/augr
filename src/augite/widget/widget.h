@@ -155,8 +155,14 @@ public:
 // (serialization, parameter binding, graph wiring, etc.) rely on.
 class ModelWidget : public Widget {
 public:
-    //using Ptr = std::unique_ptr<ModelWidget>;
-    virtual Model *model() = 0;
+    ModelWidget(Model &model) : model_(&model) {}
+    // using Ptr = std::unique_ptr<ModelWidget>;
+    // virtual Model *model() = 0;
+    //  Accessors
+    Model &model() { return *model_; }
+    const Model &model() const { return *model_; }
+    // Data members
+    Model *model_;
 };
 
 // CRTP-ish helper: stores a typed pointer to the concrete model and
@@ -166,11 +172,12 @@ public:
 template <typename T, typename TBase = ModelWidget>
 class ModelWidgetT : public TBase {
 public:
-    ModelWidgetT(T &model) : model_(&model) {}
-    Model *model() override { return model_; }
+    ModelWidgetT(T &model) : TBase(model) {}
+    T &model() { return *static_cast<T *>(TBase::model_); }
+    const T &model() const { return *static_cast<const T *>(TBase::model_); }
 
     // Data members
-    T *model_;
+    // T *model_;
 };
 
 // Factory for ModelWidget instances. Keyed on the model type so the

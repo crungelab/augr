@@ -9,9 +9,10 @@ public:
     BoxWidgetT(T &model) : ModelWidgetT<T>(model) {}
 
     void DrawHeader() {
-        if (!this->model_->is_top_level_) {
-            if(this->model_->label_visible_)
-                ImGui::SeparatorText(this->model_->label_.c_str());
+        auto &m = this->model();
+        if (!m.is_top_level_) {
+            if(m.label_visible_)
+                ImGui::SeparatorText(m.label_.c_str());
         }
     }
 
