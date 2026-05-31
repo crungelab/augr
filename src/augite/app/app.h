@@ -5,7 +5,7 @@
 
 #include "augr/core/document.h"
 #include "../frame/frame.h"
-#include "../inspector/inspector.h"
+#include "../inspector/inspector_dock.h"
 
 #include "base_app.h"
 
@@ -32,14 +32,16 @@ public:
     // or at the end of the frame after Draw() returns.
     void ProcessPendingDestroy();
 
+    void Inspect(Model *model);
+
     // Accessors
     static App &singleton() { return *singleton_; }
     Frame &root_frame() { return *root_frame_; }
     Frame *active_frame() { return active_frame_; }
     void set_active_frame(Frame *f) { active_frame_ = f; }
 
-    Inspector &inspector() { return *inspector_; }
-    void set_inspector(std::unique_ptr<Inspector> insp) { inspector_ = std::move(insp); }
+    InspectorDock &inspector_dock() { return *inspector_dock_; }
+    void set_inspector_dock(std::unique_ptr<InspectorDock> insp) { inspector_dock_ = std::move(insp); }
 
     // Data members
     static App *singleton_;
@@ -47,7 +49,8 @@ public:
     std::unique_ptr<Frame> root_frame_;
     Frame *active_frame_ = nullptr; // last frame to have focus
     std::vector<std::unique_ptr<Widget>> pending_destroy_;
-    std::unique_ptr<Inspector> inspector_;
+    std::unique_ptr<InspectorDock> inspector_dock_;
+    Model *inspected_model_ = nullptr;
 };
 
 } // namespace augr

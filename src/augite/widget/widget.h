@@ -157,7 +157,6 @@ class ModelWidget : public Widget {
 public:
     ModelWidget(Model &model) : model_(&model) {}
     // using Ptr = std::unique_ptr<ModelWidget>;
-    // virtual Model *model() = 0;
     //  Accessors
     Model &model() { return *model_; }
     const Model &model() const { return *model_; }
@@ -175,9 +174,6 @@ public:
     ModelWidgetT(T &model) : TBase(model) {}
     T &model() { return *static_cast<T *>(TBase::model_); }
     const T &model() const { return *static_cast<const T *>(TBase::model_); }
-
-    // Data members
-    // T *model_;
 };
 
 // Factory for ModelWidget instances. Keyed on the model type so the

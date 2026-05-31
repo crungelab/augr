@@ -7,6 +7,9 @@
 
 #include "../widget/widget_manufacturer.h"
 
+#include "../inspector/inspector_manufacturer.h"
+#include "../inspector/inspector_builder.h"
+
 #include "../system/imgui_system.h"
 #include "../system/imnodes_system.h"
 #include "../system/implot_system.h"
@@ -43,6 +46,8 @@ App::App() {
     REGISTER_MODEL_WIDGET_FACTORY(HBarGraphWidget)
     REGISTER_MODEL_WIDGET_FACTORY(VBarGraphWidget)
     REGISTER_MODEL_WIDGET_FACTORY(KnobWidget)
+
+    REGISTER_INSPECTOR_FACTORY(ModuleInspector)
 };
 
 bool App::DoCreate(CreateParams params) {
@@ -88,9 +93,23 @@ DestroyQueue &GetDestroyQueue() { return g_destroy_queue; }
 
 void App::Draw() {
     root_frame_->Draw();
-    if (inspector_) inspector_->Draw();
+    if (inspector_dock_) inspector_dock_->Draw();
     BaseApp::Draw();
     ProcessPendingDestroy();
+}
+
+void App::Inspect(Model *model) {
+    if (model == nullptr) {
+        set_inspector_dock(nullptr);
+        return;
+    }
+    if (model == inspected_model_) {
+        return; // already inspecting this model
+    }
+    inspected_model_ = model;
+
+    auto root = InspectorBuilder().Build(*model);
+    set_inspector_dock(std::make_unique<InspectorDock>(std::move(root)));
 }
 
 } // namespace augr

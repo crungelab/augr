@@ -19,6 +19,7 @@ set(IMGUI_SRC
     ${_}/imgui_widgets.cpp
     ${_}/imgui_tables.cpp
     ${_}/imgui.cpp
+    ${_}/misc/cpp/imgui_stdlib.cpp
 )
 
 add_library(ImGui STATIC ${IMGUI_SRC} ${IMGUI_HEADERS})

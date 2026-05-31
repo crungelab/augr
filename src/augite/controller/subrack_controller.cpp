@@ -19,8 +19,8 @@
 #include <augite/widget/subrack_widget.h>
 #include <augite/widget/widget_builder.h>
 
-#include <augite/inspector/inspector.h>
 #include <augite/app/app.h>
+#include <augite/inspector/inspector_dock.h>
 
 #include "rack_selection.h"
 
@@ -370,27 +370,36 @@ void SubrackController::DrawGridContextMenu() {
     ImGui::EndPopup();
 }
 
+void SubrackController::DrawInspectorDock() {
+    auto num = selected_nodes_.size();
+    if (num == 1) {
+        auto &wmap = view().widget_map();
+        auto it = wmap.find(selected_nodes_[0]);
+        Module *target_module = nullptr;
+        ModuleWidget *target_widget = nullptr;
+        if (it != wmap.end()) {
+            target_widget = dynamic_cast<ModuleWidget *>(it->second);
+            if (target_widget) {
+                target_module = dynamic_cast<Module *>(&target_widget->model());
+            }
+        }
+
+        App::singleton().Inspect(target_module);
+    } else {
+        App::singleton().set_inspector_dock(nullptr);
+    }
+}
+
 /*
 void SubrackController::DrawInspectorDock() {
     auto num = selected_nodes_.size();
     if (num == 1) {
-        auto widget = view().widget_map()[selected_nodes_[0]];
-        auto *mw = dynamic_cast<ModuleWidget *>(widget);
-        if (mw) {
-            mw->DrawInspector();
-        }
+        App::singleton().set_inspector_dock(std::make_unique<InspectorDock>());
+    } else {
+        App::singleton().set_inspector_dock(nullptr);
     }
 }
 */
-
-void SubrackController::DrawInspectorDock() {
-    auto num = selected_nodes_.size();
-    if (num == 1) {
-        App::singleton().set_inspector(std::make_unique<Inspector>());
-    } else {
-        App::singleton().set_inspector(nullptr);
-    }
-}
 
 void SubrackController::CheckNodeSelection() {
     const int num = ImNodes::NumSelectedNodes();
