@@ -17,8 +17,8 @@ class VcoModule : public Module {
 public:
     enum class Waveform { Saw, Square, Tri, Sine };
 
-    void Create(Model *parent = nullptr) override {
-        Module::Create(parent);
+    void Create() override {
+        Module::Create();
         label_ = "VCO";
     }
 

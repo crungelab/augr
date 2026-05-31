@@ -32,7 +32,7 @@ class Voicebank : public Subrack {
 public:
     Voicebank() = default;
 
-    void Create(Model *parent) override;
+    void Create() override;
 
     void Process() override;
 

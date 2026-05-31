@@ -14,12 +14,27 @@ public:
     Model() {
         id_ = next_id_++;
     }
+    virtual void Create()  {}
+
+    template <class T, class... Args>
+    static T& Make(Model* parent, Args&&... args) {
+        auto child = new T(std::forward<Args>(args)...);  // most-derived ctor runs
+        T& ref = *child;
+        ref.parent_ = parent;
+        ref.Create();
+        if (parent)
+            parent->AddChild(ref);  // fully built -> safe to publish + notify
+        // else: caller owns the returned root
+        return ref;
+    }
+    /*
     virtual void Create(Model *parent = nullptr)  {
         parent_ = parent;
         if (parent) {
             parent->AddChild(*this);
         }
     }
+    */
     virtual void Destroy() {}
     void AddChild(Model &child) {
         OnAddingChild(child);

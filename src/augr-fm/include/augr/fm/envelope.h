@@ -14,7 +14,7 @@ class Envelope : public Module {
 public:
     enum class Stage { kIdle, kR1, kR2, kR3, kR4 };
 
-    void Create(Model *parent = nullptr) override;
+    void Create() override;
     void CreateControls() override;
     void CreatePins() override;
 

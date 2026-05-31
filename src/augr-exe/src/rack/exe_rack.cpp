@@ -46,7 +46,7 @@ int ExeRack::ProcessAudio(double streamTime, void *inbuf, void *outbuf,
 // Lifecycle
 // ---------------------------------------------------------------------------
 
-void ExeRack::Create(Model *parent) {
+void ExeRack::Create() {
     AudioConfig audio_cfg;
     audio_cfg.sample_rate = config_.sample_rate;
     audio_cfg.frames = config_.frames;
@@ -70,7 +70,7 @@ void ExeRack::Create(Model *parent) {
         config_.audio_output_channels = audio_system_.num_out_chans();
     }
 
-    Rack::Create(parent);
+    Rack::Create();
 }
 
 bool ExeRack::Start() {

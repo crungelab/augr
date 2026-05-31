@@ -16,7 +16,7 @@ namespace augr {
 
 class Module : public Node {
 public:
-    void Create(Model *parent = nullptr) override;
+    void Create() override;
 
     virtual void CreateControls() {}
     virtual void CreatePins() {}

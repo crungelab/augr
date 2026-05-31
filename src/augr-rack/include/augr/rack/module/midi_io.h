@@ -10,7 +10,7 @@ class MidiIo : public Io {
 class MidiInputModule : public MidiIo {
 public:
     virtual ~MidiInputModule() {}
-    void Create(Model *parent = nullptr) override;
+    void Create() override;
     void CreatePins() override;
     void Process() override;
     REFLECT_ENABLE(MidiIo)
@@ -19,7 +19,7 @@ public:
 class MidiOutputModule : public MidiIo {
 public:
     virtual ~MidiOutputModule() {}
-    void Create(Model *parent = nullptr) override;
+    void Create() override;
     void CreatePins() override;
     void Process() override;
     REFLECT_ENABLE(MidiIo)

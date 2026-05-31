@@ -7,8 +7,8 @@
 
 namespace augr {
 
-void MidiInputDevice::Create(Model *parent) {
-    Device::Create(parent);
+void MidiInputDevice::Create() {
+    Device::Create();
     label_ = "Midi Input Device";
 }
 
@@ -17,8 +17,8 @@ void MidiInputDevice::CreatePins() {
     AddOutput(*midi_out_);
 }
 
-void MidiOutputDevice::Create(Model *parent) {
-    Device::Create(parent);
+void MidiOutputDevice::Create() {
+    Device::Create();
     label_ = "Midi Output Device";
 }
 

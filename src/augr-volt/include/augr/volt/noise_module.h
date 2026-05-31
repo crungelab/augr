@@ -16,8 +16,8 @@ class NoiseModule : public Module {
 public:
     enum class Color { White, Pink, Brown };
 
-    void Create(Model *parent = nullptr) override {
-        Module::Create(parent);
+    void Create() override {
+        Module::Create();
         label_ = "Noise";
     }
 

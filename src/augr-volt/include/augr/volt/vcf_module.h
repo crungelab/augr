@@ -20,8 +20,8 @@ namespace augr {
 
 class VcfModule : public Module {
 public:
-    void Create(Model *parent = nullptr) override {
-        Module::Create(parent);
+    void Create() override {
+        Module::Create();
         label_ = "VCF";
     }
 

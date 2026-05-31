@@ -13,8 +13,8 @@ namespace augr {
 
 class CvModule : public Module {
 public:
-    void Create(Model *parent = nullptr) override {
-        Module::Create(parent);
+    void Create() override {
+        Module::Create();
         label_ = "CV";
     }
 

@@ -9,8 +9,8 @@
 
 namespace augr {
 
-void MidiInputModule::Create(Model *parent) {
-    Io::Create(parent);
+void MidiInputModule::Create() {
+    Io::Create();
     label_ = "Midi Input Module";
 }
 
@@ -28,8 +28,8 @@ void MidiInputModule::Process() {
     }
 }
 
-void MidiOutputModule::Create(Model *parent) {
-    Io::Create(parent);
+void MidiOutputModule::Create() {
+    Io::Create();
     label_ = "Midi Output Module";
 }
 

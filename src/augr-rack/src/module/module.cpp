@@ -2,8 +2,8 @@
 
 namespace augr {
 
-void Module::Create(Model *parent) {
-    Node::Create(parent);
+void Module::Create() {
+    Node::Create();
 
     CreateControls();
     CreatePins();

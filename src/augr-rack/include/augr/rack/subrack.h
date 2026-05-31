@@ -16,8 +16,8 @@ class Subrack : public Graph {
 public:
     Subrack() = default;
 
-    void Create(Model *parent) override {
-        Graph::Create(parent);
+    void Create() override {
+        Graph::Create();
         label_ = "Subrack";
     }
 

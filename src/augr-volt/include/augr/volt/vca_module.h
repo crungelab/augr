@@ -16,8 +16,8 @@ namespace augr {
 
 class VcaModule : public Module {
 public:
-    void Create(Model *parent = nullptr) override {
-        Module::Create(parent);
+    void Create() override {
+        Module::Create();
         label_ = "VCA";
     }
 

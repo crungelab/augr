@@ -15,8 +15,8 @@ class MixerModule : public Module {
 public:
     static constexpr int kNumChannels = 4;
 
-    void Create(Model *parent = nullptr) override {
-        Module::Create(parent);
+    void Create() override {
+        Module::Create();
         label_ = "Mixer";
     }
 

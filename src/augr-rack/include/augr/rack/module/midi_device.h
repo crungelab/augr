@@ -10,7 +10,7 @@ class MidiDevice : public Device {
 class MidiInputDevice : public MidiDevice {
 public:
     virtual ~MidiInputDevice() {}
-    void Create(Model *parent = nullptr) override;
+    void Create() override;
     void CreatePins() override;
     REFLECT_ENABLE(MidiDevice)
 };
@@ -18,7 +18,7 @@ public:
 class MidiOutputDevice : public MidiDevice {
 public:
     virtual ~MidiOutputDevice() {}
-    void Create(Model *parent = nullptr) override;
+    void Create() override;
     void CreatePins() override;
     REFLECT_ENABLE(MidiDevice)
 };

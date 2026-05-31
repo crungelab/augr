@@ -16,17 +16,15 @@
 
 namespace augr {
 
-void Voicebank::Create(Model *parent) {
-    Subrack::Create(parent);
+void Voicebank::Create() {
+    Subrack::Create();
     label_ = "Voicebank";
 
     // Outer-facing IoModules. The user can wire post-voice FX
     // between voice replicas (summed) and audio_out_module_.
-    midi_in_module_ = new MidiInputModule();
-    midi_in_module_->Create(this);
+    midi_in_module_ = &Model::Make<MidiInputModule>(this);
 
-    audio_out_module_ = new AudioOutputModule();
-    audio_out_module_->Create(this);
+    audio_out_module_ = &Model::Make<AudioOutputModule>(this);
 
     // No master yet -- the user picks one via the inspector dropdown,
     // which calls SetMaster(). Until then, replicas_ stays empty and
@@ -71,10 +69,10 @@ void Voicebank::RebuildReplicas(int n) {
     ArchiverManufacturer::singleton().Serialize(master_archive, *master_);
 
     for (int i = 0; i < n; ++i) {
-        auto v = std::make_unique<Voice>();
-        v->Create(this);
-        ArchiverManufacturer::singleton().Deserialize(master_archive, *v.get());
-        replicas_.push_back(std::move(v));
+        //auto v = std::make_unique<Voice>();
+        Voice *v = &Model::Make<Voice>(this);
+        ArchiverManufacturer::singleton().Deserialize(master_archive, *v);
+        replicas_.push_back(std::unique_ptr<Voice>(v));
     }
 }
 

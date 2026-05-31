@@ -28,16 +28,13 @@ void Voice::Create(Model *parent) {
 */
 
 void Voice::CreateDefaultIo() {
-    midi_in_module_ = new MidiInputModule();
-    midi_in_module_->Create(this);
+    midi_in_module_ = &Model::Make<MidiInputModule>(this);
     midi_in_ = midi_in_module_->midi_in_;
 
-    audio_out_module_ = new AudioOutputModule();
-    audio_out_module_->Create(this);
+    audio_out_module_ = &Model::Make<AudioOutputModule>(this);
     audio_out_ = audio_out_module_->audio_out_;
 
-    done_out_module_ = new CvOutputModule();
-    done_out_module_->Create(this);
+    done_out_module_ = &Model::Make<CvOutputModule>(this);
     done_out_ = done_out_module_->cv_out_;
 }
 

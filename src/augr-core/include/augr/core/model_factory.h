@@ -25,11 +25,18 @@ public:
 template <typename T> class ModelFactoryT : public ModelFactory {
 public:
     using ModelFactory::ModelFactory;
+
+    static T *Make(Model *parent = nullptr) {
+        return &Model::Make<T>(parent);
+    }
+
+    /*
     static T *Make(Model *parent = nullptr) {
         T *model = new T();
         model->Create(parent);
         return model;
     }
+    */
     Model *Produce(Model *parent = nullptr) override { return Make(parent); }
     std::type_index GetKey() override { return std::type_index(typeid(T)); }
     // Data members

@@ -8,8 +8,8 @@
 
 namespace augr {
 
-void AudioInputModule::Create(Model *parent) {
-    Io::Create(parent);
+void AudioInputModule::Create() {
+    Io::Create();
     label_ = "Audio Input Module";
 }
 
@@ -26,8 +26,8 @@ void AudioInputModule::Process() {
     audio_out_->Write(audio);
 }
 
-void AudioOutputModule::Create(Model *parent) {
-    Io::Create(parent);
+void AudioOutputModule::Create() {
+    Io::Create();
     label_ = "Audio Output Module";
 }
 
