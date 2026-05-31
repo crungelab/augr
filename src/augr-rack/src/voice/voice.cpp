@@ -1,9 +1,10 @@
 #include <augr/core/model_factory.h>
 
-#include <augr/rack/voice.h>
 #include <augr/rack/module/midi_io.h>
 #include <augr/rack/module/audio_io.h>
 #include <augr/rack/module/cv_io.h>
+
+#include <augr/rack/voice/voice.h>
 
 namespace augr {
 

@@ -1,4 +1,4 @@
-#include <augr/rack/voicebank.h>
+#include <augr/rack/voice/voicebank.h>
 #include <augr/rack/archiver/voicebank_archiver.h>
 
 #include <augr/core/archiver_factory.h>
