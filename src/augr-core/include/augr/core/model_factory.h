@@ -22,7 +22,7 @@ public:
     std::string category_;
 };
 
-template <typename T> class ModelFactoryT final : public ModelFactory {
+template <typename T> class ModelFactoryT : public ModelFactory {
 public:
     using ModelFactory::ModelFactory;
     static T *Make(Model *parent = nullptr) {

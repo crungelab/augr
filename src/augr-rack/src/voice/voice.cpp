@@ -1,16 +1,17 @@
-#include <augr/core/model_factory.h>
+//#include <augr/core/model_factory.h>
 
 #include <augr/rack/module/midi_io.h>
 #include <augr/rack/module/audio_io.h>
 #include <augr/rack/module/cv_io.h>
 
 #include <augr/rack/voice/voice.h>
+#include <augr/rack/voice/voice_factory.h>
 
 namespace augr {
 
 void Voice::Create(Model *parent) {
     Subrack::Create(parent);
-    label_ = "Voice";
+    //label_ = "Voice";
 
     midi_in_module_ = new MidiInputModule();
     midi_in_module_->Create(this);
@@ -40,4 +41,5 @@ bool Voice::IsActive() const {
 } // namespace augr
 
 using namespace augr;
-DEFINE_MODEL_FACTORY(Voice, "Voice", "General")
+//DEFINE_MODEL_FACTORY(Voice, "Voice", "General")
+DEFINE_VOICE_FACTORY("Voice", "General")
