@@ -99,14 +99,15 @@ void App::Draw() {
 }
 
 void App::Inspect(Model *model) {
-    if (model == nullptr) {
-        set_inspector_dock(nullptr);
-        return;
-    }
     if (model == inspected_model_) {
         return; // already inspecting this model
     }
     inspected_model_ = model;
+
+    if (model == nullptr) {
+        set_inspector_dock(nullptr);
+        return;
+    }
 
     auto root = InspectorBuilder().Build(*model);
     set_inspector_dock(std::make_unique<InspectorDock>(std::move(root)));

@@ -40,11 +40,11 @@ void SubrackController::Control() {
     CheckLinkDestroyed();
     CheckCreateNode();
     CheckNodeSelection();
+    CheckInspection();
 
     DrawCatalogPopup();
     DrawNodeContextMenu();
     DrawGridContextMenu();
-    DrawInspectorDock();
 }
 
 // ----- Selection -----
@@ -370,7 +370,24 @@ void SubrackController::DrawGridContextMenu() {
     ImGui::EndPopup();
 }
 
-void SubrackController::DrawInspectorDock() {
+void SubrackController::CheckNodeSelection() {
+    const int num = ImNodes::NumSelectedNodes();
+    if (num > 0) {
+        selected_nodes_.resize(num);
+        ImNodes::GetSelectedNodes(selected_nodes_.data());
+    } else {
+        selected_nodes_.clear();
+    }
+
+    if (ImGui::IsKeyPressed(ImGuiKey_Escape, /*repeat=*/false)) {
+        ImNodes::ClearNodeSelection();
+        selected_nodes_.clear();
+    } else if (ImGui::IsKeyPressed(ImGuiKey_Delete, /*repeat=*/false)) {
+        DeleteSelection();
+    }
+}
+
+void SubrackController::CheckInspection() {
     auto num = selected_nodes_.size();
     if (num == 1) {
         auto &wmap = view().widget_map();
@@ -386,35 +403,7 @@ void SubrackController::DrawInspectorDock() {
 
         App::singleton().Inspect(target_module);
     } else {
-        App::singleton().set_inspector_dock(nullptr);
-    }
-}
-
-/*
-void SubrackController::DrawInspectorDock() {
-    auto num = selected_nodes_.size();
-    if (num == 1) {
-        App::singleton().set_inspector_dock(std::make_unique<InspectorDock>());
-    } else {
-        App::singleton().set_inspector_dock(nullptr);
-    }
-}
-*/
-
-void SubrackController::CheckNodeSelection() {
-    const int num = ImNodes::NumSelectedNodes();
-    if (num > 0) {
-        selected_nodes_.resize(num);
-        ImNodes::GetSelectedNodes(selected_nodes_.data());
-    } else {
-        selected_nodes_.clear();
-    }
-
-    if (ImGui::IsKeyPressed(ImGuiKey_Escape, /*repeat=*/false)) {
-        ImNodes::ClearNodeSelection();
-        selected_nodes_.clear();
-    } else if (ImGui::IsKeyPressed(ImGuiKey_Delete, /*repeat=*/false)) {
-        DeleteSelection();
+        App::singleton().Inspect(nullptr);
     }
 }
 

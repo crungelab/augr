@@ -13,9 +13,11 @@ Widget::Ptr InspectorBuilder::Build(Model &model) {
 
     ModelWidgetFactory *factory = manufacturer.GetFactory(type);
     Widget::Ptr widget = factory->Produce(model);
+    /*
     for (const auto child : model.children_) {
         widget->AddChild(Build(*child));
     }
+    */
     return widget;
 }
 
