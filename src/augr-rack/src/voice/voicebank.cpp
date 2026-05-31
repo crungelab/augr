@@ -44,8 +44,10 @@ void Voicebank::SetMaster(Voice *master) {
 }
 
 void Voicebank::SetVoiceCount(int n) {
-    if (n < 1) n = 1;
-    if (n == target_voice_count_) return;
+    if (n < 1)
+        n = 1;
+    if (n == target_voice_count_)
+        return;
 
     EnqueueAction([this, n]() {
         target_voice_count_ = n;
@@ -58,7 +60,8 @@ void Voicebank::SetVoiceCount(int n) {
 void Voicebank::RebuildReplicas(int n) {
     replicas_.clear();
 
-    if (!master_) return;
+    if (!master_)
+        return;
 
     replicas_.reserve(n);
 
@@ -69,7 +72,7 @@ void Voicebank::RebuildReplicas(int n) {
 
     for (int i = 0; i < n; ++i) {
         auto v = std::make_unique<Voice>();
-        v->Create();  // detached (no parent)
+        v->Create(this);
         ArchiverManufacturer::singleton().Deserialize(master_archive, *v.get());
         replicas_.push_back(std::move(v));
     }
@@ -95,7 +98,8 @@ void Voicebank::Process() {
 }
 
 void Voicebank::HandleMidi(const MidiMessage &msg) {
-    if (replicas_.empty()) return;
+    if (replicas_.empty())
+        return;
 
     if (msg.IsNoteOn()) {
         if (msg.velocity() == 0) {
@@ -112,7 +116,8 @@ void Voicebank::HandleMidi(const MidiMessage &msg) {
 
 void Voicebank::HandleNoteOn(const MidiMessage &msg) {
     int idx = AllocateVoiceForNote(msg.key());
-    if (idx < 0) return;
+    if (idx < 0)
+        return;
 
     Voice *v = replicas_[idx].get();
     // TODO: voicebank-side bookkeeping for stealing:
@@ -136,7 +141,8 @@ void Voicebank::BroadcastToAllVoices(const MidiMessage &msg) {
 }
 
 int Voicebank::AllocateVoiceForNote(int note) {
-    if (replicas_.empty()) return -1;
+    if (replicas_.empty())
+        return -1;
 
     // 1. Same-note retrigger.
     for (size_t i = 0; i < replicas_.size(); ++i) {

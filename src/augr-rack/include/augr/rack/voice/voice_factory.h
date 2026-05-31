@@ -12,6 +12,7 @@ public:
 
     Model *Produce(Model *parent = nullptr) override {
         Voice *v = Make(parent);
+        v->CreateDefaultIo();
         // Allocate a unique name and register.
         v->label_ = VoiceManager::singleton().AllocateUniqueName("Voice");
         VoiceManager::singleton().AddVoice(v->label_, v);

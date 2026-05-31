@@ -46,8 +46,9 @@ App::App() {
     REGISTER_MODEL_WIDGET_FACTORY(HBarGraphWidget)
     REGISTER_MODEL_WIDGET_FACTORY(VBarGraphWidget)
     REGISTER_MODEL_WIDGET_FACTORY(KnobWidget)
-
+    
     REGISTER_INSPECTOR_FACTORY(ModuleInspector)
+    REGISTER_INSPECTOR_FACTORY(VoicebankInspector)
 };
 
 bool App::DoCreate(CreateParams params) {

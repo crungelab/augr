@@ -4,6 +4,7 @@
 
 namespace augr {
 
+class Io;
 class MidiInputModule;
 class AudioOutputModule;
 class CvOutputModule;
@@ -12,7 +13,15 @@ class Voice : public Subrack {
 public:
     Voice() = default;
 
-    void Create(Model *parent = nullptr) override;
+    //void Create(Model *parent = nullptr) override;
+    void CreateDefaultIo();
+
+    // -- Child management ----------------------------------------------
+    // Adds Module / Device branches on top of Graph's wire+pin bookkeeping.
+    void OnAddingChild(Model &model) override;
+    void OnRemovingChild(Model &model) override;
+    void OnAddingIo(Io &io);
+    void OnRemovingIo(Io &io);
 
     // -- Polyphony contract --------------------------------------------
     // The voicebank calls this. Default implementation reads done_in_
@@ -34,12 +43,8 @@ public:
 
 //private:
     MidiInputModule * midi_in_module_ = nullptr;
-    MidiInput *midi_in_ = nullptr;
-    MidiOutput *midi_out_ = nullptr;
 
     AudioOutputModule *audio_out_module_ = nullptr;
-    AudioInput *audio_in_ = nullptr;
-    AudioOutput *audio_out_ = nullptr;
 
     CvOutputModule *done_out_module_ = nullptr;
     VoltageOutput *done_out_ = nullptr;
