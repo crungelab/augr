@@ -9,10 +9,11 @@
 
 namespace augr {
 
-class Voice;
+class Io;
 class MidiInputModule;
 class AudioOutputModule;
 class MidiMessage;
+class Voice;
 
 // Voicebank: a polyphony driver.
 //
@@ -33,6 +34,15 @@ public:
     Voicebank() = default;
 
     void Create() override;
+    void OnFresh() override;
+
+    // -- Child management ----------------------------------------------
+    void OnAddingChild(Model &model) override;
+    void OnRemovingChild(Model &model) override;
+    void OnAddingIo(Io &io);
+    void OnRemovingIo(Io &io);
+    void OnAddingVoice(Voice &voice);
+    void OnRemovingVoice(Voice &voice);
 
     void Process() override;
 
@@ -55,7 +65,7 @@ public:
     // active notes. Safe to call before a master is set -- the count
     // is stored and applied when SetMaster() runs.
     void SetVoiceCount(int n);
-    int  voice_count() const { return static_cast<int>(replicas_.size()); }
+    int voice_count() const { return static_cast<int>(replicas_.size()); }
 
     // -- Parameter replication -----------------------------------------
     // Deferred. Will be hooked up once the master-change notification
@@ -72,6 +82,7 @@ private:
     void BroadcastToAllVoices(const MidiMessage &msg);
 
     // -- Voice allocation ---------------------------------------------
+    bool VoiceIsFree(const Voice &v) const;
     int AllocateVoiceForNote(int note);
 
     // -- Cloning -------------------------------------------------------
@@ -83,7 +94,7 @@ private:
     void SumReplicasIntoOutput();
 
     // Outer-facing IoModules, owned as children in modules_.
-    MidiInputModule   *midi_in_module_   = nullptr;
+    MidiInputModule *midi_in_module_ = nullptr;
     AudioOutputModule *audio_out_module_ = nullptr;
 
     // Non-owning reference to the master Voice (which lives somewhere

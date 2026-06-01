@@ -13,11 +13,11 @@ class Voice : public Subrack {
 public:
     Voice() = default;
 
-    //void Create(Model *parent = nullptr) override;
-    void CreateDefaultIo();
+    void Create() override;
+    void OnFresh() override;
+    void OnLoaded() override;
 
     // -- Child management ----------------------------------------------
-    // Adds Module / Device branches on top of Graph's wire+pin bookkeeping.
     void OnAddingChild(Model &model) override;
     void OnRemovingChild(Model &model) override;
     void OnAddingIo(Io &io);
@@ -30,8 +30,10 @@ public:
     virtual bool IsActive() const;
 
     // Currently-assigned MIDI note, or -1 if free.
-    int CurrentNote() const { return current_note_; }
-    uint64_t NoteOnTick() const { return note_on_tick_; }
+    int current_note() const { return current_note_; }
+    void set_current_note(int note) { current_note_ = note; }
+    uint64_t note_on_tick() const { return note_on_tick_; }
+    void set_note_on_tick(uint64_t tick) { note_on_tick_ = tick; }
 
     //void Process() override;
 

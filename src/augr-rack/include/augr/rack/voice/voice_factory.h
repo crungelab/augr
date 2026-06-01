@@ -10,9 +10,11 @@ class VoiceFactory : public ModelFactoryT<Voice> {
 public:
     using ModelFactoryT<Voice>::ModelFactoryT;
 
-    Model *Produce(Model *parent = nullptr) override {
+    Model *Produce(Model *parent = nullptr, CreateMode mode = CreateMode::Fresh) override {
         Voice *v = Make(parent);
-        v->CreateDefaultIo();
+        if (mode == CreateMode::Fresh) {
+            v->OnFresh();
+        }
         // Allocate a unique name and register.
         v->label_ = VoiceManager::singleton().AllocateUniqueName("Voice");
         VoiceManager::singleton().AddVoice(v->label_, v);

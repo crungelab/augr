@@ -1,4 +1,3 @@
-// ModuleArchiver.cpp
 #include <augr/rack/rack.h>
 #include <augr/rack/archiver/rack_archiver.h>
 

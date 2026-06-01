@@ -13,10 +13,6 @@ public:
                       const std::vector<Model *> &modules) const;
     void SaveWires(Archive &archive,
                    const std::vector<Model *> &modules) const;
-    /*
-    void SaveChildren(Archive &archive) const;
-    void SaveWires(Archive &archive) const;
-    */
     void Load(Archive &archive) override;
     void LoadChildren(Archive &archive);
     void LoadWires(Archive &archive);

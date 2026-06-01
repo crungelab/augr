@@ -1,5 +1,3 @@
-// ModuleArchiver.cpp
-
 #include <augr/rack/archiver/module_archiver.h>
 
 #include <augr/core/archiver_factory.h>

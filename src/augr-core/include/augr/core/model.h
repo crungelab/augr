@@ -15,6 +15,8 @@ public:
         id_ = next_id_++;
     }
     virtual void Create()  {}
+    virtual void OnFresh() {}  // called when creatd from scratch, not loaded
+    virtual void OnLoaded() {} // called after deserialization, not created from scratch
 
     template <class T, class... Args>
     static T& Make(Model* parent, Args&&... args) {
@@ -27,14 +29,6 @@ public:
         // else: caller owns the returned root
         return ref;
     }
-    /*
-    virtual void Create(Model *parent = nullptr)  {
-        parent_ = parent;
-        if (parent) {
-            parent->AddChild(*this);
-        }
-    }
-    */
     virtual void Destroy() {}
     void AddChild(Model &child) {
         OnAddingChild(child);

@@ -1,4 +1,3 @@
-// ModuleArchiver.cpp
 #include <unordered_set>
 
 #include <augr/core/archiver_manufacturer.h>
@@ -148,7 +147,8 @@ void GraphArchiver::LoadChildren(Archive &archive) {
             continue;
         }
 
-        Model &child = *factory->Produce(&graph);
+        //Model &child = *factory->Produce(&graph);
+        Model &child = *factory->Produce(&graph, CreateMode::Loaded);
         // Produce already calls Create(parent) and registers the child
         // with the graph in your existing setup, so child is now in
         // graph.children_ at the next available index.

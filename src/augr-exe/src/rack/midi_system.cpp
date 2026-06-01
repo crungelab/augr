@@ -98,8 +98,10 @@ bool MidiSystem::Start() {
 }
 
 void MidiSystem::Stop() {
+    spdlog::info("MidiSystem: stopping, closing {} ports", inputs_.size());
     for (auto &midi_in : inputs_) {
         if (midi_in->isPortOpen()) {
+            spdlog::info("MidiSystem: closing port \"{}\"", midi_in->getPortName(0));
             midi_in->cancelCallback();
             midi_in->closePort();
         }
