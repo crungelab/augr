@@ -1,3 +1,5 @@
+#include <cmath>   // std::tanh
+
 #include <augr/rack/voice/voicebank.h>
 
 #include <algorithm>
@@ -271,6 +273,39 @@ void Voicebank::SumReplicasIntoOutput() {
         return;
     }
 
+    // Owned accumulator, seeded from the first voice. The deep copy
+    // fixes the buffer shape and guarantees we're not accumulating
+    // through a view that aliases the pin's storage.
+    Audio mixed = replicas_[0]->audio_out_->Read();
+
+    fy_real *d = mixed.array().data();
+    const size_t n = mixed.array().size();
+
+    // Sum every voice, including currently-silent ones (they
+    // contribute ~0). Raw-pointer add per your hot-loop preference.
+    for (size_t i = 1; i < replicas_.size(); ++i) {
+        const Audio voice = replicas_[i]->audio_out_->Read();
+        const fy_real *s = voice.array().data();
+        for (size_t k = 0; k < n; ++k)
+            d[k] += s[k];
+    }
+
+    // Soft saturation instead of a fixed divide: low levels stay
+    // nearly linear, loud sums compress toward +/-1. Never hard-clips
+    // no matter how many voices land at once.
+    for (size_t k = 0; k < n; ++k)
+        d[k] = std::tanh(d[k]);
+
+    audio_out_module_->audio_out_->Write(mixed);
+}
+
+/*
+void Voicebank::SumReplicasIntoOutput() {
+    if (replicas_.empty()) {
+        audio_out_module_->audio_out_->Write(Audio());
+        return;
+    }
+
     auto mixed = replicas_[0]->audio_out_->Read();
     for (size_t i = 1; i < replicas_.size(); ++i) {
         if (!replicas_[i]->IsActive())
@@ -279,6 +314,7 @@ void Voicebank::SumReplicasIntoOutput() {
     }
     audio_out_module_->audio_out_->Write(mixed);
 }
+*/
 
 /*
 void Voicebank::SumReplicasIntoOutput() {
