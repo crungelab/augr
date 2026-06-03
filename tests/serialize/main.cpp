@@ -18,7 +18,7 @@
 #include <augr/exe/rack/exe_rack.h>
 
 #include <augite/app/app.h>
-#include <augite/view/rack_view.h>
+#include <augite/view/subrack_view.h>
 #include <augite/widget/widget.h>
 #include <augite/widget/widget_manufacturer.h>
 
@@ -126,7 +126,7 @@ ExeRack *DeserializeRack(const nlohmann::json &j) {
         return nullptr;
     }
 
-    ExeRack *rack = dynamic_cast<ExeRack *>(model_factory->Produce(nullptr));
+    ExeRack *rack = dynamic_cast<ExeRack *>(model_factory->Produce(nullptr, CreateMode::Loaded));
     if (!rack) {
         std::cerr << "Factory produced a non-ExeRack for type '" << type_name
                   << "'\n";
@@ -169,7 +169,7 @@ int main(int, char **) {
     MyApp *app = new MyApp();
     auto &rack = app->rack();
     rack.Create();
-    rack.CreateDefaultDevices();
+    rack.OnFresh();
 
     auto bubble = ModelFactoryT<BubbleDspImpl>::Make(&rack);
 

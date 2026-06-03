@@ -16,10 +16,6 @@ bool BaseApp::DoCreate(CreateParams params) {
     bool success = Window::DoCreate(params);
     success = InitUserEvents() && success;
     
-    return success;
-}
-
-bool BaseApp::PostCreate(CreateParams params) {
     // Setup Platform/Renderer backends
     // Create GPU Device
     gpu_device_ = SDL_CreateGPUDevice(SDL_GPU_SHADERFORMAT_SPIRV |
@@ -28,13 +24,13 @@ bool BaseApp::PostCreate(CreateParams params) {
                                       true, nullptr);
     if (gpu_device_ == nullptr) {
         printf("Error: SDL_CreateGPUDevice(): %s\n", SDL_GetError());
-        return 1;
+        return false;
     }
 
     // Claim window for GPU Device
     if (!SDL_ClaimWindowForGPUDevice(gpu_device_, window_)) {
         printf("Error: SDL_ClaimWindowForGPUDevice(): %s\n", SDL_GetError());
-        return 1;
+        return false;
     }
     SDL_SetGPUSwapchainParameters(gpu_device_, window_,
                                   SDL_GPU_SWAPCHAINCOMPOSITION_SDR,
@@ -52,7 +48,7 @@ bool BaseApp::PostCreate(CreateParams params) {
     init_info.PresentMode = SDL_GPU_PRESENTMODE_VSYNC;
     ImGui_ImplSDLGPU3_Init(&init_info);
 
-    return Window::PostCreate(params);
+    return success;
 }
 
 void BaseApp::Render() {

@@ -44,7 +44,7 @@ bool RackToJson(Rack &rack, nlohmann::json &out_json) {
 }
 
 // Construct a fresh root Rack of the named type.
-std::unique_ptr<Rack> NewRack(const std::string &type_name) {
+std::unique_ptr<Rack> NewRack(const std::string &type_name, CreateMode mode = CreateMode::Fresh) {
     auto &mm = ModelManufacturer::singleton();
     ModelFactory *mf = mm.FindFactory(type_name);
     if (!mf) {
@@ -52,7 +52,7 @@ std::unique_ptr<Rack> NewRack(const std::string &type_name) {
                   << "'\n";
         return nullptr;
     }
-    Rack *raw = dynamic_cast<Rack *>(mf->Produce(nullptr));
+    Rack *raw = dynamic_cast<Rack *>(mf->Produce(nullptr, mode));
     if (!raw) {
         std::cerr << "Factory produced a non-Rack for type '" << type_name
                   << "'\n";
@@ -69,7 +69,7 @@ std::unique_ptr<Rack> RackFromJson(const nlohmann::json &j) {
     }
     std::string type_name = j["type"].get<std::string>();
 
-    auto rack = NewRack(type_name);
+    auto rack = NewRack(type_name, CreateMode::Loaded);
     if (!rack)
         return nullptr;
 
@@ -226,7 +226,6 @@ void RackDoc::NewDocument(bool auto_start) {
     auto fresh = NewRack("Rack");
     if (!fresh) { /* ... */
     }
-    fresh->CreateDefaultDevices();
 
     Stop();
     model_ = std::move(fresh);

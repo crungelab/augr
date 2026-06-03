@@ -22,7 +22,7 @@ public:
 
     // Top-level convenience: creates the standard set of boundary devices
     // based on config_. Delegates to Subrack's Create*Device helpers.
-    void CreateDefaultDevices();
+    void OnFresh() override;
 
     // -- Action queue --------------------------------------------------
     // Thread bridge: any thread enqueues, audio thread drains via

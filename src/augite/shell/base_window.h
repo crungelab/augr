@@ -59,16 +59,6 @@ public:
     };
 
     struct RunParams : CreateParams {
-        /*
-        RunParams(std::string _title = "No Name", Point _origin = Point(0, 0),
-        Size _size = Size(800, 600), void *_nativeParent = nullptr)
-        {
-          title = _title;
-          origin = _origin;
-          size = _size;
-          nativeParent = _nativeParent;
-        }
-        */
         using CreateParams::CreateParams;
     };
 
@@ -76,17 +66,10 @@ public:
     virtual ~BaseWindow();
 
     bool Create(CreateParams params = CreateParams()) {
-        if (!DoCreate(params)) {
-            return false;
-        }
-        if (!PostCreate(params)) {
-            return false;
-        }
-        return true;
+        return DoCreate(params);
     }
 
     virtual bool DoCreate(CreateParams params);
-    virtual bool PostCreate(CreateParams params) { return true; }
 
     bool CreateAndShow(CreateParams params = CreateParams()) {
         if (!Create(params)) {
