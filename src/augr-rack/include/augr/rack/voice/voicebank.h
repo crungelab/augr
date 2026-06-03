@@ -39,8 +39,8 @@ public:
     // -- Child management ----------------------------------------------
     void OnAddingChild(Model &model) override;
     void OnRemovingChild(Model &model) override;
-    void OnAddingIo(Io &io);
-    void OnRemovingIo(Io &io);
+    void OnAddingIo(Io &io) override;
+    void OnRemovingIo(Io &io) override;
     void OnAddingVoice(Voice &voice);
     void OnRemovingVoice(Voice &voice);
 

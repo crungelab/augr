@@ -10,6 +10,7 @@
 namespace augr {
 
 class Module;
+class Io;
 class Rack;
 
 class Subrack : public Graph {
@@ -35,6 +36,9 @@ public:
     // Adds Module / Device branches on top of Graph's wire+pin bookkeeping.
     void OnAddingChild(Model &model) override;
     void OnRemovingChild(Model &model) override;
+
+    virtual void OnAddingIo(Io &io) {}
+    virtual void OnRemovingIo(Io &io) {}
 
     // -- Action queue interface ----------------------------------------
     // These walk up parents to the outer Rack and forward.

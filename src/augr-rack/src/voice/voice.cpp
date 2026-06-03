@@ -1,12 +1,11 @@
 #include <augr/core/model_factory.h>
 
-#include <augr/rack/module/midi_io.h>
 #include <augr/rack/module/audio_io.h>
 #include <augr/rack/module/cv_io.h>
+#include <augr/rack/module/midi_io.h>
 
 #include <augr/rack/voice/voice.h>
 #include <augr/rack/voice/voice_manager.h>
-//#include <augr/rack/voice/voice_factory.h>
 
 namespace augr {
 
@@ -33,25 +32,11 @@ void Voice::OnLoaded() {
     // Re-register with the voice manager under the loaded name. This
     // ensures the master voicebank can find this voice by name when it
     // calls SetMaster() during its own loading.
-    //VoiceManager::singleton().AddVoice(label_, this);
-}
-
-void Voice::OnAddingChild(Model &model) {
-    Subrack::OnAddingChild(model);
-
-    if (auto *d = dynamic_cast<Io *>(&model)) {
-        OnAddingIo(*d);
-    }
-}
-
-void Voice::OnRemovingChild(Model &model) {
-    if (auto *d = dynamic_cast<Io *>(&model)) {
-        OnRemovingIo(*d);
-    }
-    Subrack::OnRemovingChild(model);
+    // VoiceManager::singleton().AddVoice(label_, this);
 }
 
 void Voice::OnAddingIo(Io &io) {
+    Subrack::OnAddingIo(io);
     if (auto *audio_output = dynamic_cast<AudioOutputModule *>(&io)) {
         audio_out_module_ = audio_output;
         audio_out_ = audio_out_module_->audio_out_;
@@ -71,14 +56,17 @@ void Voice::OnRemovingIo(Io &io) {
         midi_in_module_ = nullptr;
     if (done_out_module_ == &io)
         done_out_module_ = nullptr;
+
+    Subrack::OnRemovingIo(io);
 }
 
 bool Voice::IsActive() const {
     auto env = done_out_->Read();
-    if (env.Empty()) return false;          // no envelope -> treat as free
-    constexpr fy_real kSilence = 1e-3f;      // ~-60 dB; tune to taste
+    if (env.Empty())
+        return false;                   // no envelope -> treat as free
+    constexpr fy_real kSilence = 1e-3f; // ~-60 dB; tune to taste
     const auto &arr = env.array();
-    return arr[arr.size() - 1] > kSilence;   // last sample = most recent state
+    return arr[arr.size() - 1] > kSilence; // last sample = most recent state
 }
 
 /*
@@ -94,8 +82,13 @@ bool Voice::IsActive() const {
 }
 */
 
+void Voice::DeliverMidi(const MidiMessage &msg) {
+    if (midi_in_module_) {
+        midi_in_module_->midi_out_->Write(msg);
+    }
+}
+
 } // namespace augr
 
 using namespace augr;
 DEFINE_MODEL_FACTORY(Voice, "Voice", "General")
-//DEFINE_VOICE_FACTORY("Voice", "General")

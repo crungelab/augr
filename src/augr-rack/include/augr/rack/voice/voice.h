@@ -18,10 +18,8 @@ public:
     void OnLoaded() override;
 
     // -- Child management ----------------------------------------------
-    void OnAddingChild(Model &model) override;
-    void OnRemovingChild(Model &model) override;
-    void OnAddingIo(Io &io);
-    void OnRemovingIo(Io &io);
+    void OnAddingIo(Io &io) override;
+    void OnRemovingIo(Io &io) override;
 
     // -- Polyphony contract --------------------------------------------
     // The voicebank calls this. Default implementation reads done_in_
@@ -35,15 +33,13 @@ public:
     uint64_t note_on_tick() const { return note_on_tick_; }
     void set_note_on_tick(uint64_t tick) { note_on_tick_ = tick; }
 
-    //void Process() override;
-
     // Voicebank-facing helpers. Push MIDI into midi_in_ which forwards
     // it to midi_out_ inside the graph.
-    //void DeliverMidi(const MidiMessage &msg);
+    void DeliverMidi(const MidiMessage &msg);
 
     REFLECT_ENABLE(Subrack)
 
-//private:
+private:
     MidiInputModule * midi_in_module_ = nullptr;
 
     AudioOutputModule *audio_out_module_ = nullptr;

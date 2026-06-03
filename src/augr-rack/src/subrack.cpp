@@ -6,6 +6,7 @@
 #include <augr/core/model_factory.h>
 
 #include <augr/rack/archiver/module_archiver.h>
+#include <augr/rack/module/io.h>
 #include <augr/rack/rack.h>
 #include <augr/rack/subrack.h>
 #include <augr/rack/wire.h>
@@ -119,12 +120,18 @@ void Subrack::OnAddingChild(Model &model) {
         AddModule(*m);
         graph_dirty_ = true;
     }
+    if (auto *d = dynamic_cast<Io *>(&model)) {
+        OnAddingIo(*d);
+    }
 }
 
 void Subrack::OnRemovingChild(Model &model) {
     if (auto *m = dynamic_cast<Module *>(&model)) {
         RemoveModule(*m);
         graph_dirty_ = true;
+    }
+    if (auto *d = dynamic_cast<Io *>(&model)) {
+        OnRemovingIo(*d);
     }
     Graph::OnRemovingChild(model);
 }
