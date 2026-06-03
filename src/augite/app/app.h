@@ -19,7 +19,6 @@ public:
 
     void CreateContext() override;
 
-    bool DoCreate(CreateParams params) override;
     void Draw() override;
 
     // Schedule a widget (and its subtree) for destruction at the next

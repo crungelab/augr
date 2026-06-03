@@ -10,13 +10,15 @@ namespace augr {
 class RackApp : public FrameAppT<RackViewer> {
 public:
     RackApp();
+    bool DoCreate(CreateParams params) override;
+
     void Draw() override;
     void DrawMainDockspace();
 
     // Accessors
     static RackApp &singleton() { return *singleton_; }
     RackDoc &document() { return static_cast<RackDoc &>(*doc_); }
-    Rack &rack() { return root_frame().rack(); }
+    Rack &rack() { return document().rack(); }
     SubrackController *active_controller() {
         return active_frame() ? &active_frame()->controller() : nullptr;
     }

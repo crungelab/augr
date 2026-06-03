@@ -51,12 +51,6 @@ App::App() {
     REGISTER_INSPECTOR_FACTORY(VoicebankInspector)
 };
 
-bool App::DoCreate(CreateParams params) {
-    bool success = BaseApp::DoCreate(params);
-
-    return success;
-}
-
 void App::CreateContext() {
     system_container_.Add(new ImGuiSystem());
     system_container_.Add(new ImPlotSystem());
