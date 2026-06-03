@@ -9,8 +9,6 @@
 
 namespace augr {
 
-enum class CreateMode { Fresh, Loaded };
-
 class ModelFactory {
 public:
     virtual ~ModelFactory() = default;
@@ -28,20 +26,14 @@ public:
     using ModelFactory::ModelFactory;
 
     static T *Make(Model *parent = nullptr, CreateMode mode = CreateMode::Fresh) {
-        auto model = &Model::Make<T>(parent);
-        if (mode == CreateMode::Fresh) {
-            model->OnFresh();
-        } else {
-            model->OnLoaded();
-        }
-        return model;
+        return &Model::Make<T>(parent, mode);
     }
 
     Model *Produce(Model *parent = nullptr, CreateMode mode = CreateMode::Fresh) override { 
         return Make(parent, mode); 
     }
+
     std::type_index GetKey() override { return std::type_index(typeid(T)); }
-    // Data members
 };
 
 /*
