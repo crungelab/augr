@@ -120,7 +120,7 @@ void Voicebank::RebuildReplicas(int n) {
     ArchiverManufacturer::singleton().Serialize(master_archive, *master_);
 
     for (int i = 0; i < n; ++i) {
-        Voice *v = &Model::Make<Voice>(this);
+        Voice *v = &Model::Make<Voice>(this, CreateMode::Replicated);
         ArchiverManufacturer::singleton().Deserialize(master_archive, *v);
     }
 }
@@ -227,6 +227,13 @@ void Voicebank::SumReplicasIntoOutput() {
     // fixes the buffer shape and guarantees we're not accumulating
     // through a view that aliases the pin's storage.
     Audio mixed = replicas_[0]->audio_out_->Read();
+
+    // If the master voice is not connected to anything, its output pin will produce empty audio.
+    // In that case, we can skip the summing and just write silence.
+    if (mixed.Empty()) {
+        audio_out_module_->audio_out_->Write(Audio());
+        return;
+    }
 
     fy_real *d = mixed.array().data();
     const size_t n = mixed.array().size();

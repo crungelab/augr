@@ -1,6 +1,7 @@
 #include <imgui.h>
 #include <misc/cpp/imgui_stdlib.h> // Required for std::string overloads
 
+#include <augr/rack/voice/voice.h>
 #include <augr/rack/voice/voicebank.h>
 #include <augr/rack/voice/voice_manager.h>
 
@@ -14,7 +15,8 @@ void VoicebankInspector::Draw() {
     auto &vb = model();
     // Master selection
     {
-        auto master_name = vb.master_name();
+        //auto master_name = vb.master_name();
+        auto master_name = vb.master() ? vb.master()->label() : std::string();
         auto voice_names = VoiceManager::singleton().Names();
         if (ImGui::BeginCombo("Master Voice", master_name.empty() ? "None" : master_name.c_str())) {
             if (ImGui::Selectable("None", master_name.empty())) {

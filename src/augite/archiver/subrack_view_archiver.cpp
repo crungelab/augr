@@ -37,6 +37,12 @@ void SubrackViewArchiver::SaveWidgets(Archive& archive, const std::vector<Widget
     auto& j_widgets = j["widgets"] = nlohmann::json::array();
 
     for (Widget* child : widgets) {
+        if (auto* module_widget = dynamic_cast<ModuleWidget*>(child)) {
+            if (module_widget->model().is_replicated()) {
+                // Don't save widgets for replicated modules
+                continue;
+            }
+        }
         nlohmann::json j_widget = nlohmann::json::object();
         {
             JsonScope scope(archive, j_widget);

@@ -55,6 +55,10 @@ public:
     }
     // Accessors
     Model &parent() const { return *parent_; }
+    
+    bool is_fresh() const { return create_mode_ == CreateMode::Fresh; }
+    bool is_replicated() const { return create_mode_ == CreateMode::Replicated; }
+    bool is_loaded() const { return create_mode_ == CreateMode::Loaded; }
 
 protected:
     virtual void OnAddingChild(Model &child) {}

@@ -54,11 +54,11 @@ public:
     // Audio-thread safe: routes the actual rebuild through
     // EnqueueAction.
     void SetMaster(Voice *master);
-    Voice *master() { return master_; }
+    Voice *master() const { return master_; }
 
     // Identifier of the currently-referenced master, used for
     // serialization.
-    const std::string &master_name() const { return master_name_; }
+    //const std::string &master_name() const { return master_name_; }
 
     // -- Voice management ----------------------------------------------
     // Set polyphony. Re-clones replicas from master; cuts off any

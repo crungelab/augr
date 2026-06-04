@@ -3,6 +3,9 @@
 #include <nlohmann/json.hpp>
 
 #include <algorithm>
+#include <functional>
+#include <list>
+#include <map>
 #include <typeindex>
 #include <utility>
 #include <vector>
@@ -10,6 +13,8 @@
 namespace augr {
 
 class Model;
+
+using ModuleResolver = std::function<void(Model *model)>;
 
 class Archive {
 public:
@@ -50,7 +55,29 @@ public:
                                    : static_cast<int>(it - current.begin());
     }
 
+    void RegisterModuleResolver(const std::string &uuid,
+                                ModuleResolver resolver) {
+        if (const auto it = module_map_.find(uuid); it != module_map_.end()) {
+            resolver(it->second);
+            return;
+        }
+        module_resolver_map_[uuid].push_back(std::move(resolver));
+    }
+
+    void RegisterModule(const std::string &uuid, Model *model) {
+        module_map_[uuid] = model;
+        if (const auto it = module_resolver_map_.find(uuid);
+            it != module_resolver_map_.end()) {
+            for (const auto &resolver : it->second) {
+                resolver(model);
+            }
+        }
+    }
+
 private:
+    std::map<std::string, std::list<ModuleResolver>> module_resolver_map_;
+    std::map<std::string, Model *> module_map_;
+
     std::vector<nlohmann::json *> json_stack_;
     std::vector<std::vector<Model *>> graph_stack_;
     int version_;

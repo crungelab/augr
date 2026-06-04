@@ -9,7 +9,16 @@ void ModuleArchiver::Save(Archive &archive) const {
     auto &j = archive.json();
     const Module &module = subject();
 
+    if (module.is_replicated()) {
+        std::cerr << "Warning: Saving a replicated module — this is not a "
+                     "supported use case and may produce unexpected results.\n";
+    }
+
     j["type"] = factory_->type_name();
+
+    // Persist the module's stable identity. Lazy-minted on first call,
+    // so accessing uuid() here ensures every saved module has one.
+    j["uuid"] = module.uuid();
 
     if (!module.parameters().empty()) {
         auto &j_params = j["parameters"];
@@ -23,20 +32,22 @@ void ModuleArchiver::Load(Archive &archive) {
     const auto &j = archive.json();
     Module &module = subject();
 
+    // Restore the module's stable identity. If missing (legacy files),
+    // the uuid will be lazily minted on first access — which is fine
+    // for round-trip but means the loaded module gets a new identity
+    // rather than preserving its original.
+    if (j.contains("uuid") && j["uuid"].is_string()) {
+        module.set_uuid(j["uuid"].get<std::string>());
+    }
+
+    archive.RegisterModule(module.uuid(), &module);
+
     // Type tag is read by the caller (it's needed before we can construct
     // this Module), so we don't read it here.
 
     if (j.contains("label")) {
         module.set_label(j["label"].get<std::string>());
     }
-    /*
-    if (j.contains("position")) {
-        const auto &j_pos = j["position"];
-        if (j_pos.is_array() && j_pos.size() == 2) {
-            module.SetPosition(j_pos[0].get<float>(), j_pos[1].get<float>());
-        }
-    }
-    */
 
     if (j.contains("parameters")) {
         const auto &j_params = j["parameters"];

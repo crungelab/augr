@@ -29,10 +29,7 @@ void Voice::OnFresh() {
 }
 
 void Voice::OnLoaded() {
-    // Re-register with the voice manager under the loaded name. This
-    // ensures the master voicebank can find this voice by name when it
-    // calls SetMaster() during its own loading.
-    // VoiceManager::singleton().AddVoice(label_, this);
+    VoiceManager::singleton().AddVoice(label_, this);
 }
 
 void Voice::OnAddingIo(Io &io) {
