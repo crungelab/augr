@@ -16,11 +16,13 @@
 namespace augr {
 
 class RackDoc : public DocumentT<Rack> {
- public:
+public:
     RackDoc() = default;
     ~RackDoc(); // out-of-line because Rack is forward-declared
 
     bool Save(const std::filesystem::path &p);
+    void ReplaceRack(std::unique_ptr<Rack> fresh, nlohmann::json envelope);
+
     bool Load(const std::filesystem::path &p, bool auto_start = true);
     void NewDocument(bool auto_start = true);
 
@@ -31,6 +33,8 @@ class RackDoc : public DocumentT<Rack> {
     Rack &rack() { return *model_; }
     const Rack &rack() const { return *model_; }
     bool HasRack() const { return model_ != nullptr; }
+
+    void ClearViews() { views_.clear(); }
 
     // Document-level metadata. Anything not part of the rack itself lives
     // here: editor state, user notes, MIDI-learn maps, etc. Stored as raw
@@ -49,7 +53,7 @@ class RackDoc : public DocumentT<Rack> {
     // of the document envelope.
     std::unordered_map<std::string, nlohmann::json> views_;
 
- private:
+private:
     nlohmann::json metadata_ = nlohmann::json::object();
 };
 

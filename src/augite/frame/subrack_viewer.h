@@ -3,6 +3,7 @@
 #include <string>
 
 #include <portable-file-dialogs.h>
+#include <sigslot/signal.hpp>
 
 #include <augr/rack/rack_doc.h>
 #include <augr/rack/subrack.h>
@@ -21,17 +22,19 @@ namespace augr {
 //
 // Created when the user drills into a Subrack node in a parent frame.
 // Parented in the widget tree to whichever Frame initiated the drill-in.
-class SubrackViewer : public DocumentViewerT<RackDoc, SubrackView, SubrackController> {
+class SubrackViewer
+    : public DocumentViewerT<RackDoc, SubrackView, SubrackController> {
 public:
     // doc: the project document (shared with the root RackViewer).
     // subrack: the specific Subrack this frame displays.
-    SubrackViewer(RackDoc &doc, Subrack &subrack, const std::string &label = "");
+    SubrackViewer(RackDoc &doc, Subrack &subrack,
+                  const std::string &label = "");
     ~SubrackViewer();
 
     void Create(Widget *parent = nullptr) override;
 
     virtual void OnLoaded();
-    
+
     virtual void RebuildView();
 
     void Draw() override;
@@ -59,7 +62,7 @@ public:
     // Accessors
     Subrack &subrack() { return *subrack_; }
     const Subrack &subrack() const { return *subrack_; }
-   
+
     // Data members
     Subrack *subrack_;
 
@@ -68,14 +71,14 @@ public:
 
     PendingAction pending_ = PendingAction::None;
     bool show_unsaved_modal_ = false;
+
 protected:
     // View serialization (called from doc hooks).
     nlohmann::json ViewToJson();
     void ViewFromJson(const nlohmann::json &j);
 
-    RackDoc::HookToken save_view_token_ = 0;
-    RackDoc::HookToken load_view_token_ = 0;
-
+    sigslot::scoped_connection on_doc_save_conn_;
+    sigslot::scoped_connection on_doc_load_conn_;
 };
 
 } // namespace augr

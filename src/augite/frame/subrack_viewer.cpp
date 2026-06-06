@@ -15,10 +15,10 @@ SubrackViewer::SubrackViewer(RackDoc &doc, Subrack &subrack,
     // Install view hooks. The save hook pushes this frame's current
     // view state into views_; the load hook pulls it back out after
     // the doc has been replaced.
-    save_view_token_ = doc_->AddSaveHook([this](nlohmann::json &) {
+    on_doc_save_conn_ = doc_->on_save.connect([this]() {
         document().views_[subrack_->uuid()] = ViewToJson();
     });
-    load_view_token_ = doc_->AddLoadHook([this](const nlohmann::json &) {
+    on_doc_load_conn_ = doc_->on_load.connect([this]() {
         OnLoaded();
     });
 }
@@ -29,9 +29,6 @@ SubrackViewer::~SubrackViewer() {
         // shouldn't discard its layout — the user might reopen this
         // subrack later in the session.
         document().views_[subrack_->uuid()] = ViewToJson();
-
-        doc_->RemoveSaveHook(save_view_token_);
-        doc_->RemoveLoadHook(load_view_token_);
     }
 }
 

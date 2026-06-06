@@ -1,7 +1,6 @@
 // rack_doc.cpp
 #include <augr/rack/rack_doc.h>
 
-#include <algorithm>
 #include <fstream>
 #include <iostream>
 
@@ -18,13 +17,9 @@ namespace augr {
 
 namespace {
 
-// Document envelope constants. Bump kDocumentVersion on breaking shape
-// changes to the envelope itself (not to the rack subtree, which has its
-// own versioning concerns via GraphArchiver).
 constexpr const char *kDocumentFormatTag = "augr.document";
 constexpr int kDocumentFormatVersion = 1;
 
-// Pure: rack -> json (bare rack json, no envelope).
 bool RackToJson(Rack &rack, nlohmann::json &out_json) {
     auto &manufacturer = ArchiverManufacturer::singleton();
     auto *factory = manufacturer.FindFactory(std::type_index(typeid(rack)));
@@ -43,8 +38,8 @@ bool RackToJson(Rack &rack, nlohmann::json &out_json) {
     return true;
 }
 
-// Construct a fresh root Rack of the named type.
-std::unique_ptr<Rack> NewRack(const std::string &type_name, CreateMode mode = CreateMode::Fresh) {
+std::unique_ptr<Rack> NewRack(const std::string &type_name,
+                              CreateMode mode = CreateMode::Fresh) {
     auto &mm = ModelManufacturer::singleton();
     ModelFactory *mf = mm.FindFactory(type_name);
     if (!mf) {
@@ -61,7 +56,6 @@ std::unique_ptr<Rack> NewRack(const std::string &type_name, CreateMode mode = Cr
     return std::unique_ptr<Rack>(raw);
 }
 
-// Pure: json -> rack (takes the bare rack subtree, not the envelope).
 std::unique_ptr<Rack> RackFromJson(const nlohmann::json &j) {
     if (!j.contains("type")) {
         std::cerr << "Rack JSON missing 'type' field\n";
@@ -89,33 +83,24 @@ std::unique_ptr<Rack> RackFromJson(const nlohmann::json &j) {
     return rack;
 }
 
-// Validates the envelope and extracts the rack subtree. Returns false on
-// structural errors. Accepts legacy bare-rack files (no envelope) for
-// backward compatibility — detected by absence of the "format" tag.
-//
-// Hook subtrees aren't extracted here; load hooks read directly from the
-// full document JSON by their registered key.
+// Validates the envelope and returns a pointer to the rack subtree within it.
+// Accepts legacy bare-rack files (no "format" key) for backward compatibility.
 bool ParseEnvelope(const nlohmann::json &doc,
                    const nlohmann::json *&out_rack_json) {
-    // Legacy path: file is just a bare rack (no envelope). Treat the
-    // whole document as the rack subtree.
     if (!doc.contains("format")) {
         out_rack_json = &doc;
         return true;
     }
-
     if (!doc["format"].is_string() ||
         doc["format"].get<std::string>() != kDocumentFormatTag) {
         std::cerr << "Unknown document format tag\n";
         return false;
     }
-
     int version = doc.value("version", 0);
     if (version <= 0 || version > kDocumentFormatVersion) {
         std::cerr << "Unsupported document version: " << version << "\n";
         return false;
     }
-
     if (!doc.contains("rack") || !doc["rack"].is_object()) {
         std::cerr << "Document missing 'rack' subobject\n";
         return false;
@@ -134,40 +119,50 @@ bool RackDoc::Save(const std::filesystem::path &p) {
         if (!RackToJson(rack(), rack_json))
             return false;
 
-        nlohmann::json doc = nlohmann::json::object();
-        doc["format"] = kDocumentFormatTag;
-        doc["version"] = kDocumentFormatVersion;
-        doc["rack"] = std::move(rack_json);
+        data_ = nlohmann::json::object();
+        data_["format"] = kDocumentFormatTag;
+        data_["version"] = kDocumentFormatVersion;
+        data_["rack"] = std::move(rack_json);
 
-        // Fire save hooks before serializing views_, so frames can
-        // push their live state into views_ first.
-        for (const auto &hook : save_hooks_) {
-            try {
-                hook.fn(doc);
-            } catch (const std::exception &e) {
-                std::cerr << "Save hook threw: " << e.what() << "\n";
-            }
-        }
+        // Let subscribers (e.g. frames) push live view state into views_.
+        on_save();
 
         nlohmann::json views_json = nlohmann::json::object();
         for (const auto &[uuid, view_json] : views_) {
             views_json[uuid] = view_json;
         }
-        doc["views"] = std::move(views_json);
+        data_["views"] = std::move(views_json);
 
         std::ofstream out(p);
-        out << doc.dump(2);
+        out << data_.dump(2);
         if (!out) {
             std::cerr << "Save: write failed for " << p << "\n";
+            data_ = {};
             return false;
         }
+
         SetPath(p);
         MarkClean();
+        data_ = {};
         return true;
     } catch (const std::exception &e) {
         std::cerr << "Save failed: " << e.what() << "\n";
+        data_ = {};
         return false;
     }
+}
+
+// Stops the current rack, fires on_unload, installs the new rack, populates
+// data_, fires on_load, then clears data_. All rack replacement goes through
+// here so subscribers see a consistent sequence.
+void RackDoc::ReplaceRack(std::unique_ptr<Rack> fresh,
+                          nlohmann::json envelope) {
+    Stop();
+    on_unload();
+    model_ = std::move(fresh);
+    data_ = std::move(envelope);
+    on_load();
+    data_ = {};
 }
 
 bool RackDoc::Load(const std::filesystem::path &p, bool auto_start) {
@@ -177,13 +172,13 @@ bool RackDoc::Load(const std::filesystem::path &p, bool auto_start) {
             std::cerr << "Load: could not open " << p << "\n";
             return false;
         }
+
         nlohmann::json doc;
         in >> doc;
 
         const nlohmann::json *rack_json = nullptr;
-        if (!ParseEnvelope(doc, rack_json)) {
+        if (!ParseEnvelope(doc, rack_json))
             return false;
-        }
 
         auto fresh = RackFromJson(*rack_json);
         if (!fresh)
@@ -196,25 +191,12 @@ bool RackDoc::Load(const std::filesystem::path &p, bool auto_start) {
             }
         }
 
-        Stop();
-        model_ = std::move(fresh);
+        ReplaceRack(std::move(fresh), std::move(doc));
 
         SetPath(p);
         MarkClean();
-
-        // Fire load hooks after the rack and views_ are in place.
-        // Hooks can pull from views_ via the doc reference.
-        for (const auto &hook : load_hooks_) {
-            try {
-                hook.fn(doc);
-            } catch (const std::exception &e) {
-                std::cerr << "Load hook threw: " << e.what() << "\n";
-            }
-        }
-
-        if (auto_start) {
+        if (auto_start)
             Start();
-        }
         return true;
     } catch (const std::exception &e) {
         std::cerr << "Load failed: " << e.what() << "\n";
@@ -224,34 +206,24 @@ bool RackDoc::Load(const std::filesystem::path &p, bool auto_start) {
 
 void RackDoc::NewDocument(bool auto_start) {
     auto fresh = NewRack("Rack");
-    if (!fresh) { /* ... */
-    }
+    if (!fresh)
+        return;
 
-    Stop();
-    model_ = std::move(fresh);
     views_.clear();
     ClearPath();
     MarkClean();
 
-    // Notify load hooks with an empty envelope so subsystems reset to
-    // defaults. Synthesize a minimal doc-shaped json since we don't
-    // have a real envelope here.
+    // Synthesize a minimal envelope so on_load subscribers see a consistent
+    // data_ shape (empty views, no rack content to read).
     nlohmann::json synthetic = nlohmann::json::object();
     synthetic["format"] = kDocumentFormatTag;
     synthetic["version"] = kDocumentFormatVersion;
     synthetic["views"] = nlohmann::json::object();
 
-    for (const auto &hook : load_hooks_) {
-        try {
-            hook.fn(synthetic);
-        } catch (const std::exception &e) {
-            std::cerr << "Load hook threw on NewDocument: " << e.what() << "\n";
-        }
-    }
+    ReplaceRack(std::move(fresh), std::move(synthetic));
 
-    if (auto_start) {
+    if (auto_start)
         Start();
-    }
 }
 
 bool RackDoc::Start() {
@@ -269,9 +241,8 @@ bool RackDoc::Start() {
 }
 
 void RackDoc::Stop() {
-    if (model_ && model_->IsRunning()) {
+    if (model_ && model_->IsRunning())
         model_->Stop();
-    }
 }
 
 bool RackDoc::IsRunning() const { return model_ && model_->IsRunning(); }

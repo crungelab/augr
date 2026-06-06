@@ -5,8 +5,7 @@
 namespace augr {
 
 void InspectorDock::Draw() {
-    if (ImGui::Begin("Inspector", nullptr, ImGuiWindowFlags_AlwaysAutoResize)) {
-        //ImGui::TextUnformatted("Inspector content goes here.");
+    if (ImGui::Begin("Inspector", nullptr, ImGuiWindowFlags_NoFocusOnAppearing)) {
         root_->Draw();
     }
 

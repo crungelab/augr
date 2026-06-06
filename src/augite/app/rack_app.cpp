@@ -14,6 +14,9 @@ RackApp *RackApp::singleton_;
 RackApp::RackApp() {
     singleton_ = this;
     doc_ = std::make_unique<RackDoc>();
+    on_doc_unload_conn_ = doc_->on_unload.connect([this]() {
+        Inspect(nullptr);
+    });
     document().NewDocument();
     /*
     root_frame_ = std::make_unique<RackViewer>(*static_cast<RackDoc *>(doc_.get()), *static_cast<Rack *>(doc_->model()), "Rack");

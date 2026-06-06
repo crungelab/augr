@@ -24,6 +24,10 @@ add_subdirectory(${FMT_ROOT})
 add_subdirectory(${SPDLOG_ROOT})
 #SPDLOG END
 
+#SIGSLOT BEGIN
+add_subdirectory(${SIGSLOT_ROOT})
+#SIGSLOT END
+
 #JSON BEGIN
 add_subdirectory(${JSON_ROOT})
 #JSON END

@@ -6,6 +6,7 @@
 #include <vector>
 
 #include <nlohmann/json.hpp>
+#include <sigslot/signal.hpp>
 
 namespace augr {
 
@@ -19,11 +20,12 @@ public:
     virtual bool Save(const std::filesystem::path&) = 0;
     virtual bool Load(const std::filesystem::path&) = 0;
     virtual void NewDocument() = 0;
-    virtual std::string TypeName() const = 0;        // "Rack", for title bar / file filters
-    virtual std::vector<std::string> Extensions() const = 0;  // {".augr"}
+    virtual std::string TypeName() const = 0;        // "Rack", for title bar /
+    file filters virtual std::vector<std::string> Extensions() const = 0;  //
+    {".augr"}
     */
 
-    const std::optional<std::filesystem::path>& Path() const { return path_; }
+    const std::optional<std::filesystem::path> &Path() const { return path_; }
     bool IsModified() const { return modified_; }
     void MarkModified() { modified_ = true; }
 
@@ -31,35 +33,24 @@ public:
         std::string base = path_ ? path_->filename().string() : "Untitled";
         return modified_ ? base + "*" : base;
     }
-
-    // Hooks let subsystems persist data alongside the rack without
-    // RackDoc knowing about them. Each hook owns a top-level JSON key
-    // ("view", "midi_learn", etc.) and is invoked during Save/Load.
-    using SaveHookFn = std::function<void(nlohmann::json &)>;
-    using LoadHookFn = std::function<void(const nlohmann::json&)>;
-
-    // Returns a token that can be used to remove the hook later.
-    using HookToken = int;
-    HookToken AddSaveHook(SaveHookFn fn);
-    HookToken AddLoadHook(LoadHookFn fn);
-
-    void RemoveSaveHook(HookToken token);
-    void RemoveLoadHook(HookToken token);
+    // Accessors
+    const nlohmann::json &data() const { return data_; }
+    nlohmann::json &data() { return data_; }
+    // Data members
+    sigslot::signal_st<> on_save;
+    sigslot::signal_st<> on_unload;
+    sigslot::signal_st<> on_load;
 
 protected:
     void SetPath(std::filesystem::path p) { path_ = std::move(p); }
     void ClearPath() { path_.reset(); }
     void MarkClean() { modified_ = false; }
+    void ClearData() { data_ = nlohmann::json::object(); }
 
     std::optional<std::filesystem::path> path_;
     bool modified_ = false;
 
-    struct SaveHook { HookToken token; SaveHookFn fn; };
-    struct LoadHook { HookToken token; LoadHookFn fn; };
-    std::vector<SaveHook> save_hooks_;
-    std::vector<LoadHook> load_hooks_;
-    HookToken next_token_ = 1;
-
+    nlohmann::json data_;
 };
 
 template <typename T> class DocumentT : public Document {

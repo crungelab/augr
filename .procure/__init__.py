@@ -16,6 +16,11 @@ class SpdLog(GitSolution):
     url = "https://github.com/gabime/spdlog"
 
 
+class SigSlot(GitSolution):
+    path = "depot/sigslot"
+    url = "https://github.com/palacaze/sigslot"
+
+
 class SDL(GitSolution):
     path = "depot/sdl"
     url = "https://github.com/libsdl-org/SDL"
@@ -93,6 +98,7 @@ solutions = [
     StdUuid,
     Fmt,
     SpdLog,
+    SigSlot,
     SDL,
     ImGui,
     ImGuiKnobs,

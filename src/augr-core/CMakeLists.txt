@@ -12,8 +12,6 @@ add_library(${PROJECT_NAME} STATIC
 )
 target_include_directories(${THIS} PRIVATE ${AUGR_CORE_ROOT}/include)
 
-#include(${AUGR_CMAKE}/XTensor.cmake)
-#USES_XTENSOR(${THIS})
 include(${AUGR_CMAKE}/AugrCore.cmake)
 INTERNAL_AUGR_CORE(${THIS})
 
