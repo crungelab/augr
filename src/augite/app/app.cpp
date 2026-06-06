@@ -7,8 +7,8 @@
 
 #include "../widget/widget_manufacturer.h"
 
-#include "../inspector/inspector_manufacturer.h"
 #include "../inspector/inspector_builder.h"
+#include "../inspector/inspector_manufacturer.h"
 
 #include "../system/imgui_system.h"
 #include "../system/imnodes_system.h"
@@ -29,7 +29,6 @@ App::App() {
     REGISTER_ARCHIVER_FACTORY(SubrackViewArchiver);
     REGISTER_ARCHIVER_FACTORY(SubrackWidgetArchiver);
 
-
     REGISTER_MODEL_WIDGET_FACTORY(SubrackWidget)
     REGISTER_MODEL_WIDGET_FACTORY(RackWidget)
     REGISTER_MODEL_WIDGET_FACTORY(DefaultModuleWidget)
@@ -46,7 +45,7 @@ App::App() {
     REGISTER_MODEL_WIDGET_FACTORY(HBarGraphWidget)
     REGISTER_MODEL_WIDGET_FACTORY(VBarGraphWidget)
     REGISTER_MODEL_WIDGET_FACTORY(KnobWidget)
-    
+
     REGISTER_INSPECTOR_FACTORY(ModuleInspector)
     REGISTER_INSPECTOR_FACTORY(VoicebankInspector)
 };
@@ -59,7 +58,8 @@ void App::CreateContext() {
 }
 
 void App::ScheduleDestroy(std::unique_ptr<Widget> widget) {
-    if (!widget) return;
+    if (!widget)
+        return;
     pending_destroy_.push_back(std::move(widget));
 }
 
@@ -88,7 +88,8 @@ DestroyQueue &GetDestroyQueue() { return g_destroy_queue; }
 
 void App::Draw() {
     root_frame_->Draw();
-    if (inspector_dock_) inspector_dock_->Draw();
+    if (inspector_dock_)
+        inspector_dock_->Draw();
     BaseApp::Draw();
     ProcessPendingDestroy();
 }

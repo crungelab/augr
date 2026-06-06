@@ -7,6 +7,8 @@
 #include <augr/rack/voice/voice.h>
 #include <augr/rack/voice/voice_manager.h>
 
+#include <augr/rack/rack.h>
+
 namespace augr {
 
 void Voice::Create() {
@@ -15,8 +17,8 @@ void Voice::Create() {
 }
 
 void Voice::OnFresh() {
-    label_ = VoiceManager::singleton().AllocateUniqueName("Voice");
-    VoiceManager::singleton().AddVoice(label_, this);
+    label_ = rack().voice_manager().AllocateUniqueName("Voice");
+    rack().voice_manager().AddVoice(label_, this);
 
     midi_in_module_ = &Model::Make<MidiInputModule>(this);
     midi_in_ = midi_in_module_->midi_in_;
@@ -29,7 +31,7 @@ void Voice::OnFresh() {
 }
 
 void Voice::OnLoaded() {
-    VoiceManager::singleton().AddVoice(label_, this);
+    rack().voice_manager().AddVoice(label_, this);
 }
 
 void Voice::OnAddingIo(Io &io) {

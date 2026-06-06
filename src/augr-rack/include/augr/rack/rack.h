@@ -7,6 +7,8 @@
 #include <augr/rack/rack_config.h>
 #include <augr/rack/subrack.h>
 
+#include <augr/rack/voice/voice_manager.h>
+
 namespace augr {
 
 class Device;
@@ -54,9 +56,12 @@ public:
     static Rack &singleton() { return *singleton_; }
     bool IsRunning() const { return running_; }
 
+    VoiceManager &voice_manager() { return voice_manager_; }
+
     // Data members
     static Rack *singleton_;
     RackConfig config_;
+    VoiceManager voice_manager_;
 
     std::mutex mutex_;
     std::vector<std::function<void()>> pending_actions_;

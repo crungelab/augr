@@ -143,8 +143,12 @@ void Subrack::OnRemovingChild(Model &model) {
 Rack *Subrack::OuterRack() {
     // Walk up parents until we find a Rack. A Subrack that isn't nested
     // inside a Rack (e.g. a standalone offline graph) returns nullptr.
+    if (outer_rack_) {
+        return outer_rack_;
+    }
     for (Model *p = this; p != nullptr; p = p->parent_) {
         if (auto *r = dynamic_cast<Rack *>(p)) {
+            outer_rack_ = r;
             return r;
         }
     }

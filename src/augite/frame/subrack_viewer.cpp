@@ -23,7 +23,6 @@ SubrackViewer::SubrackViewer(RackDoc &doc, Subrack &subrack,
     });
 }
 
-// SubrackViewer::~SubrackViewer() = default;
 SubrackViewer::~SubrackViewer() {
     if (doc_) {
         // Capture final view state before going away. Closing a frame

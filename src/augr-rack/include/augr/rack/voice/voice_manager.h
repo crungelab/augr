@@ -10,9 +10,6 @@ class Voice;
 
 class VoiceManager {
 public:
-    // Accessors
-    static VoiceManager &singleton() { return *singleton_; }
-
     // Generates a name like "Voice", "Voice 2", "Voice 3" ... that
     // doesn't collide with anything currently registered.
     std::string AllocateUniqueName(const std::string &base) {
@@ -57,7 +54,6 @@ public:
         voices_.erase(name);
     }
     // Data members
-    static VoiceManager *singleton_;
     std::map<std::string, Voice *> voices_;
 };
 

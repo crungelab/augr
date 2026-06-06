@@ -50,8 +50,10 @@ public:
     // -- Accessors -----------------------------------------------------
     // Walks parents to find the enclosing Rack (returns nullptr if none).
     Rack *OuterRack();
+    Rack &rack() { return *OuterRack(); }
 
     // Data members --- scheduling
+    Rack *outer_rack_ = nullptr; // cached pointer to enclosing Rack
     std::vector<Module *> modules_;
     std::vector<Module *> sorted_modules_; // cached execution order
 
