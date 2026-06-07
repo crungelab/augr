@@ -3,7 +3,6 @@
 #include <augr/core/ui/control/button.h>
 #include <augr/core/ui/control/check_button.h>
 #include <augr/core/ui/control/combo.h>
-
 #include <augr/core/ui/control/frame_box.h>
 #include <augr/core/ui/control/h_bargraph.h>
 #include <augr/core/ui/control/h_box.h>
@@ -20,91 +19,93 @@
 
 namespace augr {
 
-UiBuilder::UiBuilder(Model &model) { PushModel(model); }
+UiBuilder::UiBuilder(Model::Ptr model) {
+    model_stack_.push_back(std::move(model));
+}
 
-void UiBuilder::PushModel(Model &model) { model_stack_.push_back(&model); }
+void UiBuilder::PushModel(Model::Ptr model) {
+    model_stack_.push_back(std::move(model));
+}
 
-Model *UiBuilder::PopModel() {
-    Model *top = model_stack_.back();
+Model::Ptr UiBuilder::PopModel() {
+    auto top = std::move(model_stack_.back());
     model_stack_.pop_back();
     return top;
 }
 
-void UiBuilder::AddModel(Model &model) {
-    Model &top = *model_stack_.back();
-    top.AddChild(model);
-}
-
-/*
-void UiBuilder::declare(float *zone, const char *key, const char *value) {
-    zones_[zone].declare(key, value);
-}
-*/
-
-
 // ---------------------------------------------------------------------------
-// Buttons / toggles — no range, map to [0, 1] boolean parameters
+// Buttons / toggles
 // ---------------------------------------------------------------------------
 
 UiBuilder &UiBuilder::Button(const std::string &label, FloatParameter *param) {
-    AddModel(*new augr::Button(label, param));
+    Model::Make<augr::Button>(model_stack_.back(), create_mode_, label, param);
     return *this;
 }
 
-UiBuilder &UiBuilder::ToggleButton(const std::string &label, FloatParameter *param) {
-    AddModel(*new augr::ToggleButton(label, param));
+UiBuilder &UiBuilder::ToggleButton(const std::string &label,
+                                   FloatParameter *param) {
+    Model::Make<augr::ToggleButton>(model_stack_.back(), create_mode_, label,
+                                    param);
     return *this;
 }
 
-UiBuilder &UiBuilder::CheckButton(const std::string &label, FloatParameter *param) {
-    AddModel(*new augr::CheckButton(label, param));
+UiBuilder &UiBuilder::CheckButton(const std::string &label,
+                                  FloatParameter *param) {
+    Model::Make<augr::CheckButton>(model_stack_.back(), create_mode_, label,
+                                   param);
     return *this;
 }
 
 // ---------------------------------------------------------------------------
-// Dropdowns / combos — return *this for chaining
+// Dropdowns
 // ---------------------------------------------------------------------------
 
 UiBuilder &UiBuilder::Combo(const std::string &label, EnumParameter *param) {
-    AddModel(*new augr::Combo(label, param));
+    Model::Make<augr::Combo>(model_stack_.back(), create_mode_, label, param);
     return *this;
 }
 
 // ---------------------------------------------------------------------------
-// Sliders / knobs / num entry — full range
+// Sliders / knobs / num entry
 // ---------------------------------------------------------------------------
 
 UiBuilder &UiBuilder::VSlider(const std::string &label, FloatParameter *param) {
-    AddModel(*new augr::VSlider(label, param));
+    Model::Make<augr::VSlider>(model_stack_.back(), create_mode_, label, param);
     return *this;
 }
 
 UiBuilder &UiBuilder::HSlider(const std::string &label, FloatParameter *param) {
-    AddModel(*new augr::HSlider(label, param));
+    Model::Make<augr::HSlider>(model_stack_.back(), create_mode_, label, param);
     return *this;
 }
 
 UiBuilder &UiBuilder::Knob(const std::string &label, FloatParameter *param) {
-    AddModel(*new augr::Knob(label, param));
+    Model::Make<augr::Knob>(model_stack_.back(), create_mode_, label, param);
     return *this;
 }
 
-UiBuilder &UiBuilder::NumEntry(const std::string &label, FloatParameter *param) {
-    AddModel(*new augr::NumEntry(label, param));
+UiBuilder &UiBuilder::NumEntry(const std::string &label,
+                               FloatParameter *param) {
+    Model::Make<augr::NumEntry>(model_stack_.back(), create_mode_, label,
+                                param);
     return *this;
 }
 
 // ---------------------------------------------------------------------------
-// Bargraphs — read-only, no step
+// Bargraphs
 // ---------------------------------------------------------------------------
 
-UiBuilder &UiBuilder::HBarGraph(const std::string &label, FloatParameter *param) {
-    AddModel(*new augr::HBarGraph(label, param));
+UiBuilder &UiBuilder::HBarGraph(const std::string &label,
+                                FloatParameter *param) {
+    Model::Make<augr::HBarGraph>(model_stack_.back(), create_mode_, label,
+                                 param);
     return *this;
 }
 
-UiBuilder &UiBuilder::VBarGraph(const std::string &label, FloatParameter *param) {
-    AddModel(*new augr::VBarGraph(label, param));
+UiBuilder &UiBuilder::VBarGraph(const std::string &label,
+                                FloatParameter *param) {
+    Model::Make<augr::VBarGraph>(model_stack_.back(), create_mode_, label,
+                                 param);
     return *this;
 }
 
@@ -115,7 +116,8 @@ UiBuilder &UiBuilder::VBarGraph(const std::string &label, FloatParameter *param)
 UiBuilder &UiBuilder::NumDisplay(const std::string &label,
                                  const ControlMeta meta, ZoneBindingPtr binding,
                                  const int precision) {
-    AddModel(*new augr::NumDisplay(label, meta, binding, precision));
+    Model::Make<augr::NumDisplay>(model_stack_.back(), create_mode_, label,
+                                  meta, binding, precision);
     return *this;
 }
 
@@ -123,8 +125,8 @@ UiBuilder &UiBuilder::TextDisplay(const std::string &label,
                                   const ControlMeta meta,
                                   ZoneBindingPtr binding, char *names[],
                                   const float min, const float max) {
-
-    AddModel(*new augr::TextDisplay(label, meta, binding, names, min, max));
+    Model::Make<augr::TextDisplay>(model_stack_.back(), create_mode_, label,
+                                   meta, binding, names, min, max);
     return *this;
 }
 
@@ -153,36 +155,36 @@ UiBuilder::BoxScope UiBuilder::FrameBox(const std::string &label) {
 }
 
 void UiBuilder::OpenFrameBox(const std::string &label) {
-    PushModel(*new augr::FrameBox(label));
+    PushModel(std::make_shared<augr::FrameBox>(label));
 }
 
 void UiBuilder::OpenTabBox(const std::string &label) {
-    PushModel(*new augr::TabBox(label));
+    PushModel(std::make_shared<augr::TabBox>(label));
 }
 
 void UiBuilder::OpenHBox(const std::string &label) {
-    auto *box = new augr::HBox(label);
+    auto box = std::make_shared<augr::HBox>(label);
     if (model_stack_.empty())
         box->is_top_level_ = true;
     if (strcmp(label.c_str(), "0x00") == 0)
         box->label_visible_ = false;
-    PushModel(*box);
+    PushModel(std::move(box));
 }
 
 void UiBuilder::OpenVBox(const std::string &label) {
-    auto *box = new augr::VBox(label);
+    auto box = std::make_shared<augr::VBox>(label);
     if (model_stack_.empty())
         box->is_top_level_ = true;
     if (strcmp(label.c_str(), "0x00") == 0)
         box->label_visible_ = false;
-    PushModel(*box);
+    PushModel(std::move(box));
 }
 
 void UiBuilder::CloseBox() {
-    Model *top = PopModel();
+    auto top = PopModel();
     if (model_stack_.empty())
         return;
-    AddModel(*top);
+    model_stack_.back()->AddChild(std::move(top));
 }
 
 } // namespace augr

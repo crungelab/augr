@@ -31,7 +31,7 @@ public:
     }
 
     void CreateControls() override {
-        UiBuilder ui(*this);
+        UiBuilder ui(shared_from_this());
         auto windowParam = CreateFloatParameter(
             "Window", ControlMeta::kDefault,
             &window_samples_, 1024.f, 128.f, 8192.f, 1.f);

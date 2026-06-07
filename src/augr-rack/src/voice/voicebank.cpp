@@ -1,4 +1,4 @@
-#include <cmath> // std::tanh
+#include <cmath>
 
 #include <augr/rack/voice/voicebank.h>
 
@@ -21,32 +21,27 @@ namespace augr {
 void Voicebank::Create() {
     Subrack::Create();
     label_ = "Voicebank";
-
-    // No master yet -- the user picks one via the inspector dropdown,
-    // which calls SetMaster(). Until then, replicas_ stays empty and
-    // Process() runs the subrack but produces no voice audio.
 }
 
 void Voicebank::OnFresh() {
-    // Outer-facing IoModules. The user can wire post-voice FX
-    // between voice replicas (summed) and audio_out_module_.
-    midi_in_module_ = &Model::Make<MidiInputModule>(this);
+    auto midi_in = Model::Make<MidiInputModule>(shared_from_this());
+    midi_in_module_ = midi_in.get();
+    midi_in_ = midi_in_module_->midi_in_;
 
-    audio_out_module_ = &Model::Make<AudioOutputModule>(this);
+    auto audio_out = Model::Make<AudioOutputModule>(shared_from_this());
+    audio_out_module_ = audio_out.get();
+    audio_out_ = audio_out_module_->audio_out_;
 }
 
 void Voicebank::OnAddingChild(Model &model) {
     Subrack::OnAddingChild(model);
-
-    if (auto *v = dynamic_cast<Voice *>(&model)) {
+    if (auto *v = dynamic_cast<Voice *>(&model))
         OnAddingVoice(*v);
-    }
 }
 
 void Voicebank::OnRemovingChild(Model &model) {
-    if (auto *v = dynamic_cast<Voice *>(&model)) {
+    if (auto *v = dynamic_cast<Voice *>(&model))
         OnRemovingVoice(*v);
-    }
     Subrack::OnRemovingChild(model);
 }
 
@@ -66,19 +61,13 @@ void Voicebank::OnRemovingIo(Io &io) {
         audio_out_module_ = nullptr;
     if (midi_in_module_ == &io)
         midi_in_module_ = nullptr;
-
     Subrack::OnRemovingIo(io);
 }
 
-void Voicebank::OnAddingVoice(Voice &voice) {
-    replicas_.push_back(std::unique_ptr<Voice>(&voice));
-}
+void Voicebank::OnAddingVoice(Voice &voice) { replicas_.push_back(&voice); }
 
 void Voicebank::OnRemovingVoice(Voice &voice) {
-    replicas_.erase(std::remove_if(replicas_.begin(), replicas_.end(),
-                                   [&voice](const std::unique_ptr<Voice> &v) {
-                                       return v.get() == &voice;
-                                   }),
+    replicas_.erase(std::remove(replicas_.begin(), replicas_.end(), &voice),
                     replicas_.end());
 }
 
@@ -86,8 +75,6 @@ void Voicebank::SetMaster(Voice *master) {
     EnqueueAction([this, master]() {
         master_ = master;
         master_name_ = master ? master->label_ : std::string();
-        // TODO: use a stable id rather than label_ once decided.
-
         RebuildReplicas(target_voice_count_);
     });
 }
@@ -97,40 +84,37 @@ void Voicebank::SetVoiceCount(int n) {
         n = 1;
     if (n == target_voice_count_)
         return;
-
     EnqueueAction([this, n]() {
         target_voice_count_ = n;
-        if (master_) {
+        if (master_)
             RebuildReplicas(n);
-        }
     });
 }
 
 void Voicebank::RebuildReplicas(int n) {
-    replicas_.clear();
+    // Remove existing replica children (replicas_ is cleared via
+    // OnRemovingVoice)
+    while (!replicas_.empty())
+        RemoveChild(*replicas_.back());
 
     if (!master_)
         return;
 
-    replicas_.reserve(n);
-
-    // Serialize master once, reuse the json for each replica.
+    // Serialize master once, reuse for each replica.
     nlohmann::json master_json;
     Archive master_archive(master_json);
     ArchiverManufacturer::singleton().Serialize(master_archive, *master_);
 
+    replicas_.reserve(n);
     for (int i = 0; i < n; ++i) {
-        Voice *v = &Model::Make<Voice>(this, CreateMode::Replicated);
+        auto v = Model::Make<Voice>(shared_from_this(), CreateMode::Replicated);
         ArchiverManufacturer::singleton().Deserialize(master_archive, *v);
     }
 }
 
 void Voicebank::Process() {
-    // Drain MIDI input and dispatch -- even if no master is set, we
-    // drain to avoid backlog when a master gets attached later.
-    for (const MidiMessage &msg : midi_in_module_->midi_in_->Drain()) {
+    for (const MidiMessage &msg : midi_in_module_->midi_in_->Drain())
         HandleMidi(msg);
-    }
 
     Subrack::Process();
 
@@ -142,11 +126,10 @@ void Voicebank::HandleMidi(const MidiMessage &msg) {
         return;
 
     if (msg.IsNoteOn()) {
-        if (msg.velocity() == 0) {
+        if (msg.velocity() == 0)
             HandleNoteOff(msg);
-        } else {
+        else
             HandleNoteOn(msg);
-        }
     } else if (msg.IsNoteOff()) {
         HandleNoteOff(msg);
     } else {
@@ -158,29 +141,24 @@ void Voicebank::HandleNoteOn(const MidiMessage &msg) {
     int idx = AllocateVoiceForNote(msg.key());
     if (idx < 0)
         return;
-
-    Voice *v = replicas_[idx].get();
+    Voice *v = replicas_[idx];
     v->set_current_note(msg.key());
     v->set_note_on_tick(next_tick_++);
-    // v->midi_in_module_->midi_out_->Write(msg);
     v->DeliverMidi(msg);
 }
 
 void Voicebank::HandleNoteOff(const MidiMessage &msg) {
-    for (auto &v : replicas_) {
+    for (auto *v : replicas_) {
         if (v->current_note() == msg.key()) {
-            // v->midi_in_module_->midi_out_->Write(msg);
             v->DeliverMidi(msg);
-            v->set_current_note(-1); // <-- release the assignment
+            v->set_current_note(-1);
         }
     }
 }
 
 void Voicebank::BroadcastToAllVoices(const MidiMessage &msg) {
-    for (auto &v : replicas_) {
-        // v->midi_in_module_->midi_out_->Write(msg);
+    for (auto *v : replicas_)
         v->DeliverMidi(msg);
-    }
 }
 
 bool Voicebank::VoiceIsFree(const Voice &v) const {
@@ -193,16 +171,14 @@ int Voicebank::AllocateVoiceForNote(int note) {
 
     // 1. Same-note retrigger.
     for (size_t i = 0; i < replicas_.size(); ++i) {
-        if (replicas_[i]->current_note() == note && replicas_[i]->IsActive()) {
+        if (replicas_[i]->current_note() == note && replicas_[i]->IsActive())
             return static_cast<int>(i);
-        }
     }
 
     // 2. A free voice.
     for (size_t i = 0; i < replicas_.size(); ++i) {
-        if (VoiceIsFree(*replicas_[i])) {
+        if (VoiceIsFree(*replicas_[i]))
             return static_cast<int>(i);
-        }
     }
 
     // 3. Steal oldest active.
@@ -223,13 +199,8 @@ void Voicebank::SumReplicasIntoOutput() {
         return;
     }
 
-    // Owned accumulator, seeded from the first voice. The deep copy
-    // fixes the buffer shape and guarantees we're not accumulating
-    // through a view that aliases the pin's storage.
     Audio mixed = replicas_[0]->audio_out_->Read();
 
-    // If the master voice is not connected to anything, its output pin will produce empty audio.
-    // In that case, we can skip the summing and just write silence.
     if (mixed.Empty()) {
         audio_out_module_->audio_out_->Write(Audio());
         return;
@@ -238,8 +209,6 @@ void Voicebank::SumReplicasIntoOutput() {
     fy_real *d = mixed.array().data();
     const size_t n = mixed.array().size();
 
-    // Sum every voice, including currently-silent ones (they
-    // contribute ~0). Raw-pointer add per your hot-loop preference.
     for (size_t i = 1; i < replicas_.size(); ++i) {
         const Audio voice = replicas_[i]->audio_out_->Read();
         const fy_real *s = voice.array().data();
@@ -247,48 +216,13 @@ void Voicebank::SumReplicasIntoOutput() {
             d[k] += s[k];
     }
 
-    // Soft saturation instead of a fixed divide: low levels stay
-    // nearly linear, loud sums compress toward +/-1. Never hard-clips
-    // no matter how many voices land at once.
     for (size_t k = 0; k < n; ++k)
         d[k] = std::tanh(d[k]);
 
     audio_out_module_->audio_out_->Write(mixed);
 }
 
-/*
-void Voicebank::SumReplicasIntoOutput() {
-    if (replicas_.empty()) {
-        audio_out_module_->audio_out_->Write(Audio());
-        return;
-    }
-
-    auto mixed = replicas_[0]->audio_out_->Read();
-    for (size_t i = 1; i < replicas_.size(); ++i) {
-        if (!replicas_[i]->IsActive())
-            continue; // skip silent voices to reduce noise from summing
-        mixed += replicas_[i]->audio_out_->Read();
-    }
-    audio_out_module_->audio_out_->Write(mixed);
-}
-*/
-
-/*
-void Voicebank::SumReplicasIntoOutput() {
-    if (replicas_.empty()) {
-        audio_out_module_->audio_out_->Write(Audio());
-        return;
-    }
-
-    auto mixed = replicas_[0]->audio_out_->Read();
-    for (size_t i = 1; i < replicas_.size(); ++i) {
-        mixed += replicas_[i]->audio_out_->Read();
-    }
-    audio_out_module_->audio_out_->Write(mixed);
-}
-*/
-
-void Voicebank::OnMasterParameterChanged(/* path, value */) {
+void Voicebank::OnMasterParameterChanged() {
     // Deferred.
 }
 

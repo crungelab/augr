@@ -17,30 +17,25 @@ void GraphArchiver::Save(Archive &archive) const {
     ModuleArchiver::Save(archive);
 
     const Graph &graph = subject();
-
     auto &j = archive.json();
 
-    // Push graph context so children iteration AND wire resolution
-    // both see this graph's children as the resolution table.
     GraphScope graph_scope(archive, graph.children_);
 
     SaveChildren(archive, graph.children_);
     SaveWires(archive, graph.children_);
 }
 
-// Refactored — takes the modules to emit.
-void GraphArchiver::SaveChildren(Archive &archive,
-                                 const std::vector<Model *> &children) const {
+void GraphArchiver::SaveChildren(
+    Archive &archive, const std::vector<Model::Ptr> &children) const {
     auto &j = archive.json();
 
     if (children.empty())
         return;
 
     auto &j_children = j["children"] = nlohmann::json::array();
-    for (auto *child : children) {
-        if (child->is_replicated()) {
-            continue; // Don't save replicas — they are an implementation detail of voicebanks, not a real part of the graph.
-        }
+    for (const auto &child : children) {
+        if (child->is_replicated())
+            continue;
         nlohmann::json j_child = nlohmann::json::object();
         {
             JsonScope json_scope(archive, j_child);
@@ -50,16 +45,12 @@ void GraphArchiver::SaveChildren(Archive &archive,
     }
 }
 
-// For SaveWires — emit only wires where both endpoints are in the set.
 void GraphArchiver::SaveWires(Archive &archive,
-                              const std::vector<Model *> &children) const {
+                              const std::vector<Model::Ptr> &children) const {
     const Graph &graph = subject();
     if (graph.wires_.empty())
         return;
 
-    // Push a GraphScope over the passed-in children list so IndexOf
-    // resolves to indices within that subset. For whole-graph save this
-    // is graph.children_; for selection save this is the subset.
     GraphScope graph_scope(archive, children);
 
     auto &j = archive.json();
@@ -75,13 +66,8 @@ void GraphArchiver::SaveWires(Archive &archive,
         int out_idx = archive.IndexOf(&out_module);
         int in_idx = archive.IndexOf(&in_module);
 
-        if (out_idx < 0 || in_idx < 0) {
-            // Endpoint not in the subset — drop it silently. For whole-
-            // graph save this means "dangling wire" (real anomaly); for
-            // selection save this means "wire crosses the selection
-            // boundary" (expected and correct).
+        if (out_idx < 0 || in_idx < 0)
             continue;
-        }
 
         nlohmann::json j_wire = nlohmann::json::array();
         j_wire.push_back(nlohmann::json::array({out_idx, out_pin->name()}));
@@ -89,9 +75,8 @@ void GraphArchiver::SaveWires(Archive &archive,
         j_wires.push_back(std::move(j_wire));
     }
 
-    if (j_wires.empty()) {
+    if (j_wires.empty())
         j.erase("wires");
-    }
 }
 
 void GraphArchiver::Load(Archive &archive) {
@@ -102,9 +87,6 @@ void GraphArchiver::Load(Archive &archive) {
 
     LoadChildren(archive);
 
-    // Push graph context so wire indices resolve against the children
-    // we just loaded. Note: LoadChildren has populated graph.children_,
-    // so we push that as the resolution table. Symmetric with Save.
     GraphScope graph_scope(archive, graph.children_);
 
     LoadWires(archive);
@@ -130,7 +112,6 @@ void GraphArchiver::LoadChildren(Archive &archive) {
         }
         auto type_name = j_child["type"].get<std::string>();
 
-        // Construct the Model via its factory.
         ModelFactory *factory = model_manufacturer.FindFactory(type_name);
         if (!factory) {
             std::cerr << "Unknown module type '" << type_name
@@ -138,15 +119,9 @@ void GraphArchiver::LoadChildren(Archive &archive) {
             continue;
         }
 
-        //Model &child = *factory->Produce(&graph);
-        Model &child = *factory->Produce(&graph, CreateMode::Loaded);
-        // Produce already calls Create(parent) and registers the child
-        // with the graph in your existing setup, so child is now in
-        // graph.children_ at the next available index.
+        Model &child =
+            *factory->Produce(graph.shared_from_this(), CreateMode::Loaded);
 
-        // Deserialize the child's contents using its own archiver.
-        // const_cast is needed because Archive's json stack stores
-        // non-const pointers; load only reads but the API is shared.
         JsonScope json_scope(archive, const_cast<nlohmann::json &>(j_child));
         archiver_manufacturer.Deserialize(archive, child);
     }
@@ -179,12 +154,9 @@ void GraphArchiver::LoadWires(Archive &archive) {
 
         Model *from_module = archive.ResolveModule(from_idx);
         Model *to_module = archive.ResolveModule(to_idx);
-        if (!from_module || !to_module) {
-            // Index out of range — drop the wire silently per policy.
+        if (!from_module || !to_module)
             continue;
-        }
 
-        // Cast to Node — wires connect Nodes, not arbitrary Models.
         Node *from_node = dynamic_cast<Node *>(from_module);
         Node *to_node = dynamic_cast<Node *>(to_module);
         if (!from_node || !to_node) {
@@ -208,5 +180,4 @@ void GraphArchiver::LoadWires(Archive &archive) {
 } // namespace augr
 
 using namespace augr;
-
 DEFINE_ARCHIVER_FACTORY(GraphArchiver, Graph, "Graph")

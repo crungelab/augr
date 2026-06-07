@@ -32,7 +32,7 @@ void Envelope::Create() {
 }
 
 void Envelope::CreateControls() {
-    UiBuilder ui(*this);
+    UiBuilder ui(shared_from_this());
 
     auto r1 = CreateFloatParameter("R1", ControlMeta::kDefault, &rates_[0],  99.f, 0.f, 99.f, 1.f);
     auto r2 = CreateFloatParameter("R2", ControlMeta::kDefault, &rates_[1],  50.f, 0.f, 99.f, 1.f);

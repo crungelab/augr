@@ -21,7 +21,7 @@ public:
     }
 
     void CreateControls() override {
-        UiBuilder ui(*this);
+        UiBuilder ui(shared_from_this());
         auto attackParam =
             CreateFloatParameter("Attack", ControlMeta::kSeconds, &attack_,
                                  0.01f, 0.001f, 10.f, 0.001f);

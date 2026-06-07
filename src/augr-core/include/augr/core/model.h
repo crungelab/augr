@@ -1,6 +1,7 @@
 #pragma once
 
 #include <algorithm>
+#include <memory>
 #include <string>
 #include <utility>
 #include <vector>
@@ -11,53 +12,75 @@ namespace augr {
 
 enum class CreateMode { Fresh, Replicated, Loaded };
 
-class Model : public Subject {
+class Model : public Subject, public std::enable_shared_from_this<Model> {
 public:
-    Model() {
-        id_ = next_id_++;
-    }
-    virtual void Create()  {}
-    virtual void OnFresh() {}  // called when creatd from scratch, not loaded
-    virtual void OnReplicated() {}  // called when replicated from another instance, not created from scratch
-    virtual void OnLoaded() {} // called after deserialization, not created from scratch
+    using Ptr = std::shared_ptr<Model>;
+    using WeakPtr = std::weak_ptr<Model>;
+
+    Model() { id_ = next_id_++; }
+
+    virtual void Create() {}
+    virtual void OnFresh() {}
+    virtual void OnReplicated() {}
+    virtual void OnLoaded() {}
 
     template <class T, class... Args>
-    static T& Make(Model* parent, CreateMode mode = CreateMode::Fresh, Args&&... args) {
-        auto child = new T(std::forward<Args>(args)...);  // most-derived ctor runs
-        T& ref = *child;
-        ref.parent_ = parent;
-        ref.create_mode_ = mode;
-        ref.Create();
+    static std::shared_ptr<T>
+    Make(Ptr parent, CreateMode mode = CreateMode::Fresh, Args &&...args) {
+        auto child = std::make_shared<T>(std::forward<Args>(args)...);
+        child->parent_ = parent;
+        child->create_mode_ = mode;
+        child->Create();
         if (parent)
-            parent->AddChild(ref);  // fully built -> safe to publish + notify
+            parent->AddChild(child);
         switch (mode) {
-            case CreateMode::Fresh:
-                ref.OnFresh();
-                break;
-            case CreateMode::Replicated:
-                ref.OnReplicated();
-                break;
-            case CreateMode::Loaded:
-                ref.OnLoaded();
-                break;
+        case CreateMode::Fresh:
+            child->OnFresh();
+            break;
+        case CreateMode::Replicated:
+            child->OnReplicated();
+            break;
+        case CreateMode::Loaded:
+            child->OnLoaded();
+            break;
         }
-        return ref;
+        return child;
     }
+
     virtual void Destroy() {}
-    void AddChild(Model &child) {
-        OnAddingChild(child);
-        children_.push_back(&child);
+
+    void AddChild(Ptr child) {
+        OnAddingChild(*child);
+        children_.push_back(std::move(child));
     }
-    void RemoveChild(Model &child) {
-        OnRemovingChild(child);
-        children_.erase(std::remove(children_.begin(), children_.end(), &child),
-                        children_.end());
+
+    bool RemoveChild(Model &child) {
+        auto it = std::find_if(children_.begin(), children_.end(),
+                               [&](const Ptr &p) { return p.get() == &child; });
+        if (it == children_.end())
+            return false;
+        OnRemovingChild(**it);
+        children_.erase(it);
+        return true;
     }
-    // Accessors
-    Model &parent() const { return *parent_; }
-    
+
+    Ptr DetachChild(Model &child) {
+        auto it = std::find_if(children_.begin(), children_.end(),
+                               [&](const Ptr &p) { return p.get() == &child; });
+        if (it == children_.end())
+            return nullptr;
+        OnRemovingChild(**it);
+        auto owned = std::move(*it);
+        children_.erase(it);
+        return owned;
+    }
+
+    Ptr parent() const { return parent_.lock(); }
+
     bool is_fresh() const { return create_mode_ == CreateMode::Fresh; }
-    bool is_replicated() const { return create_mode_ == CreateMode::Replicated; }
+    bool is_replicated() const {
+        return create_mode_ == CreateMode::Replicated;
+    }
     bool is_loaded() const { return create_mode_ == CreateMode::Loaded; }
 
 protected:
@@ -65,10 +88,9 @@ protected:
     virtual void OnRemovingChild(Model &child) {}
 
 public:
-    // Data members
-    Model *parent_ = nullptr;
+    WeakPtr parent_;
     CreateMode create_mode_ = CreateMode::Fresh;
-    std::vector<Model *> children_;
+    std::vector<Ptr> children_;
 
     static int next_id_;
     int id_ = 0;

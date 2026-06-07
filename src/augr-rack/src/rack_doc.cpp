@@ -38,7 +38,7 @@ bool RackToJson(Rack &rack, nlohmann::json &out_json) {
     return true;
 }
 
-std::unique_ptr<Rack> NewRack(const std::string &type_name,
+std::shared_ptr<Rack> NewRack(const std::string &type_name,
                               CreateMode mode = CreateMode::Fresh) {
     auto &mm = ModelManufacturer::singleton();
     ModelFactory *mf = mm.FindFactory(type_name);
@@ -47,16 +47,17 @@ std::unique_ptr<Rack> NewRack(const std::string &type_name,
                   << "'\n";
         return nullptr;
     }
-    Rack *raw = dynamic_cast<Rack *>(mf->Produce(nullptr, mode));
-    if (!raw) {
+    auto model = mf->Produce(nullptr, mode);
+    auto rack = std::dynamic_pointer_cast<Rack>(model);
+    if (!rack) {
         std::cerr << "Factory produced a non-Rack for type '" << type_name
                   << "'\n";
         return nullptr;
     }
-    return std::unique_ptr<Rack>(raw);
+    return rack;
 }
 
-std::unique_ptr<Rack> RackFromJson(const nlohmann::json &j) {
+std::shared_ptr<Rack> RackFromJson(const nlohmann::json &j) {
     if (!j.contains("type")) {
         std::cerr << "Rack JSON missing 'type' field\n";
         return nullptr;
@@ -83,8 +84,6 @@ std::unique_ptr<Rack> RackFromJson(const nlohmann::json &j) {
     return rack;
 }
 
-// Validates the envelope and returns a pointer to the rack subtree within it.
-// Accepts legacy bare-rack files (no "format" key) for backward compatibility.
 bool ParseEnvelope(const nlohmann::json &doc,
                    const nlohmann::json *&out_rack_json) {
     if (!doc.contains("format")) {
@@ -124,13 +123,11 @@ bool RackDoc::Save(const std::filesystem::path &p) {
         data_["version"] = kDocumentFormatVersion;
         data_["rack"] = std::move(rack_json);
 
-        // Let subscribers (e.g. frames) push live view state into views_.
         on_save();
 
         nlohmann::json views_json = nlohmann::json::object();
-        for (const auto &[uuid, view_json] : views_) {
+        for (const auto &[uuid, view_json] : views_)
             views_json[uuid] = view_json;
-        }
         data_["views"] = std::move(views_json);
 
         std::ofstream out(p);
@@ -152,10 +149,7 @@ bool RackDoc::Save(const std::filesystem::path &p) {
     }
 }
 
-// Stops the current rack, fires on_unload, installs the new rack, populates
-// data_, fires on_load, then clears data_. All rack replacement goes through
-// here so subscribers see a consistent sequence.
-void RackDoc::ReplaceRack(std::unique_ptr<Rack> fresh,
+void RackDoc::ReplaceRack(std::shared_ptr<Rack> fresh,
                           nlohmann::json envelope) {
     Stop();
     on_unload();
@@ -186,9 +180,8 @@ bool RackDoc::Load(const std::filesystem::path &p, bool auto_start) {
 
         views_.clear();
         if (doc.contains("views") && doc["views"].is_object()) {
-            for (auto &[uuid, view_json] : doc["views"].items()) {
+            for (auto &[uuid, view_json] : doc["views"].items())
                 views_[uuid] = view_json;
-            }
         }
 
         ReplaceRack(std::move(fresh), std::move(doc));
@@ -213,8 +206,6 @@ void RackDoc::NewDocument(bool auto_start) {
     ClearPath();
     MarkClean();
 
-    // Synthesize a minimal envelope so on_load subscribers see a consistent
-    // data_ shape (empty views, no rack content to read).
     nlohmann::json synthetic = nlohmann::json::object();
     synthetic["format"] = kDocumentFormatTag;
     synthetic["version"] = kDocumentFormatVersion;

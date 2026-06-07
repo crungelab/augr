@@ -26,7 +26,7 @@ public:
     }
 
     void CreateControls() override {
-        UiBuilder ui(*this);
+        UiBuilder ui(shared_from_this());
 
         auto cutoffParam = CreateFloatParameter(
             "Cutoff", ControlMeta::kDefault, &cutoff_, 2.f, -4.f, 6.f, 0.01f);

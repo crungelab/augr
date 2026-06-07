@@ -20,19 +20,20 @@ void Voice::OnFresh() {
     label_ = rack().voice_manager().AllocateUniqueName("Voice");
     rack().voice_manager().AddVoice(label_, this);
 
-    midi_in_module_ = &Model::Make<MidiInputModule>(this);
+    auto midi_in_module = Model::Make<MidiInputModule>(shared_from_this());
+    midi_in_module_ = midi_in_module.get();
     midi_in_ = midi_in_module_->midi_in_;
 
-    audio_out_module_ = &Model::Make<AudioOutputModule>(this);
+    auto audio_out_module = Model::Make<AudioOutputModule>(shared_from_this());
+    audio_out_module_ = audio_out_module.get();
     audio_out_ = audio_out_module_->audio_out_;
 
-    done_out_module_ = &Model::Make<CvOutputModule>(this);
+    auto done_out_module = Model::Make<CvOutputModule>(shared_from_this());
+    done_out_module_ = done_out_module.get();
     done_out_ = done_out_module_->cv_out_;
 }
 
-void Voice::OnLoaded() {
-    rack().voice_manager().AddVoice(label_, this);
-}
+void Voice::OnLoaded() { rack().voice_manager().AddVoice(label_, this); }
 
 void Voice::OnAddingIo(Io &io) {
     Subrack::OnAddingIo(io);
@@ -62,29 +63,15 @@ void Voice::OnRemovingIo(Io &io) {
 bool Voice::IsActive() const {
     auto env = done_out_->Read();
     if (env.Empty())
-        return false;                   // no envelope -> treat as free
-    constexpr fy_real kSilence = 1e-3f; // ~-60 dB; tune to taste
+        return false;
+    constexpr fy_real kSilence = 1e-3f;
     const auto &arr = env.array();
-    return arr[arr.size() - 1] > kSilence; // last sample = most recent state
+    return arr[arr.size() - 1] > kSilence;
 }
-
-/*
-bool Voice::IsActive() const {
-    // Low = done, high = still active.
-    auto voltage = done_out_->Read();
-
-    fy_real value = 0;
-    if (!voltage.Empty()) {
-        value = voltage.array()[0];
-    }
-    return value > 0.5f;
-}
-*/
 
 void Voice::DeliverMidi(const MidiMessage &msg) {
-    if (midi_in_module_) {
+    if (midi_in_module_)
         midi_in_module_->midi_out_->Write(msg);
-    }
 }
 
 } // namespace augr

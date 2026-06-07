@@ -21,7 +21,7 @@ public:
     ~RackDoc(); // out-of-line because Rack is forward-declared
 
     bool Save(const std::filesystem::path &p);
-    void ReplaceRack(std::unique_ptr<Rack> fresh, nlohmann::json envelope);
+    void ReplaceRack(std::shared_ptr<Rack> fresh, nlohmann::json envelope);
 
     bool Load(const std::filesystem::path &p, bool auto_start = true);
     void NewDocument(bool auto_start = true);

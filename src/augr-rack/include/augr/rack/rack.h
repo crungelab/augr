@@ -68,10 +68,10 @@ public:
     std::vector<std::function<void()>> pending_update_actions_;
 
     // Data members --- devices (virtual / boundary modules)
-    AudioInputDevice *audio_input_device_ = nullptr;
-    AudioOutputDevice *audio_output_device_ = nullptr;
-    MidiInputDevice *midi_input_device_ = nullptr;
-    MidiOutputDevice *midi_output_device_ = nullptr;
+    std::shared_ptr<AudioInputDevice> audio_input_device_;
+    std::shared_ptr<AudioOutputDevice> audio_output_device_;
+    std::shared_ptr<MidiInputDevice> midi_input_device_;
+    std::shared_ptr<MidiOutputDevice> midi_output_device_;
 
     REFLECT_ENABLE(Subrack)
 

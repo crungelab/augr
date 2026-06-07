@@ -10,11 +10,11 @@
 #include <utility>
 #include <vector>
 
+#include <augr/core/model.h>
+
 namespace augr {
 
-class Model;
-
-using ModuleResolver = std::function<void(Model *model)>;
+using ModuleResolver = std::function<void(Model *)>;
 
 class Archive {
 public:
@@ -31,18 +31,23 @@ public:
     void PushJson(nlohmann::json &j) { json_stack_.push_back(&j); }
     void PopJson() { json_stack_.pop_back(); }
 
-    void PushGraph(std::vector<Model *> modules) {
-        graph_stack_.push_back(std::move(modules));
+    void PushGraph(const std::vector<Model::Ptr> &modules) {
+        // Store raw non-owning pointers for index resolution.
+        std::vector<Model *> raw;
+        raw.reserve(modules.size());
+        for (const auto &m : modules)
+            raw.push_back(m.get());
+        graph_stack_.push_back(std::move(raw));
     }
+
     void PopGraph() { graph_stack_.pop_back(); }
 
     Model *ResolveModule(int index) const {
         if (graph_stack_.empty())
             return nullptr;
         const auto &current = graph_stack_.back();
-        if (index < 0 || index >= static_cast<int>(current.size())) {
+        if (index < 0 || index >= static_cast<int>(current.size()))
             return nullptr;
-        }
         return current[index];
     }
 
@@ -68,9 +73,8 @@ public:
         module_map_[uuid] = model;
         if (const auto it = module_resolver_map_.find(uuid);
             it != module_resolver_map_.end()) {
-            for (const auto &resolver : it->second) {
+            for (const auto &resolver : it->second)
                 resolver(model);
-            }
         }
     }
 
@@ -99,9 +103,9 @@ private:
 
 class GraphScope {
 public:
-    GraphScope(Archive &archive, std::vector<Model *> modules)
+    GraphScope(Archive &archive, const std::vector<Model::Ptr> &modules)
         : archive_(archive) {
-        archive_.PushGraph(std::move(modules));
+        archive_.PushGraph(modules);
     }
     ~GraphScope() { archive_.PopGraph(); }
     GraphScope(const GraphScope &) = delete;

@@ -22,7 +22,7 @@ public:
     }
 
     void CreateControls() override {
-        UiBuilder ui(*this);
+        UiBuilder ui(shared_from_this());
 
         auto levelParam = CreateFloatParameter("Level", ControlMeta::kDefault,
                                                &level_, 1.f, 0.f, 1.f, 0.01f);

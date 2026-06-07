@@ -1,4 +1,3 @@
-// ui_builder.h
 #pragma once
 
 #include <memory>
@@ -18,6 +17,7 @@ class EnumParameter;
 class UiBuilder {
 public:
     using ZoneBindingPtr = std::shared_ptr<BindingT<fy_real>>;
+
     // -------------------------------------------------------------------------
     // RAII box scope — returned by VBox/HBox/TabBox/FrameBox.
     // Calls CloseBox() on destruction, so nested layout works with auto _ = ...
@@ -29,12 +29,11 @@ public:
 
         explicit BoxScope(UiBuilder &b) : builder(b) {}
 
-        // Non-copyable, movable
         BoxScope(const BoxScope &) = delete;
         BoxScope &operator=(const BoxScope &) = delete;
         BoxScope(BoxScope &&other) noexcept
             : builder(other.builder), closed_(other.closed_) {
-            other.closed_ = true; // prevent double-close on move
+            other.closed_ = true;
         }
 
         ~BoxScope() {
@@ -49,8 +48,7 @@ public:
     // -------------------------------------------------------------------------
     // Construction
     // -------------------------------------------------------------------------
-    //UiBuilder() = default;
-    UiBuilder(Model &model);
+    explicit UiBuilder(Model::Ptr model);
 
     // -------------------------------------------------------------------------
     // High-level RAII layout — preferred for hand-written modules
@@ -71,72 +69,62 @@ public:
     void CloseBox();
 
     // -------------------------------------------------------------------------
-    // Sliders / knobs — return *this for chaining
+    // Sliders / knobs
     // -------------------------------------------------------------------------
     UiBuilder &Knob(const std::string &label, FloatParameter *param);
-
     UiBuilder &VSlider(const std::string &label, FloatParameter *param);
-
     UiBuilder &HSlider(const std::string &label, FloatParameter *param);
-
     UiBuilder &NumEntry(const std::string &label, FloatParameter *param);
 
     // -------------------------------------------------------------------------
-    // Buttons — return *this for chaining
+    // Buttons
     // -------------------------------------------------------------------------
     UiBuilder &Button(const std::string &label, FloatParameter *param);
-
     UiBuilder &CheckButton(const std::string &label, FloatParameter *param);
-
     UiBuilder &ToggleButton(const std::string &label, FloatParameter *param);
 
     // -------------------------------------------------------------------------
-    // Dropdowns / combos — return *this for chaining
+    // Dropdowns / combos
     // -------------------------------------------------------------------------
     UiBuilder &Combo(const std::string &label, EnumParameter *param);
 
     // -------------------------------------------------------------------------
-    // Displays — return *this for chaining
+    // Displays
     // -------------------------------------------------------------------------
-    UiBuilder &NumDisplay(const std::string &label, const ControlMeta meta, ZoneBindingPtr binding,
-                          int precision = 2);
-
-    UiBuilder &TextDisplay(const std::string &label, const ControlMeta meta, ZoneBindingPtr binding,
-                           char *names[], fy_real min, fy_real max);
+    UiBuilder &NumDisplay(const std::string &label, const ControlMeta meta,
+                          ZoneBindingPtr binding, int precision = 2);
+    UiBuilder &TextDisplay(const std::string &label, const ControlMeta meta,
+                           ZoneBindingPtr binding, char *names[], fy_real min,
+                           fy_real max);
 
     // -------------------------------------------------------------------------
-    // Bargraphs — return *this for chaining
-    // is_db: drives dB-scaled rendering; resolved by caller (e.g. FaustDspUi
-    // checks its zones_ map before calling, hand-written modules pass directly)
+    // Bargraphs
     // -------------------------------------------------------------------------
     UiBuilder &HBarGraph(const std::string &label, FloatParameter *param);
-
     UiBuilder &VBarGraph(const std::string &label, FloatParameter *param);
 
     // -------------------------------------------------------------------------
     // Result
-    // Returns the root Model* after building is complete.
-    // Ownership remains with the UiBuilder — transfer or clone as needed.
-    // Returns nullptr if no controls were added.
+    // Returns the root model after building is complete. May be null if no
+    // controls were added.
     // -------------------------------------------------------------------------
-    Model *root() const { return root_; }
+    Model::Ptr root() const {
+        return model_stack_.empty() ? nullptr : model_stack_.front();
+    }
 
     // -------------------------------------------------------------------------
     // Module label
-    // Typically set by FaustDspUi when it encounters the top-level box label.
-    // Hand-written modules can set this directly or ignore it.
     // -------------------------------------------------------------------------
     const std::string &module_label() const { return module_label_; }
     void set_module_label(const std::string &label) { module_label_ = label; }
 
 private:
-    void PushModel(Model &model);
-    Model *PopModel();
-    void AddModel(Model &model);
+    void PushModel(Model::Ptr model);
+    Model::Ptr PopModel();
 
-    std::vector<Model *> model_stack_;
-    Model *root_ = nullptr;
+    std::vector<Model::Ptr> model_stack_;
     std::string module_label_;
+    CreateMode create_mode_ = CreateMode::Fresh;
 };
 
 } // namespace augr

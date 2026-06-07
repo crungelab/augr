@@ -1,5 +1,5 @@
-#include <augr/core/model_factory.h>
 #include <augr/core/archiver_factory.h>
+#include <augr/core/model_factory.h>
 
 #include <augr/rack/rack.h>
 
@@ -10,9 +10,7 @@ namespace augr {
 
 Rack *Rack::singleton_;
 
-Rack::~Rack() {
-    Stop();
-}
+Rack::~Rack() { Stop(); }
 
 // ---------------------------------------------------------------------------
 // Default device set
@@ -36,9 +34,8 @@ void Rack::EnqueueAction(std::function<void()> action,
                          std::function<void()> update_action) {
     std::lock_guard lock(mutex_);
     pending_actions_.push_back(std::move(action));
-    if (update_action) {
+    if (update_action)
         pending_update_actions_.push_back(std::move(update_action));
-    }
 }
 
 void Rack::EnqueueUpdateAction(std::function<void()> action) {
@@ -72,41 +69,37 @@ void Rack::ProcessUpdateActions() {
 
 void Rack::OnAddingChild(Model &model) {
     Subrack::OnAddingChild(model);
-
-    if (auto *d = dynamic_cast<Device *>(&model)) {
+    if (auto *d = dynamic_cast<Device *>(&model))
         OnAddingDevice(*d);
-    }
 }
 
 void Rack::OnRemovingChild(Model &model) {
-    if (auto *d = dynamic_cast<Device *>(&model)) {
+    if (auto *d = dynamic_cast<Device *>(&model))
         OnRemovingDevice(*d);
-    }
     Subrack::OnRemovingChild(model);
 }
 
 void Rack::OnAddingDevice(Device &device) {
-    if (auto *audio_input = dynamic_cast<AudioInputDevice *>(&device)) {
-        audio_input_device_ = audio_input;
-    } else if (auto *audio_output =
-                   dynamic_cast<AudioOutputDevice *>(&device)) {
-        audio_output_device_ = audio_output;
-    } else if (auto *midi_input = dynamic_cast<MidiInputDevice *>(&device)) {
-        midi_input_device_ = midi_input;
-    } else if (auto *midi_output = dynamic_cast<MidiOutputDevice *>(&device)) {
-        midi_output_device_ = midi_output;
-    }
+    if (auto *p = dynamic_cast<AudioInputDevice *>(&device))
+        audio_input_device_.reset(p,
+                                  [](auto *) {}); // non-owning alias — see note
+    else if (auto *p = dynamic_cast<AudioOutputDevice *>(&device))
+        audio_output_device_.reset(p, [](auto *) {});
+    else if (auto *p = dynamic_cast<MidiInputDevice *>(&device))
+        midi_input_device_.reset(p, [](auto *) {});
+    else if (auto *p = dynamic_cast<MidiOutputDevice *>(&device))
+        midi_output_device_.reset(p, [](auto *) {});
 }
 
 void Rack::OnRemovingDevice(Device &device) {
-    if (audio_input_device_ == &device)
-        audio_input_device_ = nullptr;
-    if (audio_output_device_ == &device)
-        audio_output_device_ = nullptr;
-    if (midi_input_device_ == &device)
-        midi_input_device_ = nullptr;
-    if (midi_output_device_ == &device)
-        midi_output_device_ = nullptr;
+    if (audio_input_device_.get() == &device)
+        audio_input_device_.reset();
+    if (audio_output_device_.get() == &device)
+        audio_output_device_.reset();
+    if (midi_input_device_.get() == &device)
+        midi_input_device_.reset();
+    if (midi_output_device_.get() == &device)
+        midi_output_device_.reset();
 }
 
 // ---------------------------------------------------------------------------
@@ -114,32 +107,34 @@ void Rack::OnRemovingDevice(Device &device) {
 // ---------------------------------------------------------------------------
 
 bool Rack::CreateAudioInputDevice() {
-    audio_input_device_ = ModelFactoryT<AudioInputDevice>::Make(this);
+    audio_input_device_ =
+        ModelFactoryT<AudioInputDevice>::Make(shared_from_this());
     return true;
 }
 
 bool Rack::CreateAudioOutputDevice() {
-    audio_output_device_ = ModelFactoryT<AudioOutputDevice>::Make(this);
+    audio_output_device_ =
+        ModelFactoryT<AudioOutputDevice>::Make(shared_from_this());
     return true;
 }
 
 bool Rack::CreateMidiInputDevice() {
-    midi_input_device_ = ModelFactoryT<MidiInputDevice>::Make(this);
+    midi_input_device_ =
+        ModelFactoryT<MidiInputDevice>::Make(shared_from_this());
     return true;
 }
 
 bool Rack::CreateMidiOutputDevice() {
-    midi_output_device_ = ModelFactoryT<MidiOutputDevice>::Make(this);
+    midi_output_device_ =
+        ModelFactoryT<MidiOutputDevice>::Make(shared_from_this());
     return true;
 }
 
 void Rack::EnqueueMidiMessage(MidiMessage message) {
-    EnqueueAction([this, message = std::move(message)]() {
-        if (midi_input_device_) {
+    EnqueueAction([this, message]() {
+        if (midi_input_device_)
             midi_input_device_->midi_out_->Write(message);
-        }
     });
 }
-
 
 } // namespace augr

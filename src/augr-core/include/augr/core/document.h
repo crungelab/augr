@@ -57,7 +57,7 @@ template <typename T> class DocumentT : public Document {
 public:
     Model *model() override { return model_.get(); }
     // Data members
-    std::unique_ptr<T> model_;
+    std::shared_ptr<T> model_;
 };
 
 } // namespace augr

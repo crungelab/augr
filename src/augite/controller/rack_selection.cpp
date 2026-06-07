@@ -32,20 +32,25 @@ RackSelection::BuildSelectionJson(Subrack &subrack, SubrackView &view,
         nlohmann::json rack_json = nlohmann::json::object();
         Archive archive(rack_json);
 
-        // Construct a GraphArchiver bound to the source rack. We use it
-        // directly (not via the manufacturer) because we're calling its
-        // subset variants, not its full Save().
+        // Wrap the raw Model* selection into shared_ptr aliases so we can
+        // pass them to SaveChildren/SaveWires which expect vector<Model::Ptr>.
+        // No-op deleter — ownership stays with the subrack's children_ list.
+        std::vector<Model::Ptr> module_ptrs;
+        module_ptrs.reserve(modules.size());
+        for (Model *m : modules)
+            module_ptrs.push_back(Model::Ptr(m, [](Model *) {}));
+
         auto &mfr = ArchiverManufacturer::singleton();
         auto *factory = mfr.FindFactory(std::type_index(typeid(subrack)));
         if (factory) {
             std::unique_ptr<Archiver> archiver(factory->Produce(subrack));
             if (auto *graph_arc =
                     dynamic_cast<GraphArchiver *>(archiver.get())) {
-                graph_arc->SaveChildren(archive, modules);
-                graph_arc->SaveWires(archive, modules);
+                graph_arc->SaveChildren(archive, module_ptrs);
+                graph_arc->SaveWires(archive, module_ptrs);
             } else {
-                std::cerr << "BuildSelectionJson: archiver is not a "
-                             "GraphArchiver\n";
+                std::cerr
+                    << "BuildSelectionJson: archiver is not a GraphArchiver\n";
             }
         } else {
             std::cerr
@@ -55,8 +60,7 @@ RackSelection::BuildSelectionJson(Subrack &subrack, SubrackView &view,
         doc["rack"] = std::move(rack_json);
     }
 
-    // Build "view" subtree: parallel widgets, in the same order as the
-    // modules list so positional correspondence holds on paste.
+    // Build "view" subtree.
     {
         nlohmann::json view_json = nlohmann::json::object();
         Archive archive(view_json);
@@ -73,18 +77,17 @@ RackSelection::BuildSelectionJson(Subrack &subrack, SubrackView &view,
                              "SubrackViewArchiver\n";
             }
         } else {
-            std::cerr << "BuildSelectionJson: no archiver factory for "
-                         "view\n";
+            std::cerr << "BuildSelectionJson: no archiver factory for view\n";
         }
 
         doc["view"] = std::move(view_json);
     }
 
-    // After view subtree is built, before returning:
+    // Compute bounding-box origin of the selection for paste anchoring.
     if (!widgets.empty()) {
         bool first = true;
         Vec2 origin{0.0f, 0.0f};
-        for (auto &w : widgets) {
+        for (auto *w : widgets) {
             auto *mw = dynamic_cast<ModuleWidget *>(w);
             if (!mw)
                 continue;
@@ -96,9 +99,8 @@ RackSelection::BuildSelectionJson(Subrack &subrack, SubrackView &view,
                 origin.y = std::min(origin.y, mw->grid_position_.y);
             }
         }
-        if (!first) {
+        if (!first)
             doc["origin"] = nlohmann::json::array({origin.x, origin.y});
-        }
     }
 
     return doc;
@@ -113,9 +115,6 @@ RackSelection::MergeIntoRack(Subrack &dest, SubrackView &view,
     if (selection_json.value("version", 0) != 1)
         return {};
 
-    // Make local mutable copies of the rack and view subtrees so we can
-    // construct Archives over them. nlohmann's json is copyable; this is
-    // cheap for clipboard-sized payloads.
     nlohmann::json rack_j = selection_json["rack"];
     nlohmann::json view_j = selection_json.contains("view")
                                 ? selection_json["view"]
@@ -127,7 +126,7 @@ RackSelection::MergeIntoRack(Subrack &dest, SubrackView &view,
     // --- Load modules ---
     std::vector<Model *> loaded_models;
     if (rack_j.contains("children") && rack_j["children"].is_array()) {
-        Archive rack_archive(rack_j); // root = rack subtree
+        Archive rack_archive(rack_j);
 
         for (auto &j_child : rack_j["children"]) {
             if (!j_child.contains("type"))
@@ -138,11 +137,12 @@ RackSelection::MergeIntoRack(Subrack &dest, SubrackView &view,
             if (!mf)
                 continue;
 
-            Model &child = *mf->Produce(&dest);
+            auto child_ptr = mf->Produce(dest.shared_from_this());
+            Model *child = child_ptr.get();
 
             JsonScope scope(rack_archive, j_child);
-            am.Deserialize(rack_archive, child);
-            loaded_models.push_back(&child);
+            am.Deserialize(rack_archive, *child);
+            loaded_models.push_back(child);
         }
     }
 
@@ -192,25 +192,22 @@ RackSelection::MergeIntoRack(Subrack &dest, SubrackView &view,
             continue;
         }
         auto w = builder.Build(*module);
-        auto *mw = dynamic_cast<ModuleWidget *>(w.get()); // observe before move
-        if (mw) {
+        auto *mw = dynamic_cast<ModuleWidget *>(w.get());
+        if (mw)
             view.widget_map()[module->id_] = mw;
-        }
         view.root_->AddChild(std::move(w));
         loaded_widgets.push_back(mw);
     }
 
     // --- Load widget state ---
     if (view_j.contains("widgets") && view_j["widgets"].is_array()) {
-        Archive view_archive(view_j); // separate Archive over the view subtree
+        Archive view_archive(view_j);
 
         const auto &j_widgets = view_j["widgets"];
         size_t n = std::min(loaded_widgets.size(), j_widgets.size());
         for (size_t i = 0; i < n; ++i) {
             if (!loaded_widgets[i])
                 continue;
-            // const_cast needed because PushJson takes a non-const ref;
-            // load only reads.
             auto &j_w = const_cast<nlohmann::json &>(j_widgets[i]);
             JsonScope scope(view_archive, j_w);
             am.Deserialize(view_archive, *loaded_widgets[i]);
@@ -223,8 +220,8 @@ RackSelection::MergeIntoRack(Subrack &dest, SubrackView &view,
 
     std::vector<Model *> result;
     for (Model *m : loaded_models) {
-        if (auto *mod = dynamic_cast<Module *>(m))
-            result.push_back(mod);
+        if (dynamic_cast<Module *>(m))
+            result.push_back(m);
     }
     return result;
 }

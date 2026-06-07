@@ -8,36 +8,31 @@
 #include <set>
 #include <vector>
 
+#include <augr/core/model.h>
 #include <augr/core/ui/control/control_meta.h>
 
 #include "faust_ui.h"
-
-using namespace std;
 
 using Meta = augr::Meta;
 
 namespace augr {
 
-using ZoneMetaMap = map<FAUSTFLOAT *, ControlMeta>;
+using ZoneMetaMap = std::map<FAUSTFLOAT *, ControlMeta>;
 
-class Model;
 class Parameter;
 class FaustDsp;
 
-typedef pair<const char *, const char *> strpair;
+typedef std::pair<const char *, const char *> strpair;
 
 enum SliderKind { Vertical, Horizontal };
 
 class FaustDspUi : public UI {
 public:
     FaustDspUi(FaustDsp &m);
-    void PushModel(Model &model);
-    Model *PopModel();
-    void AddModel(Model &model);
 
     FloatParameter *MakeParameter(const char *label, float *zone, fy_real init,
-                             fy_real min, fy_real max, fy_real step);
-    // Builder methods
+                                  fy_real min, fy_real max, fy_real step);
+
     void declare(float *zone, const char *key, const char *value) override;
 
     void addButton(const char *label, float *zone) override;
@@ -52,7 +47,6 @@ public:
     void addNumEntry(const char *label, float *zone, float init, float min,
                      float max, float step) override;
 
-    // -- passive widgets
     void addNumDisplay(const char *label, float *zone, int precision) override;
     void addTextDisplay(const char *label, float *zone, char *names[],
                         float min, float max) override;
@@ -61,7 +55,6 @@ public:
     void addVerticalBargraph(const char *label, float *zone, float min,
                              float max) override;
 
-    // -- frames and labels
     void openFrameBox(const char *label) override;
     void openTabBox(const char *label) override;
     void openHorizontalBox(const char *label) override;
@@ -70,10 +63,14 @@ public:
 
     // Data members
     FaustDsp *m_;
-    map<int, list<strpair>> metadata_;
+    std::map<int, std::list<strpair>> metadata_;
     ZoneMetaMap zones_;
-    std::vector<Model *> model_stack_;
+    std::vector<Model::Ptr> model_stack_;
     bool is_top_ = true;
+
+private:
+    void PushModel(Model::Ptr model);
+    Model::Ptr PopModel();
 };
 
 } // namespace augr

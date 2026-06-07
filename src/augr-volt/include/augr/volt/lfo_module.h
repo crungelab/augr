@@ -23,7 +23,7 @@ public:
     }
 
     void CreateControls() override {
-        UiBuilder ui(*this);
+        UiBuilder ui(shared_from_this());
 
         auto rateParam = CreateFloatParameter(
             "Rate", ControlMeta::kDefault, &rate_, 0.f, -6.64f, 4.32f, 0.01f);

@@ -22,7 +22,7 @@ public:
     }
 
     void CreateControls() override {
-        UiBuilder ui(*this);
+        UiBuilder ui(shared_from_this());
         auto gainParam = CreateFloatParameter("Gain", ControlMeta::kDefault,
                                               &gain_, 1.f, 0.f, 1.f, 0.01f);
         ui.Knob("Gain", gainParam);
