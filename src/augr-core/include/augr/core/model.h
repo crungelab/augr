@@ -47,6 +47,24 @@ public:
         return child;
     }
 
+    template <class T, class... Args>
+    static std::shared_ptr<T>
+    MakeFresh(Ptr parent, Args &&...args) {
+        return Make<T>(parent, CreateMode::Fresh, std::forward<Args>(args)...);
+    }
+
+    template <class T, class... Args>
+    static std::shared_ptr<T>
+    MakeReplicated(Ptr parent, Args &&...args) {
+        return Make<T>(parent, CreateMode::Replicated, std::forward<Args>(args)...);
+    }
+
+    template <class T, class... Args>
+    static std::shared_ptr<T>
+    MakeLoaded(Ptr parent, Args &&...args) {
+        return Make<T>(parent, CreateMode::Loaded, std::forward<Args>(args)...);
+    }
+
     virtual void Destroy() {}
 
     void AddChild(Ptr child) {

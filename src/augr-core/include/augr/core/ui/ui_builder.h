@@ -124,7 +124,6 @@ private:
 
     std::vector<Model::Ptr> model_stack_;
     std::string module_label_;
-    CreateMode create_mode_ = CreateMode::Fresh;
 };
 
 } // namespace augr

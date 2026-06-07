@@ -38,21 +38,19 @@ Model::Ptr UiBuilder::PopModel() {
 // ---------------------------------------------------------------------------
 
 UiBuilder &UiBuilder::Button(const std::string &label, FloatParameter *param) {
-    Model::Make<augr::Button>(model_stack_.back(), create_mode_, label, param);
+    Model::MakeFresh<augr::Button>(model_stack_.back(), label, param);
     return *this;
 }
 
 UiBuilder &UiBuilder::ToggleButton(const std::string &label,
                                    FloatParameter *param) {
-    Model::Make<augr::ToggleButton>(model_stack_.back(), create_mode_, label,
-                                    param);
+    Model::MakeFresh<augr::ToggleButton>(model_stack_.back(), label, param);
     return *this;
 }
 
 UiBuilder &UiBuilder::CheckButton(const std::string &label,
                                   FloatParameter *param) {
-    Model::Make<augr::CheckButton>(model_stack_.back(), create_mode_, label,
-                                   param);
+    Model::MakeFresh<augr::CheckButton>(model_stack_.back(), label, param);
     return *this;
 }
 
@@ -61,7 +59,7 @@ UiBuilder &UiBuilder::CheckButton(const std::string &label,
 // ---------------------------------------------------------------------------
 
 UiBuilder &UiBuilder::Combo(const std::string &label, EnumParameter *param) {
-    Model::Make<augr::Combo>(model_stack_.back(), create_mode_, label, param);
+    Model::MakeFresh<augr::Combo>(model_stack_.back(), label, param);
     return *this;
 }
 
@@ -70,24 +68,23 @@ UiBuilder &UiBuilder::Combo(const std::string &label, EnumParameter *param) {
 // ---------------------------------------------------------------------------
 
 UiBuilder &UiBuilder::VSlider(const std::string &label, FloatParameter *param) {
-    Model::Make<augr::VSlider>(model_stack_.back(), create_mode_, label, param);
+    Model::MakeFresh<augr::VSlider>(model_stack_.back(), label, param);
     return *this;
 }
 
 UiBuilder &UiBuilder::HSlider(const std::string &label, FloatParameter *param) {
-    Model::Make<augr::HSlider>(model_stack_.back(), create_mode_, label, param);
+    Model::MakeFresh<augr::HSlider>(model_stack_.back(), label, param);
     return *this;
 }
 
 UiBuilder &UiBuilder::Knob(const std::string &label, FloatParameter *param) {
-    Model::Make<augr::Knob>(model_stack_.back(), create_mode_, label, param);
+    Model::MakeFresh<augr::Knob>(model_stack_.back(), label, param);
     return *this;
 }
 
 UiBuilder &UiBuilder::NumEntry(const std::string &label,
                                FloatParameter *param) {
-    Model::Make<augr::NumEntry>(model_stack_.back(), create_mode_, label,
-                                param);
+    Model::MakeFresh<augr::NumEntry>(model_stack_.back(), label, param);
     return *this;
 }
 
@@ -97,15 +94,13 @@ UiBuilder &UiBuilder::NumEntry(const std::string &label,
 
 UiBuilder &UiBuilder::HBarGraph(const std::string &label,
                                 FloatParameter *param) {
-    Model::Make<augr::HBarGraph>(model_stack_.back(), create_mode_, label,
-                                 param);
+    Model::MakeFresh<augr::HBarGraph>(model_stack_.back(), label, param);
     return *this;
 }
 
 UiBuilder &UiBuilder::VBarGraph(const std::string &label,
                                 FloatParameter *param) {
-    Model::Make<augr::VBarGraph>(model_stack_.back(), create_mode_, label,
-                                 param);
+    Model::MakeFresh<augr::VBarGraph>(model_stack_.back(), label, param);
     return *this;
 }
 
@@ -116,8 +111,7 @@ UiBuilder &UiBuilder::VBarGraph(const std::string &label,
 UiBuilder &UiBuilder::NumDisplay(const std::string &label,
                                  const ControlMeta meta, ZoneBindingPtr binding,
                                  const int precision) {
-    Model::Make<augr::NumDisplay>(model_stack_.back(), create_mode_, label,
-                                  meta, binding, precision);
+    Model::MakeFresh<augr::NumDisplay>(model_stack_.back(), label, meta, binding, precision);
     return *this;
 }
 
@@ -125,8 +119,7 @@ UiBuilder &UiBuilder::TextDisplay(const std::string &label,
                                   const ControlMeta meta,
                                   ZoneBindingPtr binding, char *names[],
                                   const float min, const float max) {
-    Model::Make<augr::TextDisplay>(model_stack_.back(), create_mode_, label,
-                                   meta, binding, names, min, max);
+    Model::MakeFresh<augr::TextDisplay>(model_stack_.back(), label, meta, binding, names, min, max);
     return *this;
 }
 

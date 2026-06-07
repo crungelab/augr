@@ -63,18 +63,18 @@ FloatParameter *FaustDspUi::MakeParameter(const char *label, float *zone,
 // ---------------------------------------------------------------------------
 
 void FaustDspUi::addButton(const char *label, float *zone) {
-    Model::Make<Button>(model_stack_.back(), CreateMode::Fresh, label,
-                        MakeParameter(label, zone, 0, 0, 1, 1));
+    Model::MakeFresh<Button>(model_stack_.back(), label,
+                             MakeParameter(label, zone, 0, 0, 1, 1));
 }
 
 void FaustDspUi::addToggleButton(const char *label, float *zone) {
-    Model::Make<ToggleButton>(model_stack_.back(), CreateMode::Fresh, label,
-                              MakeParameter(label, zone, 0, 0, 1, 1));
+    Model::MakeFresh<ToggleButton>(model_stack_.back(), label,
+                                   MakeParameter(label, zone, 0, 0, 1, 1));
 }
 
 void FaustDspUi::addCheckButton(const char *label, float *zone) {
-    Model::Make<CheckButton>(model_stack_.back(), CreateMode::Fresh, label,
-                             MakeParameter(label, zone, 0, 0, 1, 1));
+    Model::MakeFresh<CheckButton>(model_stack_.back(), label,
+                                  MakeParameter(label, zone, 0, 0, 1, 1));
 }
 
 // ---------------------------------------------------------------------------
@@ -85,28 +85,29 @@ void FaustDspUi::addVerticalSlider(const char *label, float *zone, float init,
                                    float min, float max, float step) {
     if (zones_[zone].IsKnob())
         return addKnob(label, zone, init, min, max, step);
-    Model::Make<VSlider>(model_stack_.back(), CreateMode::Fresh, label,
-                         MakeParameter(label, zone, init, min, max, step));
+    Model::MakeFresh<VSlider>(model_stack_.back(), label,
+                              MakeParameter(label, zone, init, min, max, step));
 }
 
 void FaustDspUi::addHorizontalSlider(const char *label, float *zone, float init,
                                      float min, float max, float step) {
     if (zones_[zone].IsKnob())
         return addKnob(label, zone, init, min, max, step);
-    Model::Make<HSlider>(model_stack_.back(), CreateMode::Fresh, label,
-                         MakeParameter(label, zone, init, min, max, step));
+    Model::MakeFresh<HSlider>(model_stack_.back(), label,
+                              MakeParameter(label, zone, init, min, max, step));
 }
 
 void FaustDspUi::addKnob(const char *label, float *zone, float init, float min,
                          float max, float step) {
-    Model::Make<Knob>(model_stack_.back(), CreateMode::Fresh, label,
-                      MakeParameter(label, zone, init, min, max, step));
+    Model::MakeFresh<Knob>(model_stack_.back(), label,
+                           MakeParameter(label, zone, init, min, max, step));
 }
 
 void FaustDspUi::addNumEntry(const char *label, float *zone, float init,
                              float min, float max, float step) {
-    Model::Make<NumEntry>(model_stack_.back(), CreateMode::Fresh, label,
-                          MakeParameter(label, zone, init, min, max, step));
+    Model::MakeFresh<NumEntry>(
+        model_stack_.back(), label,
+        MakeParameter(label, zone, init, min, max, step));
 }
 
 // ---------------------------------------------------------------------------
@@ -115,14 +116,14 @@ void FaustDspUi::addNumEntry(const char *label, float *zone, float init,
 
 void FaustDspUi::addHorizontalBargraph(const char *label, float *zone,
                                        float min, float max) {
-    Model::Make<HBarGraph>(model_stack_.back(), CreateMode::Fresh, label,
-                           MakeParameter(label, zone, min, min, max, 0));
+    Model::MakeFresh<HBarGraph>(model_stack_.back(), label,
+                                MakeParameter(label, zone, min, min, max, 0));
 }
 
 void FaustDspUi::addVerticalBargraph(const char *label, float *zone, float min,
                                      float max) {
-    Model::Make<VBarGraph>(model_stack_.back(), CreateMode::Fresh, label,
-                           MakeParameter(label, zone, min, min, max, 0));
+    Model::MakeFresh<VBarGraph>(model_stack_.back(), label,
+                                MakeParameter(label, zone, min, min, max, 0));
 }
 
 // ---------------------------------------------------------------------------
@@ -132,15 +133,15 @@ void FaustDspUi::addVerticalBargraph(const char *label, float *zone, float min,
 void FaustDspUi::addNumDisplay(const char *label, float *zone,
                                const int precision) {
     const auto meta = zones_[zone];
-    Model::Make<NumDisplay>(model_stack_.back(), CreateMode::Fresh, label, meta,
-                            MakePointerBinding(zone), precision);
+    Model::MakeFresh<NumDisplay>(model_stack_.back(), label, meta,
+                                 MakePointerBinding(zone), precision);
 }
 
 void FaustDspUi::addTextDisplay(const char *label, float *zone, char *names[],
                                 const float min, const float max) {
     const auto meta = zones_[zone];
-    Model::Make<TextDisplay>(model_stack_.back(), CreateMode::Fresh, label,
-                             meta, MakePointerBinding(zone), names, min, max);
+    Model::MakeFresh<TextDisplay>(model_stack_.back(), label, meta,
+                                  MakePointerBinding(zone), names, min, max);
 }
 
 // ---------------------------------------------------------------------------

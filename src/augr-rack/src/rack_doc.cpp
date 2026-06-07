@@ -21,7 +21,7 @@ constexpr const char *kDocumentFormatTag = "augr.document";
 constexpr int kDocumentFormatVersion = 1;
 
 bool RackToJson(Rack &rack, nlohmann::json &out_json) {
-    auto &manufacturer = ArchiverManufacturer::singleton();
+    const auto &manufacturer = ArchiverManufacturer::singleton();
     auto *factory = manufacturer.FindFactory(std::type_index(typeid(rack)));
     if (!factory) {
         std::cerr << "No archiver factory registered for type "
@@ -47,7 +47,7 @@ std::shared_ptr<Rack> NewRack(const std::string &type_name,
                   << "'\n";
         return nullptr;
     }
-    auto model = mf->Produce(nullptr, mode);
+    const auto model = mf->Produce(nullptr, mode);
     auto rack = std::dynamic_pointer_cast<Rack>(model);
     if (!rack) {
         std::cerr << "Factory produced a non-Rack for type '" << type_name
@@ -68,7 +68,7 @@ std::shared_ptr<Rack> RackFromJson(const nlohmann::json &j) {
     if (!rack)
         return nullptr;
 
-    auto &am = ArchiverManufacturer::singleton();
+    const auto &am = ArchiverManufacturer::singleton();
     ArchiverFactory *af = am.FindFactory(type_name);
     if (!af) {
         std::cerr << "No archiver factory registered for type '" << type_name
@@ -95,8 +95,8 @@ bool ParseEnvelope(const nlohmann::json &doc,
         std::cerr << "Unknown document format tag\n";
         return false;
     }
-    int version = doc.value("version", 0);
-    if (version <= 0 || version > kDocumentFormatVersion) {
+    if (const int version = doc.value("version", 0);
+        version <= 0 || version > kDocumentFormatVersion) {
         std::cerr << "Unsupported document version: " << version << "\n";
         return false;
     }
