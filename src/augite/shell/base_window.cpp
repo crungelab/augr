@@ -126,7 +126,7 @@ bool BaseWindow::PostRun(RunParams params)
     return true;
 }
 
-void BaseWindow::Destroy()
+void BaseWindow::OnDestroy()
 {
     DestroyContext();
 
@@ -136,6 +136,7 @@ void BaseWindow::Destroy()
         window_ = nullptr;
     }
     SDL_Quit();
+    Widget::OnDestroy();
 }
 
 void BaseWindow::RequestResize(int w, int h)

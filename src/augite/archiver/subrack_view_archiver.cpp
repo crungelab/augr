@@ -14,30 +14,28 @@
 
 namespace augr {
 
-void SubrackViewArchiver::Save(Archive& archive) const {
-    const SubrackView& view = subject();
+void SubrackViewArchiver::Save(Archive &archive) const {
+    const SubrackView &view = subject();
 
-    auto& j = archive.json();
+    auto &j = archive.json();
     j["type"] = factory_->type_name();
 
     // View-level state (pan, zoom, etc.) goes here in the future.
     // For now, just the widgets array.
 
     SaveWidgets(archive, view.root_->child_pointers());
-
 }
 
-void SubrackViewArchiver::SaveWidgets(Archive& archive, const std::vector<Widget *> &widgets) const {
-    const SubrackView& view = subject();
+void SubrackViewArchiver::SaveWidgets(
+    Archive &archive, const std::vector<Widget *> &widgets) const {
+    const SubrackView &view = subject();
 
-    auto& j = archive.json();
+    auto &j = archive.json();
 
-    // if (view.root_ == nullptr || view.root_->children_.empty()) return;
+    auto &j_widgets = j["widgets"] = nlohmann::json::array();
 
-    auto& j_widgets = j["widgets"] = nlohmann::json::array();
-
-    for (Widget* child : widgets) {
-        if (auto* module_widget = dynamic_cast<ModuleWidget*>(child)) {
+    for (Widget *child : widgets) {
+        if (auto *module_widget = dynamic_cast<ModuleWidget *>(child)) {
             if (module_widget->model().is_replicated()) {
                 // Don't save widgets for replicated modules
                 continue;
@@ -48,20 +46,28 @@ void SubrackViewArchiver::SaveWidgets(Archive& archive, const std::vector<Widget
             JsonScope scope(archive, j_widget);
             ArchiverManufacturer::singleton().Serialize(archive, *child);
         }
+
+        // Temporary: catch which widget produces bad UTF-8
+        try {
+            j_widget.dump();
+        } catch (const std::exception &e) {
+            std::cerr << "Bad UTF-8 in widget archiver for: "
+                      << typeid(*child).name() << " : " << e.what() << "\n";
+        }
+
         j_widgets.push_back(std::move(j_widget));
     }
 }
 
-void SubrackViewArchiver::Load(Archive& archive) {
-    LoadWidgets(archive);
-}
+void SubrackViewArchiver::Load(Archive &archive) { LoadWidgets(archive); }
 
-void SubrackViewArchiver::LoadWidgets(Archive& archive) {
-    const auto& j = archive.json();
-    SubrackView& view = subject();
+void SubrackViewArchiver::LoadWidgets(Archive &archive) {
+    const auto &j = archive.json();
+    SubrackView &view = subject();
 
-    if (!j.contains("widgets") || !j["widgets"].is_array()) return;
-    const auto& j_widgets = j["widgets"];
+    if (!j.contains("widgets") || !j["widgets"].is_array())
+        return;
+    const auto &j_widgets = j["widgets"];
 
     // Assumption: the rack has already been loaded, view.root_ has been
     // built via SubrackView::Build() — so widgets already exist parallel to
@@ -75,7 +81,7 @@ void SubrackViewArchiver::LoadWidgets(Archive& archive) {
         return;
     }
 
-    const auto& children = view.root_->children_;
+    const auto &children = view.root_->children_;
     const size_t n = std::min(children.size(), j_widgets.size());
     if (children.size() != j_widgets.size()) {
         // Could mean: rack loaded different children than the view JSON
@@ -86,14 +92,15 @@ void SubrackViewArchiver::LoadWidgets(Archive& archive) {
                   << "). Loading first " << n << ".\n";
     }
 
-    auto& mfr = ArchiverManufacturer::singleton();
+    auto &mfr = ArchiverManufacturer::singleton();
     for (size_t i = 0; i < n; ++i) {
-        const auto& j_widget = j_widgets[i];
-        if (!j_widget.contains("type")) continue;
+        const auto &j_widget = j_widgets[i];
+        if (!j_widget.contains("type"))
+            continue;
 
         // Optional: sanity-check the type tag matches what the widget
         // actually is. For now, just deserialize into whatever's there.
-        JsonScope scope(archive, const_cast<nlohmann::json&>(j_widget));
+        JsonScope scope(archive, const_cast<nlohmann::json &>(j_widget));
         mfr.Deserialize(archive, *children[i]);
     }
 }

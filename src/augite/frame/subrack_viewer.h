@@ -32,6 +32,7 @@ public:
     ~SubrackViewer();
 
     void Create(Widget *parent = nullptr) override;
+    void OnDestroy() override;
 
     virtual void OnLoaded();
 

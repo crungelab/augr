@@ -72,21 +72,29 @@ public:
         return owned;
     }
 
+    // Called synchronously at the start of Destroy() and DestroyChildren(),
+    // before the widget is detached from its parent or queued for deletion.
+    // Override to disconnect signals, release external resources, etc.
+    // Guaranteed to be called exactly once. The default is a no-op.
+    virtual void OnDestroy() {}
+
     // Schedule this widget (and its subtree) for destruction at the next
     // safe point in the main loop. Detaches from the parent immediately
     // so the widget stops being drawn or receiving events. Safe to call
     // from inside the widget's own event handlers.
-    virtual void Destroy() {
+    // Non-virtual: override OnDestroy() instead.
+    void Destroy() {
         if (destroying_)
             return;
         destroying_ = true;
+        OnDestroy();
 
         Ptr self;
         if (parent_) {
             self = parent_->RemoveChild(*this);
         }
         // If parent_ is null, this is either a top-level widget (App
-        // should override the path, see Frame::Destroy) or an orphan
+        // should arrange ScheduleDestroy directly, see Frame) or an orphan
         // the caller already owns. In the latter case the caller must
         // arrange for ScheduleDestroy itself; we can't take ownership
         // of `this` without a unique_ptr.
@@ -117,6 +125,7 @@ public:
             if (child->destroying_)
                 continue;
             child->destroying_ = true;
+            child->OnDestroy();
             child->parent_ = nullptr;
             queue.ScheduleDestroy(std::move(child));
         }

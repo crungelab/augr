@@ -91,7 +91,9 @@ void App::Draw() {
     if (inspector_dock_)
         inspector_dock_->Draw();
     BaseApp::Draw();
+
     ProcessPendingDestroy();
+    RunDeferred();
 }
 
 void App::Inspect(Model *model) {

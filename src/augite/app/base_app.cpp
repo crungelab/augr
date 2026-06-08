@@ -101,11 +101,11 @@ void BaseApp::Render() {
     SDL_SubmitGPUCommandBuffer(command_buffer);
 }
 
-void BaseApp::Destroy() {
+void BaseApp::OnDestroy() {
     // Cleanup
     ImGui_ImplSDLGPU3_Shutdown();
     ImGui_ImplSDL3_Shutdown();
-    Window::Destroy();
+    Window::OnDestroy();
 }
 
 } // namespace augr

@@ -8,11 +8,13 @@
 #include <augr/core/math/vec2.h>
 #include <augr/rack/module/module.h>
 
+#include "augr/rack/rack_doc.h"
 #include "widget.h"
 
 namespace augr {
 
-// class Module;
+class Document;
+class Frame;
 
 class ModuleWidget : public ModelWidget {
 public:
@@ -23,9 +25,18 @@ public:
     void ShowWindow() { is_open_ = true; }
     void HideWindow() { is_open_ = false; }
 
-    void DrawInspector();
+    void Draw() override;
+    void DrawNode();
+    virtual void DrawViewer();
 
-    virtual void DrawInspectorContent();
+    virtual void DrawNodeContent() {}
+    virtual void DrawView() { this->DrawChildren(); }
+
+    // Event handlers
+    virtual void OnLeftDoubleClick(RackDoc &doc, Frame &parent_frame) {
+        is_open_ = !is_open_;
+        window_pose_dirty_ = true;
+    }
 
     // Accessors
     Module &model() { return *static_cast<Module *>(model_); }
@@ -54,86 +65,7 @@ public:
 template <typename T>
 class ModuleWidgetT : public ModelWidgetT<T, ModuleWidget> {
 public:
-    explicit ModuleWidgetT(T &model) : ModelWidgetT<T, ModuleWidget>(model) { }
-
-    void Draw() override {
-        DrawNode();
-
-        // Always pull the latest ImNodes position back into the model so
-        // serialization sees current values. Cheap; runs every frame.
-        // (Pulled here rather than at editor level so each widget owns
-        // its own state.)
-        ImVec2 gp = ImNodes::GetNodeGridSpacePos(this->model().id_);
-        this->grid_position_ = ModuleWidget::FromImVec2(gp);
-
-        if (this->is_open_) {
-            DrawViewer();
-        }
-    }
-
-    void DrawNode() {
-        // Push persisted position on the first draw after load/spawn.
-        if (this->position_dirty_) {
-            ImNodes::SetNodeGridSpacePos(
-                this->model().id_,
-                ModuleWidget::ToImVec2(this->grid_position_));
-            this->position_dirty_ = false;
-        }
-
-        ImNodes::BeginNode(this->model().id_);
-
-        ImNodes::BeginNodeTitleBar();
-        ImGui::TextUnformatted(this->model().label_.c_str());
-        ImNodes::EndNodeTitleBar();
-
-        for (auto input : this->model().inport_.pins_) {
-            ImNodes::BeginInputAttribute(input->id_);
-            ImGui::TextUnformatted(input->name_.c_str());
-            ImNodes::EndInputAttribute();
-        }
-
-        DrawNodeContent();
-
-        for (auto output : this->model().outport_.pins_) {
-            ImNodes::BeginOutputAttribute(output->id_);
-            ImGui::Indent(40);
-            ImGui::TextUnformatted(output->name_.c_str());
-            ImNodes::EndOutputAttribute();
-        }
-
-        ImNodes::EndNode();
-    }
-
-    void DrawViewer() {
-        // Push persisted window pose on the first draw after load/open.
-        if (this->window_pose_dirty_) {
-            ImGui::SetNextWindowPos(
-                ModuleWidget::ToImVec2(this->window_position_));
-            ImGui::SetNextWindowSize(
-                ModuleWidget::ToImVec2(this->window_size_));
-            this->window_pose_dirty_ = false;
-        }
-
-        ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(8, 8));
-
-        if (ImGui::Begin(this->window_name_.c_str(), &this->is_open_)) {
-            ImGui::PushID(this->model_->id_);
-            this->DrawView();
-            ImGui::PopID();
-
-            // Pull current pose back so the next save sees latest.
-            this->window_position_ =
-                ModuleWidget::FromImVec2(ImGui::GetWindowPos());
-            this->window_size_ =
-                ModuleWidget::FromImVec2(ImGui::GetWindowSize());
-        }
-
-        ImGui::End();
-        ImGui::PopStyleVar();
-    }
-
-    virtual void DrawNodeContent() {}
-    virtual void DrawView() { this->DrawChildren(); }
+    explicit ModuleWidgetT(T &model) : ModelWidgetT<T, ModuleWidget>(model) {}
 };
 
 using DefaultModuleWidget = ModuleWidgetT<Module>;

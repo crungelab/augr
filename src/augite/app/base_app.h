@@ -11,7 +11,7 @@ public:
     BaseApp();
 
     bool DoCreate(CreateParams params) override;
-    void Destroy() override;
+    void OnDestroy() override;
 
     void Render() override;
 };

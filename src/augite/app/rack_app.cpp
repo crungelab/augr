@@ -16,13 +16,12 @@ RackApp::RackApp() {
     doc_ = std::make_unique<RackDoc>();
     on_doc_unload_conn_ = doc_->on_unload.connect([this]() {
         Inspect(nullptr);
+        if (root_frame_) {
+            root_frame_->DestroyChildren();
+        }
+        //ProcessPendingDestroy();
     });
     document().NewDocument();
-    /*
-    root_frame_ = std::make_unique<RackViewer>(*static_cast<RackDoc *>(doc_.get()), *static_cast<Rack *>(doc_->model()), "Rack");
-    root_frame_->Create();
-    set_active_frame(root_frame_.get());
-    */
 }
 
 bool RackApp::DoCreate(CreateParams params) {

@@ -2,6 +2,8 @@
 #include <augr/core/archiver.h>
 #include <augr/core/archiver_manufacturer.h>
 
+#include <augite/app/app.h>
+
 #include "subrack_viewer.h"
 
 #include <imgui.h>
@@ -21,6 +23,12 @@ SubrackViewer::SubrackViewer(RackDoc &doc, Subrack &subrack,
     on_doc_load_conn_ = doc_->on_load.connect([this]() {
         OnLoaded();
     });
+}
+
+void SubrackViewer::OnDestroy() {
+    on_doc_save_conn_.disconnect();
+    on_doc_load_conn_.disconnect();
+    DocumentViewer::OnDestroy();
 }
 
 SubrackViewer::~SubrackViewer() {
@@ -206,12 +214,25 @@ void SubrackViewer::StartSaveAsDialog() {
 }
 
 // ---------- Document operations ----------
-
+void SubrackViewer::DoNew() {
+    App::singleton().QueueAction([this]() { document().NewDocument(); });
+}
+/*
 void SubrackViewer::DoNew() {
     document().NewDocument();
     // Load hook fires from inside NewDocument and rebuilds the view.
 }
+*/
 
+void SubrackViewer::DoOpen(const std::filesystem::path &p) {
+    App::singleton().QueueAction([this, p]() {
+        if (!document().Load(p)) {
+            pfd::message("Load Failed", "Could not load: " + p.string(),
+                         pfd::choice::ok, pfd::icon::error);
+        }
+    });
+}
+/*
 void SubrackViewer::DoOpen(const std::filesystem::path &p) {
     if (!document().Load(p)) {
         pfd::message("Load Failed", "Could not load: " + p.string(),
@@ -219,6 +240,7 @@ void SubrackViewer::DoOpen(const std::filesystem::path &p) {
     }
     // Load hook handles RebuildView and view JSON deserialization.
 }
+*/
 
 void SubrackViewer::DoSave() {
     if (!document().Path())

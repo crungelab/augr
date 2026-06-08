@@ -14,9 +14,9 @@
 #include <augr/rack/subrack.h>
 #include <augr/rack/wire.h>
 
-#include <augite/frame/subrack_viewer.h>
+//#include <augite/frame/subrack_viewer.h>
 #include <augite/widget/module_widget.h>
-#include <augite/widget/subrack_widget.h>
+//#include <augite/widget/subrack_widget.h>
 #include <augite/widget/widget_builder.h>
 
 #include <augite/app/app.h>
@@ -165,7 +165,7 @@ void SubrackController::DeleteSelection() {
             continue;
 
         if (auto *mod = dynamic_cast<Module *>(&mw->model()))
-            //subrack().RemoveChild(*mod);
+            // subrack().RemoveChild(*mod);
             mod->Destroy();
         wmap.erase(it);
         widget->Destroy();
@@ -231,6 +231,26 @@ void SubrackController::CheckMouse() {
         if (ImGui::IsMouseDoubleClicked(ImGuiMouseButton_Left)) {
             const auto &wmap = view().widget_map();
             if (auto it = wmap.find(hovered_node_id_); it != wmap.end()) {
+                if (auto *mw = dynamic_cast<ModuleWidget *>(it->second)) {
+                    mw->OnLeftDoubleClick(document(), frame());
+                }
+            }
+        }
+
+        if (ImGui::IsMouseClicked(ImGuiMouseButton_Right))
+            ImGui::OpenPopup("node_ctx");
+    }
+}
+
+/*
+void SubrackController::CheckMouse() {
+    int node_id = -1;
+    if (ImNodes::IsNodeHovered(&node_id)) {
+        hovered_node_id_ = node_id;
+
+        if (ImGui::IsMouseDoubleClicked(ImGuiMouseButton_Left)) {
+            const auto &wmap = view().widget_map();
+            if (auto it = wmap.find(hovered_node_id_); it != wmap.end()) {
                 if (auto *mw = dynamic_cast<SubrackWidget *>(it->second)) {
                     auto *sr = &dynamic_cast<Subrack &>(mw->model());
                     auto *doc = dynamic_cast<RackDoc *>(doc_);
@@ -248,6 +268,7 @@ void SubrackController::CheckMouse() {
             ImGui::OpenPopup("node_ctx");
     }
 }
+*/
 
 void SubrackController::CheckKeyboard() {
     if (!view().is_editor_hovered() || ImGui::GetIO().WantTextInput)

@@ -90,7 +90,7 @@ public:
     //
     // Destroy
     //
-    virtual void Destroy();
+    void OnDestroy() override;
 
     //
     // Events
