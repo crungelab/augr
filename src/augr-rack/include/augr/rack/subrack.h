@@ -37,6 +37,9 @@ public:
     void OnAddingChild(Model &model) override;
     void OnRemovingChild(Model &model) override;
 
+    virtual void OnAddingModule(Module &module);
+    virtual void OnRemovingModule(Module &module);
+
     virtual void OnAddingIo(Io &io) {}
     virtual void OnRemovingIo(Io &io) {}
 

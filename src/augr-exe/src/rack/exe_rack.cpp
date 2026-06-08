@@ -1,15 +1,14 @@
 #include <spdlog/spdlog.h>
 
+#include <augr/core/archiver_factory.h>
 #include <augr/core/audio.h>
 #include <augr/core/model_factory.h>
-#include <augr/core/archiver_factory.h>
 
+#include <augr/rack/archiver/rack_archiver.h>
 #include <augr/rack/module/audio_device.h>
 #include <augr/rack/module/midi_device.h>
-#include <augr/rack/archiver/rack_archiver.h>
 
 #include <augr/exe/rack/exe_rack.h>
-
 
 #define SCALE 1.0
 
@@ -21,14 +20,17 @@ namespace augr {
 
 int ExeRack::ProcessAudio(double streamTime, void *inbuf, void *outbuf,
                           unsigned long frames) {
+
+    /*
     if (graph_dirty_)
         RebuildExecutionOrder();
-
+    */
+    Process();
     ProcessActions();
-
+    /*
     for (const auto &m : sorted_modules_)
         m->Process();
-
+    */
     Audio output = audio_output_device_->audio_in_->Read();
 
     if (output.layout() != ChannelLayout::kNull) {
@@ -89,7 +91,7 @@ void ExeRack::Stop() {
 } // namespace augr
 
 using namespace augr;
-//DEFINE_MODEL_FACTORY(ExeRack, "Rack", "Rack")
+// DEFINE_MODEL_FACTORY(ExeRack, "Rack", "Rack")
 DEFINE_MODEL_FACTORY(ExeRack, "Rack", "")
 
 class ExeRackArchiver : public RackArchiver {};

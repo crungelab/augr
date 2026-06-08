@@ -10,7 +10,9 @@ namespace augr {
 
 Rack *Rack::singleton_;
 
-Rack::~Rack() { Stop(); }
+Rack::~Rack() {
+    //Stop();
+}
 
 // ---------------------------------------------------------------------------
 // Default device set

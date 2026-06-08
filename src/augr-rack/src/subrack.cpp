@@ -113,6 +113,7 @@ void Subrack::RebuildExecutionOrder() {
 // Child management
 // ---------------------------------------------------------------------------
 
+/*
 void Subrack::OnAddingChild(Model &model) {
     Graph::OnAddingChild(model);
 
@@ -135,7 +136,38 @@ void Subrack::OnRemovingChild(Model &model) {
     }
     Graph::OnRemovingChild(model);
 }
+*/
 
+void Subrack::OnAddingChild(Model &model) {
+    Graph::OnAddingChild(model);
+
+    if (auto *m = dynamic_cast<Module *>(&model)) {
+        OnAddingModule(*m);
+    }
+    if (auto *d = dynamic_cast<Io *>(&model)) {
+        OnAddingIo(*d);
+    }
+}
+
+void Subrack::OnRemovingChild(Model &model) {
+    if (auto *m = dynamic_cast<Module *>(&model)) {
+        OnRemovingModule(*m);
+    }
+    if (auto *d = dynamic_cast<Io *>(&model)) {
+        OnRemovingIo(*d);
+    }
+    Graph::OnRemovingChild(model);
+}
+
+void Subrack::OnAddingModule(Module &module) {
+    AddModule(module);
+    graph_dirty_ = true;
+}
+
+void Subrack::OnRemovingModule(Module &module) {
+    RemoveModule(module);
+    graph_dirty_ = true;
+}
 // ---------------------------------------------------------------------------
 // Outer-rack lookup
 // ---------------------------------------------------------------------------
