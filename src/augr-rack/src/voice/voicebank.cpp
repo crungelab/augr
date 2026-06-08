@@ -67,14 +67,21 @@ void Voicebank::OnRemovingIo(Io &io) {
 void Voicebank::OnAddingVoice(Voice &voice) { replicas_.push_back(&voice); }
 
 void Voicebank::OnRemovingVoice(Voice &voice) {
+    // If the voice being removed is our master, clear the weak_ptr.
+    if (master_.lock().get() == &voice)
+        master_.reset();
+
     replicas_.erase(std::remove(replicas_.begin(), replicas_.end(), &voice),
                     replicas_.end());
 }
 
 void Voicebank::SetMaster(Voice *master) {
-    EnqueueAction([this, master]() {
-        master_ = master;
-        master_name_ = master ? master->label_ : std::string();
+    std::weak_ptr<Voice> weak;
+    if (master)
+        weak = std::dynamic_pointer_cast<Voice>(master->shared_from_this());
+
+    EnqueueAction([this, weak]() {
+        master_ = weak;
         RebuildReplicas(target_voice_count_);
     });
 }
@@ -86,24 +93,27 @@ void Voicebank::SetVoiceCount(int n) {
         return;
     EnqueueAction([this, n]() {
         target_voice_count_ = n;
-        if (master_)
+        if (!master_.expired())
             RebuildReplicas(n);
     });
 }
 
 void Voicebank::RebuildReplicas(int n) {
+    auto master = master_.lock();
+
     // Remove existing replica children (replicas_ is cleared via
     // OnRemovingVoice)
     while (!replicas_.empty())
-        RemoveChild(*replicas_.back());
+        //RemoveChild(*replicas_.back());
+        replicas_.back()->Destroy();
 
-    if (!master_)
+    if (!master)
         return;
 
     // Serialize master once, reuse for each replica.
     nlohmann::json master_json;
     Archive master_archive(master_json);
-    ArchiverManufacturer::singleton().Serialize(master_archive, *master_);
+    ArchiverManufacturer::singleton().Serialize(master_archive, *master);
 
     replicas_.reserve(n);
     for (int i = 0; i < n; ++i) {

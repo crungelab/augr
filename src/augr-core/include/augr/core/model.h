@@ -48,24 +48,28 @@ public:
     }
 
     template <class T, class... Args>
-    static std::shared_ptr<T>
-    MakeFresh(Ptr parent, Args &&...args) {
+    static std::shared_ptr<T> MakeFresh(Ptr parent, Args &&...args) {
         return Make<T>(parent, CreateMode::Fresh, std::forward<Args>(args)...);
     }
 
     template <class T, class... Args>
-    static std::shared_ptr<T>
-    MakeReplicated(Ptr parent, Args &&...args) {
-        return Make<T>(parent, CreateMode::Replicated, std::forward<Args>(args)...);
+    static std::shared_ptr<T> MakeReplicated(Ptr parent, Args &&...args) {
+        return Make<T>(parent, CreateMode::Replicated,
+                       std::forward<Args>(args)...);
     }
 
     template <class T, class... Args>
-    static std::shared_ptr<T>
-    MakeLoaded(Ptr parent, Args &&...args) {
+    static std::shared_ptr<T> MakeLoaded(Ptr parent, Args &&...args) {
         return Make<T>(parent, CreateMode::Loaded, std::forward<Args>(args)...);
     }
 
-    virtual void Destroy() {}
+    void Destroy() {
+        OnDestroy();
+        if (auto p = parent_.lock())
+            p->RemoveChild(*this);
+    }
+
+    virtual void OnDestroy() {}
 
     void AddChild(Ptr child) {
         OnAddingChild(*child);
@@ -78,19 +82,9 @@ public:
         if (it == children_.end())
             return false;
         OnRemovingChild(**it);
+        //(*it)->Destroy();
         children_.erase(it);
         return true;
-    }
-
-    Ptr DetachChild(Model &child) {
-        auto it = std::find_if(children_.begin(), children_.end(),
-                               [&](const Ptr &p) { return p.get() == &child; });
-        if (it == children_.end())
-            return nullptr;
-        OnRemovingChild(**it);
-        auto owned = std::move(*it);
-        children_.erase(it);
-        return owned;
     }
 
     Ptr parent() const { return parent_.lock(); }

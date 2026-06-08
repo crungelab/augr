@@ -165,7 +165,8 @@ void SubrackController::DeleteSelection() {
             continue;
 
         if (auto *mod = dynamic_cast<Module *>(&mw->model()))
-            subrack().RemoveChild(*mod);
+            //subrack().RemoveChild(*mod);
+            mod->Destroy();
         wmap.erase(it);
         widget->Destroy();
     }

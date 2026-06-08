@@ -12,6 +12,7 @@ class CvOutputModule;
 class Voice : public Subrack {
 public:
     Voice() = default;
+    void OnDestroy() override;
 
     void Create() override;
     void OnFresh() override;

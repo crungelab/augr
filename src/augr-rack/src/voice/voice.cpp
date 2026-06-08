@@ -11,6 +11,11 @@
 
 namespace augr {
 
+void Voice::OnDestroy() {
+    if (create_mode_ != CreateMode::Replicated)
+        rack().voice_manager().RemoveVoice(label_);
+}
+
 void Voice::Create() {
     Subrack::Create();
     label_ = "Voice";

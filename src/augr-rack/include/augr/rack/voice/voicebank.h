@@ -34,7 +34,10 @@ public:
 
     // -- Master selection ----------------------------------------------
     void SetMaster(Voice *master);
-    Voice *master() const { return master_; }
+    Voice *master() const {
+        auto sp = master_.lock();
+        return sp ? sp.get() : nullptr;
+    }
 
     // -- Voice management ----------------------------------------------
     void SetVoiceCount(int n);
@@ -66,10 +69,10 @@ private:
     MidiInputModule *midi_in_module_ = nullptr;
     AudioOutputModule *audio_out_module_ = nullptr;
 
-    // Non-owning reference to the master Voice (lives elsewhere in the rack).
-    Voice *master_ = nullptr;
-
-    std::string master_name_;
+    // Weak reference to the master Voice (lives elsewhere in the rack).
+    // Automatically becomes null if the master is destroyed, preventing
+    // dangling pointer access. Lock before use.
+    std::weak_ptr<Voice> master_;
 
     // Non-owning observers — owned as children by this Subrack.
     std::vector<Voice *> replicas_;
