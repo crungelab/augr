@@ -27,8 +27,7 @@ class SubrackViewer
 public:
     // doc: the project document (shared with the root RackViewer).
     // subrack: the specific Subrack this frame displays.
-    SubrackViewer(RackDoc &doc, Subrack &subrack,
-                  const std::string &label = "");
+    SubrackViewer(const std::string &label, RackDoc &doc, Subrack &subrack);
     ~SubrackViewer();
 
     void Create(Widget *parent = nullptr) override;

@@ -6,7 +6,7 @@ namespace augr {
 
 class RackViewer : public SubrackViewer {
 public:
-    RackViewer(RackDoc &doc, Rack &rack, const std::string &label = "");
+    RackViewer(const std::string &label, RackDoc &doc, Rack &rack);
     ~RackViewer() override;
 
     void OnLoaded() override;

@@ -10,19 +10,16 @@
 
 namespace augr {
 
-SubrackViewer::SubrackViewer(RackDoc &doc, Subrack &subrack,
-                           const std::string &label)
+SubrackViewer::SubrackViewer(const std::string &label, RackDoc &doc,
+                             Subrack &subrack)
     : DocumentViewerT<RackDoc, SubrackView, SubrackController>(label, doc),
       subrack_(&subrack) {
     // Install view hooks. The save hook pushes this frame's current
     // view state into views_; the load hook pulls it back out after
     // the doc has been replaced.
-    on_doc_save_conn_ = doc_->on_save.connect([this]() {
-        document().views_[subrack_->uuid()] = ViewToJson();
-    });
-    on_doc_load_conn_ = doc_->on_load.connect([this]() {
-        OnLoaded();
-    });
+    on_doc_save_conn_ = doc_->on_save.connect(
+        [this]() { document().views_[subrack_->uuid()] = ViewToJson(); });
+    on_doc_load_conn_ = doc_->on_load.connect([this]() { OnLoaded(); });
 }
 
 void SubrackViewer::OnDestroy() {
@@ -54,7 +51,8 @@ void SubrackViewer::RebuildView() {
     view_ = std::make_unique<SubrackView>(document());
     view().set_model(subrack());
     view().Build();
-    controller_ = std::make_unique<SubrackController>(document(), view(), *this);
+    controller_ =
+        std::make_unique<SubrackController>(document(), view(), *this);
     controller().set_model(subrack());
 
     // If we have a cached view state for this subrack, apply it.
@@ -193,8 +191,9 @@ void SubrackViewer::DrawMenuBar() {
 // ---------- Dialog launchers ----------
 
 void SubrackViewer::StartOpenDialog() {
-    std::string default_dir =
-        document().Path() ? document().Path()->parent_path().string() : pfd::path::home();
+    std::string default_dir = document().Path()
+                                  ? document().Path()->parent_path().string()
+                                  : pfd::path::home();
 
     open_dialog_ = std::make_unique<pfd::open_file>(
         "Open Rack", default_dir,

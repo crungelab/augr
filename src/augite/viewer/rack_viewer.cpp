@@ -9,8 +9,8 @@
 namespace augr {
 
 
-RackViewer::RackViewer(RackDoc &doc, Rack &rack, const std::string &label)
-    : SubrackViewer(doc, rack, label) {
+RackViewer::RackViewer(const std::string &label, RackDoc &doc, Rack &rack)
+    : SubrackViewer(label, doc, rack) {
 }
 
 RackViewer::~RackViewer() {

@@ -9,7 +9,7 @@ namespace augr {
 
 class Viewer : public Frame {
 public:
-    Viewer(const std::string &label = "") : Frame(label) {}
+    Viewer(const std::string &label) : Frame(label) {}
     virtual ~Viewer() = default;
 
     //void Draw() override;
@@ -31,7 +31,7 @@ template <typename TView, typename TController, typename TBase = Viewer>
 class ViewerT : public TBase {
 public:
     template <typename... Args>
-    ViewerT(const std::string &label = "", Args&&... args) : TBase(label, std::forward<Args>(args)...) {}
+    ViewerT(const std::string &label, Args&&... args) : TBase(label, std::forward<Args>(args)...) {}
     // Accessors
     TView &view() { return *static_cast<TView *>(this->view_.get()); }
     TController &controller() {

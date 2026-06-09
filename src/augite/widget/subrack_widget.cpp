@@ -20,7 +20,7 @@ void SubrackWidget::OnLeftDoubleClick(RackDoc &doc, Frame &parent_frame) {
     ModuleWidgetT<Subrack>::OnLeftDoubleClick(doc, parent_frame);
     if (is_open_ && !viewer_) {
         auto &sr = model();
-        viewer_ = new SubrackViewer(doc, sr, sr.label_);
+        viewer_ = new SubrackViewer(sr.label_, doc, sr);
         viewer_->Create(&parent_frame);
     } else if (!is_open_ && viewer_) {
         viewer_->Destroy();

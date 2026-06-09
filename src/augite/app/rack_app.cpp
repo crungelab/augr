@@ -27,7 +27,7 @@ RackApp::RackApp() {
 bool RackApp::DoCreate(CreateParams params) {
     bool success = FrameApp::DoCreate(params);
 
-    root_frame_ = std::make_unique<RackViewer>(*static_cast<RackDoc *>(doc_.get()), *static_cast<Rack *>(doc_->model()), "Rack");
+    root_frame_ = std::make_unique<RackViewer>("Rack", *static_cast<RackDoc *>(doc_.get()), *static_cast<Rack *>(doc_->model()));
     root_frame_->Create();
     set_active_frame(root_frame_.get());
 
