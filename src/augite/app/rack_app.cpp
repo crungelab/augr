@@ -3,7 +3,7 @@
 
 #include <augr/rack/rack.h>
 #include <augr/rack/rack_doc.h>
-#include "../frame/rack_viewer.h"
+#include "../viewer/rack_viewer.h"
 
 #include "rack_app.h"
 

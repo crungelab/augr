@@ -2,7 +2,7 @@
 
 #include <augr/rack/subrack.h>
 
-#include <augite/frame/subrack_viewer.h>
+#include <augite/viewer/subrack_viewer.h>
 
 #include "../archiver/module_widget_archiver.h"
 

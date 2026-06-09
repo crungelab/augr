@@ -14,9 +14,7 @@
 #include <augr/rack/subrack.h>
 #include <augr/rack/wire.h>
 
-//#include <augite/frame/subrack_viewer.h>
 #include <augite/widget/module_widget.h>
-//#include <augite/widget/subrack_widget.h>
 #include <augite/widget/widget_builder.h>
 
 #include <augite/app/app.h>

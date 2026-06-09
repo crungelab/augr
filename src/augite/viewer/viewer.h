@@ -3,7 +3,7 @@
 #include "../controller/controller.h"
 #include "../view/view.h"
 
-#include "frame.h"
+#include "../widget/frame.h"
 
 namespace augr {
 

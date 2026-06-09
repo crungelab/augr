@@ -3,7 +3,7 @@
 #include <memory>
 #include <vector>
 
-#include "../frame/frame.h"
+#include "../widget/frame.h"
 #include "../inspector/inspector_dock.h"
 #include "augr/core/document.h"
 

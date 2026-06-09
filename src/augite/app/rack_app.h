@@ -5,7 +5,7 @@
 #include "frame_app.h"
 
 #include "../controller/subrack_controller.h"
-#include "../frame/rack_viewer.h"
+#include "../viewer/rack_viewer.h"
 
 namespace augr {
 

@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.14)
 
-set(THIS AugiteFrame)
+set(THIS AugiteViewer)
 
 project(${THIS} CXX)
 
@@ -13,12 +13,12 @@ include(${AUGR_CMAKE}/ImPlot.cmake)
 include(${AUGR_CMAKE}/ImNodes.cmake)
 include(${AUGR_CMAKE}/ImKnobs.cmake)
 
-file(GLOB FRAME_SRC ${CMAKE_CURRENT_SOURCE_DIR}/*.cpp)
-file(GLOB FRAME_INCLUDE ${CMAKE_CURRENT_SOURCE_DIR}/*.h)
+file(GLOB VIEWER_SRC ${CMAKE_CURRENT_SOURCE_DIR}/*.cpp)
+file(GLOB VIEWER_INCLUDE ${CMAKE_CURRENT_SOURCE_DIR}/*.h)
 
 add_library(${PROJECT_NAME} STATIC
-  ${FRAME_SRC}
-  ${FRAME_INCLUDE}
+  ${VIEWER_SRC}
+  ${VIEWER_INCLUDE}
 )
 
 USES_AUGR_RACK(${THIS})

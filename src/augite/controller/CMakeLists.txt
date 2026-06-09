@@ -7,7 +7,7 @@ project(${THIS} CXX)
 include(${AUGR_CMAKE}/AugrRack.cmake)
 include(${AUGR_CMAKE}/Augite.cmake)
 include(${AUGR_CMAKE}/AugiteView.cmake)
-include(${AUGR_CMAKE}/AugiteFrame.cmake)
+include(${AUGR_CMAKE}/AugiteViewer.cmake)
 include(${AUGR_CMAKE}/AugiteInspector.cmake)
 
 include(${AUGR_CMAKE}/ImPlot.cmake)
@@ -25,7 +25,7 @@ add_library(${PROJECT_NAME} STATIC
 USES_AUGR_RACK(${THIS})
 USES_AUGITE(${THIS})
 USES_AUGITE_VIEW(${THIS})
-USES_AUGITE_FRAME(${THIS})
+USES_AUGITE_VIEWER(${THIS})
 USES_AUGITE_INSPECTOR(${THIS})
 
 USES_IMPLOT(${THIS})
