@@ -23,7 +23,7 @@ namespace augr {
 // Created when the user drills into a Subrack node in a parent frame.
 // Parented in the widget tree to whichever Frame initiated the drill-in.
 class SubrackViewer
-    : public DocumentViewerT<RackDoc, SubrackView, SubrackController> {
+    : public DocumentViewerT<RackDoc, Subrack, SubrackView, SubrackController> {
 public:
     // doc: the project document (shared with the root RackViewer).
     // subrack: the specific Subrack this frame displays.
@@ -60,12 +60,8 @@ public:
     };
 
     // Accessors
-    Subrack &subrack() { return *subrack_; }
-    const Subrack &subrack() const { return *subrack_; }
 
     // Data members
-    Subrack *subrack_;
-
     std::unique_ptr<pfd::open_file> open_dialog_;
     std::unique_ptr<pfd::save_file> save_dialog_;
 

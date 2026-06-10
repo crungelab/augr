@@ -20,7 +20,7 @@ public:
     // Accessors
     static RackApp &singleton() { return *singleton_; }
     RackDoc &document() { return static_cast<RackDoc &>(*doc_); }
-    Rack &rack() { return document().rack(); }
+    Rack &rack() { return document().model(); }
     SubrackController *active_controller() {
         return active_frame() ? &active_frame()->controller() : nullptr;
     }

@@ -17,7 +17,7 @@ RackViewer::~RackViewer() {
 }
 
 void RackViewer::OnLoaded() {
-    subrack_ = &document().rack();
+    set_model(document().model());
     SubrackViewer::OnLoaded();
 }
 

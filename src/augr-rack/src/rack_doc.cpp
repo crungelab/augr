@@ -115,7 +115,7 @@ RackDoc::~RackDoc() { Stop(); }
 bool RackDoc::Save(const std::filesystem::path &p) {
     try {
         nlohmann::json rack_json;
-        if (!RackToJson(rack(), rack_json))
+        if (!RackToJson(model(), rack_json))
             return false;
 
         data_ = nlohmann::json::object();

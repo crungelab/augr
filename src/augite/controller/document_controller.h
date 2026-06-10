@@ -8,7 +8,7 @@ template <typename TDoc, typename TView>
 class DocumentController : public ModelController {
 public:
     DocumentController(TDoc &doc, TView &view, Frame &frame)
-        : ModelController(*doc.model(), view, frame), doc_(&doc) {}
+        : ModelController(doc.model(), view, frame), doc_(&doc) {}
 
     TDoc &document() { return *doc_; }
     const TDoc &document() const { return *doc_; }

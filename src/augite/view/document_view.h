@@ -9,7 +9,7 @@ namespace augr {
 class DocumentView : public ModelView {
 public:
     explicit DocumentView(Document &doc)
-        : ModelView(*doc.model()), doc_(&doc) {}
+        : ModelView(doc.model()), doc_(&doc) {}
 
     Document *document() { return doc_; }
     const Document *document() const { return doc_; }

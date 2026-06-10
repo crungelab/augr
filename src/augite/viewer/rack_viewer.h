@@ -14,7 +14,7 @@ public:
     void Begin() override;
 
     // Accessors
-    Rack &rack() { return document().rack(); }
+    //Rack &rack() { return document().rack(); }
     // Data members
 };
 

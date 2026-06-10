@@ -30,10 +30,6 @@ public:
     void Stop();
     bool IsRunning() const;
 
-    Rack &rack() { return *model_; }
-    const Rack &rack() const { return *model_; }
-    bool HasRack() const { return model_ != nullptr; }
-
     void ClearViews() { views_.clear(); }
 
     // Document-level metadata. Anything not part of the rack itself lives
@@ -43,10 +39,6 @@ public:
     nlohmann::json &metadata() { return metadata_; }
     const nlohmann::json &metadata() const { return metadata_; }
 
-    // Convenience: get/set a top-level metadata subobject by key. Useful
-    // for "editor", "midi_learn", etc. without callers having to remember
-    // to ensure-object on first write.
-    nlohmann::json &MetadataSection(const std::string &key);
     // Per-subrack archived view state, keyed by Subrack::uuid().
     // Populated when SubrackFrames close (or at save time for open
     // frames), consumed when SubrackFrames open. Serialized as part

@@ -8,14 +8,14 @@
 #include <nlohmann/json.hpp>
 #include <sigslot/signal.hpp>
 
-namespace augr {
+#include "model.h"
 
-class Model;
+namespace augr {
 
 class Document {
 public:
     virtual ~Document() = default;
-    virtual Model *model() = 0;
+    //virtual Model &model() = 0;
     /*
     virtual bool Save(const std::filesystem::path&) = 0;
     virtual bool Load(const std::filesystem::path&) = 0;
@@ -34,9 +34,14 @@ public:
         return modified_ ? base + "*" : base;
     }
     // Accessors
+    Model &model() { return *model_; }
+    const Model &model() const { return *model_; }
+
     const nlohmann::json &data() const { return data_; }
     nlohmann::json &data() { return data_; }
+
     // Data members
+    Model::Ptr model_;
     sigslot::signal_st<> on_save;
     sigslot::signal_st<> on_unload;
     sigslot::signal_st<> on_load;
@@ -55,7 +60,7 @@ protected:
 
 template <typename T> class DocumentT : public Document {
 public:
-    Model *model() override { return model_.get(); }
+    T &model() { return *static_cast<T *>(model_.get()); }
     // Data members
     std::shared_ptr<T> model_;
 };

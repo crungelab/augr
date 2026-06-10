@@ -12,20 +12,21 @@ namespace augr {
 
 SubrackViewer::SubrackViewer(const std::string &label, RackDoc &doc,
                              Subrack &subrack)
-    : DocumentViewerT<RackDoc, SubrackView, SubrackController>(label, doc),
-      subrack_(&subrack) {
+    : DocumentViewerT<RackDoc, Subrack, SubrackView, SubrackController>(
+          label, doc, subrack) {
     // Install view hooks. The save hook pushes this frame's current
     // view state into views_; the load hook pulls it back out after
     // the doc has been replaced.
     on_doc_save_conn_ = doc_->on_save.connect(
-        [this]() { document().views_[subrack_->uuid()] = ViewToJson(); });
+        [this]() { document().views_[model().uuid()] = ViewToJson(); });
     on_doc_load_conn_ = doc_->on_load.connect([this]() { OnLoaded(); });
 }
 
 void SubrackViewer::OnDestroy() {
     on_doc_save_conn_.disconnect();
     on_doc_load_conn_.disconnect();
-    DocumentViewer::OnDestroy();
+    DocumentViewerT<RackDoc, Subrack, SubrackView,
+                    SubrackController>::OnDestroy();
 }
 
 SubrackViewer::~SubrackViewer() {
@@ -33,7 +34,7 @@ SubrackViewer::~SubrackViewer() {
         // Capture final view state before going away. Closing a frame
         // shouldn't discard its layout — the user might reopen this
         // subrack later in the session.
-        document().views_[subrack_->uuid()] = ViewToJson();
+        document().views_[model().uuid()] = ViewToJson();
     }
 }
 
@@ -49,14 +50,14 @@ void SubrackViewer::OnLoaded() {
 
 void SubrackViewer::RebuildView() {
     view_ = std::make_unique<SubrackView>(document());
-    view().set_model(subrack());
+    view().set_model(model());
     view().Build();
     controller_ =
         std::make_unique<SubrackController>(document(), view(), *this);
-    controller().set_model(subrack());
+    controller().set_model(model());
 
     // If we have a cached view state for this subrack, apply it.
-    auto it = document().views_.find(subrack_->uuid());
+    auto it = document().views_.find(model().uuid());
     if (it != document().views_.end()) {
         ViewFromJson(it->second);
     }
@@ -78,7 +79,7 @@ void SubrackViewer::Begin() {
     char title[128];
     std::snprintf(title, sizeof(title), "%s###subrack_%p",
                   label_.empty() ? "Subrack" : label_.c_str(),
-                  static_cast<void *>(subrack_));
+                  static_cast<void *>(&model()));
     bool p_open = true;
     ImGui::Begin(title, &p_open, ImGuiWindowFlags_NoCollapse);
     if (!p_open) {
