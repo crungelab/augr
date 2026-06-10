@@ -17,6 +17,9 @@ public:
     virtual Model::Ptr Produce(Model::Ptr parent = nullptr,
                                CreateMode mode = CreateMode::Fresh) = 0;
     virtual std::type_index GetKey() = 0;
+    // Accessors
+    const std::string &name() const { return name_; }
+    const std::string &category() const { return category_; }
     // Data members
     std::string name_;
     std::string category_;

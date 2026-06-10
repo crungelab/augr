@@ -11,7 +11,7 @@ void ModuleWidgetArchiver::Save(Archive& archive) const {
     auto& j = archive.json();
     const ModuleWidget& w = subject();
 
-    j["type"] = factory_->type_name();
+    j["type"] = factory_->name();
 
     j["grid_position"]   = { w.grid_position_.x,   w.grid_position_.y   };
     j["window_position"] = { w.window_position_.x, w.window_position_.y };

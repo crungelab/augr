@@ -6,6 +6,11 @@
 
 namespace augr {
 
+/*
+* DocumentViewer is a Viewer that's model is the same as the document's model
+* It is responsible for showing the menubar for the document
+*/
+
 class DocumentViewer : public Viewer {
 public:
     DocumentViewer(const std::string &label, Document &doc, Model &model) : Viewer(label, doc, model) {}

@@ -5,22 +5,18 @@
 #include <typeindex>
 #include <vector>
 
+#include <augr/core/manufacturer.h>
+
 namespace augr {
 
 class ModelWidgetFactory;
 
-class ModelWidgetManufacturer {
+class ModelWidgetManufacturer : public Manufacturer<ModelWidgetFactory> {
 public:
     static ModelWidgetManufacturer &singleton() noexcept {
         static ModelWidgetManufacturer *self = new ModelWidgetManufacturer();
         return *self;
     }
-    void AddFactory(ModelWidgetFactory &factory);
-    ModelWidgetFactory *GetFactory(std::type_index &key);
-    ModelWidgetFactory *FindFactory(const std::type_index &type);
-    // Data members
-    std::vector<ModelWidgetFactory *> factories_;
-    std::map<std::type_index, ModelWidgetFactory *> factory_type_map_;
 };
 
 #define REGISTER_MODEL_WIDGET_FACTORY(T)                                       \

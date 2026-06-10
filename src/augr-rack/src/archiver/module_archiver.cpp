@@ -14,7 +14,7 @@ void ModuleArchiver::Save(Archive &archive) const {
                      "supported use case and may produce unexpected results.\n";
     }
 
-    j["type"] = factory_->type_name();
+    j["type"] = factory_->name();
 
     // Persist the module's stable identity. Lazy-minted on first call,
     // so accessing uuid() here ensures every saved module has one.

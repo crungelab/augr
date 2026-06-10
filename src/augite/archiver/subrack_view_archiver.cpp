@@ -18,7 +18,7 @@ void SubrackViewArchiver::Save(Archive &archive) const {
     const SubrackView &view = subject();
 
     auto &j = archive.json();
-    j["type"] = factory_->type_name();
+    j["type"] = factory_->name();
 
     // View-level state (pan, zoom, etc.) goes here in the future.
     // For now, just the widgets array.

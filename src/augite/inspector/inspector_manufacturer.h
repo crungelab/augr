@@ -9,8 +9,6 @@
 
 namespace augr {
 
-class ModelWidgetFactory;
-
 class InspectorManufacturer : public ModelWidgetManufacturer {
 public:
     static InspectorManufacturer &singleton() noexcept {

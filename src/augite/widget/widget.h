@@ -195,6 +195,11 @@ public:
     // into the widget tree (typically via parent->AddChild(...)).
     virtual ModelWidget::Ptr Produce(Model &model) = 0;
     virtual std::type_index GetKey() = 0;
+    // Accessors
+    const std::string &name() const { return name_; }
+    // Data members
+private:
+    std::string name_;
 };
 
 template <typename T, typename N = Model>
