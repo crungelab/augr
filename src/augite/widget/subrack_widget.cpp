@@ -20,6 +20,6 @@ void SubrackWidget::DrawNodeContent() {
 DEFINE_MODEL_WIDGET_FACTORY(SubrackWidget, Subrack)
 
 class SubrackWidgetArchiver : public ModuleWidgetArchiver {};
-DEFINE_ARCHIVER_FACTORY(SubrackWidgetArchiver, SubrackWidget, "Widget.Subrack")
+DEFINE_ARCHIVER_FACTORY(SubrackWidgetArchiver, SubrackWidget, "SubrackWidget")
 
 } // namespace augr

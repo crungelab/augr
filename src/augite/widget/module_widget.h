@@ -16,8 +16,7 @@ class Frame;
 
 class ModuleWidget : public ModelWidget {
 public:
-    explicit ModuleWidget(Module &model) : ModelWidget(model) {
-    }
+    explicit ModuleWidget(Module &model) : ModelWidget(model) {}
 
     void Draw() override;
     void DrawNode();
@@ -44,7 +43,5 @@ class ModuleWidgetT : public ModelWidgetT<T, ModuleWidget> {
 public:
     explicit ModuleWidgetT(T &model) : ModelWidgetT<T, ModuleWidget>(model) {}
 };
-
-using DefaultModuleWidget = ModuleWidgetT<Module>;
 
 } // namespace augr

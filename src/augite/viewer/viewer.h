@@ -11,6 +11,8 @@ namespace augr {
 
 class Viewer : public Frame {
 public:
+    friend class ViewerArchiver;
+
     Viewer(const std::string &label, Document &doc, Model &model)
         : Frame(label), doc_(&doc), model_(&model) {}
     virtual ~Viewer() = default;

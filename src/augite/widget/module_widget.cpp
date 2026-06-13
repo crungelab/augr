@@ -82,6 +82,6 @@ void ModuleWidget::DrawViewer() {
 }
 */
 
-DEFINE_MODEL_WIDGET_FACTORY(DefaultModuleWidget, Module)
+DEFINE_MODEL_WIDGET_FACTORY(ModuleWidget, Module)
 
 } // namespace augr

@@ -1,4 +1,3 @@
-// augite/archiver/rack_view_archiver.cpp
 #include <iostream>
 
 #include <augite/archiver/subrack_view_archiver.h>
