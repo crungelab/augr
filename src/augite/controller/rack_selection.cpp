@@ -214,7 +214,6 @@ RackSelection::MergeIntoRack(Subrack &dest, SubrackView &view,
 
             loaded_widgets[i]->grid_position_ += paste_offset;
             loaded_widgets[i]->position_dirty_ = true;
-            loaded_widgets[i]->window_pose_dirty_ = true;
         }
     }
 

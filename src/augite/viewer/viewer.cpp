@@ -6,6 +6,21 @@
 
 namespace augr {
 
+void Viewer::Begin() {
+    // Use a unique ImGui window ID per viewer so multiple frames
+    // (different viewers) don't collide. The viewer pointer is stable
+    // for the frame's lifetime.
+    char title[128];
+    std::snprintf(title, sizeof(title), "%s###viewer_%p",
+                  label_.empty() ? "Viewer" : label_.c_str(),
+                  static_cast<void *>(&model()));
+    bool p_open = true;
+    ImGui::Begin(title, &p_open, ImGuiWindowFlags_NoCollapse);
+    if (!p_open) {
+        App::singleton().viewer_manager().CloseViewer(*this);
+    }
+}
+
 void Viewer::End() {
     if (view_) view_->Draw();
     if (ImGui::IsWindowFocused(ImGuiFocusedFlags_RootAndChildWindows)) {
@@ -15,21 +30,5 @@ void Viewer::End() {
 
     Frame::End();
 }
-
-/*
-void Frame::Draw() {
-    ImGui::Begin(label_.c_str());
-
-    if (view_) view_->Draw();
-    if (ImGui::IsWindowFocused(ImGuiFocusedFlags_RootAndChildWindows)) {
-        App::singleton().set_active_frame(this);
-        if (controller_) controller_->Control();
-    }
-    //if (controller_) controller_->Control();
-
-    DrawChildren();
-    ImGui::End();
-}
-*/
 
 } // namespace augr

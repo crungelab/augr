@@ -18,6 +18,8 @@ public:
     using WeakPtr = std::weak_ptr<Model>;
 
     Model() { id_ = next_id_++; }
+    Model(const std::string &label) : label_(label) { id_ = next_id_++; }
+    virtual ~Model() = default;
 
     virtual void Create() {}
     virtual void OnFresh() {}
@@ -87,6 +89,10 @@ public:
         return true;
     }
 
+    // Accessors
+    const std::string &label() const { return label_; }
+    void set_label(const std::string &label) { label_ = label; }
+
     Ptr parent() const { return parent_.lock(); }
 
     bool is_fresh() const { return create_mode_ == CreateMode::Fresh; }
@@ -100,6 +106,7 @@ protected:
     virtual void OnRemovingChild(Model &child) {}
 
 public:
+    std::string label_;
     WeakPtr parent_;
     CreateMode create_mode_ = CreateMode::Fresh;
     std::vector<Ptr> children_;

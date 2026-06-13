@@ -15,7 +15,7 @@ public:
         : Frame(label), doc_(&doc), model_(&model) {}
     virtual ~Viewer() = default;
 
-    // void Draw() override;
+    void Begin() override;
     void End() override;
 
     // Accessors
@@ -40,7 +40,7 @@ protected:
     std::unique_ptr<Controller> controller_;
 };
 
-template <typename TDoc, typename TModel, typename TView, typename TController,
+template <typename TDoc, typename TModel, typename TView, typename TController = Controller,
           typename TBase = Viewer>
 class ViewerT : public TBase {
 public:
@@ -72,31 +72,5 @@ public:
     //
     // Data members
 };
-
-// Factory for Viewer instances. Keyed on the model type so the
-// UI builder can look up the right viewer to produce for a given
-// model at runtime.
-class ViewerFactory {
-public:
-    virtual ~ViewerFactory() = default;
-    // Returns an owned widget. Caller is responsible for inserting it
-    // into the widget tree (typically via parent->AddChild(...)).
-    virtual Viewer::Ptr Produce(const std::string &label, Document &doc,
-                                Model &model) = 0;
-    virtual std::type_index GetKey() = 0;
-};
-
-template <typename T, typename N = Model>
-class ViewerFactoryT : public ViewerFactory {
-    Viewer::Ptr Produce(const std::string &label, Document &doc,
-                        Model &model) override {
-        return std::make_unique<T>(label, doc, static_cast<N &>(model));
-    }
-    std::type_index GetKey() override { return std::type_index(typeid(N)); }
-};
-
-#define DEFINE_VIEWER_FACTORY(T, N)                                            \
-    ViewerFactoryT<T, N> T##Factory;                                           \
-    ViewerFactory *Get##T##Factory() { return &T##Factory; }
 
 } // namespace augr

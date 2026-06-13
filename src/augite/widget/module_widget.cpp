@@ -16,10 +16,11 @@ void ModuleWidget::Draw() {
     // its own state.)
     ImVec2 gp = ImNodes::GetNodeGridSpacePos(this->model().id_);
     this->grid_position_ = ModuleWidget::FromImVec2(gp);
-
+    /*
     if (this->is_open_) {
         DrawViewer();
     }
+    */
 }
 
 void ModuleWidget::DrawNode() {
@@ -54,6 +55,7 @@ void ModuleWidget::DrawNode() {
     ImNodes::EndNode();
 }
 
+/*
 void ModuleWidget::DrawViewer() {
     // Push persisted window pose on the first draw after load/open.
     if (this->window_pose_dirty_) {
@@ -78,6 +80,7 @@ void ModuleWidget::DrawViewer() {
     ImGui::End();
     ImGui::PopStyleVar();
 }
+*/
 
 DEFINE_MODEL_WIDGET_FACTORY(DefaultModuleWidget, Module)
 

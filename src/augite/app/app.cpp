@@ -7,6 +7,9 @@
 
 #include "../widget/widget_manufacturer.h"
 
+#include "../viewer/viewer_manufacturer.h"
+#include "../viewer/viewer_factory.h"
+
 #include "../inspector/inspector_builder.h"
 #include "../inspector/inspector_manufacturer.h"
 
@@ -48,6 +51,11 @@ App::App() {
 
     REGISTER_INSPECTOR_FACTORY(ModuleInspector)
     REGISTER_INSPECTOR_FACTORY(VoicebankInspector)
+
+    REGISTER_VIEWER_FACTORY(ModuleViewer)
+    REGISTER_VIEWER_FACTORY(SubrackViewer)
+    REGISTER_VIEWER_FACTORY(ScopeViewer)
+    REGISTER_VIEWER_FACTORY(SpectralViewer)
 };
 
 void App::CreateContext() {

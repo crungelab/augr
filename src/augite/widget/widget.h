@@ -6,7 +6,10 @@
 #include <utility>
 #include <vector>
 
+#include <imgui.h>
+
 #include <augr/core/subject.h>
+#include <augr/core/math/vec2.h>
 
 namespace augr {
 
@@ -48,10 +51,7 @@ public:
     // parent takes ownership. If parent is null, the widget is left as
     // an orphan; the caller is responsible for handing ownership to App
     // (for top-level widgets) or destroying it.
-    virtual void Create(Widget *parent = nullptr) {
-        if (parent) {
-            parent->AddChild(Ptr(this));
-        }
+    virtual void Create() {
     }
 
     void AddChild(Ptr child) {
@@ -142,7 +142,18 @@ public:
             DrawChild(*child);
     }
 
-    virtual void DrawChild(Widget &child) { child.Draw(); }
+    virtual void DrawChild(Widget &child) {
+        /*
+        if (child.destroying_)
+            return;
+        */
+        child.Draw(); 
+    }
+
+    // Conversion helpers — keep Vec2 (ImGui-free) at the data layer
+    // and only touch ImVec2 at the draw boundary.
+    static ImVec2 ToImVec2(const Vec2 &v) { return ImVec2(v.x, v.y); }
+    static Vec2 FromImVec2(const ImVec2 &v) { return Vec2{v.x, v.y}; }
 
     // Accessors
     std::vector<Widget *> child_pointers() const {

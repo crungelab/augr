@@ -3,9 +3,11 @@
 #include <memory>
 #include <vector>
 
-#include "../widget/frame.h"
+#include <augr/core/document.h>
+
 #include "../inspector/inspector_dock.h"
-#include "augr/core/document.h"
+#include "../viewer/viewer_manager.h"
+#include "../widget/frame.h"
 
 #include "base_app.h"
 
@@ -32,7 +34,7 @@ public:
             action();
         deferred_actions_.clear();
     }
-    
+
     // Schedule a widget (and its subtree) for destruction at the next
     // safe point. Widget::Destroy() forwards here via GetDestroyQueue().
     // Safe to call from inside event handlers and draw code.
@@ -56,14 +58,19 @@ public:
         inspector_dock_ = std::move(insp);
     }
 
+    ViewerManager &viewer_manager() { return viewer_manager_; }
+
     // Data members
     static App *singleton_;
     std::unique_ptr<Document> doc_;
     std::unique_ptr<Frame> root_frame_;
     Frame *active_frame_ = nullptr; // last frame to have focus
     std::vector<std::unique_ptr<Widget>> pending_destroy_;
+    //
     std::unique_ptr<InspectorDock> inspector_dock_;
     Model *inspected_model_ = nullptr;
+    //
+    ViewerManager viewer_manager_;
 };
 
 } // namespace augr

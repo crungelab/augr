@@ -33,12 +33,13 @@ public:
     Widget* root_;
 };
 
-template <typename T> class ModelViewT : public ModelView {
+template <typename T, typename TBase = ModelView>
+class ModelViewT : public TBase {
 public:
-    explicit ModelViewT(T &model) : ModelView(model) {}
+    explicit ModelViewT(T &model) : TBase(model) {}
 
-    T *model() { return static_cast<T *>(model_); }
-    const T *model() const { return static_cast<const T *>(model_); }
+    T &model() { return *static_cast<T *>(this->model_); }
+    const T &model() const { return *static_cast<const T *>(this->model_); }
 };
 
 } // namespace augr

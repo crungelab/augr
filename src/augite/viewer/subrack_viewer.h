@@ -30,7 +30,7 @@ public:
     SubrackViewer(const std::string &label, RackDoc &doc, Subrack &subrack);
     ~SubrackViewer();
 
-    void Create(Widget *parent = nullptr) override;
+    void Create() override;
     void OnDestroy() override;
 
     virtual void OnLoaded();
@@ -38,7 +38,6 @@ public:
     virtual void RebuildView();
 
     void Draw() override;
-    void Begin() override;
 
     void PollPendingDialog();
     void DrawMenuBar();

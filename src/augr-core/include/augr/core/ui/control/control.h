@@ -16,18 +16,16 @@ class Control : public Model {
 public:
     Control() = default;
     Control(const std::string &label, ControlMeta meta = {})
-        : label_(label), meta_(meta),
+        : Model(label), meta_(meta),
           unit_(meta_.Unit()) {}
 
     virtual ~Control() = default;
 
     // Accessors
-    const std::string &label() const { return label_; }
     const ControlMeta &meta() const { return meta_; }
     ControlUnit unit() const { return unit_; }
 
     // Data members.
-    std::string label_;
     ControlMeta meta_;
     ControlUnit unit_ = ControlUnit::kNone;
 

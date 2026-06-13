@@ -19,7 +19,6 @@ RackApp::RackApp() {
         if (root_frame_) {
             root_frame_->DestroyChildren();
         }
-        //ProcessPendingDestroy();
     });
     document().NewDocument();
 }

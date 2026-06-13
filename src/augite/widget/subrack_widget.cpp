@@ -3,6 +3,7 @@
 #include <augr/rack/subrack.h>
 
 #include <augite/viewer/subrack_viewer.h>
+#include <augite/app/app.h>
 
 #include "../archiver/module_widget_archiver.h"
 
@@ -14,18 +15,6 @@ void SubrackWidget::DrawNodeContent() {
     ModuleWidgetT<Subrack>::DrawNodeContent();
     ImGui::Dummy(ImVec2(0, 0));
     // ImGui::Text("Subrack");
-}
-
-void SubrackWidget::OnLeftDoubleClick(RackDoc &doc, Frame &parent_frame) {
-    ModuleWidgetT<Subrack>::OnLeftDoubleClick(doc, parent_frame);
-    if (is_open_ && !viewer_) {
-        auto &sr = model();
-        viewer_ = new SubrackViewer(sr.label_, doc, sr);
-        viewer_->Create(&parent_frame);
-    } else if (!is_open_ && viewer_) {
-        viewer_->Destroy();
-        viewer_ = nullptr;
-    }
 }
 
 DEFINE_MODEL_WIDGET_FACTORY(SubrackWidget, Subrack)

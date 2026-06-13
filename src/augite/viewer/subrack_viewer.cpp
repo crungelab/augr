@@ -5,6 +5,7 @@
 #include <augite/app/app.h>
 
 #include "subrack_viewer.h"
+#include "viewer_factory.h"
 
 #include <imgui.h>
 
@@ -38,8 +39,8 @@ SubrackViewer::~SubrackViewer() {
     }
 }
 
-void SubrackViewer::Create(Widget *parent) {
-    Widget::Create(parent);
+void SubrackViewer::Create() {
+    Widget::Create();
     RebuildView();
 }
 
@@ -69,23 +70,7 @@ void SubrackViewer::Draw() {
         DrawMenuBar();
     }
     DrawUnsavedModal();
-    Frame::Draw();
-}
-
-void SubrackViewer::Begin() {
-    // Use a unique ImGui window ID per subrack so multiple frames
-    // (different subracks) don't collide. The subrack pointer is stable
-    // for the frame's lifetime.
-    char title[128];
-    std::snprintf(title, sizeof(title), "%s###subrack_%p",
-                  label_.empty() ? "Subrack" : label_.c_str(),
-                  static_cast<void *>(&model()));
-    bool p_open = true;
-    ImGui::Begin(title, &p_open, ImGuiWindowFlags_NoCollapse);
-    if (!p_open) {
-        // User closed the window; close the frame.
-        Destroy();
-    }
+    Viewer::Draw();
 }
 
 // ---------- Dialog polling ----------
@@ -330,5 +315,7 @@ void SubrackViewer::ViewFromJson(const nlohmann::json &j) {
     Archive archive(local);
     archiver->Load(archive);
 }
+
+DEFINE_VIEWER_FACTORY(SubrackViewer, RackDoc, Subrack)
 
 } // namespace augr

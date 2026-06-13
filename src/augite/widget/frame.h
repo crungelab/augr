@@ -17,6 +17,9 @@ public:
     bool is_active();
     // Data members
     std::string label_;
+    Vec2 window_position_ = {100.0f, 100.0f};
+    Vec2 window_size_ = {320.0f, 240.0f};
+    bool window_pose_dirty_ = true;
 };
 
 } // namespace augr

@@ -63,15 +63,11 @@ public:
     }
 
     // Accessors
-    const std::string &label() const { return label_; }
-    void set_label(const std::string &label) { label_ = label; }
-
     const std::vector<std::unique_ptr<Parameter>> &parameters() const {
         return parameters_;
     }
 
     // Data members
-    std::string label_;
     AudioInput *audio_in_ = nullptr;
     AudioOutput *audio_out_ = nullptr;
     MidiInput *midi_in_ = nullptr;
