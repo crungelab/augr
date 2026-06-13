@@ -6,6 +6,8 @@
 namespace augr {
 
 void ModuleArchiver::Save(Archive &archive) const {
+    Archiver::Save(archive);
+
     auto &j = archive.json();
     const Module &module = subject();
 
@@ -13,8 +15,6 @@ void ModuleArchiver::Save(Archive &archive) const {
         std::cerr << "Warning: Saving a replicated module — this is not a "
                      "supported use case and may produce unexpected results.\n";
     }
-
-    j["type"] = factory_->name();
 
     // Persist the module's stable identity. Lazy-minted on first call,
     // so accessing uuid() here ensures every saved module has one.

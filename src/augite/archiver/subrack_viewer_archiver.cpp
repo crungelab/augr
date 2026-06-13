@@ -6,10 +6,10 @@
 namespace augr {
 
 void SubrackViewerArchiver::Save(Archive &archive) const {
+    Archiver::Save(archive);
+
     const SubrackViewer &viewer = subject();
     auto &j = archive.json();
-
-    j["type"] = factory_->name();
 
     j["window_position"] = {viewer.window_position_.x,
                              viewer.window_position_.y};

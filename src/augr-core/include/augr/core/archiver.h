@@ -21,8 +21,8 @@ class Archiver {
 public:
     virtual ~Archiver() = default;
     virtual void Create(ArchiverFactory &factory, Subject &model) = 0;
-    virtual void Save(Archive &archive) const = 0;
-    virtual void Load(Archive &archive) = 0;
+    virtual void Save(Archive &archive) const;
+    virtual void Load(Archive &archive);
 
 protected:
     Subject *subject_ = nullptr;

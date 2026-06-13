@@ -8,14 +8,12 @@
 namespace augr {
 
 void ModuleWidgetArchiver::Save(Archive& archive) const {
+    Archiver::Save(archive);
+
     auto& j = archive.json();
     const ModuleWidget& w = subject();
 
-    j["type"] = factory_->name();
-
     j["grid_position"]   = { w.grid_position_.x,   w.grid_position_.y   };
-    //j["window_position"] = { w.window_position_.x, w.window_position_.y };
-    //j["window_size"]     = { w.window_size_.x,     w.window_size_.y     };
     j["window_open"]     = w.is_open_;
 }
 
@@ -31,8 +29,6 @@ void ModuleWidgetArchiver::Load(Archive& archive) {
     };
 
     if (j.contains("grid_position"))   read_vec2(j["grid_position"],   w.grid_position_);
-    //if (j.contains("window_position")) read_vec2(j["window_position"], w.window_position_);
-    //if (j.contains("window_size"))     read_vec2(j["window_size"],     w.window_size_);
     if (j.contains("window_open"))     w.is_open_ = j["window_open"].get<bool>();
 }
 
