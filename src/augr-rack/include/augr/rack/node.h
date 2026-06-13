@@ -14,11 +14,6 @@ public:
     Node() {}
     Node(Graph &graph);
 
-    // -- Identity -------------------------------------------------------
-    const std::string &uuid() const;
-    void RegenerateUuid();
-    void set_uuid(std::string uuid) { uuid_ = std::move(uuid); }
-
     // Pins
     void AddInput(Pin &input);
     void AddOutput(Pin &output);
@@ -29,7 +24,6 @@ public:
 
 
     // Data members
-    mutable std::string uuid_;
     Inport inport_;
     Outport outport_;
 

@@ -4,11 +4,6 @@
 
 namespace augr {
 
-void SpectralViewer::Create() {
-    Widget::Create();
-    RebuildView();
-}
-
 void SpectralViewer::RebuildView() {
     view_ = std::make_unique<SpectralView>(model());
     view().set_model(model());

@@ -15,36 +15,9 @@ SubrackViewer::SubrackViewer(const std::string &label, RackDoc &doc,
                              Subrack &subrack)
     : DocumentViewerT<RackDoc, Subrack, SubrackView, SubrackController>(
           label, doc, subrack) {
-    on_doc_save_conn_ = doc_->on_save.connect([this]() {
-        SaveViewerState();
-    });
-    on_doc_load_conn_ = doc_->on_load.connect([this]() { OnLoaded(); });
-}
-
-void SubrackViewer::OnDestroy() {
-    on_doc_save_conn_.disconnect();
-    on_doc_load_conn_.disconnect();
-    DocumentViewerT<RackDoc, Subrack, SubrackView,
-                    SubrackController>::OnDestroy();
 }
 
 SubrackViewer::~SubrackViewer() {
-    if (doc_) {
-        // Capture final view state before going away. Closing a frame
-        // shouldn't discard its layout — the user might reopen this
-        // subrack later in the session.
-        SaveViewerState();
-    }
-}
-
-void SubrackViewer::Create() {
-    Widget::Create();
-    RebuildView();
-}
-
-void SubrackViewer::OnLoaded() {
-    DestroyChildren();
-    RebuildView();
 }
 
 void SubrackViewer::RebuildView() {
@@ -54,24 +27,6 @@ void SubrackViewer::RebuildView() {
     controller_ =
         std::make_unique<SubrackController>(document(), view(), *this);
     controller().set_model(model());
-
-    RestoreViewerState();
-}
-
-void SubrackViewer::SaveViewerState() {
-    nlohmann::json out;
-    Archive archive(out);
-    ArchiverManufacturer::singleton().Serialize(archive, *this);
-    document().viewers_[model().uuid()] = std::move(out);
-}
-
-void SubrackViewer::RestoreViewerState() {
-    auto it = document().viewers_.find(model().uuid());
-    if (it == document().viewers_.end())
-        return;
-
-    Archive archive(it->second);
-    ArchiverManufacturer::singleton().Deserialize(archive, *this);
 }
 
 void SubrackViewer::Draw() {

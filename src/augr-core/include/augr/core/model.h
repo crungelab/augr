@@ -21,6 +21,11 @@ public:
     Model(const std::string &label) : label_(label) { id_ = next_id_++; }
     virtual ~Model() = default;
 
+    // -- Identity -------------------------------------------------------
+    const std::string &uuid() const;
+    void RegenerateUuid();
+    void set_uuid(std::string uuid) { uuid_ = std::move(uuid); }
+
     virtual void Create() {}
     virtual void OnFresh() {}
     virtual void OnReplicated() {}
@@ -105,7 +110,9 @@ protected:
     virtual void OnAddingChild(Model &child) {}
     virtual void OnRemovingChild(Model &child) {}
 
+    // Data members
 public:
+    mutable std::string uuid_;
     std::string label_;
     WeakPtr parent_;
     CreateMode create_mode_ = CreateMode::Fresh;

@@ -8,11 +8,6 @@
 
 namespace augr {
 
-void ModuleViewer::Create() {
-    Widget::Create();
-    RebuildView();
-}
-
 void ModuleViewer::RebuildView() {
     view_ = std::make_unique<ModuleView>(model());
     view().set_model(model());

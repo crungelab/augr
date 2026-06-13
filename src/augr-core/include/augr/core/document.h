@@ -46,6 +46,15 @@ public:
     sigslot::signal_st<> on_unload;
     sigslot::signal_st<> on_load;
 
+    void ClearViewers() { viewers_.clear(); }
+
+    // Per-subrack archived view state, keyed by Subrack::uuid().
+    // Populated when SubrackFrames close (or at save time for open
+    // frames), consumed when SubrackFrames open. Serialized as part
+    // of the document envelope.
+    std::unordered_map<std::string, nlohmann::json> viewers_;
+
+
 protected:
     void SetPath(std::filesystem::path p) { path_ = std::move(p); }
     void ClearPath() { path_.reset(); }

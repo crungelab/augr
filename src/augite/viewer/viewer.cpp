@@ -1,3 +1,7 @@
+#include <augr/core/archive.h>
+#include <augr/core/archiver.h>
+#include <augr/core/archiver_manufacturer.h>
+
 #include "../app/app.h"
 
 #include "viewer.h"
@@ -5,6 +9,56 @@
 #include "imgui.h"
 
 namespace augr {
+
+Viewer::Viewer(const std::string &label, Document &doc, Model &model)
+    : Frame(label), doc_(&doc), model_(&model) {
+    on_doc_save_conn_ = doc_->on_save.connect([this]() { SaveViewerState(); });
+    on_doc_load_conn_ = doc_->on_load.connect([this]() { OnLoaded(); });
+}
+
+Viewer::~Viewer() {
+    if (doc_) {
+        // Capture final viewer state before going away. Closing a frame
+        // shouldn't discard its layout — the user might reopen this
+        // subrack later in the session.
+        // SaveViewerState();
+    }
+}
+
+void Viewer::Create() {
+    Frame::Create();
+    RebuildView();
+    RestoreViewerState();
+}
+
+void Viewer::OnDestroy() {
+    SaveViewerState();
+    on_doc_save_conn_.disconnect();
+    on_doc_load_conn_.disconnect();
+    Frame::OnDestroy();
+}
+
+void Viewer::OnLoaded() {
+    DestroyChildren();
+    RebuildView();
+    RestoreViewerState();
+}
+
+void Viewer::SaveViewerState() {
+    nlohmann::json out;
+    Archive archive(out);
+    ArchiverManufacturer::singleton().Serialize(archive, *this);
+    document().viewers_[model().uuid()] = std::move(out);
+}
+
+void Viewer::RestoreViewerState() {
+    auto it = document().viewers_.find(model().uuid());
+    if (it == document().viewers_.end())
+        return;
+
+    Archive archive(it->second);
+    ArchiverManufacturer::singleton().Deserialize(archive, *this);
+}
 
 void Viewer::Begin() {
     // Use a unique ImGui window ID per viewer so multiple frames
@@ -22,10 +76,12 @@ void Viewer::Begin() {
 }
 
 void Viewer::End() {
-    if (view_) view_->Draw();
+    if (view_)
+        view_->Draw();
     if (ImGui::IsWindowFocused(ImGuiFocusedFlags_RootAndChildWindows)) {
         App::singleton().set_active_frame(this);
-        if (controller_) controller_->Control();
+        if (controller_)
+            controller_->Control();
     }
 
     Frame::End();

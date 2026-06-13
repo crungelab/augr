@@ -3,7 +3,6 @@
 #include <string>
 
 #include <portable-file-dialogs.h>
-#include <sigslot/signal.hpp>
 
 #include <augr/rack/rack_doc.h>
 #include <augr/rack/subrack.h>
@@ -31,12 +30,7 @@ public:
     SubrackViewer(const std::string &label, RackDoc &doc, Subrack &subrack);
     ~SubrackViewer();
 
-    void Create() override;
-    void OnDestroy() override;
-
-    virtual void OnLoaded();
-
-    virtual void RebuildView();
+    void RebuildView() override;
 
     void Draw() override;
 
@@ -67,14 +61,6 @@ public:
 
     PendingAction pending_ = PendingAction::None;
     bool show_unsaved_modal_ = false;
-
-protected:
-    // View serialization (called from doc hooks).
-    void SaveViewerState();
-    void RestoreViewerState();
-
-    sigslot::scoped_connection on_doc_save_conn_;
-    sigslot::scoped_connection on_doc_load_conn_;
 };
 
 } // namespace augr

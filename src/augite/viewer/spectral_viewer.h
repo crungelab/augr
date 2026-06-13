@@ -10,9 +10,8 @@ namespace augr {
 class SpectralViewer : public ViewerT<RackDoc, SpectralModule, SpectralView> {
 public:
     using ViewerT<RackDoc, SpectralModule, SpectralView>::ViewerT;
-    void Create() override;
 
-    virtual void RebuildView();
+    void RebuildView() override;
 };
 
 } // namespace augr

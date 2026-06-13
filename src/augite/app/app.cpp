@@ -34,6 +34,7 @@ App::App() {
     REGISTER_ARCHIVER_FACTORY(SubrackViewArchiver)
 
     REGISTER_ARCHIVER_FACTORY(ViewerArchiver);
+    REGISTER_ARCHIVER_FACTORY(ModuleViewerArchiver);
     REGISTER_ARCHIVER_FACTORY(SubrackViewerArchiver);
     REGISTER_ARCHIVER_FACTORY(RackViewerArchiver);
 

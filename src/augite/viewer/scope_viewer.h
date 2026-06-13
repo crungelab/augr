@@ -10,9 +10,8 @@ namespace augr {
 class ScopeViewer : public ViewerT<RackDoc, ScopeModule, ScopeView> {
 public:
     using ViewerT<RackDoc, ScopeModule, ScopeView>::ViewerT;
-    void Create() override;
 
-    virtual void RebuildView();
+    void RebuildView() override;
 };
 
 } // namespace augr

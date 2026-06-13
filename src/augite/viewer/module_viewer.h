@@ -9,9 +9,8 @@ namespace augr {
 class ModuleViewer : public ViewerT<RackDoc, Module, ModuleView> {
 public:
     using ViewerT<RackDoc, Module, ModuleView>::ViewerT;
-    void Create() override;
 
-    virtual void RebuildView();
+    void RebuildView() override;
 };
 
 } // namespace augr

@@ -1,5 +1,7 @@
 #pragma once
 
+#include <sigslot/signal.hpp>
+
 #include <augr/core/document.h>
 
 #include "../controller/controller.h"
@@ -13,9 +15,14 @@ class Viewer : public Frame {
 public:
     friend class ViewerArchiver;
 
-    Viewer(const std::string &label, Document &doc, Model &model)
-        : Frame(label), doc_(&doc), model_(&model) {}
-    virtual ~Viewer() = default;
+    Viewer(const std::string &label, Document &doc, Model &model);
+    virtual ~Viewer();
+
+    void Create() override;
+    void OnDestroy() override;
+
+    virtual void OnLoaded();
+    virtual void RebuildView() {}
 
     void Begin() override;
     void End() override;
@@ -40,6 +47,13 @@ protected:
     Model *model_;
     std::unique_ptr<View> view_;
     std::unique_ptr<Controller> controller_;
+
+    // View serialization (called from doc hooks).
+    void SaveViewerState();
+    void RestoreViewerState();
+
+    sigslot::scoped_connection on_doc_save_conn_;
+    sigslot::scoped_connection on_doc_load_conn_;
 };
 
 template <typename TDoc, typename TModel, typename TView, typename TController = Controller,
