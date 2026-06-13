@@ -30,7 +30,7 @@ public:
     void Stop();
     bool IsRunning() const;
 
-    void ClearViews() { views_.clear(); }
+    void ClearViewers() { viewers_.clear(); }
 
     // Document-level metadata. Anything not part of the rack itself lives
     // here: editor state, user notes, MIDI-learn maps, etc. Stored as raw
@@ -43,7 +43,7 @@ public:
     // Populated when SubrackFrames close (or at save time for open
     // frames), consumed when SubrackFrames open. Serialized as part
     // of the document envelope.
-    std::unordered_map<std::string, nlohmann::json> views_;
+    std::unordered_map<std::string, nlohmann::json> viewers_;
 
 private:
     nlohmann::json metadata_ = nlohmann::json::object();

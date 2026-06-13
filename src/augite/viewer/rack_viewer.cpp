@@ -11,6 +11,7 @@ namespace augr {
 
 RackViewer::RackViewer(const std::string &label, RackDoc &doc, Rack &rack)
     : SubrackViewer(label, doc, rack) {
+    docked_ = true;
 }
 
 RackViewer::~RackViewer() {

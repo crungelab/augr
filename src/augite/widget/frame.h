@@ -19,6 +19,7 @@ public:
     std::string label_;
     Vec2 window_position_ = {100.0f, 100.0f};
     Vec2 window_size_ = {320.0f, 240.0f};
+    bool docked_ = false;
     bool window_pose_dirty_ = true;
 };
 

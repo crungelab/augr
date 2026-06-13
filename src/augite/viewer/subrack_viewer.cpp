@@ -15,11 +15,9 @@ SubrackViewer::SubrackViewer(const std::string &label, RackDoc &doc,
                              Subrack &subrack)
     : DocumentViewerT<RackDoc, Subrack, SubrackView, SubrackController>(
           label, doc, subrack) {
-    // Install view hooks. The save hook pushes this frame's current
-    // view state into views_; the load hook pulls it back out after
-    // the doc has been replaced.
-    on_doc_save_conn_ = doc_->on_save.connect(
-        [this]() { document().views_[model().uuid()] = ViewToJson(); });
+    on_doc_save_conn_ = doc_->on_save.connect([this]() {
+        SaveViewerState();
+    });
     on_doc_load_conn_ = doc_->on_load.connect([this]() { OnLoaded(); });
 }
 
@@ -35,7 +33,7 @@ SubrackViewer::~SubrackViewer() {
         // Capture final view state before going away. Closing a frame
         // shouldn't discard its layout — the user might reopen this
         // subrack later in the session.
-        document().views_[model().uuid()] = ViewToJson();
+        SaveViewerState();
     }
 }
 
@@ -57,11 +55,23 @@ void SubrackViewer::RebuildView() {
         std::make_unique<SubrackController>(document(), view(), *this);
     controller().set_model(model());
 
-    // If we have a cached view state for this subrack, apply it.
-    auto it = document().views_.find(model().uuid());
-    if (it != document().views_.end()) {
-        ViewFromJson(it->second);
-    }
+    RestoreViewerState();
+}
+
+void SubrackViewer::SaveViewerState() {
+    nlohmann::json out;
+    Archive archive(out);
+    ArchiverManufacturer::singleton().Serialize(archive, *this);
+    document().viewers_[model().uuid()] = std::move(out);
+}
+
+void SubrackViewer::RestoreViewerState() {
+    auto it = document().viewers_.find(model().uuid());
+    if (it == document().viewers_.end())
+        return;
+
+    Archive archive(it->second);
+    ArchiverManufacturer::singleton().Deserialize(archive, *this);
 }
 
 void SubrackViewer::Draw() {
@@ -202,12 +212,6 @@ void SubrackViewer::StartSaveAsDialog() {
 void SubrackViewer::DoNew() {
     App::singleton().QueueAction([this]() { document().NewDocument(); });
 }
-/*
-void SubrackViewer::DoNew() {
-    document().NewDocument();
-    // Load hook fires from inside NewDocument and rebuilds the view.
-}
-*/
 
 void SubrackViewer::DoOpen(const std::filesystem::path &p) {
     App::singleton().QueueAction([this, p]() {
@@ -217,15 +221,6 @@ void SubrackViewer::DoOpen(const std::filesystem::path &p) {
         }
     });
 }
-/*
-void SubrackViewer::DoOpen(const std::filesystem::path &p) {
-    if (!document().Load(p)) {
-        pfd::message("Load Failed", "Could not load: " + p.string(),
-                     pfd::choice::ok, pfd::icon::error);
-    }
-    // Load hook handles RebuildView and view JSON deserialization.
-}
-*/
 
 void SubrackViewer::DoSave() {
     if (!document().Path())
@@ -282,38 +277,6 @@ void SubrackViewer::DrawUnsavedModal() {
         }
         ImGui::EndPopup();
     }
-}
-
-nlohmann::json SubrackViewer::ViewToJson() {
-    if (!view_)
-        return nlohmann::json();
-
-    auto &mfr = ArchiverManufacturer::singleton();
-    auto *factory = mfr.FindFactory(std::type_index(typeid(*view_)));
-    if (!factory) {
-        std::cerr << "No archiver factory for SubrackView\n";
-        return nlohmann::json();
-    }
-    std::unique_ptr<Archiver> archiver(factory->Produce(*view_));
-    nlohmann::json out;
-    Archive archive(out);
-    archiver->Save(archive);
-    return out;
-}
-
-void SubrackViewer::ViewFromJson(const nlohmann::json &j) {
-    if (!view_)
-        return;
-
-    auto &mfr = ArchiverManufacturer::singleton();
-    auto *factory = mfr.FindFactory(std::type_index(typeid(*view_)));
-    if (!factory)
-        return;
-
-    std::unique_ptr<Archiver> archiver(factory->Produce(*view_));
-    nlohmann::json local = j;
-    Archive archive(local);
-    archiver->Load(archive);
 }
 
 DEFINE_VIEWER_FACTORY(SubrackViewer, RackDoc, Subrack)

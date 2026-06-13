@@ -11,6 +11,8 @@ namespace augr {
 void ArchiverManufacturer::Serialize(Archive &archive, Subject &subject) const {
     auto *factory = FindFactory(std::type_index(typeid(subject)));
     if (!factory) { /* error */
+        std::cerr << "Serialize: no archiver factory registered for type '"
+                  << typeid(subject).name() << "'\n";
         return;
     }
     Archiver *archiver = factory->Produce(subject);

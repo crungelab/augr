@@ -91,7 +91,6 @@ void ExeRack::Stop() {
 } // namespace augr
 
 using namespace augr;
-// DEFINE_MODEL_FACTORY(ExeRack, "Rack", "Rack")
 DEFINE_MODEL_FACTORY(ExeRack, "Rack", "")
 
 class ExeRackArchiver : public RackArchiver {};

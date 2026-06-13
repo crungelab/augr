@@ -25,6 +25,7 @@ namespace augr {
 class SubrackViewer
     : public DocumentViewerT<RackDoc, Subrack, SubrackView, SubrackController> {
 public:
+    friend class SubrackViewerArchiver;
     // doc: the project document (shared with the root RackViewer).
     // subrack: the specific Subrack this frame displays.
     SubrackViewer(const std::string &label, RackDoc &doc, Subrack &subrack);
@@ -69,8 +70,8 @@ public:
 
 protected:
     // View serialization (called from doc hooks).
-    nlohmann::json ViewToJson();
-    void ViewFromJson(const nlohmann::json &j);
+    void SaveViewerState();
+    void RestoreViewerState();
 
     sigslot::scoped_connection on_doc_save_conn_;
     sigslot::scoped_connection on_doc_load_conn_;

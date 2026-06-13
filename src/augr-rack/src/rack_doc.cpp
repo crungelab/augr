@@ -125,10 +125,10 @@ bool RackDoc::Save(const std::filesystem::path &p) {
 
         on_save();
 
-        nlohmann::json views_json = nlohmann::json::object();
-        for (const auto &[uuid, view_json] : views_)
-            views_json[uuid] = view_json;
-        data_["views"] = std::move(views_json);
+        nlohmann::json viewers_json = nlohmann::json::object();
+        for (const auto &[uuid, view_json] : viewers_)
+            viewers_json[uuid] = view_json;
+        data_["viewers"] = std::move(viewers_json);
 
         std::ofstream out(p);
         out << data_.dump(2);
@@ -178,10 +178,10 @@ bool RackDoc::Load(const std::filesystem::path &p, bool auto_start) {
         if (!fresh)
             return false;
 
-        views_.clear();
-        if (doc.contains("views") && doc["views"].is_object()) {
-            for (auto &[uuid, view_json] : doc["views"].items())
-                views_[uuid] = view_json;
+        viewers_.clear();
+        if (doc.contains("viewers") && doc["viewers"].is_object()) {
+            for (auto &[uuid, view_json] : doc["viewers"].items())
+                viewers_[uuid] = view_json;
         }
 
         ReplaceRack(std::move(fresh), std::move(doc));
@@ -202,14 +202,14 @@ void RackDoc::NewDocument(bool auto_start) {
     if (!fresh)
         return;
 
-    views_.clear();
+    viewers_.clear();
     ClearPath();
     MarkClean();
 
     nlohmann::json synthetic = nlohmann::json::object();
     synthetic["format"] = kDocumentFormatTag;
     synthetic["version"] = kDocumentFormatVersion;
-    synthetic["views"] = nlohmann::json::object();
+    synthetic["viewers"] = nlohmann::json::object();
 
     ReplaceRack(std::move(fresh), std::move(synthetic));
 
