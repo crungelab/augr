@@ -16,7 +16,7 @@ public:
     friend class ViewerArchiver;
 
     Viewer(const std::string &label, Document &doc, Model &model);
-    virtual ~Viewer();
+    virtual ~Viewer() {}
 
     void Create() override;
     void OnDestroy() override;

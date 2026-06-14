@@ -3,6 +3,8 @@
 #include <augr/core/archiver_factory.h>
 #include <augr/core/archiver_manufacturer.h>
 
+#include <augite/app/app.h>
+
 #include "viewer_archiver.h"
 
 namespace augr {
@@ -14,10 +16,11 @@ void ViewerArchiver::Save(Archive &archive) const {
     auto &j = archive.json();
 
     j["window_position"] = {viewer.window_position_.x,
-                             viewer.window_position_.y};
+                            viewer.window_position_.y};
     j["window_size"] = {viewer.window_size_.x, viewer.window_size_.y};
 
     SaveView(archive);
+    SaveSubviewers(archive);
 }
 
 void ViewerArchiver::SaveView(Archive &archive) const {
@@ -40,6 +43,21 @@ void ViewerArchiver::SaveView(Archive &archive) const {
     archiver->Save(archive);
 }
 
+void ViewerArchiver::SaveSubviewers(Archive &archive) const {
+    const Viewer &viewer = subject();
+    auto &j = archive.json();
+
+    auto &j_subviewers = j["subviewers"];
+    j_subviewers = nlohmann::json::array();
+
+    for (const auto &child : viewer.children_) {
+        auto *child_viewer = dynamic_cast<Viewer *>(child.get());
+        if (!child_viewer)
+            continue;
+        j_subviewers.push_back(child_viewer->model().uuid());
+    }
+}
+
 void ViewerArchiver::Load(Archive &archive) {
     Viewer &viewer = subject();
     auto &j = archive.json();
@@ -57,6 +75,7 @@ void ViewerArchiver::Load(Archive &archive) {
         read_vec2(j["window_size"], viewer.window_size_);
 
     LoadView(archive);
+    LoadSubviewers(archive);
 }
 
 void ViewerArchiver::LoadView(Archive &archive) {
@@ -77,6 +96,25 @@ void ViewerArchiver::LoadView(Archive &archive) {
 
     JsonScope scope(archive, j["view"]);
     archiver->Load(archive);
+}
+
+void ViewerArchiver::LoadSubviewers(Archive &archive) {
+    Viewer &viewer = subject();
+    const auto &j = archive.json();
+
+    if (!j.contains("subviewers") || !j["subviewers"].is_array())
+        return;
+
+    for (const auto &j_uuid : j["subviewers"]) {
+        if (!j_uuid.is_string())
+            continue;
+
+        archive.RegisterModuleResolver(
+            j_uuid.get<std::string>(), [j, &viewer](Model *model) {
+                auto &vm = App::singleton().viewer_manager();
+                vm.OpenViewer(viewer, viewer.document(), *model);
+            });
+    }
 }
 
 DEFINE_ARCHIVER_FACTORY(ViewerArchiver, Viewer, "Viewer")

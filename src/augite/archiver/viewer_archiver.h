@@ -13,6 +13,9 @@ public:
 private:
     void SaveView(Archive &archive) const;
     void LoadView(Archive &archive);
+
+    void SaveSubviewers(Archive &archive) const;
+    void LoadSubviewers(Archive &archive);
 };
 
 } // namespace augr

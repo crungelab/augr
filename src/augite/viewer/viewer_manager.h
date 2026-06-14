@@ -13,6 +13,7 @@ class Frame;
 class ViewerManager {
 public:
     void ToggleViewer(Frame &parent, Document &document, Model &model);
+    void OpenViewer(Frame &parent, Document &document, Model &model);
     void CloseViewer(Viewer &viewer);
 
     // Data members

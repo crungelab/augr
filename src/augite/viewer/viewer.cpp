@@ -16,15 +16,6 @@ Viewer::Viewer(const std::string &label, Document &doc, Model &model)
     on_doc_load_conn_ = doc_->on_load.connect([this]() { OnLoaded(); });
 }
 
-Viewer::~Viewer() {
-    if (doc_) {
-        // Capture final viewer state before going away. Closing a frame
-        // shouldn't discard its layout — the user might reopen this
-        // subrack later in the session.
-        // SaveViewerState();
-    }
-}
-
 void Viewer::Create() {
     Frame::Create();
     RebuildView();

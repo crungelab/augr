@@ -5,8 +5,10 @@
 
 namespace augr {
 
+/*
 void SubrackViewerArchiver::Save(Archive &archive) const {
-    Archiver::Save(archive);
+    //Archiver::Save(archive);
+    ViewerArchiver::Save(archive);
 
     const SubrackViewer &viewer = subject();
     auto &j = archive.json();
@@ -76,7 +78,7 @@ void SubrackViewerArchiver::LoadView(Archive &archive) {
     JsonScope scope(archive, j["view"]);
     archiver->Load(archive);
 }
-
+*/
 DEFINE_ARCHIVER_FACTORY(SubrackViewerArchiver, SubrackViewer, "SubrackViewer")
 
 } // namespace augr
