@@ -5,6 +5,8 @@
 #include <string>
 #include <vector>
 
+#include <uuid.h>
+
 #include <nlohmann/json.hpp>
 #include <sigslot/signal.hpp>
 
@@ -52,7 +54,7 @@ public:
     // Populated when SubrackFrames close (or at save time for open
     // frames), consumed when SubrackFrames open. Serialized as part
     // of the document envelope.
-    std::unordered_map<std::string, nlohmann::json> viewers_;
+    std::unordered_map<uuids::uuid, nlohmann::json> viewers_;
 
 
 protected:

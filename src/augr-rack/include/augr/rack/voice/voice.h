@@ -15,8 +15,8 @@ public:
     void OnDestroy() override;
 
     void Create() override;
-    void OnFresh() override;
-    void OnLoaded() override;
+    void OnCreateFresh() override;
+    void OnCreateLoaded() override;
 
     // -- Child management ----------------------------------------------
     void OnAddingIo(Io &io) override;

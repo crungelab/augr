@@ -1,3 +1,5 @@
+#include <augr/core/model_registry.h>
+
 #include <augr/rack/archiver/module_archiver.h>
 
 #include <augr/core/archiver_factory.h>
@@ -18,7 +20,7 @@ void ModuleArchiver::Save(Archive &archive) const {
 
     // Persist the module's stable identity. Lazy-minted on first call,
     // so accessing uuid() here ensures every saved module has one.
-    j["uuid"] = module.uuid();
+    j["uuid"] = module.uuid_to_string();
 
     if (!module.parameters().empty()) {
         auto &j_params = j["parameters"];
@@ -40,6 +42,7 @@ void ModuleArchiver::Load(Archive &archive) {
         module.set_uuid(j["uuid"].get<std::string>());
     }
 
+    ModelRegistry::singleton().RegisterWithUuid(&module, module.uuid());
     archive.RegisterModule(module.uuid(), &module);
 
     // Type tag is read by the caller (it's needed before we can construct

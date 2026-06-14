@@ -21,7 +21,9 @@ void Voice::Create() {
     label_ = "Voice";
 }
 
-void Voice::OnFresh() {
+void Voice::OnCreateFresh() {
+    Subrack::OnCreateFresh();
+
     label_ = rack().voice_manager().AllocateUniqueName("Voice");
     rack().voice_manager().AddVoice(label_, this);
 
@@ -38,7 +40,10 @@ void Voice::OnFresh() {
     done_out_ = done_out_module_->cv_out_;
 }
 
-void Voice::OnLoaded() { rack().voice_manager().AddVoice(label_, this); }
+void Voice::OnCreateLoaded() { 
+    Subrack::OnCreateLoaded();
+    rack().voice_manager().AddVoice(label_, this); 
+}
 
 void Voice::OnAddingIo(Io &io) {
     Subrack::OnAddingIo(io);

@@ -16,7 +16,7 @@ void VoicebankArchiver::Save(Archive &archive) const {
     auto &j = archive.json();
 
     if (const auto master = voicebank.master()) {
-        j["master_uuid"] = master->uuid();
+        j["master_uuid"] = master->uuid_to_string();
     } else {
         j["master_uuid"] = std::string();
     }

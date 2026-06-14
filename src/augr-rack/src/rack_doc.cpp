@@ -127,7 +127,7 @@ bool RackDoc::Save(const std::filesystem::path &p) {
 
         nlohmann::json viewers_json = nlohmann::json::object();
         for (const auto &[uuid, view_json] : viewers_)
-            viewers_json[uuid] = view_json;
+            viewers_json[uuids::to_string(uuid)] = view_json;
         data_["viewers"] = std::move(viewers_json);
 
         std::ofstream out(p);
@@ -180,8 +180,9 @@ bool RackDoc::Load(const std::filesystem::path &p, bool auto_start) {
 
         viewers_.clear();
         if (doc.contains("viewers") && doc["viewers"].is_object()) {
-            for (auto &[uuid, view_json] : doc["viewers"].items())
-                viewers_[uuid] = view_json;
+            for (auto &[uuid_str, view_json] : doc["viewers"].items())
+                viewers_[uuids::uuid::from_string(uuid_str).value_or(
+                    uuids::uuid{})] = view_json;
         }
 
         ReplaceRack(std::move(fresh), std::move(doc));

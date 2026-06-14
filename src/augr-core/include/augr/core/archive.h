@@ -60,7 +60,7 @@ public:
                                    : static_cast<int>(it - current.begin());
     }
 
-    void RegisterModuleResolver(const std::string &uuid,
+    void RegisterModuleResolver(const uuids::uuid &uuid,
                                 ModuleResolver resolver) {
         if (const auto it = module_map_.find(uuid); it != module_map_.end()) {
             resolver(it->second);
@@ -69,7 +69,14 @@ public:
         module_resolver_map_[uuid].push_back(std::move(resolver));
     }
 
-    void RegisterModule(const std::string &uuid, Model *model) {
+    void RegisterModuleResolver(const std::string &uuid_str,
+                                ModuleResolver resolver) {
+        RegisterModuleResolver(
+            uuids::uuid::from_string(uuid_str).value_or(uuids::uuid{}),
+            std::move(resolver));
+    }
+
+    void RegisterModule(const uuids::uuid &uuid, Model *model) {
         module_map_[uuid] = model;
         if (const auto it = module_resolver_map_.find(uuid);
             it != module_resolver_map_.end()) {
@@ -78,9 +85,14 @@ public:
         }
     }
 
+    void RegisterModule(const std::string &uuid_str, Model *model) {
+        RegisterModule(
+            uuids::uuid::from_string(uuid_str).value_or(uuids::uuid{}), model);
+    }
+
 private:
-    std::map<std::string, std::list<ModuleResolver>> module_resolver_map_;
-    std::map<std::string, Model *> module_map_;
+    std::map<uuids::uuid, std::list<ModuleResolver>> module_resolver_map_;
+    std::map<uuids::uuid, Model *> module_map_;
 
     std::vector<nlohmann::json *> json_stack_;
     std::vector<std::vector<Model *>> graph_stack_;

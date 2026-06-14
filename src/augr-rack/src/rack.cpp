@@ -18,7 +18,8 @@ Rack::~Rack() {
 // Default device set
 // ---------------------------------------------------------------------------
 
-void Rack::OnFresh() {
+void Rack::OnCreateFresh() {
+    Subrack::OnCreateFresh();
     if (config_.audio_input_channels > 0)
         CreateAudioInputDevice();
     CreateAudioOutputDevice();

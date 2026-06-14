@@ -20,7 +20,7 @@ public:
     Voicebank() = default;
 
     void Create() override;
-    void OnFresh() override;
+    void OnCreateFresh() override;
 
     // -- Child management ----------------------------------------------
     void OnAddingChild(Model &model) override;

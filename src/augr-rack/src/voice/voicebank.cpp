@@ -23,7 +23,9 @@ void Voicebank::Create() {
     label_ = "Voicebank";
 }
 
-void Voicebank::OnFresh() {
+void Voicebank::OnCreateFresh() {
+    Subrack::OnCreateFresh();
+
     auto midi_in = Model::Make<MidiInputModule>(shared_from_this());
     midi_in_module_ = midi_in.get();
     midi_in_ = midi_in_module_->midi_in_;

@@ -2,6 +2,7 @@
 
 #include <augr/core/archiver_factory.h>
 #include <augr/core/archiver_manufacturer.h>
+#include <augr/core/model_registry.h>
 
 #include <augite/app/app.h>
 
@@ -54,7 +55,7 @@ void ViewerArchiver::SaveSubviewers(Archive &archive) const {
         auto *child_viewer = dynamic_cast<Viewer *>(child.get());
         if (!child_viewer)
             continue;
-        j_subviewers.push_back(child_viewer->model().uuid());
+        j_subviewers.push_back(child_viewer->model().uuid_to_string());
     }
 }
 
@@ -108,12 +109,15 @@ void ViewerArchiver::LoadSubviewers(Archive &archive) {
     for (const auto &j_uuid : j["subviewers"]) {
         if (!j_uuid.is_string())
             continue;
-
-        archive.RegisterModuleResolver(
-            j_uuid.get<std::string>(), [j, &viewer](Model *model) {
-                auto &vm = App::singleton().viewer_manager();
-                vm.OpenViewer(viewer, viewer.document(), *model);
-            });
+        auto uuid_str = j_uuid.get<std::string>();
+        auto model_uuid = uuids::uuid::from_string(uuid_str);
+        if (!model_uuid)
+            continue;
+        auto model = ModelRegistry::singleton().Find(model_uuid.value());
+        if (!model)
+            continue;
+        auto &vm = App::singleton().viewer_manager();
+        vm.OpenViewer(viewer, viewer.document(), *model);
     }
 }
 

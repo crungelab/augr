@@ -6,6 +6,8 @@
 #include <utility>
 #include <vector>
 
+#include <uuid.h>
+
 #include <augr/core/subject.h>
 
 namespace augr {
@@ -19,17 +21,12 @@ public:
 
     Model() { id_ = next_id_++; }
     Model(const std::string &label) : label_(label) { id_ = next_id_++; }
-    virtual ~Model() = default;
-
-    // -- Identity -------------------------------------------------------
-    const std::string &uuid() const;
-    void RegenerateUuid();
-    void set_uuid(std::string uuid) { uuid_ = std::move(uuid); }
+    virtual ~Model();
 
     virtual void Create() {}
-    virtual void OnFresh() {}
-    virtual void OnReplicated() {}
-    virtual void OnLoaded() {}
+    virtual void OnCreateFresh();
+    virtual void OnCreateReplicated() {}
+    virtual void OnCreateLoaded();
 
     template <class T, class... Args>
     static std::shared_ptr<T>
@@ -42,13 +39,13 @@ public:
             parent->AddChild(child);
         switch (mode) {
         case CreateMode::Fresh:
-            child->OnFresh();
+            child->OnCreateFresh();
             break;
         case CreateMode::Replicated:
-            child->OnReplicated();
+            child->OnCreateReplicated();
             break;
         case CreateMode::Loaded:
-            child->OnLoaded();
+            child->OnCreateLoaded();
             break;
         }
         return child;
@@ -95,6 +92,13 @@ public:
     }
 
     // Accessors
+    uuids::uuid uuid() const { return uuid_; }
+    std::string uuid_to_string() const { return uuids::to_string(uuid_); }
+    void set_uuid(const uuids::uuid &u) { uuid_ = u; }
+    void set_uuid(const std::string &s) {
+        uuid_ = uuids::uuid::from_string(s).value_or(uuids::uuid{});
+    }
+
     const std::string &label() const { return label_; }
     void set_label(const std::string &label) { label_ = label; }
 
@@ -112,7 +116,7 @@ protected:
 
     // Data members
 public:
-    mutable std::string uuid_;
+    uuids::uuid uuid_;
     std::string label_;
     WeakPtr parent_;
     CreateMode create_mode_ = CreateMode::Fresh;
