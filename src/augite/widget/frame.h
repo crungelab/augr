@@ -10,6 +10,9 @@ public:
     virtual ~Frame() = default;
 
     void Draw() override;
+    void DrawMainMenuBar();
+    virtual void OnDrawMainMenuBar();
+
     virtual void Begin();
     virtual void End();
 

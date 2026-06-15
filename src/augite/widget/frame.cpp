@@ -15,10 +15,30 @@ void Frame::Draw() {
         window_pose_dirty_ = false;
     }
 
+    if (is_active()) {
+        DrawMainMenuBar();
+    }
+
     Begin();
     docked_ = ImGui::IsWindowDocked();
     // DrawChildren();
     End();
+}
+
+void Frame::DrawMainMenuBar() {
+    if (ImGui::BeginMainMenuBar()) {
+        OnDrawMainMenuBar();
+    }
+    ImGui::EndMainMenuBar();
+}
+
+void Frame::OnDrawMainMenuBar() {
+    /*
+    Frame *parent_viewer = dynamic_cast<Frame *>(parent_);
+    if (parent_viewer == nullptr)
+        return; // only draw if we're nested inside another viewer
+    parent_viewer->OnDrawMainMenuBar();
+    */
 }
 
 void Frame::Begin() { ImGui::Begin(label_.c_str()); }

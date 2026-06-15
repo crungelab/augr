@@ -11,6 +11,7 @@ public:
 
     void OnLoaded() override;
 
+    void OnDrawMainMenuBar() override;
     void Begin() override;
 
     // Accessors

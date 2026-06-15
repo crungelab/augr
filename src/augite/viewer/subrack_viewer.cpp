@@ -14,11 +14,9 @@ namespace augr {
 SubrackViewer::SubrackViewer(const std::string &label, RackDoc &doc,
                              Subrack &subrack)
     : DocumentViewerT<RackDoc, Subrack, SubrackView, SubrackController>(
-          label, doc, subrack) {
-}
+          label, doc, subrack) {}
 
-SubrackViewer::~SubrackViewer() {
-}
+SubrackViewer::~SubrackViewer() {}
 
 void SubrackViewer::RebuildView() {
     view_ = std::make_unique<SubrackView>(document());
@@ -31,9 +29,11 @@ void SubrackViewer::RebuildView() {
 
 void SubrackViewer::Draw() {
     PollPendingDialog();
+    /*
     if (is_active()) {
         DrawMenuBar();
     }
+    */
     DrawUnsavedModal();
     Viewer::Draw();
 }
@@ -69,6 +69,42 @@ void SubrackViewer::PollPendingDialog() {
     }
 }
 
+void SubrackViewer::OnDrawMainMenuBar() {
+    Frame *parent_frame = dynamic_cast<Frame *>(parent_);
+    if (parent_frame != nullptr)
+        parent_frame->OnDrawMainMenuBar();
+
+    if (is_active() && ImGui::BeginMenu("Edit")) {
+        const bool has_selection = controller().HasSelection();
+        const bool has_clipboard = controller().HasClipboardSelection();
+
+        if (ImGui::MenuItem("Cut", "Ctrl+X", false, has_selection)) {
+            controller().Cut();
+        }
+        if (ImGui::MenuItem("Copy", "Ctrl+C", false, has_selection)) {
+            controller().Copy();
+        }
+        if (ImGui::MenuItem("Paste", "Ctrl+V", false, has_clipboard)) {
+            controller().Paste();
+        }
+        if (ImGui::MenuItem("Duplicate", "Ctrl+D", false, has_selection)) {
+            controller().Duplicate();
+        }
+        ImGui::Separator();
+        if (ImGui::MenuItem("Delete", "Del", false, has_selection)) {
+            controller().DeleteSelection();
+        }
+        ImGui::Separator();
+        if (ImGui::MenuItem("Select All", "Ctrl+A")) {
+            controller().SelectAll();
+        }
+
+        ImGui::EndMenu();
+    }
+    Viewer::OnDrawMainMenuBar();
+}
+
+/*
 void SubrackViewer::DrawMenuBar() {
     if (ImGui::BeginMainMenuBar()) {
         if (ImGui::BeginMenu("File")) {
@@ -138,6 +174,7 @@ void SubrackViewer::DrawMenuBar() {
         ImGui::EndMainMenuBar();
     }
 }
+*/
 
 // ---------- Dialog launchers ----------
 

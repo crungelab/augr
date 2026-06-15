@@ -32,11 +32,6 @@ protected:
     virtual void OnTopologyChanged() { on_topology_changed(); }
 
 public:
-    // Accessors
-    // Data members --- identity
-    // Mutable to allow lazy initialization from const uuid() accessor.
-    mutable std::string uuid_;
-
     // Data members
     std::list<Wire *> wires_;
     std::map<int, Wire *> wire_map_;

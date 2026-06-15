@@ -5,6 +5,8 @@ set(THIS AugiteViewer)
 project(${THIS} CXX)
 
 include(${AUGR_CMAKE}/AugrRack.cmake)
+include(${AUGR_CMAKE}/AugrFm.cmake)
+
 include(${AUGR_CMAKE}/Augite.cmake)
 include(${AUGR_CMAKE}/AugiteView.cmake)
 include(${AUGR_CMAKE}/AugiteController.cmake)
@@ -22,6 +24,7 @@ add_library(${PROJECT_NAME} STATIC
 )
 
 USES_AUGR_RACK(${THIS})
+USES_AUGR_FM(${THIS})
 USES_AUGITE(${THIS})
 USES_AUGITE_VIEW(${THIS})
 USES_AUGITE_CONTROLLER(${THIS})

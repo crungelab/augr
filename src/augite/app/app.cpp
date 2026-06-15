@@ -61,6 +61,8 @@ App::App() {
 
     REGISTER_VIEWER_FACTORY(ModuleViewer)
     REGISTER_VIEWER_FACTORY(SubrackViewer)
+    REGISTER_VIEWER_FACTORY(DexieVoiceViewer)
+
     REGISTER_VIEWER_FACTORY(ScopeViewer)
     REGISTER_VIEWER_FACTORY(SpectralViewer)
 };
