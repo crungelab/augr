@@ -81,7 +81,8 @@ void Voicebank::SetMaster(Voice *master) {
     std::weak_ptr<Voice> weak;
     if (master) {
         weak = std::dynamic_pointer_cast<Voice>(master->shared_from_this());
-        on_master_topology_changed_conn_ = master->on_topology_changed.connect([this]() { RebuildReplicas(target_voice_count_); });
+        on_master_topology_changed_conn_ = master->on_topology_changed.connect(
+            [this]() { RebuildReplicas(target_voice_count_); });
     } else {
         on_master_topology_changed_conn_.disconnect();
     }
@@ -123,7 +124,6 @@ void Voicebank::RebuildReplicas(int n) {
     // Remove existing replica children (replicas_ is cleared via
     // OnRemovingVoice)
     while (!replicas_.empty())
-        //RemoveChild(*replicas_.back());
         replicas_.back()->Destroy();
 
     if (!master)
@@ -138,6 +138,9 @@ void Voicebank::RebuildReplicas(int n) {
     for (int i = 0; i < n; ++i) {
         auto v = Model::Make<Voice>(shared_from_this(), CreateMode::Replicated);
         ArchiverManufacturer::singleton().Deserialize(master_archive, *v);
+    }
+    for (auto &replica : replicas_) {
+        replica->LinkTo(*master);
     }
 }
 

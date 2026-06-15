@@ -67,14 +67,19 @@ public:
     }
 
     template <class T, class... Args>
-    static std::shared_ptr<T> MakeReplicated(Ptr parent, Args &&...args) {
-        return Make<T>(parent, CreateMode::Replicated,
-                       std::forward<Args>(args)...);
+    static std::shared_ptr<T> MakeLoaded(Ptr parent, Args &&...args) {
+        return Make<T>(parent, CreateMode::Loaded, std::forward<Args>(args)...);
     }
 
     template <class T, class... Args>
-    static std::shared_ptr<T> MakeLoaded(Ptr parent, Args &&...args) {
-        return Make<T>(parent, CreateMode::Loaded, std::forward<Args>(args)...);
+    static std::shared_ptr<T> MakeCopied(Ptr parent, Args &&...args) {
+        return Make<T>(parent, CreateMode::Copied, std::forward<Args>(args)...);
+    }
+
+    template <class T, class... Args>
+    static std::shared_ptr<T> MakeReplicated(Ptr parent, Args &&...args) {
+        return Make<T>(parent, CreateMode::Replicated,
+                       std::forward<Args>(args)...);
     }
 
     void Destroy() {

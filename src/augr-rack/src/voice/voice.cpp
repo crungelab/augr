@@ -90,6 +90,18 @@ void Voice::DeliverMidi(const MidiMessage &msg) {
         midi_in_module_->midi_out_->Write(msg);
 }
 
+void Voice::LinkTo(Voice& master) const {
+    for (auto& module : modules_) {
+        const Module * master_module = dynamic_cast<Module*>(master.FindByUuid(module->uuid()));
+        if (!master_module) continue;
+        for (auto& param : module->parameters()) {
+            auto* master_param = master_module->FindParameter(param->label());
+            if (!master_param) continue;
+            param->LinkTo(*master_param);
+        }
+    }
+}
+
 } // namespace augr
 
 using namespace augr;

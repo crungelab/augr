@@ -12,16 +12,20 @@ class CvOutputModule;
 class Voice : public Subrack {
 public:
     Voice() = default;
-    void OnDestroy() override;
 
     void OnCreate() override;
     void OnCreateFresh() override;
     void OnCreateLoaded() override;
     void OnCreateCopied() override;
 
+    void OnDestroy() override;
+
     // -- Child management ----------------------------------------------
     void OnAddingIo(Io &io) override;
     void OnRemovingIo(Io &io) override;
+
+    // Synchronization
+    void LinkTo(Voice &master) const;
 
     // -- Polyphony contract --------------------------------------------
     // The voicebank calls this. Default implementation reads done_in_
@@ -42,7 +46,7 @@ public:
     REFLECT_ENABLE(Subrack)
 
 private:
-    MidiInputModule * midi_in_module_ = nullptr;
+    MidiInputModule *midi_in_module_ = nullptr;
 
     AudioOutputModule *audio_out_module_ = nullptr;
 

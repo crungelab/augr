@@ -1,25 +1,5 @@
 #pragma once
 
-// VST3-inspired Parameter architecture for augr-core.
-//
-// Hierarchy:
-//   Control
-//   └── Parameter                         (abstract; normalized I/O, format)
-//        └── BoundControl<T, Parameter>   (adds typed binding +
-//        value/set_value)
-//             └── ParameterT<T>           (adds typed observers)
-//                  └── FloatParameter     (abstract; adds init/min/max/step,
-//                  │    │                  snap/clamp, normalized mapping)
-//                  │    ├── LinearParameter
-//                  │    ├── DecibelParameter
-//                  │    └── FrequencyParameter
-//                  └── ChoiceParameter    (adds choices list, index I/O)
-//
-// Parameter exposes only what the UI/Rack layer needs without knowing T:
-// normalized I/O, formatted display, reset-to-default, and an untyped change
-// listener. Typed access (value(), typed observers) lives on ParameterT<T>;
-// numeric-range semantics live on FloatParameter.
-
 #include <algorithm>
 #include <cassert>
 #include <cmath>
@@ -42,8 +22,6 @@ namespace augr {
 // ---------------------------------------------------------------------------
 class Parameter : public Control {
 public:
-    using ChangeListener = std::function<void()>;
-
     Parameter(std::string label, ControlMeta meta)
         : Control(std::move(label), std::move(meta)) {}
 
@@ -66,20 +44,7 @@ public:
 
     bool IsKnob() const { return meta_.IsKnob(); }
 
-    // Untyped subscription for UI refresh etc. Typed subscribers should use
-    // ParameterT<T>::AddObserver instead.
-    void AddChangeListener(ChangeListener cb) {
-        listeners_.push_back(std::move(cb));
-    }
-
-protected:
-    void NotifyChanged() {
-        for (auto &cb : listeners_)
-            cb();
-    }
-
-private:
-    std::vector<ChangeListener> listeners_;
+    virtual void LinkTo(Parameter &master) = 0;
 };
 
 // ---------------------------------------------------------------------------
@@ -94,26 +59,25 @@ class ParameterT : public BoundControl<T, TBase> {
 public:
     using Base = BoundControl<T, TBase>;
     using BindingPtr = typename Base::BindingPtr;
-    using Observer = std::function<void(T)>;
 
     ParameterT(std::string label, ControlMeta meta, BindingPtr binding)
         : Base(std::move(label), std::move(meta), std::move(binding)) {}
 
-    // Typed subscription -- fires after any programmatic value change.
-    void AddObserver(Observer cb) { observers_.push_back(std::move(cb)); }
+    void LinkTo(Parameter &master) override {
+        auto *typed = dynamic_cast<ParameterT<T, TBase> *>(&master);
+        assert(typed);
+        Link(*typed);
+    }
 
-protected:
-    // Subclasses call this from their overridden set_value() after the value
-    // has been written to the binding.
-    void NotifyObservers() {
-        const T v = this->value();
-        for (auto &cb : observers_)
-            cb(v);
-        this->NotifyChanged();
+    void Link(ParameterT<T, TBase> &master) {
+        link_connection_ = master.on_change.connect([this](T v) {
+            if (this->binding_)
+                this->binding_->set(v);
+        });
     }
 
 private:
-    std::vector<Observer> observers_;
+    sigslot::scoped_connection link_connection_;
 };
 
 } // namespace augr

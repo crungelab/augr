@@ -109,12 +109,12 @@ public:
     // ---- Typed interface ---------------------------------------------------
 
     // Typed write. Silently drops values not present in the choices list.
-    void set_value(const T &v) override {
-        if (!IndexOf(v).has_value())
+    void set_value(const T &value) override {
+        if (!IndexOf(value).has_value())
             return;
         if (this->binding_) {
-            this->binding_->set(v);
-            this->NotifyObservers();
+            this->binding_->set(value);
+            this->on_change(value);
         }
     }
 

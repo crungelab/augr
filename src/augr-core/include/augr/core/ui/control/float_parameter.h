@@ -1,25 +1,6 @@
 #ifndef AUGR_CORE_PARAMETER_H_
 #define AUGR_CORE_PARAMETER_H_
 
-// VST3-inspired Parameter architecture for augr-core.
-//
-// Hierarchy:
-//   Control
-//   └── Parameter                         (abstract; normalized I/O, format)
-//        └── BoundControl<T, Parameter>   (adds typed binding + value/set_value)
-//             └── ParameterT<T>           (adds typed observers)
-//                  └── FloatParameter     (abstract; adds init/min/max/step,
-//                  │    │                  snap/clamp, normalized mapping)
-//                  │    ├── LinearParameter
-//                  │    ├── DecibelParameter
-//                  │    └── FrequencyParameter
-//                  └── ChoiceParameter    (adds choices list, index I/O)
-//
-// Parameter exposes only what the UI/Rack layer needs without knowing T:
-// normalized I/O, formatted display, reset-to-default, and an untyped change
-// listener. Typed access (value(), typed observers) lives on ParameterT<T>;
-// numeric-range semantics live on FloatParameter.
-
 #include <algorithm>
 #include <cassert>
 #include <cmath>
@@ -49,23 +30,24 @@ public:
           init_(init), min_(min), max_(max), step_(step) {}
 
     // Writes through snap/clamp, then notifies. Overrides BoundControl.
-    void set_value(const fy_real &v) override {
-        if (binding_) {
-            binding_->set(SnapAndClamp(v));
-            NotifyObservers();
+    void set_value(const fy_real &value) override {
+        if (this->binding_) {
+            auto snapped = SnapAndClamp(value);
+            this->binding_->set(snapped);
+            this->on_change(snapped);
         }
     }
 
     void ResetToInit() override { set_value(init_); }
 
     fy_real init() const { return init_; }
-    fy_real min()  const { return min_; }
-    fy_real max()  const { return max_; }
+    fy_real min() const { return min_; }
+    fy_real max() const { return max_; }
     fy_real step() const { return step_; }
 
     fy_real NormalizedInit() const { return GetNormalizedFor(init_); }
-    fy_real NormalizedMin()  const { return GetNormalizedFor(min_); }
-    fy_real NormalizedMax()  const { return GetNormalizedFor(max_); }
+    fy_real NormalizedMin() const { return GetNormalizedFor(min_); }
+    fy_real NormalizedMax() const { return GetNormalizedFor(max_); }
 
     // Factory: picks the concrete subclass based on meta.Unit().
     static std::unique_ptr<FloatParameter>
@@ -114,7 +96,8 @@ public:
 
 protected:
     fy_real GetNormalizedFor(fy_real v) const override {
-        if (max() == min()) return fy_real{0};
+        if (max() == min())
+            return fy_real{0};
         return (v - min()) / (max() - min());
     }
 
@@ -134,13 +117,15 @@ public:
 
     std::string Format() const override {
         const fy_real v = value();
-        if (v <= min()) return "-inf dB";
+        if (v <= min())
+            return "-inf dB";
         return std::format("{:+.1f} dB", v);
     }
 
 protected:
     fy_real GetNormalizedFor(fy_real v) const override {
-        if (max() == min()) return fy_real{0};
+        if (max() == min())
+            return fy_real{0};
         return (v - min()) / (max() - min());
     }
 };
@@ -171,7 +156,8 @@ public:
 
 protected:
     fy_real GetNormalizedFor(fy_real v) const override {
-        if (log_ratio_ == fy_real{0}) return fy_real{0};
+        if (log_ratio_ == fy_real{0})
+            return fy_real{0};
         return std::log(v / min()) / log_ratio_;
     }
 
@@ -186,46 +172,46 @@ FloatParameter::Make(std::string label, ControlMeta meta, BindingPtr binding,
     switch (meta.Unit()) {
     case ControlUnit::kDecibel:
         return std::make_unique<DecibelParameter>(
-            std::move(label), std::move(meta), std::move(binding),
-            init, min, max, step);
+            std::move(label), std::move(meta), std::move(binding), init, min,
+            max, step);
 
     case ControlUnit::kHertz:
         if (min > fy_real{0}) {
             return std::make_unique<FrequencyParameter>(
-                std::move(label), std::move(meta), std::move(binding),
-                init, min, max, step);
+                std::move(label), std::move(meta), std::move(binding), init,
+                min, max, step);
         }
         [[fallthrough]];
 
     case ControlUnit::kMilliseconds:
         return std::make_unique<LinearParameter>(
-            std::move(label), std::move(meta), std::move(binding),
-            init, min, max, step, " ms");
+            std::move(label), std::move(meta), std::move(binding), init, min,
+            max, step, " ms");
 
     case ControlUnit::kSeconds:
         return std::make_unique<LinearParameter>(
-            std::move(label), std::move(meta), std::move(binding),
-            init, min, max, step, " s");
+            std::move(label), std::move(meta), std::move(binding), init, min,
+            max, step, " s");
 
     case ControlUnit::kPercent:
         return std::make_unique<LinearParameter>(
-            std::move(label), std::move(meta), std::move(binding),
-            init, min, max, step, "%");
+            std::move(label), std::move(meta), std::move(binding), init, min,
+            max, step, "%");
 
     case ControlUnit::kSemitones:
         return std::make_unique<LinearParameter>(
-            std::move(label), std::move(meta), std::move(binding),
-            init, min, max, step, " st");
+            std::move(label), std::move(meta), std::move(binding), init, min,
+            max, step, " st");
 
     case ControlUnit::kBpm:
         return std::make_unique<LinearParameter>(
-            std::move(label), std::move(meta), std::move(binding),
-            init, min, max, step, " bpm");
+            std::move(label), std::move(meta), std::move(binding), init, min,
+            max, step, " bpm");
 
     default:
         return std::make_unique<LinearParameter>(
-            std::move(label), std::move(meta), std::move(binding),
-            init, min, max, step);
+            std::move(label), std::move(meta), std::move(binding), init, min,
+            max, step);
     }
 }
 

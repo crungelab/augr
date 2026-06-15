@@ -5,6 +5,8 @@
 #include <string>
 #include <utility>
 
+#include <sigslot/signal.hpp>
+
 #include <augr/core/binding.h>
 #include <augr/core/config.h>
 #include <augr/core/model.h>
@@ -50,6 +52,7 @@ public:
     virtual void set_value(const T &value) {
         if (binding_) {
             binding_->set(value);
+            on_change(value);
         }
     }
 
@@ -59,6 +62,8 @@ public:
     void set_binding(BindingPtr binding) { binding_ = std::move(binding); }
 
     bool has_binding() const { return static_cast<bool>(binding_); }
+
+    sigslot::signal_st<T> on_change;
 
 protected:
     BindingPtr binding_;
