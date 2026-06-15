@@ -11,8 +11,8 @@ namespace augr {
 
 class AttenuverterModule : public Module {
 public:
-    void Create() override {
-        Module::Create();
+    void OnCreate() override {
+        Module::OnCreate();
         label_ = "Atten";
     }
 

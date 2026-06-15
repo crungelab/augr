@@ -9,8 +9,8 @@
 
 namespace augr {
 
-void CvInputModule::Create() {
-    Io::Create();
+void CvInputModule::OnCreate() {
+    Io::OnCreate();
     label_ = "CV Input Module";
 }
 
@@ -27,8 +27,8 @@ void CvInputModule::Process() {
     cv_out_->Write(cv);
 }
 
-void CvOutputModule::Create() {
-    Io::Create();
+void CvOutputModule::OnCreate() {
+    Io::OnCreate();
     label_ = "CV Output Module";
 }
 

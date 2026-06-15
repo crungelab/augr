@@ -15,8 +15,8 @@ class AdsrModule : public Module {
 public:
     enum class Stage { Idle, Attack, Decay, Sustain, Release };
 
-    void Create() override {
-        Module::Create();
+    void OnCreate() override {
+        Module::OnCreate();
         label_ = "ADSR";
     }
 

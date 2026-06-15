@@ -21,7 +21,7 @@ class Voicebank : public Subrack {
 public:
     Voicebank() = default;
 
-    void Create() override;
+    void OnCreate() override;
     void OnCreateFresh() override;
 
     // -- Child management ----------------------------------------------

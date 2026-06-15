@@ -18,8 +18,8 @@
 
 namespace augr {
 
-void Voicebank::Create() {
-    Subrack::Create();
+void Voicebank::OnCreate() {
+    Subrack::OnCreate();
     label_ = "Voicebank";
 }
 

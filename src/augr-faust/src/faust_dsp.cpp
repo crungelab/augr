@@ -7,8 +7,8 @@
 
 namespace augr {
 
-void FaustDsp::Create() {
-    Dsp::Create();
+void FaustDsp::OnCreate() {
+    Dsp::OnCreate();
     init(Audio::sample_rate());
 }
 

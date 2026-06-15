@@ -6,8 +6,8 @@
 
 namespace augr {
 
-void AudioInputDevice::Create() {
-    Device::Create();
+void AudioInputDevice::OnCreate() {
+    Device::OnCreate();
     label_ = "Audio Input Device";
 }
 
@@ -16,8 +16,8 @@ void AudioInputDevice::CreatePins() {
     AddOutput(*audio_out_);
 }
 
-void AudioOutputDevice::Create() {
-    Device::Create();
+void AudioOutputDevice::OnCreate() {
+    Device::OnCreate();
     label_ = "Audio Output Device";
 }
 

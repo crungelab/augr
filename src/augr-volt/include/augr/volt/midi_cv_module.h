@@ -15,8 +15,8 @@ namespace augr {
 
 class MidiCvModule : public Module {
 public:
-    void Create() override {
-        Module::Create();
+    void OnCreate() override {
+        Module::OnCreate();
         label_ = "MIDI/CV";
     }
 

@@ -10,7 +10,7 @@ class AudioIo : public Io {
 class AudioInputModule : public AudioIo {
 public:
     virtual ~AudioInputModule() {}
-    void Create() override;
+    void OnCreate() override;
     void CreatePins() override;
     void Process() override;
     REFLECT_ENABLE(AudioIo)
@@ -19,7 +19,7 @@ public:
 class AudioOutputModule : public AudioIo {
 public:
     virtual ~AudioOutputModule() {}
-    void Create() override;
+    void OnCreate() override;
     void CreatePins() override;
     void Process() override;
     REFLECT_ENABLE(AudioIo)

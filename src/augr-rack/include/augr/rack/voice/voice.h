@@ -14,9 +14,10 @@ public:
     Voice() = default;
     void OnDestroy() override;
 
-    void Create() override;
+    void OnCreate() override;
     void OnCreateFresh() override;
     void OnCreateLoaded() override;
+    void OnCreateCopied() override;
 
     // -- Child management ----------------------------------------------
     void OnAddingIo(Io &io) override;

@@ -25,8 +25,8 @@ public:
     static constexpr std::size_t kRingSize = 16384;
     //static constexpr std::size_t kRingSize = 32768;
 
-    void Create() override {
-        Module::Create();
+    void OnCreate() override {
+        Module::OnCreate();
         label_ = "Scope";
     }
 

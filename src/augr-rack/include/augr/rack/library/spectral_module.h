@@ -24,8 +24,8 @@ class SpectralModule : public Module {
 public:
     static constexpr std::size_t kRingSize = 16384;
 
-    void Create() override {
-        Module::Create();
+    void OnCreate() override {
+        Module::OnCreate();
         label_ = "Spectral";
 
         sample_rate_ = static_cast<float>(Audio::sample_rate());

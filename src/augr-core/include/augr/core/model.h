@@ -23,7 +23,27 @@ public:
     Model(const std::string &label) : label_(label) { id_ = next_id_++; }
     virtual ~Model();
 
-    virtual void Create() {}
+    void Create(CreateMode mode = CreateMode::Fresh) {
+        OnCreate();
+        OnCreated();
+        switch (mode) {
+        case CreateMode::Fresh:
+            OnCreateFresh();
+            break;
+        case CreateMode::Loaded:
+            OnCreateLoaded();
+            break;
+        case CreateMode::Copied:
+            OnCreateCopied();
+            break;
+        case CreateMode::Replicated:
+            OnCreateReplicated();
+            break;
+        }
+    }
+
+    virtual void OnCreate() {}
+    virtual void OnCreated() {}
     virtual void OnCreateFresh();
     virtual void OnCreateLoaded();
     virtual void OnCreateCopied();
@@ -35,20 +55,9 @@ public:
         auto child = std::make_shared<T>(std::forward<Args>(args)...);
         child->parent_ = parent;
         child->create_mode_ = mode;
-        child->Create();
+        child->Create(mode);
         if (parent)
             parent->AddChild(child);
-        switch (mode) {
-        case CreateMode::Fresh:
-            child->OnCreateFresh();
-            break;
-        case CreateMode::Replicated:
-            child->OnCreateReplicated();
-            break;
-        case CreateMode::Loaded:
-            child->OnCreateLoaded();
-            break;
-        }
         return child;
     }
 

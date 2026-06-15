@@ -14,7 +14,7 @@ public:
 class CvInputModule : public CvIo {
 public:
     virtual ~CvInputModule() {}
-    void Create() override;
+    void OnCreate() override;
     void CreatePins() override;
     void Process() override;
     // Data members
@@ -24,7 +24,7 @@ public:
 class CvOutputModule : public CvIo {
 public:
     virtual ~CvOutputModule() {}
-    void Create() override;
+    void OnCreate() override;
     void CreatePins() override;
     void Process() override;
     REFLECT_ENABLE(CvIo)

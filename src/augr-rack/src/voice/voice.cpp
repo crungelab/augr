@@ -16,8 +16,8 @@ void Voice::OnDestroy() {
         rack().voice_manager().RemoveVoice(label_);
 }
 
-void Voice::Create() {
-    Subrack::Create();
+void Voice::OnCreate() {
+    Subrack::OnCreate();
     label_ = "Voice";
 }
 
@@ -43,6 +43,12 @@ void Voice::OnCreateFresh() {
 void Voice::OnCreateLoaded() { 
     Subrack::OnCreateLoaded();
     rack().voice_manager().AddVoice(label_, this); 
+}
+
+void Voice::OnCreateCopied() {
+    Subrack::OnCreateCopied();
+    label_ = rack().voice_manager().AllocateUniqueName(label_);
+    rack().voice_manager().AddVoice(label_, this);
 }
 
 void Voice::OnAddingIo(Io &io) {
