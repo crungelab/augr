@@ -11,6 +11,7 @@ public:
 
     void Draw() override;
     void DrawMainMenuBar();
+    virtual void OnBeforeDrawMainMenuBar();
     virtual void OnDrawMainMenuBar();
 
     virtual void Begin();

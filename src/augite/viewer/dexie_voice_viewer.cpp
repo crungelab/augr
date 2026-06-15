@@ -5,10 +5,6 @@
 namespace augr {
 
 void DexieVoiceViewer::OnDrawMainMenuBar() {
-    Frame *parent_frame = dynamic_cast<Frame *>(parent_);
-    if (parent_frame != nullptr)
-        parent_frame->OnDrawMainMenuBar();
-
     if (is_active() && ImGui::BeginMenu("Patch")) {
         const bool has_selection = controller().HasSelection();
         const bool has_clipboard = controller().HasClipboardSelection();

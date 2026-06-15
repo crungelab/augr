@@ -21,24 +21,26 @@ void Frame::Draw() {
 
     Begin();
     docked_ = ImGui::IsWindowDocked();
-    // DrawChildren();
     End();
 }
 
 void Frame::DrawMainMenuBar() {
     if (ImGui::BeginMainMenuBar()) {
+        OnBeforeDrawMainMenuBar();
         OnDrawMainMenuBar();
     }
     ImGui::EndMainMenuBar();
 }
 
-void Frame::OnDrawMainMenuBar() {
-    /*
+void Frame::OnBeforeDrawMainMenuBar() {
     Frame *parent_viewer = dynamic_cast<Frame *>(parent_);
     if (parent_viewer == nullptr)
-        return; // only draw if we're nested inside another viewer
+        return;
     parent_viewer->OnDrawMainMenuBar();
-    */
+    parent_viewer->OnBeforeDrawMainMenuBar();
+}
+
+void Frame::OnDrawMainMenuBar() {
 }
 
 void Frame::Begin() { ImGui::Begin(label_.c_str()); }
