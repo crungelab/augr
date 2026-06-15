@@ -5,6 +5,8 @@
 #include <string>
 #include <vector>
 
+#include <sigslot/signal.hpp>
+
 #include <augr/rack/subrack.h>
 
 namespace augr {
@@ -73,6 +75,7 @@ private:
     // Automatically becomes null if the master is destroyed, preventing
     // dangling pointer access. Lock before use.
     std::weak_ptr<Voice> master_;
+    sigslot::scoped_connection on_master_topology_changed_conn_;
 
     // Non-owning observers — owned as children by this Subrack.
     std::vector<Voice *> replicas_;

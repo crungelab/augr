@@ -137,7 +137,7 @@ RackSelection::MergeIntoRack(Subrack &dest, SubrackView &view,
             if (!mf)
                 continue;
 
-            auto child_ptr = mf->Produce(dest.shared_from_this());
+            auto child_ptr = mf->Produce(dest.shared_from_this(), CreateMode::Copied);
             Model *child = child_ptr.get();
 
             JsonScope scope(rack_archive, j_child);

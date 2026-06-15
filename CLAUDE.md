@@ -47,7 +47,7 @@ All third-party libraries live in `depot/` (vendored, not committed).
 
 - **`Part`** — root base class; carries `owner_` (parent in ownership tree) and `id_`. Uses the custom `REFLECT_ENABLE(Base...)` macro for runtime type introspection.
 - **`Model : Part`** — adds `children_` vector; forms the composite data tree.
-- **`Graph : Model`** — adds `Wire` management and `Connect`/`Disconnect` API. `graph_dirty_` triggers execution-order rebuild.
+- **`Graph : Model`** — adds `Wire` management and `Connect`/`Disconnect` API. `topology_changed_` triggers execution-order rebuild.
 - **`Node : Model`** — has `Inport` and `Outport` `Pin` collections.
 - **`Module : Node`** — the core DSP unit. Has typed audio/MIDI pins, `parameters_` (`FloatParameter`/`EnumParameter`), and virtual `Process()`. Modules declare UI inside `Create()` via `UiBuilder`.
 - **`Rack : Graph`** — singleton DSP graph. Holds `modules_` and `sorted_modules_` (Kahn's topological sort). Thread-safe `pending_actions_` / `pending_update_actions_` queues decouple UI thread from audio thread.
@@ -60,7 +60,7 @@ MidiSystem callback (MIDI thread) → ExeRack::EnqueueMidiMessage() → pending_
 
 AudioSystem callback (audio thread)
   → ExeRack::ProcessAudio()
-      → RebuildExecutionOrder() if graph_dirty_
+      → RebuildExecutionOrder() if topology_changed_
       → ProcessActions()           ← drains pending MIDI etc.
       → foreach sorted_module: m->Process()
       → write output device buffer

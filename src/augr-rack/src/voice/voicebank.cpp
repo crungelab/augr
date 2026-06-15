@@ -79,6 +79,22 @@ void Voicebank::OnRemovingVoice(Voice &voice) {
 
 void Voicebank::SetMaster(Voice *master) {
     std::weak_ptr<Voice> weak;
+    if (master) {
+        weak = std::dynamic_pointer_cast<Voice>(master->shared_from_this());
+        on_master_topology_changed_conn_ = master->on_topology_changed.connect([this]() { RebuildReplicas(target_voice_count_); });
+    } else {
+        on_master_topology_changed_conn_.disconnect();
+    }
+
+    EnqueueAction([this, weak]() {
+        master_ = weak;
+        RebuildReplicas(target_voice_count_);
+    });
+}
+
+/*
+void Voicebank::SetMaster(Voice *master) {
+    std::weak_ptr<Voice> weak;
     if (master)
         weak = std::dynamic_pointer_cast<Voice>(master->shared_from_this());
 
@@ -87,6 +103,7 @@ void Voicebank::SetMaster(Voice *master) {
         RebuildReplicas(target_voice_count_);
     });
 }
+*/
 
 void Voicebank::SetVoiceCount(int n) {
     if (n < 1)

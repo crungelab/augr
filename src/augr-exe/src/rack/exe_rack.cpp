@@ -21,16 +21,9 @@ namespace augr {
 int ExeRack::ProcessAudio(double streamTime, void *inbuf, void *outbuf,
                           unsigned long frames) {
 
-    /*
-    if (graph_dirty_)
-        RebuildExecutionOrder();
-    */
     Process();
     ProcessActions();
-    /*
-    for (const auto &m : sorted_modules_)
-        m->Process();
-    */
+
     Audio output = audio_output_device_->audio_in_->Read();
 
     if (output.layout() != ChannelLayout::kNull) {

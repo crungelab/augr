@@ -12,7 +12,7 @@
 
 namespace augr {
 
-enum class CreateMode { Fresh, Replicated, Loaded };
+enum class CreateMode { Fresh, Loaded, Copied, Replicated };
 
 class Model : public Subject, public std::enable_shared_from_this<Model> {
 public:
@@ -25,8 +25,9 @@ public:
 
     virtual void Create() {}
     virtual void OnCreateFresh();
-    virtual void OnCreateReplicated() {}
     virtual void OnCreateLoaded();
+    virtual void OnCreateCopied();
+    virtual void OnCreateReplicated();
 
     template <class T, class... Args>
     static std::shared_ptr<T>

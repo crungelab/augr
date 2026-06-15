@@ -5,6 +5,13 @@
 
 namespace augr {
 
+void Graph::Process() {
+    if (topology_changed_) {
+        OnTopologyChanged();
+        topology_changed_ = false;
+    }
+}
+
 void Graph::MapOutput(Pin &output) { output_map_[output.id_] = &output; }
 
 void Graph::MapInput(Pin &input) { input_map_[input.id_] = &input; }
@@ -13,14 +20,14 @@ void Graph::Connect(Pin &output, Pin &input) {
     auto wire = new Wire(output, input);
     wires_.push_back(wire);
     wire_map_[wire->id_] = wire;
-    graph_dirty_ = true;
+    topology_changed_ = true;
 }
 
 void Graph::Disconnect(Wire &wire) {
     wires_.remove(&wire);
     wire_map_.erase(wire.id_);
     delete &wire;
-    graph_dirty_ = true;
+    topology_changed_ = true;
 }
 
 bool Graph::IsOutput(int id) const {

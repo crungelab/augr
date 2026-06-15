@@ -18,12 +18,21 @@ namespace augr {
 // ---------------------------------------------------------------------------
 
 void Subrack::Process() {
-    if (graph_dirty_)
+    Graph::Process();
+
+    for (Module *m : sorted_modules_)
+        m->Process();
+}
+
+/*
+void Subrack::Process() {
+    if (topology_changed_)
         RebuildExecutionOrder();
 
     for (Module *m : sorted_modules_)
         m->Process();
 }
+*/
 
 void Subrack::RebuildExecutionOrder() {
     std::unordered_map<Module *, std::vector<Module *>> dependents;
@@ -106,37 +115,12 @@ void Subrack::RebuildExecutionOrder() {
         // TODO: log/report cycle detected here
     }
 
-    graph_dirty_ = false;
+    //topology_changed_ = false;
 }
 
 // ---------------------------------------------------------------------------
 // Child management
 // ---------------------------------------------------------------------------
-
-/*
-void Subrack::OnAddingChild(Model &model) {
-    Graph::OnAddingChild(model);
-
-    if (auto *m = dynamic_cast<Module *>(&model)) {
-        AddModule(*m);
-        graph_dirty_ = true;
-    }
-    if (auto *d = dynamic_cast<Io *>(&model)) {
-        OnAddingIo(*d);
-    }
-}
-
-void Subrack::OnRemovingChild(Model &model) {
-    if (auto *m = dynamic_cast<Module *>(&model)) {
-        RemoveModule(*m);
-        graph_dirty_ = true;
-    }
-    if (auto *d = dynamic_cast<Io *>(&model)) {
-        OnRemovingIo(*d);
-    }
-    Graph::OnRemovingChild(model);
-}
-*/
 
 void Subrack::OnAddingChild(Model &model) {
     Graph::OnAddingChild(model);
@@ -161,12 +145,12 @@ void Subrack::OnRemovingChild(Model &model) {
 
 void Subrack::OnAddingModule(Module &module) {
     AddModule(module);
-    graph_dirty_ = true;
+    topology_changed_ = true;
 }
 
 void Subrack::OnRemovingModule(Module &module) {
     RemoveModule(module);
-    graph_dirty_ = true;
+    topology_changed_ = true;
 }
 // ---------------------------------------------------------------------------
 // Outer-rack lookup

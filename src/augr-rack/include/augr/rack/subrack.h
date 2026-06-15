@@ -27,6 +27,11 @@ public:
     // in topological order calling Process() on each.
     void Process() override;
 
+    void OnTopologyChanged() override {
+        Graph::OnTopologyChanged();
+        RebuildExecutionOrder();
+    }
+
     // Topological sort over modules_ using outport wires.
     // Non-Module Nodes (e.g. WDF ports) participate in topology
     // but are not scheduled here.

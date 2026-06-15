@@ -3,6 +3,8 @@
 #include <list>
 #include <map>
 
+#include <sigslot/signal.hpp>
+
 #include <augr/rack/module/module.h>
 
 namespace augr {
@@ -13,6 +15,8 @@ class Pin;
 class Graph : public Module {
 public:
     Graph() {}
+
+    void Process() override;
 
     void Connect(Pin &output, Pin &input);
     void Disconnect(Wire &wire);
@@ -25,6 +29,7 @@ public:
 protected:
     void OnAddingChild(Model &model) override;
     void OnRemovingChild(Model &model) override;
+    virtual void OnTopologyChanged() { on_topology_changed(); }
 
 public:
     // Accessors
@@ -38,7 +43,8 @@ public:
     std::map<int, Pin *> output_map_;
     std::map<int, Pin *> input_map_;
 
-    bool graph_dirty_ = false;
+    bool topology_changed_ = false;
+    sigslot::signal_st<> on_topology_changed;
 
     REFLECT_ENABLE(Module)
 };
