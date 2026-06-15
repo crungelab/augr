@@ -10,7 +10,7 @@ public:
     void Save(Archive &archive) const override;
     void Load(Archive &archive) override;
 
-private:
+protected:
     void SaveView(Archive &archive) const;
     void LoadView(Archive &archive);
 

@@ -1,4 +1,4 @@
-#include <augr/core/model_registry.h>
+//#include <augr/core/model_registry.h>
 
 #include <augr/rack/archiver/module_archiver.h>
 
@@ -42,7 +42,7 @@ void ModuleArchiver::Load(Archive &archive) {
         module.set_uuid(j["uuid"].get<std::string>());
     }
 
-    ModelRegistry::singleton().RegisterWithUuid(&module, module.uuid());
+    //ModelRegistry::singleton().RegisterWithUuid(&module, module.uuid());
     archive.RegisterModule(module.uuid(), &module);
 
     // Type tag is read by the caller (it's needed before we can construct

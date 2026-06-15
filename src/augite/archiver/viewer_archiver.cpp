@@ -2,7 +2,7 @@
 
 #include <augr/core/archiver_factory.h>
 #include <augr/core/archiver_manufacturer.h>
-#include <augr/core/model_registry.h>
+//#include <augr/core/model_registry.h>
 
 #include <augite/app/app.h>
 
@@ -113,7 +113,8 @@ void ViewerArchiver::LoadSubviewers(Archive &archive) {
         auto model_uuid = uuids::uuid::from_string(uuid_str);
         if (!model_uuid)
             continue;
-        auto model = ModelRegistry::singleton().Find(model_uuid.value());
+        //auto model = ModelRegistry::singleton().Find(model_uuid.value());
+        auto model = subject().model().FindByUuid(model_uuid.value());
         if (!model)
             continue;
         auto &vm = App::singleton().viewer_manager();

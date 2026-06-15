@@ -91,6 +91,8 @@ public:
         return true;
     }
 
+    Model *FindByUuid(const uuids::uuid &uuid);
+    
     // Accessors
     uuids::uuid uuid() const { return uuid_; }
     std::string uuid_to_string() const { return uuids::to_string(uuid_); }
