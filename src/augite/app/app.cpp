@@ -37,6 +37,7 @@ App::App() {
     REGISTER_ARCHIVER_FACTORY(ModuleViewerArchiver);
     REGISTER_ARCHIVER_FACTORY(SubrackViewerArchiver);
     REGISTER_ARCHIVER_FACTORY(RackViewerArchiver);
+    REGISTER_ARCHIVER_FACTORY(DexieVoiceViewerArchiver);
 
 
     REGISTER_MODEL_WIDGET_FACTORY(SubrackWidget)

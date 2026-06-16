@@ -21,4 +21,5 @@ void InitAugrFmLibrary() {
     REGISTER_MODULE(Dexie);
 
     REGISTER_MODEL_FACTORY(DexieVoice);
+    REGISTER_ARCHIVER_FACTORY(DexieVoiceArchiver);
 }

@@ -7,11 +7,11 @@
 namespace augr {
 
 void RackArchiver::Save(Archive &archive) const {
-    GraphArchiver::Save(archive);
+    SubrackArchiver::Save(archive);
 }
 
 void RackArchiver::Load(Archive &archive) {
-    GraphArchiver::Load(archive);
+    SubrackArchiver::Load(archive);
 }
 
 } // namespace augr

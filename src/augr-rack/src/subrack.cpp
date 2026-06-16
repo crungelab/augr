@@ -24,16 +24,6 @@ void Subrack::Process() {
         m->Process();
 }
 
-/*
-void Subrack::Process() {
-    if (topology_changed_)
-        RebuildExecutionOrder();
-
-    for (Module *m : sorted_modules_)
-        m->Process();
-}
-*/
-
 void Subrack::RebuildExecutionOrder() {
     std::unordered_map<Module *, std::vector<Module *>> dependents;
     std::unordered_map<Module *, int> in_degree;
@@ -114,9 +104,8 @@ void Subrack::RebuildExecutionOrder() {
 
         // TODO: log/report cycle detected here
     }
-
-    //topology_changed_ = false;
 }
+
 
 // ---------------------------------------------------------------------------
 // Child management

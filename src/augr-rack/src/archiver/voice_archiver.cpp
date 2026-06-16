@@ -7,11 +7,11 @@
 namespace augr {
 
 void VoiceArchiver::Save(Archive &archive) const {
-    GraphArchiver::Save(archive);
+    SubrackArchiver::Save(archive);
 }
 
 void VoiceArchiver::Load(Archive &archive) {
-    GraphArchiver::Load(archive);
+    SubrackArchiver::Load(archive);
 }
 
 } // namespace augr

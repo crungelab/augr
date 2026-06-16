@@ -35,7 +35,6 @@ public:
     void Draw() override;
 
     void PollPendingDialog();
-    //void DrawMenuBar();
     void OnDrawMainMenuBar() override;
 
     void StartOpenDialog();

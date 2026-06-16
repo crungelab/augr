@@ -62,6 +62,11 @@ public:
         velocity_out_->Write(velocity_audio);
     }
 
+    MidiInput *midi_in_ = nullptr;
+    VoltageOutput *pitch_out_ = nullptr;
+    VoltageOutput *gate_out_ = nullptr;
+    VoltageOutput *velocity_out_ = nullptr;
+
     REFLECT_ENABLE(Module)
 
 private:
@@ -98,11 +103,6 @@ private:
     static float KeyToCv(uint8_t key) {
         return (static_cast<int>(key) - 60) / 12.f;
     }
-
-    MidiInput *midi_in_ = nullptr;
-    VoltageOutput *pitch_out_ = nullptr;
-    VoltageOutput *gate_out_ = nullptr;
-    VoltageOutput *velocity_out_ = nullptr;
 
     std::vector<uint8_t> held_notes_;
     float pitch_cv_ = 0.f;

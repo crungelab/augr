@@ -45,7 +45,7 @@ public:
 
     REFLECT_ENABLE(Subrack)
 
-private:
+protected:
     MidiInputModule *midi_in_module_ = nullptr;
 
     AudioOutputModule *audio_out_module_ = nullptr;

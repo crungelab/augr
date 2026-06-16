@@ -29,11 +29,6 @@ void SubrackViewer::RebuildView() {
 
 void SubrackViewer::Draw() {
     PollPendingDialog();
-    /*
-    if (is_active()) {
-        DrawMenuBar();
-    }
-    */
     DrawUnsavedModal();
     Viewer::Draw();
 }
@@ -99,78 +94,6 @@ void SubrackViewer::OnDrawMainMenuBar() {
     }
     Viewer::OnDrawMainMenuBar();
 }
-
-/*
-void SubrackViewer::DrawMenuBar() {
-    if (ImGui::BeginMainMenuBar()) {
-        if (ImGui::BeginMenu("File")) {
-            if (ImGui::MenuItem("New", "Ctrl+N")) {
-                if (document().IsModified()) {
-                    pending_ = PendingAction::NewAfterPrompt;
-                    show_unsaved_modal_ = true;
-                } else {
-                    DoNew();
-                }
-            }
-            if (ImGui::MenuItem("Open...", "Ctrl+O")) {
-                if (document().IsModified()) {
-                    pending_ = PendingAction::OpenAfterPrompt;
-                    show_unsaved_modal_ = true;
-                } else {
-                    StartOpenDialog();
-                }
-            }
-            ImGui::Separator();
-            bool can_save = document().IsModified() || !document().Path();
-            if (ImGui::MenuItem("Save", "Ctrl+S", false, can_save)) {
-                if (document().Path()) {
-                    DoSave();
-                } else {
-                    StartSaveAsDialog();
-                }
-            }
-            if (ImGui::MenuItem("Save As...", "Ctrl+Shift+S")) {
-                StartSaveAsDialog();
-            }
-            ImGui::Separator();
-            if (ImGui::MenuItem("Quit", "Ctrl+Q")) {
-                // similar dirty-check pattern; left as exercise
-            }
-            ImGui::EndMenu();
-        }
-
-        if (ImGui::BeginMenu("Edit")) {
-            const bool has_selection = controller().HasSelection();
-            const bool has_clipboard = controller().HasClipboardSelection();
-
-            if (ImGui::MenuItem("Cut", "Ctrl+X", false, has_selection)) {
-                controller().Cut();
-            }
-            if (ImGui::MenuItem("Copy", "Ctrl+C", false, has_selection)) {
-                controller().Copy();
-            }
-            if (ImGui::MenuItem("Paste", "Ctrl+V", false, has_clipboard)) {
-                controller().Paste();
-            }
-            if (ImGui::MenuItem("Duplicate", "Ctrl+D", false, has_selection)) {
-                controller().Duplicate();
-            }
-            ImGui::Separator();
-            if (ImGui::MenuItem("Delete", "Del", false, has_selection)) {
-                controller().DeleteSelection();
-            }
-            ImGui::Separator();
-            if (ImGui::MenuItem("Select All", "Ctrl+A")) {
-                controller().SelectAll();
-            }
-
-            ImGui::EndMenu();
-        }
-
-        ImGui::EndMainMenuBar();
-    }
-}
-*/
 
 // ---------- Dialog launchers ----------
 

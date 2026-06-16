@@ -14,3 +14,6 @@ target_include_directories(${THIS} PRIVATE ${AUGR_FM_ROOT}/include)
 
 include(${AUGR_CMAKE}/AugrRack.cmake)
 USES_AUGR_RACK(${THIS})
+
+include(${AUGR_CMAKE}/AugrVolt.cmake)
+USES_AUGR_VOLT(${THIS})

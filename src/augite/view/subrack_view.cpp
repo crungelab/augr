@@ -17,12 +17,6 @@ SubrackView::SubrackView(RackDoc &doc) : DocumentViewT<RackDoc>(doc) {
 }
 
 SubrackView::~SubrackView() {
-    /*
-    if (root_) {
-        delete root_;
-        root_ = nullptr;
-    }
-    */
     if (context_) {
         ImNodes::EditorContextFree(context_);
         context_ = nullptr;
