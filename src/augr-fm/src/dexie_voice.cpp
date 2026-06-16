@@ -126,17 +126,11 @@ void DexieVoice::PushOperatorParams(int op_idx, const Dx7Op &op, int feedback,
     d->detune_ = op.detune;
     d->output_level_ = OutputLevelToGain(op.output_level);
 
-    // feedback_ now carries the raw 0..7 patch amount; feedback_scale_
-    // carries the per-algorithm depth constant. Dexie::Process multiplies
-    // them together. Only the designated feedback operator gets nonzero
-    // values for either.
-    if (op_idx == def.feedback_op) {
-        d->feedback_       = static_cast<float>(feedback);
-        d->feedback_scale_ = def.feedback_scale;
-    } else {
-        d->feedback_       = 0.f;
-        d->feedback_scale_ = 0.f;
-    }
+    // feedback_ is the raw DX7 0..7 patch value. Dexie::Process converts it
+    // to a feedback shift internally. Only the algorithm's designated
+    // feedback operator gets a nonzero value; everyone else stays at 0,
+    // which Process() treats as "off".
+    d->feedback_ = (op_idx == def.feedback_op) ? static_cast<float>(feedback) : 0.f;
 }
 
 } // namespace augr::fm

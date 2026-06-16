@@ -26,6 +26,8 @@ float LevelToAmplitude(float level_0_99) {
     return std::clamp(level_0_99, 0.0f, 99.0f) / 99.0f;
 }
 
+constexpr int kFeedbackBitdepth = 8;
+
 } // namespace
 
 void Dexie::OnCreate() {
@@ -136,11 +138,10 @@ void Dexie::Process() {
         LevelToAmplitude(levels_[3]),
     };
 
-    // Combined feedback depth — per-algorithm scale times the raw 0..7
-    // patch amount. The two-sample average (fb_hist_[0]+fb_hist_[1])*0.5
-    // is a stability fix (see compute_fb in MSFA's fm_op_kernel.cc),
-    // independent of this depth scaling.
-    const float feedback_depth = feedback_scale_ * feedback_;
+    const int feedback_int = static_cast<int>(std::round(feedback_));
+    const int feedback_shift =
+        feedback_int != 0 ? kFeedbackBitdepth - feedback_int : 16;
+    const bool fb_on = feedback_shift < 16;
 
     Audio out(ChannelLayout::kMono);
     fy_real *out_data = out.array().data();
@@ -196,7 +197,11 @@ void Dexie::Process() {
         const float freq = ratio_mode ? (base_hz * ratio) : frequency_;
         const float phase_inc = freq / sample_rate;
 
-        const float fb = feedback_depth * (fb_hist_[0] + fb_hist_[1]) * 0.5f;
+        const float fb = fb_on
+                             ? (fb_hist_[0] + fb_hist_[1]) /
+                                   static_cast<float>(1 << (feedback_shift + 1))
+                             : 0.0f;
+
         const float sample = std::sin(kTwoPi * (phase_ + phase_mod + fb));
         const float shaped = sample * output_level_ * eg_value_;
 

@@ -30,8 +30,15 @@ public:
     float frequency_ = 0.0f; // Hz; used only when ratio <= 0
     float detune_ = 0.0f; // DX7 detune: integer steps -7..7, ~0.49 cents each
     float output_level_ = 1.0f; // operator output scaling [0..1]
-    float feedback_ = 0.0f;     // self-modulation amount [0..1]
-    float feedback_scale_ = 0.0f;  // per-algorithm constant from Dx7AlgorithmDef
+    // Feedback: feedback_shift_ follows the DX7's own encoding — derived from
+    // the raw 0..7 patch value as FEEDBACK_BITDEPTH - feedback (or 16 if the
+    // patch feedback is 0, meaning "off"). See Dx7Note::init in Dexed's Mark I
+    // engine. Only the algorithm's designated feedback operator has a value
+    // other than 16; all others stay off.
+    int feedback_shift_ = 16;
+    float feedback_ =
+        0.0f; // raw DX7 feedback amount, 0..7 — same range as the
+              // hardware control. Converted to a shift internally.
 
     // CV inputs — pitch → gate → phase
     VoltageInput *cv_pitch_in_ = nullptr; // V/oct pitch
