@@ -1,5 +1,5 @@
-#include <augr/core/model_factory.h>
 #include <augr/core/archiver_factory.h>
+#include <augr/core/model_factory.h>
 
 #include <augr/rack/module/audio_io.h>
 #include <augr/rack/module/cv_io.h>
@@ -30,6 +30,7 @@ void DexieVoice::OnCreateFresh() {
 
     for (int i = 0; i < 6; ++i) {
         auto op = Model::Make<Dexie>(shared_from_this());
+        op->label_ = "OP" + std::to_string(i + 1);
         Connect(*midi_cv_module_->pitch_out_, *op->cv_pitch_in_);
         Connect(*midi_cv_module_->gate_out_, *op->gate_in_);
         ops_[i] = op.get();
@@ -38,15 +39,31 @@ void DexieVoice::OnCreateFresh() {
 
 void DexieVoice::OnAddingChild(Model &model) {
     Voice::OnAddingChild(model);
+
     if (auto *midi_cv = dynamic_cast<MidiCvModule *>(&model)) {
         midi_cv_module_ = midi_cv;
+    } else if (auto *op = dynamic_cast<Dexie *>(&model)) {
+        for (int i = 0; i < 6; ++i) {
+            if (!ops_[i]) {
+                ops_[i] = op;
+                return;
+            }
+        }
     }
 }
 
 void DexieVoice::OnRemovingChild(Model &model) {
     if (auto *midi_cv = dynamic_cast<MidiCvModule *>(&model)) {
         midi_cv_module_ = nullptr;
+    } else if (auto *op = dynamic_cast<Dexie *>(&model)) {
+        for (int i = 0; i < 6; ++i) {
+            if (ops_[i] == op) {
+                ops_[i] = nullptr;
+                return;
+            }
+        }
     }
+
     Voice::OnRemovingChild(model);
 }
 
@@ -86,6 +103,15 @@ void DexieVoice::WireAlgorithm(int algorithm, int feedback_op) {
     }
 }
 
+// DX7 output level is roughly logarithmic. This is an approximation —
+// calibrate the dB-per-step against Dexed by ear.
+float OutputLevelToGain(float level_0_99) {
+    if (level_0_99 <= 0.f) return 0.f;
+    constexpr float kDbPerStep = 0.75f;          // tune this
+    const float db = (level_0_99 - 99.f) * kDbPerStep;
+    return std::pow(10.f, db / 20.f);
+}
+
 void DexieVoice::PushOperatorParams(int op_idx, const Dx7Op &op, int feedback,
                                     int feedback_op) {
     Dexie *d = ops_[op_idx];
@@ -98,7 +124,9 @@ void DexieVoice::PushOperatorParams(int op_idx, const Dx7Op &op, int feedback,
     d->ratio_coarse_ = op.ratio_coarse;
     d->ratio_fine_ = op.ratio_fine;
     d->detune_ = op.detune;
-    d->output_level_ = op.output_level / 99.f;
+    //d->output_level_ = op.output_level / 99.f;
+    d->output_level_ = OutputLevelToGain(op.output_level);
+    //d->feedback_ = 0.0f;
     d->feedback_ =
         (op_idx == feedback_op) ? static_cast<float>(feedback) / 7.f : 0.f;
 }

@@ -15,58 +15,73 @@ namespace {
 constexpr int kUnpackedVoiceSize = 155;
 constexpr int kPackedVoiceSize   = 128;
 
-// Unpack a single 128-byte packed voice into a 155-byte unpacked buffer.
 void UnpackVoice(const uint8_t* packed, uint8_t* unpacked) {
-    // Each operator: 17 packed bytes → 21 unpacked bytes
     for (int op = 0; op < 6; ++op) {
         const uint8_t* ps = packed   + op * 17;
         uint8_t*       us = unpacked + op * 21;
 
-        us[0]  = ps[0] & 0x0F;          // EG R1
-        us[1]  = ps[1] & 0x0F;          // EG R2
-        us[2]  = ps[2] & 0x0F;          // EG R3
-        us[3]  = ps[3] & 0x0F;          // EG R4
-        us[4]  = ps[4] & 0x0F;          // EG L1
-        us[5]  = ps[5] & 0x0F;          // EG L2
-        us[6]  = ps[6] & 0x0F;          // EG L3
-        us[7]  = ps[7] & 0x0F;          // EG L4
-        us[8]  = ps[8] & 0x1F;          // kbd break point
-        us[9]  = ps[9] & 0x1F;          // kbd scale left depth
-        us[10] = ps[10] & 0x1F;         // kbd scale right depth
-        us[11] = ps[11] & 0x03;         // kbd scale left curve
-        us[12] = (ps[11] >> 2) & 0x03;  // kbd scale right curve
-        us[13] = ps[12] & 0x07;         // kbd rate scaling
-        us[14] = ps[13] & 0x03;         // amp mod sensitivity
-        us[15] = (ps[13] >> 2) & 0x07;  // key vel sensitivity
-        us[16] = ps[14] & 0x7F;         // output level
-        us[17] = ps[15] & 0x01;         // osc mode (0=ratio, 1=fixed)
-        us[18] = (ps[15] >> 1) & 0x1F;  // coarse ratio / fixed freq coarse
-        us[19] = ps[16] & 0x0F;         // fine ratio / fixed freq fine (0..99)
-        us[20] = (ps[16] >> 4) & 0x0F;  // detune (0..14, center=7)
+        us[0]  = ps[0];   // EG R1 — plain byte
+        us[1]  = ps[1];   // EG R2
+        us[2]  = ps[2];   // EG R3
+        us[3]  = ps[3];   // EG R4
+        us[4]  = ps[4];   // EG L1
+        us[5]  = ps[5];   // EG L2
+        us[6]  = ps[6];   // EG L3
+        us[7]  = ps[7];   // EG L4
+        us[8]  = ps[8];   // kbd break point
+        us[9]  = ps[9];   // kbd scale left depth
+        us[10] = ps[10];  // kbd scale right depth
+
+        uint8_t tmp = ps[11];
+        us[11] = tmp & 0x03;          // kbd scale left curve
+        us[12] = (tmp >> 2) & 0x03;   // kbd scale right curve
+
+        tmp = ps[12];
+        us[20] = (tmp >> 3) & 0x0F;   // detune  (note: lives here, not byte 16!)
+        us[13] = tmp & 0x07;          // kbd rate scaling
+
+        tmp = ps[13];
+        us[15] = (tmp >> 2) & 0x07;   // key vel sensitivity
+        us[14] = tmp & 0x03;          // amp mod sensitivity
+
+        us[16] = ps[14];              // output level — plain byte
+
+        tmp = ps[15];
+        us[18] = (tmp >> 1) & 0x1F;   // coarse
+        us[17] = tmp & 0x01;          // osc mode
+
+        us[19] = ps[16];              // fine — plain byte
     }
 
-    // Remaining voice parameters (after 6 operators)
     const uint8_t* ps = packed   + 102;
     uint8_t*       us = unpacked + 126;
 
-    us[0]  = ps[0] & 0x0F;   // pitch EG R1
-    us[1]  = ps[1] & 0x0F;   // pitch EG R2
-    us[2]  = ps[2] & 0x0F;   // pitch EG R3
-    us[3]  = ps[3] & 0x0F;   // pitch EG R4
-    us[4]  = ps[4] & 0x0F;   // pitch EG L1
-    us[5]  = ps[5] & 0x0F;   // pitch EG L2
-    us[6]  = ps[6] & 0x0F;   // pitch EG L3
-    us[7]  = ps[7] & 0x0F;   // pitch EG L4
-    us[8]  = ps[8] & 0x1F;   // algorithm (0..31)
-    us[9]  = ps[9] & 0x07;   // feedback
-    us[10] = (ps[9] >> 3) & 0x01;  // osc key sync
-    std::memcpy(us + 11, ps + 10, 4);  // LFO speed, delay, pitch mod depth, amp mod depth
-    us[15] = ps[14] & 0x01;  // LFO sync
-    us[16] = (ps[14] >> 1) & 0x07;  // LFO waveform
-    us[17] = (ps[14] >> 4) & 0x07;  // pitch mod sensitivity
-    us[18] = ps[15] & 0x7F;  // transpose
-    std::memcpy(us + 19, ps + 16, 10); // voice name
-    // remaining 6 bytes are padding / operator on/off
+    us[0] = ps[0];   // pitch EG R1 — plain byte
+    us[1] = ps[1];   // pitch EG R2
+    us[2] = ps[2];   // pitch EG R3
+    us[3] = ps[3];   // pitch EG R4
+    us[4] = ps[4];   // pitch EG L1
+    us[5] = ps[5];   // pitch EG L2
+    us[6] = ps[6];   // pitch EG L3
+    us[7] = ps[7];   // pitch EG L4
+    us[8] = ps[8];   // algorithm
+
+    uint8_t tmp = ps[9];
+    us[10] = (tmp >> 3) & 0x01;  // osc key sync
+    us[9]  = tmp & 0x07;         // feedback
+
+    us[11] = ps[10];  // lfo speed
+    us[12] = ps[11];  // lfo delay
+    us[13] = ps[12];  // lfo pitch mod depth
+    us[14] = ps[13];  // lfo amp mod depth
+
+    tmp = ps[14];
+    us[17] = (tmp >> 4) & 0x07;  // pitch mod sensitivity
+    us[16] = (tmp >> 1) & 0x07;  // lfo waveform
+    us[15] = tmp & 0x01;         // lfo sync
+
+    us[18] = ps[15];             // transpose
+    std::memcpy(us + 19, ps + 16, 10);  // name
 }
 
 // DX7 rates in sysex are 0..99 but NOT the same scale as our internal 0..99.
