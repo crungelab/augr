@@ -1,15 +1,3 @@
-// augr/fm/dx7_algorithm.cpp
-#include <augr/fm/dx7_algorithm.h>
-
-#include <cassert>
-
-namespace augr::fm {
-
-// Feedback on the DX7 always applies to the last operator in the feedback
-// loop, which is the operator that feeds back into itself. For most
-// algorithms this is OP1 (index 0). Where the spec designates a different
-// operator it is noted per-entry.
-
 static const Dx7AlgorithmDef kAlgorithms[32] = {
     // Algorithm 1: carriers 1, 3; 6->5 5->4 4->3 2->1; feedback OP6 (scale 0.2)
     {
@@ -204,11 +192,3 @@ static const Dx7AlgorithmDef kAlgorithms[32] = {
         0, 5, 0.6f
     },
 };
-
-
-const Dx7AlgorithmDef& GetDx7Algorithm(int index) {
-    assert(index >= 0 && index < 32);
-    return kAlgorithms[index];
-}
-
-} // namespace augr::fm

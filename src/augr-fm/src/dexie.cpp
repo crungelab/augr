@@ -80,7 +80,7 @@ void Dexie::CreateControls() {
         auto level = CreateFloatParameter("Level", ControlMeta::kDefault,
                                           &output_level_, 1.f, 0.f, 1.f, 0.01f);
         auto feedback = CreateFloatParameter("Feedback", ControlMeta::kDefault,
-                                             &feedback_, 0.f, 0.f, 1.f, 0.01f);
+                                             &feedback_, 0.f, 0.f, 7.f, 1.f);
         ui.Knob("Coarse", coarse);
         ui.Knob("Fine", fine);
         ui.Knob("Detune", detune);
@@ -136,6 +136,12 @@ void Dexie::Process() {
         LevelToAmplitude(levels_[3]),
     };
 
+    // Combined feedback depth — per-algorithm scale times the raw 0..7
+    // patch amount. The two-sample average (fb_hist_[0]+fb_hist_[1])*0.5
+    // is a stability fix (see compute_fb in MSFA's fm_op_kernel.cc),
+    // independent of this depth scaling.
+    const float feedback_depth = feedback_scale_ * feedback_;
+
     Audio out(ChannelLayout::kMono);
     fy_real *out_data = out.array().data();
 
@@ -190,7 +196,7 @@ void Dexie::Process() {
         const float freq = ratio_mode ? (base_hz * ratio) : frequency_;
         const float phase_inc = freq / sample_rate;
 
-        const float fb = feedback_ * (fb_hist_[0] + fb_hist_[1]) * 0.5f;
+        const float fb = feedback_depth * (fb_hist_[0] + fb_hist_[1]) * 0.5f;
         const float sample = std::sin(kTwoPi * (phase_ + phase_mod + fb));
         const float shaped = sample * output_level_ * eg_value_;
 
@@ -202,19 +208,6 @@ void Dexie::Process() {
         phase_ += phase_inc;
         if (phase_ >= 1.0f)
             phase_ -= std::floor(phase_);
-
-        /*
-        const float fb     = feedback_ * last_sample_ * 0.5f;
-        const float sample = std::sin(kTwoPi * (phase_ + phase_mod + fb));
-        const float shaped = sample * output_level_ * eg_value_;
-
-        out_data[i] = static_cast<fy_real>(shaped);
-        last_sample_ = shaped;
-
-        phase_ += phase_inc;
-        if (phase_ >= 1.0f)
-            phase_ -= std::floor(phase_);
-        */
     }
 
     audio_out_->Write(out);

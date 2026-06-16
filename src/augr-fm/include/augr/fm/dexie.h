@@ -31,6 +31,7 @@ public:
     float detune_ = 0.0f; // DX7 detune: integer steps -7..7, ~0.49 cents each
     float output_level_ = 1.0f; // operator output scaling [0..1]
     float feedback_ = 0.0f;     // self-modulation amount [0..1]
+    float feedback_scale_ = 0.0f;  // per-algorithm constant from Dx7AlgorithmDef
 
     // CV inputs — pitch → gate → phase
     VoltageInput *cv_pitch_in_ = nullptr; // V/oct pitch

@@ -14,6 +14,7 @@ class MidiCvModule;
 namespace augr::fm {
 
 class Dexie;
+struct Dx7AlgorithmDef;
 
 class DexieVoice : public Voice {
 public:
@@ -35,7 +36,7 @@ private:
 
     void WireAlgorithm(int algorithm, int feedback_op);
     void PushOperatorParams(int op_idx, const Dx7Op& op,
-                            int feedback, int feedback_op);
+                            int feedback, const Dx7AlgorithmDef& def);
 };
 
 } // namespace augr::fm

@@ -73,7 +73,7 @@ void DexieVoice::LoadPatch(const Dx7Patch &patch) {
     WireAlgorithm(patch.algorithm, def.feedback_op);
 
     for (int i = 0; i < 6; ++i)
-        PushOperatorParams(i, patch.ops[i], patch.feedback, def.feedback_op);
+        PushOperatorParams(i, patch.ops[i], patch.feedback, def);
 }
 
 void DexieVoice::WireAlgorithm(int algorithm, int feedback_op) {
@@ -113,7 +113,7 @@ float OutputLevelToGain(float level_0_99) {
 }
 
 void DexieVoice::PushOperatorParams(int op_idx, const Dx7Op &op, int feedback,
-                                    int feedback_op) {
+                                    const Dx7AlgorithmDef &def) {
     Dexie *d = ops_[op_idx];
 
     for (int i = 0; i < 4; ++i) {
@@ -124,11 +124,19 @@ void DexieVoice::PushOperatorParams(int op_idx, const Dx7Op &op, int feedback,
     d->ratio_coarse_ = op.ratio_coarse;
     d->ratio_fine_ = op.ratio_fine;
     d->detune_ = op.detune;
-    //d->output_level_ = op.output_level / 99.f;
     d->output_level_ = OutputLevelToGain(op.output_level);
-    //d->feedback_ = 0.0f;
-    d->feedback_ =
-        (op_idx == feedback_op) ? static_cast<float>(feedback) / 7.f : 0.f;
+
+    // feedback_ now carries the raw 0..7 patch amount; feedback_scale_
+    // carries the per-algorithm depth constant. Dexie::Process multiplies
+    // them together. Only the designated feedback operator gets nonzero
+    // values for either.
+    if (op_idx == def.feedback_op) {
+        d->feedback_       = static_cast<float>(feedback);
+        d->feedback_scale_ = def.feedback_scale;
+    } else {
+        d->feedback_       = 0.f;
+        d->feedback_scale_ = 0.f;
+    }
 }
 
 } // namespace augr::fm
