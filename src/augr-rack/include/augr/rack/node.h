@@ -3,7 +3,7 @@
 #include <vector>
 
 #include "port.h"
-#include <augr/core/model.h>
+#include <augr/model.h>
 
 namespace augr {
 

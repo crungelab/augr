@@ -1,4 +1,4 @@
-#include <augr/core/subject.h>
+#include <augr/subject.h>
 
 namespace augr {
 

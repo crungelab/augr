@@ -1,4 +1,4 @@
-#include <augr/core/midi/midi_message.h>
+#include <augr/midi/midi_message.h>
 
 namespace augr {
 

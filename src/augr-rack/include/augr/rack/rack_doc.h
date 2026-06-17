@@ -9,7 +9,7 @@
 
 #include <nlohmann/json.hpp>
 
-#include <augr/core/document.h>
+#include <augr/document.h>
 
 #include "rack.h"
 

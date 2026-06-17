@@ -1,6 +1,6 @@
 #pragma once
 
-#include <augr/core/ui/ui_builder.h>
+#include <augr/ui/ui_builder.h>
 
 #include <augr/rack/module/module.h>
 #include <augr/rack/voltage_pin.h>

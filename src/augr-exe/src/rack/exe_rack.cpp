@@ -1,8 +1,8 @@
 #include <spdlog/spdlog.h>
 
-#include <augr/core/archiver_factory.h>
-#include <augr/core/audio.h>
-#include <augr/core/model_factory.h>
+#include <augr/archiver_factory.h>
+#include <augr/audio.h>
+#include <augr/model_factory.h>
 
 #include <augr/rack/archiver/rack_archiver.h>
 #include <augr/rack/module/audio_device.h>

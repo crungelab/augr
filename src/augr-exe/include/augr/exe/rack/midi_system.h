@@ -6,7 +6,7 @@
 
 #include <RtMidi.h>
 
-#include <augr/core/midi/midi_message.h>
+#include <augr/midi/midi_message.h>
 #include <augr/exe/rack/midi_configurator.h>
 
 namespace augr {

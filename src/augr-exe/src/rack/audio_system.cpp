@@ -1,4 +1,4 @@
-#include <augr/core/audio.h>
+#include <augr/audio.h>
 
 #include <augr/exe/rack/audio_system.h>
 #include <augr/exe/rack/exe_rack.h>

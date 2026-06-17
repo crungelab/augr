@@ -3,8 +3,8 @@
 #include <algorithm>
 #include <vector>
 
-#include <augr/core/audio.h>
-#include <augr/core/midi/midi_message.h>
+#include <augr/audio.h>
+#include <augr/midi/midi_message.h>
 
 #include <augr/rack/midi_pin.h>
 #include <augr/rack/module/module.h>

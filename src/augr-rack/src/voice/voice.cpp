@@ -1,4 +1,4 @@
-#include <augr/core/model_factory.h>
+#include <augr/model_factory.h>
 
 #include <augr/rack/module/audio_io.h>
 #include <augr/rack/module/cv_io.h>

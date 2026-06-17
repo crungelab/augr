@@ -2,8 +2,8 @@
 
 #include <algorithm>
 
-#include <augr/core/audio.h>
-#include <augr/core/ui/ui_builder.h>
+#include <augr/audio.h>
+#include <augr/ui/ui_builder.h>
 
 #include <augr/rack/module/module.h>
 #include <augr/rack/node.h>

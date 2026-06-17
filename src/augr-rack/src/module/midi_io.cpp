@@ -1,6 +1,6 @@
-#include <augr/core/archiver_factory.h>
-#include <augr/core/model_factory.h>
-#include <augr/core/midi/midi_message.h>
+#include <augr/archiver_factory.h>
+#include <augr/model_factory.h>
+#include <augr/midi/midi_message.h>
 
 #include <augr/rack/archiver/module_archiver.h>
 #include <augr/rack/module/midi_io.h>

@@ -3,21 +3,21 @@
 #include <augr/faust/faust_dsp.h>
 #include <augr/faust/faust_dsp_ui.h>
 
-#include <augr/core/ui/control/button.h>
-#include <augr/core/ui/control/check_button.h>
-#include <augr/core/ui/control/frame_box.h>
-#include <augr/core/ui/control/h_bargraph.h>
-#include <augr/core/ui/control/h_box.h>
-#include <augr/core/ui/control/h_slider.h>
-#include <augr/core/ui/control/knob.h>
-#include <augr/core/ui/control/num_display.h>
-#include <augr/core/ui/control/num_entry.h>
-#include <augr/core/ui/control/tab_box.h>
-#include <augr/core/ui/control/text_display.h>
-#include <augr/core/ui/control/toggle_button.h>
-#include <augr/core/ui/control/v_bargraph.h>
-#include <augr/core/ui/control/v_box.h>
-#include <augr/core/ui/control/v_slider.h>
+#include <augr/ui/control/button.h>
+#include <augr/ui/control/check_button.h>
+#include <augr/ui/control/frame_box.h>
+#include <augr/ui/control/h_bargraph.h>
+#include <augr/ui/control/h_box.h>
+#include <augr/ui/control/h_slider.h>
+#include <augr/ui/control/knob.h>
+#include <augr/ui/control/num_display.h>
+#include <augr/ui/control/num_entry.h>
+#include <augr/ui/control/tab_box.h>
+#include <augr/ui/control/text_display.h>
+#include <augr/ui/control/toggle_button.h>
+#include <augr/ui/control/v_bargraph.h>
+#include <augr/ui/control/v_box.h>
+#include <augr/ui/control/v_slider.h>
 
 namespace augr {
 

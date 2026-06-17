@@ -1,7 +1,7 @@
 #include <augr/rack/rack.h>
 #include <augr/rack/archiver/rack_archiver.h>
 
-#include <augr/core/archiver_factory.h>
+#include <augr/archiver_factory.h>
 #include <nlohmann/json.hpp>
 
 namespace augr {

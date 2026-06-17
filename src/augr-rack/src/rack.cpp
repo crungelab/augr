@@ -1,5 +1,5 @@
-#include <augr/core/archiver_factory.h>
-#include <augr/core/model_factory.h>
+#include <augr/archiver_factory.h>
+#include <augr/model_factory.h>
 
 #include <augr/rack/rack.h>
 

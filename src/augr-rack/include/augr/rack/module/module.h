@@ -3,8 +3,8 @@
 #include <memory>
 #include <vector>
 
-#include <augr/core/ui/control/enum_parameter.h>
-#include <augr/core/ui/control/float_parameter.h>
+#include <augr/ui/control/enum_parameter.h>
+#include <augr/ui/control/float_parameter.h>
 
 #include <augr/rack/audio_pin.h>
 #include <augr/rack/midi_pin.h>

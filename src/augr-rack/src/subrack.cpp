@@ -2,8 +2,8 @@
 #include <unordered_map>
 #include <unordered_set>
 
-#include <augr/core/archiver_factory.h>
-#include <augr/core/model_factory.h>
+#include <augr/archiver_factory.h>
+#include <augr/model_factory.h>
 
 #include <augr/rack/archiver/module_archiver.h>
 #include <augr/rack/module/io.h>

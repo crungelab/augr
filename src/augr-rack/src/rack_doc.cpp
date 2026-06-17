@@ -6,11 +6,11 @@
 
 #include <nlohmann/json.hpp>
 
-#include <augr/core/archive.h>
-#include <augr/core/archiver.h>
-#include <augr/core/archiver_factory.h>
-#include <augr/core/archiver_manufacturer.h>
-#include <augr/core/model_manufacturer.h>
+#include <augr/archive.h>
+#include <augr/archiver.h>
+#include <augr/archiver_factory.h>
+#include <augr/archiver_manufacturer.h>
+#include <augr/model_manufacturer.h>
 #include <augr/rack/rack.h>
 
 namespace augr {

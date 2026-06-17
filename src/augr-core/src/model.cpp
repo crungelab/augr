@@ -2,7 +2,7 @@
 
 #include <uuid.h>
 
-#include <augr/core/model.h>
+#include <augr/model.h>
 
 namespace augr {
 

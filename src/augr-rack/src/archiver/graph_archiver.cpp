@@ -1,14 +1,14 @@
 #include <unordered_set>
 
-#include <augr/core/archiver_manufacturer.h>
-#include <augr/core/model_manufacturer.h>
+#include <augr/archiver_manufacturer.h>
+#include <augr/model_manufacturer.h>
 
 #include <augr/rack/graph.h>
 #include <augr/rack/wire.h>
 
 #include <augr/rack/archiver/graph_archiver.h>
 
-#include <augr/core/archiver_factory.h>
+#include <augr/archiver_factory.h>
 #include <nlohmann/json.hpp>
 
 namespace augr {

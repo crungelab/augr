@@ -3,8 +3,8 @@
 #include <cstdint>
 #include <vector>
 
-#include <augr/core/audio.h>
-#include <augr/core/ui/ui_builder.h>
+#include <augr/audio.h>
+#include <augr/ui/ui_builder.h>
 
 #include <augr/rack/audio_pin.h>
 #include <augr/rack/module/module.h>

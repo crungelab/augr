@@ -1,6 +1,6 @@
 #pragma once
 
-#include <augr/core/midi/midi_message.h>
+#include <augr/midi/midi_message.h>
 #include <augr/rack/pin.h>
 
 namespace augr {

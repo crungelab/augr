@@ -3,7 +3,7 @@
 #include <algorithm>
 #include <cmath>
 
-#include <augr/core/ui/ui_builder.h>
+#include <augr/ui/ui_builder.h>
 #include <augr/fm/dexie.h>
 
 namespace augr::fm {

@@ -1,6 +1,6 @@
 #include <spdlog/spdlog.h>
 
-#include <augr/core/midi/midi_message_logger.h>
+#include <augr/midi/midi_message_logger.h>
 
 #include <augr/exe/rack/exe_rack.h>
 #include <augr/exe/rack/midi_configurator.h>

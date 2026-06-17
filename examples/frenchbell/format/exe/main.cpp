@@ -1,4 +1,4 @@
-#include <augr/core/model_manufacturer.h>
+#include <augr/model_manufacturer.h>
 
 #include <augr/faust/faust_dsp.h>
 #include <augr/faust/faust_dsp_ui.h>
@@ -20,9 +20,9 @@ int main(int, char **) {
     REGISTER_MODEL_FACTORY(ExeRack);
 
     RackApp app;
-    Rack &rack = app.rack();
+    const Rack::Ptr rack = app.document().model_;
 
-    ModelFactoryT<FrenchBellDspImpl>::Make(&rack);
+    ModelFactoryT<FrenchBellDspImpl>::Make(rack);
 
     app.Run(augr::Window::RunParams("Augr French Bell"));
 

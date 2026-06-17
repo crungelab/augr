@@ -1,6 +1,6 @@
 #include <fmt/core.h>
 
-#include <augr/core/audio.h>
+#include <augr/audio.h>
 #include <augr/faust/faust_dsp.h>
 #include <augr/faust/faust_dsp_ui.h>
 #include <augr/rack/audio_pin.h>

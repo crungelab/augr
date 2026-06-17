@@ -1,0 +1,78 @@
+#ifndef AUGR_CORE_CONTROL_CONTROL_H_
+#define AUGR_CORE_CONTROL_CONTROL_H_
+
+#include <memory>
+#include <string>
+#include <utility>
+
+#include <sigslot/signal.hpp>
+
+#include <augr/binding.h>
+#include <augr/config.h>
+#include <augr/model.h>
+#include <augr/ui/control/control_meta.h>
+
+namespace augr {
+
+class Control : public Model {
+public:
+    Control() = default;
+    Control(const std::string &label, ControlMeta meta = {})
+        : Model(label), meta_(meta),
+          unit_(meta_.Unit()) {}
+
+    virtual ~Control() = default;
+
+    // Accessors
+    const ControlMeta &meta() const { return meta_; }
+    ControlUnit unit() const { return unit_; }
+
+    // Data members.
+    ControlMeta meta_;
+    ControlUnit unit_ = ControlUnit::kNone;
+
+    REFLECT_ENABLE(Model)
+};
+
+template <typename T, typename TBase = Control> class BoundControl : public TBase {
+public:
+    using BindingType = BindingT<T>;
+    using BindingPtr = std::shared_ptr<BindingType>;
+
+    BoundControl() = default;
+
+    explicit BoundControl(const std::string &label, ControlMeta meta = {},
+                          BindingPtr binding = nullptr)
+        : TBase(label, meta),
+          binding_(std::move(binding)) {}
+
+    T value() const { return binding_ ? binding_->get() : T{}; }
+
+    // Virtual so subclasses (e.g. Parameter) can add snap/clamp/observer logic.
+    virtual void set_value(const T &value) {
+        if (binding_) {
+            binding_->set(value);
+            on_change(value);
+        }
+    }
+
+    BindingType *binding() { return binding_.get(); }
+    const BindingType *binding() const { return binding_.get(); }
+
+    void set_binding(BindingPtr binding) { binding_ = std::move(binding); }
+
+    bool has_binding() const { return static_cast<bool>(binding_); }
+
+    sigslot::signal_st<T> on_change;
+
+protected:
+    BindingPtr binding_;
+};
+
+using FloatControl = BoundControl<fy_real>;
+using IntControl = BoundControl<int>;
+using BoolControl = BoundControl<bool>;
+
+} // namespace augr
+
+#endif // AUGR_CORE_CONTROL_CONTROL_H_

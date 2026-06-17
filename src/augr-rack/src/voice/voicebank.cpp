@@ -4,13 +4,13 @@
 
 #include <algorithm>
 
-#include <augr/core/model_factory.h>
+#include <augr/model_factory.h>
 
-#include <augr/core/archiver.h>
-#include <augr/core/archiver_factory.h>
-#include <augr/core/archiver_manufacturer.h>
+#include <augr/archiver.h>
+#include <augr/archiver_factory.h>
+#include <augr/archiver_manufacturer.h>
 
-#include <augr/core/midi/midi_message.h>
+#include <augr/midi/midi_message.h>
 
 #include <augr/rack/module/audio_io.h>
 #include <augr/rack/module/midi_io.h>

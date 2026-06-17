@@ -1,4 +1,4 @@
-#include <augr/core/ui/control/control_meta.h>
+#include <augr/ui/control/control_meta.h>
 
 namespace augr {
 

@@ -1,5 +1,5 @@
-#include <augr/core/archiver.h>
-#include <augr/core/archiver_factory.h>
+#include <augr/archiver.h>
+#include <augr/archiver_factory.h>
 
 namespace augr {
 

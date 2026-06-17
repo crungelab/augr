@@ -1,7 +1,7 @@
 #include <augr/rack/voice/voice.h>
 #include <augr/rack/archiver/voice_archiver.h>
 
-#include <augr/core/archiver_factory.h>
+#include <augr/archiver_factory.h>
 #include <nlohmann/json.hpp>
 
 namespace augr {
