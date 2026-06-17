@@ -48,19 +48,7 @@ class MixingAudioInput : public AudioInput {
 public:
     using AudioInput::AudioInput;
 
-    Audio Reduce() const override {
-        Audio mixed = slots_[0]->Read();
-        for (size_t i = 1; i < slots_.size(); ++i)
-            mixed.array() += slots_[i]->Read().array();
-
-        // Fixed headroom rather than 1/N — avoids quietening
-        // single-carrier algorithms while preventing multi-carrier clipping.
-        constexpr float kHeadroom = 0.25f;
-        mixed.array() *= kHeadroom;
-        return mixed;
-    }
-
-    REFLECT_ENABLE(AudioInput)
+    Audio Reduce() const override;
 };
 
 } // namespace augr
