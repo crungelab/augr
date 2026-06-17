@@ -14,18 +14,6 @@ constexpr float kTwoPi = 6.28318530717958647692f;
 
 float CvToFreq(float cv) { return 261.6255653f * std::pow(2.f, cv); }
 
-// DX7-style rate 0..99 → per-sample increment toward target level.
-// ~10 s at rate 0, ~1 ms at rate 99. Simplified — not bit-exact.
-float RateToIncrement(float rate_0_99, float sample_rate) {
-    const float r = std::clamp(rate_0_99, 0.0f, 99.0f) / 99.0f;
-    const float seconds = 10.0f * std::pow(0.0001f, r);
-    return 1.0f / (seconds * sample_rate);
-}
-
-float LevelToAmplitude(float level_0_99) {
-    return std::clamp(level_0_99, 0.0f, 99.0f) / 99.0f;
-}
-
 constexpr int kFeedbackBitdepth = 8;
 
 } // namespace
@@ -80,7 +68,7 @@ void Dexie::CreateControls() {
         auto detune = CreateFloatParameter("Detune", ControlMeta::kDefault,
                                            &detune_, 0.f, -7.f, 7.f, 1.f);
         auto level = CreateFloatParameter("Level", ControlMeta::kDefault,
-                                          &output_level_, 1.f, 0.f, 1.f, 0.01f);
+                                          &output_level_, 99.f, 0.f, 99.f, 1.f);
         auto feedback = CreateFloatParameter("Feedback", ControlMeta::kDefault,
                                              &feedback_, 0.f, 0.f, 7.f, 1.f);
         ui.Knob("Coarse", coarse);
@@ -117,31 +105,22 @@ void Dexie::Process() {
     const fy_real *phase_data =
         phase_buf.Empty() ? nullptr : phase_buf.array().data();
 
+    env_.SetSampleRate(sample_rate);
+
     // DX7 detune: ±7 steps → ±3.4 cents total (~0.486 cents/step).
     const float detune_cents = std::round(detune_) * (3.4f / 7.f);
     const float detune_factor = std::pow(2.f, detune_cents / 1200.f);
 
     const float ratio = ratio_coarse_ + ratio_fine_;
+    //const float ratio = ratio_coarse_ * (1.0f + ratio_fine_);
     const bool ratio_mode = ratio > 0.0f;
 
-    // Precompute EG increments — rates don't change mid-buffer.
-    const float eg_inc[4] = {
-        RateToIncrement(rates_[0], sample_rate),
-        RateToIncrement(rates_[1], sample_rate),
-        RateToIncrement(rates_[2], sample_rate),
-        RateToIncrement(rates_[3], sample_rate),
-    };
-    const float eg_target[4] = {
-        LevelToAmplitude(levels_[0]),
-        LevelToAmplitude(levels_[1]),
-        LevelToAmplitude(levels_[2]),
-        LevelToAmplitude(levels_[3]),
-    };
-
+    // Feedback amount 0..7 → shift (FEEDBACK_BITDEPTH - amount), or 16 = off.
     const int feedback_int = static_cast<int>(std::round(feedback_));
     const int feedback_shift =
         feedback_int != 0 ? kFeedbackBitdepth - feedback_int : 16;
     const bool fb_on = feedback_shift < 16;
+    const float fb_divisor = static_cast<float>(1 << (feedback_shift + 1));
 
     Audio out(ChannelLayout::kMono);
     fy_real *out_data = out.array().data();
@@ -150,42 +129,12 @@ void Dexie::Process() {
         // --- Envelope ---
         const bool gate = gate_data && (gate_data[i] > 0.5f);
         if (gate && !gate_prev_)
-            stage_ = Stage::kR1;
+            env_.NoteOn(rates_, levels_, output_level_, /*rate_scaling=*/0);
         else if (!gate && gate_prev_)
-            stage_ = Stage::kR4;
+            env_.NoteOff();
         gate_prev_ = gate;
 
-        auto advance = [&](int idx, Stage next) {
-            const float target = eg_target[idx];
-            const float inc = eg_inc[idx];
-            if (eg_value_ < target)
-                eg_value_ = std::min(eg_value_ + inc, target);
-            else if (eg_value_ > target)
-                eg_value_ = std::max(eg_value_ - inc, target);
-            else
-                stage_ = next;
-        };
-
-        switch (stage_) {
-        case Stage::kIdle:
-            break;
-        case Stage::kR1:
-            advance(0, Stage::kR2);
-            break;
-        case Stage::kR2:
-            advance(1, Stage::kR3);
-            break;
-        case Stage::kR3:
-            advance(2, Stage::kR3);
-            break; // sustain
-        case Stage::kR4:
-            advance(3, Stage::kIdle);
-            if (eg_value_ <= 0.0001f) {
-                eg_value_ = 0.0f;
-                stage_ = Stage::kIdle;
-            }
-            break;
-        }
+        const float env_amp = env_.Tick();
 
         // --- Oscillator ---
         const float pitch_cv =
@@ -197,13 +146,11 @@ void Dexie::Process() {
         const float freq = ratio_mode ? (base_hz * ratio) : frequency_;
         const float phase_inc = freq / sample_rate;
 
-        const float fb = fb_on
-                             ? (fb_hist_[0] + fb_hist_[1]) /
-                                   static_cast<float>(1 << (feedback_shift + 1))
-                             : 0.0f;
+        const float fb =
+            fb_on ? (fb_hist_[0] + fb_hist_[1]) / fb_divisor : 0.0f;
 
         const float sample = std::sin(kTwoPi * (phase_ + phase_mod + fb));
-        const float shaped = sample * output_level_ * eg_value_;
+        const float shaped = sample * env_amp;  // output level is baked into env_amp
 
         out_data[i] = static_cast<fy_real>(shaped);
 

@@ -55,7 +55,7 @@ public:
 
         // Fixed headroom rather than 1/N — avoids quietening
         // single-carrier algorithms while preventing multi-carrier clipping.
-        constexpr float kHeadroom = 0.5f;
+        constexpr float kHeadroom = 0.25f;
         mixed.array() *= kHeadroom;
         return mixed;
     }

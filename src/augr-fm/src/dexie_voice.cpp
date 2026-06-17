@@ -103,15 +103,6 @@ void DexieVoice::WireAlgorithm(int algorithm, int feedback_op) {
     }
 }
 
-// DX7 output level is roughly logarithmic. This is an approximation —
-// calibrate the dB-per-step against Dexed by ear.
-float OutputLevelToGain(float level_0_99) {
-    if (level_0_99 <= 0.f) return 0.f;
-    constexpr float kDbPerStep = 0.75f;          // tune this
-    const float db = (level_0_99 - 99.f) * kDbPerStep;
-    return std::pow(10.f, db / 20.f);
-}
-
 void DexieVoice::PushOperatorParams(int op_idx, const Dx7Op &op, int feedback,
                                     const Dx7AlgorithmDef &def) {
     Dexie *d = ops_[op_idx];
@@ -124,12 +115,15 @@ void DexieVoice::PushOperatorParams(int op_idx, const Dx7Op &op, int feedback,
     d->ratio_coarse_ = op.ratio_coarse;
     d->ratio_fine_ = op.ratio_fine;
     d->detune_ = op.detune;
-    d->output_level_ = OutputLevelToGain(op.output_level);
 
-    // feedback_ is the raw DX7 0..7 patch value. Dexie::Process converts it
-    // to a feedback shift internally. Only the algorithm's designated
-    // feedback operator gets a nonzero value; everyone else stays at 0,
-    // which Process() treats as "off".
+    // Output level is the raw DX7 0..99 value now — DexieEnv applies the
+    // scaleoutlevel curve and folds it into the envelope's target levels
+    // internally, so there is no separate gain conversion here.
+    d->output_level_ = op.output_level;
+
+    // feedback_ is the raw DX7 0..7 patch amount. Dexie::Process converts it
+    // to a feedback shift. Only the algorithm's designated feedback operator
+    // gets a nonzero value; everyone else stays at 0 (off).
     d->feedback_ = (op_idx == def.feedback_op) ? static_cast<float>(feedback) : 0.f;
 }
 
