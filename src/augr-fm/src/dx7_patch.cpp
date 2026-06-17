@@ -125,7 +125,10 @@ void ParseUnpacked(const uint8_t* u, Dx7Patch& out) {
         dst.levels[2] = SysexLevelToParam(op[6]);
         dst.levels[3] = SysexLevelToParam(op[7]);
 
-        // op[8..15]: keyboard scaling and velocity — skip for now
+        // op[8..13]: keyboard scaling and rate scaling — still skipped for now
+        dst.amp_mod_sens  = op[14] & 0x03;     // AMS, low 2 bits
+        // op[15] high bits: key velocity sensitivity — still skipped for now
+
         dst.output_level = SysexLevelToParam(op[16]);
         dst.fixed_freq   = (op[17] & 0x01) != 0;
         dst.ratio_coarse = CoarseToRatio(op[18] & 0x1F);

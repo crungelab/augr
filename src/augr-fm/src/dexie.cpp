@@ -77,6 +77,14 @@ void Dexie::CreateControls() {
         ui.Knob("Level", level);
         ui.Knob("Feedback", feedback);
     }
+
+    // LFO section
+    {
+        auto _ = ui.HBox("LFO");
+        auto amp_mod_sens = CreateFloatParameter(
+            "AMS", ControlMeta::kDefault, &amp_mod_sens_, 0.f, 0.f, 3.f, 1.f);
+        ui.Knob("AMS", amp_mod_sens);
+    }
 }
 
 void Dexie::CreatePins() {
@@ -86,6 +94,10 @@ void Dexie::CreatePins() {
     AddInput(*gate_in_);
     cv_phase_in_ = new VoltageInput(*this, "phase");
     AddInput(*cv_phase_in_);
+
+    cv_amp_mod_in_ = new VoltageInput(*this, "amp_mod");
+    AddInput(*cv_amp_mod_in_);
+
     audio_out_ = new AudioOutput(*this, "out", ChannelLayout::kMono);
     AddOutput(*audio_out_);
 }
@@ -99,6 +111,28 @@ void Dexie::Process() {
     const Audio pitch_buf = cv_pitch_in_->Read();
     const Audio gate_buf = gate_in_->Read();
     const Audio phase_buf = cv_phase_in_->Read();
+
+    const Audio amp_mod_buf = cv_amp_mod_in_->Read();
+    const fy_real *amp_mod_data =
+        amp_mod_buf.Empty() ? nullptr : amp_mod_buf.array().data();
+
+    /*
+    // DX7 ampmodsenstab approximation: raw 0..3 -> tremolo depth fraction.
+    // Needs calibration against Dexed; placeholder values for now.
+    constexpr float kAmpModSensTab[4] = {0.0f, 0.16f, 0.33f, 1.0f};
+    */
+    // dexie.cpp — replace the placeholder table:
+    // DX7 ampmodsenstab, ported directly from Dexed (Dx7Note.cpp). Values are
+    // 24-bit fixed point (1<<24 = unity); converted to float here.
+    constexpr float kAmpModSensTab[4] = {
+        0.0f,
+        4342338.0f / 16777216.0f,
+        7171437.0f / 16777216.0f,
+        16777216.0f / 16777216.0f,
+    };
+
+    const float ams_depth = kAmpModSensTab[std::clamp(
+        static_cast<int>(std::round(amp_mod_sens_)), 0, 3)];
 
     const float sample_rate = Audio::sample_rate();
     const std::size_t frames = Audio::frames();
@@ -159,8 +193,19 @@ void Dexie::Process() {
             fb_on ? (fb_hist_[0] + fb_hist_[1]) / fb_divisor : 0.0f;
 
         const float sample = std::sin(kTwoPi * (phase_ + phase_mod + fb));
+
+        /*
         const float shaped =
             sample * env_amp; // output level is baked into env_amp
+        */
+        // --- LFO ---
+        const float lfo_val =
+            amp_mod_data ? static_cast<float>(amp_mod_data[i]) : 0.0f;
+        // LFO is bipolar [-1,1]; tremolo should only reduce level, never boost
+        // it, so map to a [0,1] attenuation factor scaled by depth and
+        // sensitivity.
+        const float tremolo = 1.0f - ams_depth * 0.5f * (1.0f - lfo_val);
+        const float shaped = sample * env_amp * tremolo;
 
         out_data[i] = static_cast<fy_real>(shaped);
 

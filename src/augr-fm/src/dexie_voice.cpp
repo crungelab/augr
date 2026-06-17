@@ -6,6 +6,7 @@
 #include <augr/rack/module/midi_io.h>
 
 #include <augr/volt/midi_cv_module.h>
+#include <augr/volt/lfo_module.h>
 
 #include <augr/fm/dexie_voice.h>
 
@@ -28,6 +29,24 @@ void DexieVoice::OnCreateFresh() {
     midi_cv_module_ = Model::Make<MidiCvModule>(shared_from_this()).get();
     Connect(*midi_in_module_->midi_out_, *midi_cv_module_->midi_in_);
 
+    lfo_module_ = Model::Make<LfoModule>(shared_from_this()).get();
+
+    for (int i = 0; i < 6; ++i) {
+        auto op = Model::Make<Dexie>(shared_from_this());
+        op->label_ = "OP" + std::to_string(i + 1);
+        Connect(*midi_cv_module_->pitch_out_, *op->cv_pitch_in_);
+        Connect(*midi_cv_module_->gate_out_, *op->gate_in_);
+        Connect(*lfo_module_->cv_out_, *op->cv_amp_mod_in_);
+        ops_[i] = op.get();
+    }
+}
+/*
+void DexieVoice::OnCreateFresh() {
+    Voice::OnCreateFresh();
+
+    midi_cv_module_ = Model::Make<MidiCvModule>(shared_from_this()).get();
+    Connect(*midi_in_module_->midi_out_, *midi_cv_module_->midi_in_);
+
     for (int i = 0; i < 6; ++i) {
         auto op = Model::Make<Dexie>(shared_from_this());
         op->label_ = "OP" + std::to_string(i + 1);
@@ -36,6 +55,7 @@ void DexieVoice::OnCreateFresh() {
         ops_[i] = op.get();
     }
 }
+*/
 
 void DexieVoice::OnAddingChild(Model &model) {
     Voice::OnAddingChild(model);
@@ -124,7 +144,10 @@ void DexieVoice::PushOperatorParams(int op_idx, const Dx7Op &op, int feedback,
     // feedback_ is the raw DX7 0..7 patch amount. Dexie::Process converts it
     // to a feedback shift. Only the algorithm's designated feedback operator
     // gets a nonzero value; everyone else stays at 0 (off).
-    d->feedback_ = (op_idx == def.feedback_op) ? static_cast<float>(feedback) : 0.f;
+    d->feedback_ =
+        (op_idx == def.feedback_op) ? static_cast<float>(feedback) : 0.f;
+
+    d->amp_mod_sens_ = static_cast<float>(op.amp_mod_sens);
 }
 
 } // namespace augr::fm

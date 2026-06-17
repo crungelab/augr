@@ -17,6 +17,7 @@ struct Dx7Op {
     float ratio_fine    = 0.f;
     float detune        = 0.f;   // -7..7
     bool  fixed_freq    = false;
+    int   amp_mod_sens   = 0;     // 0..3, raw DX7 AMS value
 };
 
 struct Dx7Patch {

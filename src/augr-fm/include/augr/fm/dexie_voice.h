@@ -9,6 +9,8 @@
 namespace augr {
 class Wire;
 class MidiCvModule;
+class LfoModule;
+
 }
 
 namespace augr::fm {
@@ -30,6 +32,8 @@ public:
 
 private:
     MidiCvModule* midi_cv_module_ = nullptr;
+    LfoModule* lfo_module_ = nullptr;
+
     Dexie* ops_[6]      = {};
     bool is_carrier_[6] = {};
     std::vector<Wire*> algorithm_wires_;

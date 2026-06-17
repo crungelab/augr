@@ -100,14 +100,15 @@ public:
     float rate_ = 0.f; // octaves above 1 Hz
     Waveform waveform_ = Waveform::Sine;
 
+    VoltageInput *cv_rate_in_ = nullptr;
+    VoltageInput *reset_in_ = nullptr;
+    VoltageOutput *cv_out_ = nullptr;
+
     REFLECT_ENABLE(Module)
 
 private:
     static constexpr float kGateThreshold = 0.5f;
 
-    VoltageInput *cv_rate_in_ = nullptr;
-    VoltageInput *reset_in_ = nullptr;
-    VoltageOutput *cv_out_ = nullptr;
 
     float phase_ = 0.f;
     float sh_value_ = 0.f;

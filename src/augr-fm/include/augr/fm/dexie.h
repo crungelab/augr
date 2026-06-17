@@ -39,6 +39,7 @@ public:
     VoltageInput *cv_pitch_in_ = nullptr; // V/oct pitch
     VoltageInput *gate_in_ = nullptr;     // envelope gate (note on/off)
     VoltageInput *cv_phase_in_ = nullptr; // FM input — sum of modulator outputs
+    VoltageInput *cv_amp_mod_in_ = nullptr; // shared voice LFO signal
 
     // Audio output
     AudioOutput *audio_out_ = nullptr;
@@ -50,9 +51,13 @@ public:
     // temporary debug — last computed carrier/oscillator frequency, in Hz
     float debug_freq_ = 0.0f;
 
+    // LFO stuff
+    float amp_mod_sens_ = 0.0f; // 0..3, DX7 raw value (ampmodsenstab index)
+
 private:
     // Oscillator state
     float phase_ = 0.0f;
+
     // Two-sample feedback history (stability fix — see compute_fb in MSFA /
     // Dexed). fb_hist_[0] is the most recent sample.
     float fb_hist_[2] = {0.0f, 0.0f};
