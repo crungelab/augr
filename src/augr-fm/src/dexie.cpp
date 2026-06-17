@@ -3,8 +3,8 @@
 #include <algorithm>
 #include <cmath>
 
-#include <augr/ui/ui_builder.h>
 #include <augr/fm/dexie.h>
+#include <augr/ui/ui_builder.h>
 
 namespace augr::fm {
 
@@ -91,6 +91,11 @@ void Dexie::CreatePins() {
 }
 
 void Dexie::Process() {
+    if (muted_) {
+        audio_out_->Write(Audio()); // write silence
+        return;
+    }
+
     const Audio pitch_buf = cv_pitch_in_->Read();
     const Audio gate_buf = gate_in_->Read();
     const Audio phase_buf = cv_phase_in_->Read();
@@ -112,7 +117,7 @@ void Dexie::Process() {
     const float detune_factor = std::pow(2.f, detune_cents / 1200.f);
 
     const float ratio = ratio_coarse_ + ratio_fine_;
-    //const float ratio = ratio_coarse_ * (1.0f + ratio_fine_);
+    // const float ratio = ratio_coarse_ * (1.0f + ratio_fine_);
     const bool ratio_mode = ratio > 0.0f;
 
     // Feedback amount 0..7 → shift (FEEDBACK_BITDEPTH - amount), or 16 = off.
@@ -141,16 +146,21 @@ void Dexie::Process() {
             pitch_data ? static_cast<float>(pitch_data[i]) : 0.0f;
         const float phase_mod =
             phase_data ? static_cast<float>(phase_data[i]) : 0.0f;
+        phase_mod_peak_ = std::max(phase_mod_peak_, std::fabs(phase_mod));
 
         const float base_hz = CvToFreq(pitch_cv) * detune_factor;
+
         const float freq = ratio_mode ? (base_hz * ratio) : frequency_;
+        debug_freq_ = freq; // <-- add this
+
         const float phase_inc = freq / sample_rate;
 
         const float fb =
             fb_on ? (fb_hist_[0] + fb_hist_[1]) / fb_divisor : 0.0f;
 
         const float sample = std::sin(kTwoPi * (phase_ + phase_mod + fb));
-        const float shaped = sample * env_amp;  // output level is baked into env_amp
+        const float shaped =
+            sample * env_amp; // output level is baked into env_amp
 
         out_data[i] = static_cast<fy_real>(shaped);
 

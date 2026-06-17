@@ -73,6 +73,9 @@ public:
     MidiInput *midi_in_ = nullptr;
     MidiOutput *midi_out_ = nullptr;
 
+    // Debugging
+    bool muted_ = false;
+
     REFLECT_ENABLE(Node)
 
 private:

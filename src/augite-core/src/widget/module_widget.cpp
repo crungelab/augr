@@ -33,10 +33,20 @@ void ModuleWidget::DrawNode() {
 
     ImNodes::BeginNode(this->model().id_);
 
+    bool muted = model().muted_;
     ImNodes::BeginNodeTitleBar();
     ImGui::TextUnformatted(this->model().label_.c_str());
+    ImGui::SameLine();
+    if (ImGui::RadioButton("##mute", muted)) {
+        model().muted_ = !muted;
+    }
     ImNodes::EndNodeTitleBar();
 
+    /*
+    bool muted = model().muted_;
+    if (ImGui::Checkbox("Mute", &muted))
+        model().muted_ = muted;
+    */
     for (auto input : this->model().inport_.pins_) {
         ImNodes::BeginInputAttribute(input->id_);
         ImGui::TextUnformatted(input->name_.c_str());

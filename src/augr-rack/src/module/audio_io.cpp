@@ -32,8 +32,8 @@ void AudioOutputModule::OnCreate() {
 }
 
 void AudioOutputModule::CreatePins() {
-    audio_in_ = new AudioInput(*this, "audio_in", ChannelLayout::kStereo);
-    //audio_in_ = new MixingAudioInput(*this, "audio_in", ChannelLayout::kStereo);
+    //audio_in_ = new AudioInput(*this, "audio_in", ChannelLayout::kStereo);
+    audio_in_ = new MixingAudioInput(*this, "audio_in", ChannelLayout::kStereo);
     AddInput(*audio_in_);
 
     audio_out_ = new AudioOutput(graph(), "audio_out", ChannelLayout::kStereo);
