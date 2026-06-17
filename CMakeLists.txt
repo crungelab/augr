@@ -124,6 +124,9 @@ add_subdirectory(src/augr-exe)
 #Augite
 add_subdirectory(src/augite-core)
 
+#AugiteFm
+add_subdirectory(src/augite-fm)
+
 #Tests
 add_subdirectory(tests)
 

@@ -12,7 +12,7 @@
 #include <augite/archiver/subrack_viewer_archiver.h>
 
 #include <augite/viewer/viewer_factory.h>
-#include <augite/viewer/dexie_voice_viewer.h>
+#include <augite/fm/viewer/dexie_voice_viewer.h>
 
 namespace augr {
 

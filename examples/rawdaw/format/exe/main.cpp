@@ -7,7 +7,6 @@
 
 #include <augite/app/app.h>
 
-#include <augite/view/rack_view.h>
 #include <augite/widget/widget_manufacturer.h>
 
 #include "flanger_dsp.h"

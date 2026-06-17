@@ -11,6 +11,8 @@ add_executable(${THIS} "main.cpp" ${CMN_SOURCES} ${CMN_INCLUDES} ${EXE_SOURCES} 
 target_include_directories(${THIS} PRIVATE ${PROJECT_ROOT})
 
 include(${AUGR_CMAKE}/AugiteExeApp.cmake)
+include(${AUGR_CMAKE}/AugiteFm.cmake)
+
 include(${AUGR_CMAKE}/AugrFaustLibrary.cmake)
 include(${AUGR_CMAKE}/AugrVolt.cmake)
 include(${AUGR_CMAKE}/AugrFm.cmake)
@@ -18,6 +20,8 @@ include(${AUGR_CMAKE}/AugrFm.cmake)
 include(${THIS_DIR}/../../cmake/Common.cmake)
 
 USES_AUGITE_EXE_APP(${THIS})
+USES_AUGITE_FM(${THIS})
+
 USES_AUGR_EXE(${THIS})
 USES_AUGR_FAUST_LIBRARY(${THIS})
 USES_AUGR_VOLT(${THIS})
