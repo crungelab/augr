@@ -21,8 +21,9 @@ public:
     // Note-on: (re)start from zero. rates/levels are raw DX7 0..99 values;
     // output_level is the raw operator output level 0..99; rate_scaling is the
     // pitch-derived rate offset (0 when unused).
-    void NoteOn(const float rates[4], const float levels[4],
-                float output_level, int rate_scaling);
+    void NoteOn(const float rates[4], const float levels[4], float output_level,
+                int rate_scaling, int level_scaling = 0,
+                int velocity_scaling = 0);
 
     // Gate release: move to the R4/L4 segment.
     void NoteOff();
@@ -36,20 +37,20 @@ private:
     void Advance(int newix);
     static int ScaleOutLevel(int outlevel);
 
-    float rates_[4]     = { 0.f, 0.f, 0.f, 0.f };
-    float levels_[4]    = { 0.f, 0.f, 0.f, 0.f };
-    int   outlevel_     = 0;       // scaleoutlevel(0..99) << 5
-    int   rate_scaling_ = 0;
+    float rates_[4] = {0.f, 0.f, 0.f, 0.f};
+    float levels_[4] = {0.f, 0.f, 0.f, 0.f};
+    int outlevel_ = 0; // scaleoutlevel(0..99) << 5
+    int rate_scaling_ = 0;
 
     // State, in the DX7 "actuallevel << 16" log domain.
-    float level_       = 0.0f;
+    float level_ = 0.0f;
     float targetlevel_ = 0.0f;
-    float inc_         = 0.0f;
-    int   ix_          = 4;        // start idle
-    bool  rising_      = false;
-    bool  down_        = false;
+    float inc_ = 0.0f;
+    int ix_ = 4; // start idle
+    bool rising_ = false;
+    bool down_ = false;
 
-    float sr_ratio_ = 1.0f;        // 44100 / sample_rate
+    float sr_ratio_ = 1.0f; // 44100 / sample_rate
 };
 
 } // namespace augr::fm

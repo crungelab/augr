@@ -5,39 +5,38 @@
 #include <augr/rack/module/cv_io.h>
 #include <augr/rack/module/midi_io.h>
 
-#include <augr/volt/midi_cv_module.h>
 #include <augr/volt/lfo_module.h>
+#include <augr/volt/midi_cv_module.h>
 
 #include <augr/fm/dexie_voice.h>
 
 #include <augr/fm/dexie.h>
+#include <augr/fm/dexie_lfo.h>
+
 #include <augr/fm/dx7_algorithm.h>
 #include <augr/rack/wire.h>
 
 #include <augr/rack/archiver/voice_archiver.h>
 
-
 namespace augr::fm {
 
 LfoModule::Waveform Dx7WaveformToLfoWaveform(int dx7_waveform) {
     switch (dx7_waveform) {
-        case 0: return LfoModule::Waveform::Tri;
-        case 1: return LfoModule::Waveform::SawDown;
-        case 2: return LfoModule::Waveform::SawUp;
-        case 3: return LfoModule::Waveform::Square;
-        case 4: return LfoModule::Waveform::Sine;
-        case 5: return LfoModule::Waveform::SampleHold;
-        default: return LfoModule::Waveform::Sine;
+    case 0:
+        return LfoModule::Waveform::Tri;
+    case 1:
+        return LfoModule::Waveform::SawDown;
+    case 2:
+        return LfoModule::Waveform::SawUp;
+    case 3:
+        return LfoModule::Waveform::Square;
+    case 4:
+        return LfoModule::Waveform::Sine;
+    case 5:
+        return LfoModule::Waveform::SampleHold;
+    default:
+        return LfoModule::Waveform::Sine;
     }
-}
-
-float Dx7LfoSpeedToOctaves(int speed_0_99) {
-    // DX7 LFO speed 0..99 spans roughly 0.06 Hz .. 47 Hz. Placeholder
-    // exponential mapping — needs calibration against Dexed by ear, same
-    // as the envelope/feedback constants were.
-    const float t = std::clamp(speed_0_99, 0, 99) / 99.0f;
-    const float hz = 0.06f * std::pow(47.0f / 0.06f, t);
-    return std::log2(hz);  // LfoModule::rate_ is octaves above 1 Hz
 }
 
 void DexieVoice::OnCreate() {
@@ -59,6 +58,7 @@ void DexieVoice::OnCreateFresh() {
         Connect(*midi_cv_module_->pitch_out_, *op->cv_pitch_in_);
         Connect(*midi_cv_module_->gate_out_, *op->gate_in_);
         Connect(*lfo_module_->cv_out_, *op->cv_amp_mod_in_);
+        Connect(*midi_cv_module_->velocity_out_, *op->cv_velocity_in_);
         ops_[i] = op.get();
     }
 }
@@ -69,7 +69,7 @@ void DexieVoice::OnAddingChild(Model &model) {
     if (auto *midi_cv = dynamic_cast<MidiCvModule *>(&model)) {
         midi_cv_module_ = midi_cv;
     } else if (auto *op = dynamic_cast<Dexie *>(&model)) {
-        for (auto & i : ops_) {
+        for (auto &i : ops_) {
             if (!i) {
                 i = op;
                 return;
@@ -82,7 +82,7 @@ void DexieVoice::OnRemovingChild(Model &model) {
     if (auto *midi_cv = dynamic_cast<MidiCvModule *>(&model)) {
         midi_cv_module_ = nullptr;
     } else if (auto *op = dynamic_cast<Dexie *>(&model)) {
-        for (auto & i : ops_) {
+        for (auto &i : ops_) {
             if (i == op) {
                 i = nullptr;
             }
@@ -92,17 +92,32 @@ void DexieVoice::OnRemovingChild(Model &model) {
     Voice::OnRemovingChild(model);
 }
 
+// dexie_voice.cpp
 void DexieVoice::LoadPatch(const Dx7Patch &patch) {
     const Dx7AlgorithmDef &def = GetDx7Algorithm(patch.algorithm);
-
     WireAlgorithm(patch.algorithm, def.feedback_op);
 
     for (int i = 0; i < 6; ++i)
         PushOperatorParams(i, patch.ops[i], patch.feedback, def);
 
     if (lfo_module_) {
-        lfo_module_->rate_     = Dx7LfoSpeedToOctaves(patch.lfo_speed);
+        lfo_module_->rate_ = DexieLfo::SpeedToOctaves(patch.lfo_speed);
         lfo_module_->waveform_ = Dx7WaveformToLfoWaveform(patch.lfo_waveform);
+    }
+
+    // Convert the patch's 0..99 LFO delay to a sample count, and propagate
+    // depth/delay to every operator (delay ramp and depth scaling are
+    // applied per-operator inside Dexie::Process, alongside each operator's
+    // own AMS).
+    const float sample_rate = Audio::sample_rate();
+    constexpr float kMaxDelaySeconds = 5.0f; // placeholder — needs calibration
+    const int delay_samples = static_cast<int>((patch.lfo_delay / 99.0f) *
+                                               kMaxDelaySeconds * sample_rate);
+
+    for (int i = 0; i < 6; ++i) {
+        //ops_[i]->lfo_amp_depth_ = patch.lfo_amp_depth / 99.0f;
+        ops_[i]->lfo_amp_depth_ = static_cast<float>(patch.lfo_amp_depth);
+        ops_[i]->lfo_delay_samples_total_ = delay_samples;
     }
 }
 
@@ -158,6 +173,13 @@ void DexieVoice::PushOperatorParams(int op_idx, const Dx7Op &op, int feedback,
         (op_idx == def.feedback_op) ? static_cast<float>(feedback) : 0.f;
 
     d->amp_mod_sens_ = static_cast<float>(op.amp_mod_sens);
+    d->velocity_sens_ = static_cast<float>(op.velocity_sens);
+
+    d->kbd_break_pt_ = op.kbd_break_pt;
+    d->kbd_left_depth_ = op.kbd_left_depth;
+    d->kbd_right_depth_ = op.kbd_right_depth;
+    d->kbd_left_curve_ = op.kbd_left_curve;
+    d->kbd_right_curve_ = op.kbd_right_curve;
 }
 
 } // namespace augr::fm

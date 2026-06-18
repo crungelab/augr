@@ -129,8 +129,14 @@ void ParseUnpacked(const uint8_t *u, Dx7Patch &out) {
         dst.levels[3] = SysexLevelToParam(op[7]);
 
         // op[8..13]: keyboard scaling and rate scaling — still skipped for now
+        dst.kbd_break_pt = op[8];
+        dst.kbd_left_depth = op[9];
+        dst.kbd_right_depth = op[10];
+        dst.kbd_left_curve = op[11] & 0x03;
+        dst.kbd_right_curve = op[12] & 0x03;
+
         dst.amp_mod_sens = op[14] & 0x03; // AMS, low 2 bits
-        // op[15] high bits: key velocity sensitivity — still skipped for now
+        dst.velocity_sens = op[15] & 0x07;
 
         dst.output_level = SysexLevelToParam(op[16]);
         dst.fixed_freq = (op[17] & 0x01) != 0;
@@ -149,12 +155,12 @@ void ParseUnpacked(const uint8_t *u, Dx7Patch &out) {
     out.lfo_delay = g[12];
     out.lfo_pitch_depth = g[13];
     out.lfo_amp_depth = g[14];
-    //out.lfo_sync = g[15] & 0x01;
-    //out.lfo_waveform = (g[16] >> 1) & 0x07;
 
-    out.lfo_sync           = g[15] & 0x01;
-    out.lfo_waveform       = g[16] & 0x07;
-    out.pitch_mod_sens      = g[17] & 0x07;   // worth capturing now since it's right here
+    out.lfo_sync = g[15] & 0x01;
+    out.lfo_waveform = g[16] & 0x07;
+
+    out.pitch_mod_sens =
+        g[17] & 0x07; // worth capturing now since it's right here
 
     // Name is at byte 145 (126 + 19)
     const char *name_ptr = reinterpret_cast<const char *>(u + 145);

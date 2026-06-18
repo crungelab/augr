@@ -90,6 +90,17 @@ def dump_cartridge(path):
             print(f"        OP{op+1}  R={r[0]:2d}/{r[1]:2d}/{r[2]:2d}/{r[3]:2d}"
                   f"   L={l[0]:2d}/{l[1]:2d}/{l[2]:2d}/{l[3]:2d}")
 
+        #lfo speed, lfo delay, lfo pitch_mod_depth, lfo_amp_mod_depth, lfo_sync, lfo_waveform
+        lfo_speed   = voice[112]
+        lfo_delay    = voice[113]
+        lfo_pitch_depth = voice[114]
+        lfo_amp_depth   = voice[115]
+        lfo_sync        = voice[116] & 0x01
+        lfo_waveform    = voice[117] & 0x07
+        print(f"        LFO: speed={lfo_speed} delay={lfo_delay} "
+            f"pitch_depth={lfo_pitch_depth} amp_depth={lfo_amp_depth} "
+            f"sync={lfo_sync} waveform={lfo_waveform}")
+
     print()
     used = sorted(algo_usage)
     print("algorithms used by this cartridge (verify these first):")

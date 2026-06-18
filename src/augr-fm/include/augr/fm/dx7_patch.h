@@ -10,34 +10,42 @@
 namespace augr::fm {
 
 struct Dx7Op {
-    float rates[4]  = { 99.f, 99.f, 99.f, 99.f };
-    float levels[4] = { 99.f, 99.f, 99.f,  0.f };
-    float output_level  = 99.f;
-    float ratio_coarse  = 1.f;
-    float ratio_fine    = 0.f;
-    float detune        = 0.f;   // -7..7
-    bool  fixed_freq    = false;
-    int   amp_mod_sens   = 0;     // 0..3, raw DX7 AMS value
+    float rates[4] = {99.f, 99.f, 99.f, 99.f};
+    float levels[4] = {99.f, 99.f, 99.f, 0.f};
+    float output_level = 99.f;
+    float ratio_coarse = 1.f;
+    float ratio_fine = 0.f;
+    float detune = 0.f; // -7..7
+    bool fixed_freq = false;
+    int amp_mod_sens = 0;  // 0..3, raw DX7 AMS value
+    int velocity_sens = 0; // 0..7, raw DX7 key velocity sensitivity
+
+    // Keyboard level scaling — raw DX7 bytes, ported via ScaleLevel.
+    int kbd_break_pt = 0;    // 0..99, offset by +17 internally
+    int kbd_left_depth = 0;  // 0..99
+    int kbd_right_depth = 0; // 0..99
+    int kbd_left_curve = 0;  // 0..3
+    int kbd_right_curve = 0; // 0..3
 };
 
 struct Dx7Patch {
     std::string name;
-    int algorithm = 0;   // 0..31
-    int feedback  = 0;   // 0..7
-    std::array<Dx7Op, 6> ops;  // ops[0] = OP1 .. ops[5] = OP6
+    int algorithm = 0;        // 0..31
+    int feedback = 0;         // 0..7
+    std::array<Dx7Op, 6> ops; // ops[0] = OP1 .. ops[5] = OP6
 
     // LFO (voice-level, shared across all operators)
-    int lfo_speed       = 0;   // 0..99
-    int lfo_delay        = 0;   // 0..99
-    int lfo_pitch_depth  = 0;   // 0..99
-    int lfo_amp_depth    = 0;   // 0..99
-    int lfo_sync         = 0;   // 0 or 1
-    int lfo_waveform     = 0;   // 0..5, DX7 encoding
+    int lfo_speed = 0;       // 0..99
+    int lfo_delay = 0;       // 0..99
+    int lfo_pitch_depth = 0; // 0..99
+    int lfo_amp_depth = 0;   // 0..99
+    int lfo_sync = 0;        // 0 or 1
+    int lfo_waveform = 0;    // 0..5, DX7 encoding
 
-    int pitch_mod_sens   = 0;   // 0..7, indexes pitchmodsenstab (not yet ported)
+    int pitch_mod_sens = 0; // 0..7, indexes pitchmodsenstab (not yet ported)
 };
 
-bool ParseDx7Voice(std::span<const uint8_t> data, Dx7Patch& out);
+bool ParseDx7Voice(std::span<const uint8_t> data, Dx7Patch &out);
 std::vector<Dx7Patch> ParseDx7Cartridge(std::span<const uint8_t> sysex);
 
 } // namespace augr::fm

@@ -35,24 +35,43 @@ public:
     // designated feedback operator carries a nonzero value.
     float feedback_ = 0.0f;
 
-    // CV inputs — pitch → gate → phase
+    // --- LFO amplitude modulation ---
+    float amp_mod_sens_ = 0.0f; // 0..3, raw DX7 AMS value (per-operator)
+    /*
+    float lfo_amp_depth_ =
+        1.0f; // 0..1, from the patch's voice-level LFO amp depth
+    */
+    float lfo_amp_depth_ = 99.0f;  // raw DX7 0..99 LFO amplitude-mod depth (AMD)
+
+    int lfo_delay_samples_total_ =
+        0; // samples for the LFO to ramp to full depth after gate-on
+
+    float velocity_sens_ = 0.0f;  // raw DX7 0..7 key velocity sensitivity
+
+    // Keyboard
+    int kbd_break_pt_ = 0;
+    int kbd_left_depth_ = 0;
+    int kbd_right_depth_ = 0;
+    int kbd_left_curve_ = 0;
+    int kbd_right_curve_ = 0;
+
+    // CV inputs — pitch → gate → phase → amp mod
     VoltageInput *cv_pitch_in_ = nullptr; // V/oct pitch
     VoltageInput *gate_in_ = nullptr;     // envelope gate (note on/off)
     VoltageInput *cv_phase_in_ = nullptr; // FM input — sum of modulator outputs
     VoltageInput *cv_amp_mod_in_ = nullptr; // shared voice LFO signal
+    VoltageInput *cv_velocity_in_ = nullptr;  // note-on velocity, 0..1 normalized
 
     // Audio output
     AudioOutput *audio_out_ = nullptr;
 
-    REFLECT_ENABLE(Module)
     // For UI display only: the peak absolute value of the current phase
     // modulation
     float phase_mod_peak_ = 0.0f;
     // temporary debug — last computed carrier/oscillator frequency, in Hz
     float debug_freq_ = 0.0f;
 
-    // LFO stuff
-    float amp_mod_sens_ = 0.0f; // 0..3, DX7 raw value (ampmodsenstab index)
+    REFLECT_ENABLE(Module)
 
 private:
     // Oscillator state
@@ -65,6 +84,9 @@ private:
     // Envelope
     DexieEnv env_;
     bool gate_prev_ = false;
+
+    // LFO delay-ramp state — samples elapsed since the gate last went high.
+    int samples_since_gate_on_ = 0;
 };
 
 } // namespace augr::fm
