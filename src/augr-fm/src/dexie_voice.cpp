@@ -16,7 +16,29 @@
 
 #include <augr/rack/archiver/voice_archiver.h>
 
+
 namespace augr::fm {
+
+LfoModule::Waveform Dx7WaveformToLfoWaveform(int dx7_waveform) {
+    switch (dx7_waveform) {
+        case 0: return LfoModule::Waveform::Tri;
+        case 1: return LfoModule::Waveform::SawDown;
+        case 2: return LfoModule::Waveform::SawUp;
+        case 3: return LfoModule::Waveform::Square;
+        case 4: return LfoModule::Waveform::Sine;
+        case 5: return LfoModule::Waveform::SampleHold;
+        default: return LfoModule::Waveform::Sine;
+    }
+}
+
+float Dx7LfoSpeedToOctaves(int speed_0_99) {
+    // DX7 LFO speed 0..99 spans roughly 0.06 Hz .. 47 Hz. Placeholder
+    // exponential mapping — needs calibration against Dexed by ear, same
+    // as the envelope/feedback constants were.
+    const float t = std::clamp(speed_0_99, 0, 99) / 99.0f;
+    const float hz = 0.06f * std::pow(47.0f / 0.06f, t);
+    return std::log2(hz);  // LfoModule::rate_ is octaves above 1 Hz
+}
 
 void DexieVoice::OnCreate() {
     Voice::OnCreate();
@@ -77,6 +99,11 @@ void DexieVoice::LoadPatch(const Dx7Patch &patch) {
 
     for (int i = 0; i < 6; ++i)
         PushOperatorParams(i, patch.ops[i], patch.feedback, def);
+
+    if (lfo_module_) {
+        lfo_module_->rate_     = Dx7LfoSpeedToOctaves(patch.lfo_speed);
+        lfo_module_->waveform_ = Dx7WaveformToLfoWaveform(patch.lfo_waveform);
+    }
 }
 
 void DexieVoice::WireAlgorithm(int algorithm, int feedback_op) {

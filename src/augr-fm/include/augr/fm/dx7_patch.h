@@ -25,6 +25,16 @@ struct Dx7Patch {
     int algorithm = 0;   // 0..31
     int feedback  = 0;   // 0..7
     std::array<Dx7Op, 6> ops;  // ops[0] = OP1 .. ops[5] = OP6
+
+    // LFO (voice-level, shared across all operators)
+    int lfo_speed       = 0;   // 0..99
+    int lfo_delay        = 0;   // 0..99
+    int lfo_pitch_depth  = 0;   // 0..99
+    int lfo_amp_depth    = 0;   // 0..99
+    int lfo_sync         = 0;   // 0 or 1
+    int lfo_waveform     = 0;   // 0..5, DX7 encoding
+
+    int pitch_mod_sens   = 0;   // 0..7, indexes pitchmodsenstab (not yet ported)
 };
 
 bool ParseDx7Voice(std::span<const uint8_t> data, Dx7Patch& out);
