@@ -106,7 +106,6 @@ void Subrack::RebuildExecutionOrder() {
     }
 }
 
-
 // ---------------------------------------------------------------------------
 // Child management
 // ---------------------------------------------------------------------------
@@ -161,20 +160,13 @@ Rack *Subrack::OuterRack() {
 // Action queue forwarding
 // ---------------------------------------------------------------------------
 
-void Subrack::EnqueueAction(std::function<void()> action,
-                            std::function<void()> update_action) {
+void Subrack::EnqueueAction(std::function<void()> action) {
     if (Rack *r = OuterRack()) {
-        r->EnqueueAction(std::move(action), std::move(update_action));
+        r->EnqueueAction(std::move(action));
     }
     // If there's no outer rack, the subrack is standalone and has no
     // thread to bridge to. Drop the action silently. (Could assert here
     // instead if standalone usage should never enqueue.)
-}
-
-void Subrack::EnqueueUpdateAction(std::function<void()> action) {
-    if (Rack *r = OuterRack()) {
-        r->EnqueueUpdateAction(std::move(action));
-    }
 }
 
 } // namespace augr

@@ -43,6 +43,7 @@ void Graph::OnAddingChild(Model &model) {
 }
 
 void Graph::OnRemovingChild(Model &model) {
+    OnTopologyChanged();
     auto node = dynamic_cast<Node *>(&model);
     for (auto pin : node->inport_.pins_) {
         for (auto wire : pin->wires_) {

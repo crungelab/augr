@@ -53,6 +53,8 @@ public:
     static std::shared_ptr<T>
     Make(Ptr parent, CreateMode mode = CreateMode::Fresh, Args &&...args) {
         auto child = std::make_shared<T>(std::forward<Args>(args)...);
+        // parent_ is set early so OnCreateFresh et al. can see it; AddChild
+        // (re)sets it to the same value when the child is registered.
         child->parent_ = parent;
         child->create_mode_ = mode;
         child->Create(mode);
@@ -90,24 +92,53 @@ public:
 
     virtual void OnDestroy() {}
 
+    // Registers child under this model, establishing the parent link. Fires
+    // OnAddingChild before the child is visible in children_, matching the
+    // ordering OnRemovingChild sees on the way out.
     void AddChild(Ptr child) {
+        child->parent_ = weak_from_this();
         OnAddingChild(*child);
         children_.push_back(std::move(child));
     }
 
-    bool RemoveChild(Model &child) {
+    // Removes child and destroys it (the returned owning pointer is dropped).
+    void RemoveChild(Model &child) { DetachChild(child); }
+
+    // Removes child WITHOUT destroying it and returns the owning pointer, so
+    // the caller can re-home it. Fires OnRemovingChild while the child is
+    // still in children_ and its parent link is still valid, then clears the
+    // parent link. Returns nullptr if child isn't actually ours.
+    Ptr DetachChild(Model &child) {
         auto it = std::find_if(children_.begin(), children_.end(),
                                [&](const Ptr &p) { return p.get() == &child; });
         if (it == children_.end())
-            return false;
-        OnRemovingChild(**it);
-        //(*it)->Destroy();
+            return nullptr;
+
+        Ptr detached = *it; // hold a reference so the erase can't free it
+        OnRemovingChild(*detached);
         children_.erase(it);
-        return true;
+        detached->parent_.reset();
+        return detached;
+    }
+
+    // Moves this model to new_parent without a destroy/create cycle. Composes
+    // directly from DetachChild + AddChild, so both parents' bookkeeping hooks
+    // (OnRemovingChild / OnAddingChild) fire exactly as in a normal move, and
+    // the parent link is maintained by AddChild. No-op if new_parent is null,
+    // there is no current parent, or new_parent is already the parent.
+    void Reparent(Ptr new_parent) {
+        if (!new_parent)
+            return;
+        auto old_parent = parent_.lock();
+        if (!old_parent || old_parent.get() == new_parent.get())
+            return;
+
+        if (Ptr self = old_parent->DetachChild(*this))
+            new_parent->AddChild(std::move(self));
     }
 
     Model *FindByUuid(const uuids::uuid &uuid);
-    
+
     // Accessors
     uuids::uuid uuid() const { return uuid_; }
     std::string uuid_to_string() const { return uuids::to_string(uuid_); }
@@ -122,10 +153,11 @@ public:
     Ptr parent() const { return parent_.lock(); }
 
     bool is_fresh() const { return create_mode_ == CreateMode::Fresh; }
+    bool is_loaded() const { return create_mode_ == CreateMode::Loaded; }
     bool is_replicated() const {
         return create_mode_ == CreateMode::Replicated;
     }
-    bool is_loaded() const { return create_mode_ == CreateMode::Loaded; }
+    bool is_copied() const { return create_mode_ == CreateMode::Copied; }
 
 protected:
     virtual void OnAddingChild(Model &child) {}

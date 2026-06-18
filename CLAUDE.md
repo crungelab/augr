@@ -64,7 +64,6 @@ AudioSystem callback (audio thread)
       → ProcessActions()           ← drains pending MIDI etc.
       → foreach sorted_module: m->Process()
       → write output device buffer
-      → ProcessUpdateActions()     ← deferred UI-thread callbacks
 ```
 
 All UI mutations must go through `Rack::EnqueueAction()` — never write module state directly from the UI thread.

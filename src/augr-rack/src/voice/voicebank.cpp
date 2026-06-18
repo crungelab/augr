@@ -93,19 +93,6 @@ void Voicebank::SetMaster(Voice *master) {
     });
 }
 
-/*
-void Voicebank::SetMaster(Voice *master) {
-    std::weak_ptr<Voice> weak;
-    if (master)
-        weak = std::dynamic_pointer_cast<Voice>(master->shared_from_this());
-
-    EnqueueAction([this, weak]() {
-        master_ = weak;
-        RebuildReplicas(target_voice_count_);
-    });
-}
-*/
-
 void Voicebank::SetVoiceCount(int n) {
     if (n < 1)
         n = 1;

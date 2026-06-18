@@ -28,15 +28,12 @@ public:
 
     // -- Action queue --------------------------------------------------
     // Thread bridge: any thread enqueues, audio thread drains via
-    // ProcessActions() / ProcessUpdateActions().
-    void EnqueueAction(std::function<void()> action,
-                       std::function<void()> update_action = nullptr);
-    void EnqueueUpdateAction(std::function<void()> action);
+    // ProcessActions().
+    void EnqueueAction(std::function<void()> action);
     // Called from the MIDI thread; routes to the outer Rack's queue.
     void EnqueueMidiMessage(MidiMessage message);
 
     void ProcessActions();
-    void ProcessUpdateActions();
 
     // -- Child management ----------------------------------------------
     // Adds Module / Device branches on top of Graph's wire+pin bookkeeping.
@@ -65,7 +62,6 @@ public:
 
     std::mutex mutex_;
     std::vector<std::function<void()>> pending_actions_;
-    std::vector<std::function<void()>> pending_update_actions_;
 
     // Data members --- devices (virtual / boundary modules)
     std::shared_ptr<AudioInputDevice> audio_input_device_;

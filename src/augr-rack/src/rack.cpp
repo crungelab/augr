@@ -33,17 +33,9 @@ void Rack::OnCreateFresh() {
 // Action queue
 // ---------------------------------------------------------------------------
 
-void Rack::EnqueueAction(std::function<void()> action,
-                         std::function<void()> update_action) {
+void Rack::EnqueueAction(std::function<void()> action) {
     std::lock_guard lock(mutex_);
     pending_actions_.push_back(std::move(action));
-    if (update_action)
-        pending_update_actions_.push_back(std::move(update_action));
-}
-
-void Rack::EnqueueUpdateAction(std::function<void()> action) {
-    std::lock_guard lock(mutex_);
-    pending_update_actions_.push_back(std::move(action));
 }
 
 void Rack::ProcessActions() {
@@ -51,16 +43,6 @@ void Rack::ProcessActions() {
     {
         std::lock_guard lock(mutex_);
         std::swap(actions, pending_actions_);
-    }
-    for (auto &a : actions)
-        a();
-}
-
-void Rack::ProcessUpdateActions() {
-    std::vector<std::function<void()>> actions;
-    {
-        std::lock_guard lock(mutex_);
-        std::swap(actions, pending_update_actions_);
     }
     for (auto &a : actions)
         a();

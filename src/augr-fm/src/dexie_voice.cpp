@@ -40,22 +40,6 @@ void DexieVoice::OnCreateFresh() {
         ops_[i] = op.get();
     }
 }
-/*
-void DexieVoice::OnCreateFresh() {
-    Voice::OnCreateFresh();
-
-    midi_cv_module_ = Model::Make<MidiCvModule>(shared_from_this()).get();
-    Connect(*midi_in_module_->midi_out_, *midi_cv_module_->midi_in_);
-
-    for (int i = 0; i < 6; ++i) {
-        auto op = Model::Make<Dexie>(shared_from_this());
-        op->label_ = "OP" + std::to_string(i + 1);
-        Connect(*midi_cv_module_->pitch_out_, *op->cv_pitch_in_);
-        Connect(*midi_cv_module_->gate_out_, *op->gate_in_);
-        ops_[i] = op.get();
-    }
-}
-*/
 
 void DexieVoice::OnAddingChild(Model &model) {
     Voice::OnAddingChild(model);
@@ -63,9 +47,9 @@ void DexieVoice::OnAddingChild(Model &model) {
     if (auto *midi_cv = dynamic_cast<MidiCvModule *>(&model)) {
         midi_cv_module_ = midi_cv;
     } else if (auto *op = dynamic_cast<Dexie *>(&model)) {
-        for (int i = 0; i < 6; ++i) {
-            if (!ops_[i]) {
-                ops_[i] = op;
+        for (auto & i : ops_) {
+            if (!i) {
+                i = op;
                 return;
             }
         }
@@ -76,10 +60,9 @@ void DexieVoice::OnRemovingChild(Model &model) {
     if (auto *midi_cv = dynamic_cast<MidiCvModule *>(&model)) {
         midi_cv_module_ = nullptr;
     } else if (auto *op = dynamic_cast<Dexie *>(&model)) {
-        for (int i = 0; i < 6; ++i) {
-            if (ops_[i] == op) {
-                ops_[i] = nullptr;
-                return;
+        for (auto & i : ops_) {
+            if (i == op) {
+                i = nullptr;
             }
         }
     }

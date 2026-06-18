@@ -35,11 +35,11 @@ void ModuleWidget::DrawNode() {
 
     bool muted = model().muted_;
     ImNodes::BeginNodeTitleBar();
-    ImGui::TextUnformatted(this->model().label_.c_str());
-    ImGui::SameLine();
     if (ImGui::RadioButton("##mute", muted)) {
         model().muted_ = !muted;
     }
+    ImGui::SameLine();
+    ImGui::TextUnformatted(this->model().label_.c_str());
     ImNodes::EndNodeTitleBar();
 
     /*
