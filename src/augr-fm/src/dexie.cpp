@@ -268,8 +268,8 @@ void Dexie::Process() {
             const int velocity_scaling = ScaleVelocity(
                 velocity_0_127, static_cast<int>(std::round(velocity_sens_)));
 
-            const int rate_scaling = ScaleRate(midinote,
-                                            static_cast<int>(std::round(kbd_rate_scaling_)));
+            const int rate_scaling = ScaleRate(
+                midinote, static_cast<int>(std::round(kbd_rate_scaling_)));
 
             env_.NoteOn(rates_, levels_, output_level_, rate_scaling,
                         level_scaling, velocity_scaling);
@@ -320,10 +320,26 @@ void Dexie::Process() {
         const float sample = std::sin(kTwoPi * (phase_ + phase_mod + fb));
         const float shaped = sample * env_amp * tremolo;
 
+        // Emulate DX7's 12-bit DAC quantization. This introduces the
+        // characteristic quantization noise/grit that's part of the DX7's
+        // sound, particularly audible on high-feedback operators (TRAIN) and as
+        // subtle harmonic richness on lower-feedback operators (BRASS 1). The
+        // real DX7 used a 12-bit DAC, giving 4096 quantization steps over the
+        // full [-1, 1] range.
+        constexpr float kQuantSteps = 4096.0f; // 2^12
+        const float quantized = std::round(shaped * kQuantSteps) / kQuantSteps;
+
+        out_data[i] = static_cast<fy_real>(quantized);
+
+        fb_hist_[1] = fb_hist_[0];
+        fb_hist_[0] = quantized; // feedback uses quantized output, as the real
+                                 // hardware did
+        /*
         out_data[i] = static_cast<fy_real>(shaped);
 
         fb_hist_[1] = fb_hist_[0];
         fb_hist_[0] = shaped;
+        */
 
         phase_ += phase_inc;
         if (phase_ >= 1.0f)

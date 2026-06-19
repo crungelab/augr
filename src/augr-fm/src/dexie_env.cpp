@@ -23,7 +23,9 @@ constexpr float kLevelMax = 3840.0f;
 
 // DX7 log-level resolution: ~256 actuallevel units per octave (~6 dB),
 // derived from the engine's level_in -> operator-gain mapping.
-constexpr float kLevelPerOctave = 256.0f;
+//constexpr float kLevelPerOctave = 256.0f;
+//constexpr float kLevelPerOctave = 512.0f;
+constexpr float kLevelPerOctave = 341.333333333f;
 
 } // namespace
 
