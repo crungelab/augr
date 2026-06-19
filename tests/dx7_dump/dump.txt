@@ -1,0 +1,1381 @@
+file: rom1a.syx  (4104 bytes)
+
+────────────────────────────────────────────────────────────
+   1. BRASS   1
+      algorithm=22  feedback=1  osc_sync=1
+      pitch_EG  rates=84/95/95/60  levels=50/50/50/50
+      LFO  wave=4  speed=37  delay=0  sync=0
+           pitch_depth=5  amp_depth=0  pms=3  transpose=0
+
+      OP6
+        output_level=82  mode=0  coarse=1  fine=0  detune=7
+        rate_scale=4  kvs=2  ams=0
+        kbd_scl  break=39  left_depth=54  left_curve=1  right_depth=50  right_curve=1
+        EG  rates=49/99/28/68  levels=98/98/91/0
+
+      OP5
+        output_level=98  mode=0  coarse=1  fine=0  detune=8
+        rate_scale=0  kvs=2  ams=0
+        kbd_scl  break=39  left_depth=0  left_curve=3  right_depth=0  right_curve=3
+        EG  rates=77/36/41/71  levels=99/98/98/0
+
+      OP4
+        output_level=99  mode=0  coarse=1  fine=0  detune=7
+        rate_scale=0  kvs=2  ams=0
+        kbd_scl  break=39  left_depth=0  left_curve=3  right_depth=0  right_curve=3
+        EG  rates=77/36/41/71  levels=99/98/98/0
+
+      OP3
+        output_level=99  mode=0  coarse=1  fine=0  detune=5
+        rate_scale=0  kvs=2  ams=0
+        kbd_scl  break=39  left_depth=0  left_curve=3  right_depth=0  right_curve=3
+        EG  rates=77/76/82/71  levels=99/98/98/0
+
+      OP2
+        output_level=86  mode=0  coarse=0  fine=0  detune=14
+        rate_scale=0  kvs=0  ams=0
+        kbd_scl  break=27  left_depth=0  left_curve=3  right_depth=7  right_curve=1
+        EG  rates=62/51/29/71  levels=82/95/96/0
+
+      OP1
+        output_level=98  mode=0  coarse=0  fine=0  detune=14
+        rate_scale=0  kvs=0  ams=0
+        kbd_scl  break=39  left_depth=0  left_curve=3  right_depth=14  right_curve=3
+        EG  rates=72/76/99/71  levels=99/88/96/0
+
+────────────────────────────────────────────────────────────
+   2. BRASS   2
+      algorithm=22  feedback=1  osc_sync=1
+      pitch_EG  rates=84/95/95/60  levels=50/50/50/50
+      LFO  wave=4  speed=37  delay=0  sync=0
+           pitch_depth=0  amp_depth=0  pms=3  transpose=0
+
+      OP6
+        output_level=80  mode=0  coarse=0  fine=0  detune=7
+        rate_scale=0  kvs=0  ams=0
+        kbd_scl  break=51  left_depth=0  left_curve=3  right_depth=0  right_curve=3
+        EG  rates=99/39/32/71  levels=99/98/88/0
+
+      OP5
+        output_level=99  mode=0  coarse=0  fine=0  detune=8
+        rate_scale=0  kvs=0  ams=0
+        kbd_scl  break=39  left_depth=0  left_curve=3  right_depth=0  right_curve=3
+        EG  rates=99/39/32/71  levels=99/98/81/0
+
+      OP4
+        output_level=99  mode=0  coarse=0  fine=0  detune=5
+        rate_scale=0  kvs=0  ams=0
+        kbd_scl  break=39  left_depth=0  left_curve=3  right_depth=0  right_curve=3
+        EG  rates=99/39/32/71  levels=99/98/81/0
+
+      OP3
+        output_level=99  mode=0  coarse=0  fine=0  detune=4
+        rate_scale=0  kvs=0  ams=0
+        kbd_scl  break=39  left_depth=0  left_curve=3  right_depth=0  right_curve=3
+        EG  rates=99/39/32/71  levels=99/98/81/0
+
+      OP2
+        output_level=84  mode=0  coarse=0  fine=0  detune=14
+        rate_scale=0  kvs=0  ams=0
+        kbd_scl  break=51  left_depth=0  left_curve=3  right_depth=38  right_curve=3
+        EG  rates=99/39/32/71  levels=99/98/80/0
+
+      OP1
+        output_level=99  mode=0  coarse=0  fine=0  detune=14
+        rate_scale=0  kvs=0  ams=0
+        kbd_scl  break=51  left_depth=0  left_curve=3  right_depth=38  right_curve=3
+        EG  rates=99/39/32/71  levels=99/98/80/0
+
+────────────────────────────────────────────────────────────
+   3. BRASS   3
+      algorithm=18  feedback=1  osc_sync=0
+      pitch_EG  rates=94/67/95/60  levels=50/50/50/50
+      LFO  wave=0  speed=35  delay=0  sync=0
+           pitch_depth=5  amp_depth=0  pms=1  transpose=4
+
+      OP6
+        output_level=79  mode=0  coarse=7  fine=21  detune=7
+        rate_scale=7  kvs=0  ams=0
+        kbd_scl  break=0  left_depth=0  left_curve=0  right_depth=0  right_curve=0
+        EG  rates=77/56/20/70  levels=99/0/0/0
+
+      OP5
+        output_level=70  mode=0  coarse=3  fine=6  detune=6
+        rate_scale=0  kvs=0  ams=0
+        kbd_scl  break=0  left_depth=0  left_curve=0  right_depth=0  right_curve=0
+        EG  rates=48/55/22/50  levels=98/61/62/0
+
+      OP4
+        output_level=79  mode=0  coarse=1  fine=0  detune=7
+        rate_scale=0  kvs=0  ams=0
+        kbd_scl  break=0  left_depth=0  left_curve=0  right_depth=0  right_curve=0
+        EG  rates=66/92/22/50  levels=53/61/62/0
+
+      OP3
+        output_level=77  mode=0  coarse=1  fine=0  detune=7
+        rate_scale=1  kvs=1  ams=0
+        kbd_scl  break=0  left_depth=0  left_curve=0  right_depth=0  right_curve=0
+        EG  rates=46/35/22/50  levels=99/86/86/0
+
+      OP2
+        output_level=70  mode=0  coarse=1  fine=0  detune=7
+        rate_scale=2  kvs=1  ams=0
+        kbd_scl  break=0  left_depth=0  left_curve=0  right_depth=0  right_curve=0
+        EG  rates=37/34/15/70  levels=85/0/0/0
+
+      OP1
+        output_level=99  mode=0  coarse=1  fine=0  detune=7
+        rate_scale=2  kvs=2  ams=0
+        kbd_scl  break=0  left_depth=0  left_curve=0  right_depth=0  right_curve=0
+        EG  rates=55/24/19/55  levels=99/86/86/0
+
+────────────────────────────────────────────────────────────
+   4. STRINGS 1
+      algorithm=2  feedback=1  osc_sync=1
+      pitch_EG  rates=94/67/95/60  levels=50/50/50/50
+      LFO  wave=0  speed=30  delay=0  sync=0
+           pitch_depth=8  amp_depth=0  pms=3  transpose=0
+
+      OP6
+        output_level=53  mode=0  coarse=14  fine=0  detune=7
+        rate_scale=2  kvs=2  ams=0
+        kbd_scl  break=0  left_depth=0  left_curve=0  right_depth=0  right_curve=0
+        EG  rates=53/19/20/54  levels=99/92/86/0
+
+      OP5
+        output_level=84  mode=0  coarse=3  fine=0  detune=7
+        rate_scale=2  kvs=2  ams=0
+        kbd_scl  break=0  left_depth=0  left_curve=0  right_depth=0  right_curve=0
+        EG  rates=53/19/20/54  levels=86/92/86/0
+
+      OP4
+        output_level=77  mode=0  coarse=1  fine=0  detune=7
+        rate_scale=2  kvs=2  ams=0
+        kbd_scl  break=0  left_depth=0  left_curve=0  right_depth=0  right_curve=0
+        EG  rates=96/19/20/54  levels=99/92/86/0
+
+      OP3
+        output_level=86  mode=0  coarse=1  fine=0  detune=7
+        rate_scale=0  kvs=7  ams=0
+        kbd_scl  break=56  left_depth=0  left_curve=0  right_depth=97  right_curve=0
+        EG  rates=44/45/20/54  levels=99/85/82/0
+
+      OP2
+        output_level=83  mode=0  coarse=1  fine=0  detune=7
+        rate_scale=1  kvs=0  ams=0
+        kbd_scl  break=54  left_depth=0  left_curve=0  right_depth=0  right_curve=0
+        EG  rates=75/71/17/49  levels=82/92/62/0
+
+      OP1
+        output_level=99  mode=0  coarse=1  fine=0  detune=7
+        rate_scale=2  kvs=3  ams=0
+        kbd_scl  break=0  left_depth=0  left_curve=0  right_depth=0  right_curve=0
+        EG  rates=45/24/20/41  levels=99/85/70/0
+
+────────────────────────────────────────────────────────────
+   5. STRINGS 2
+      algorithm=2  feedback=1  osc_sync=1
+      pitch_EG  rates=84/95/95/60  levels=50/50/50/50
+      LFO  wave=4  speed=30  delay=81  sync=0
+           pitch_depth=8  amp_depth=0  pms=1  transpose=4
+
+      OP6
+        output_level=70  mode=0  coarse=8  fine=0  detune=7
+        rate_scale=0  kvs=0  ams=0
+        kbd_scl  break=0  left_depth=0  left_curve=0  right_depth=0  right_curve=0
+        EG  rates=72/76/10/32  levels=99/92/0/0
+
+      OP5
+        output_level=66  mode=0  coarse=2  fine=0  detune=7
+        rate_scale=0  kvs=0  ams=0
+        kbd_scl  break=0  left_depth=0  left_curve=0  right_depth=0  right_curve=0
+        EG  rates=76/73/10/28  levels=99/92/0/0
+
+      OP4
+        output_level=76  mode=0  coarse=2  fine=0  detune=7
+        rate_scale=0  kvs=0  ams=0
+        kbd_scl  break=98  left_depth=0  left_curve=0  right_depth=0  right_curve=0
+        EG  rates=49/74/10/32  levels=98/98/36/0
+
+      OP3
+        output_level=92  mode=0  coarse=2  fine=0  detune=13
+        rate_scale=0  kvs=0  ams=0
+        kbd_scl  break=0  left_depth=0  left_curve=0  right_depth=0  right_curve=0
+        EG  rates=51/15/10/47  levels=99/92/0/0
+
+      OP2
+        output_level=74  mode=0  coarse=2  fine=0  detune=1
+        rate_scale=0  kvs=0  ams=0
+        kbd_scl  break=0  left_depth=0  left_curve=0  right_depth=0  right_curve=0
+        EG  rates=81/13/7/25  levels=99/92/28/0
+
+      OP1
+        output_level=92  mode=0  coarse=2  fine=0  detune=7
+        rate_scale=0  kvs=0  ams=0
+        kbd_scl  break=98  left_depth=0  left_curve=0  right_depth=0  right_curve=0
+        EG  rates=48/56/10/47  levels=98/98/36/0
+
+────────────────────────────────────────────────────────────
+   6. STRINGS 3
+      algorithm=15  feedback=1  osc_sync=1
+      pitch_EG  rates=94/67/95/60  levels=50/50/50/50
+      LFO  wave=4  speed=28  delay=46  sync=0
+           pitch_depth=30  amp_depth=0  pms=1  transpose=4
+
+      OP6
+        output_level=54  mode=0  coarse=14  fine=0  detune=7
+        rate_scale=2  kvs=2  ams=0
+        kbd_scl  break=55  left_depth=25  left_curve=3  right_depth=0  right_curve=0
+        EG  rates=53/64/44/54  levels=99/92/56/0
+
+      OP5
+        output_level=84  mode=0  coarse=3  fine=0  detune=7
+        rate_scale=2  kvs=1  ams=0
+        kbd_scl  break=0  left_depth=0  left_curve=0  right_depth=0  right_curve=0
+        EG  rates=53/67/38/54  levels=86/92/74/0
+
+      OP4
+        output_level=75  mode=0  coarse=1  fine=0  detune=7
+        rate_scale=2  kvs=2  ams=0
+        kbd_scl  break=0  left_depth=0  left_curve=0  right_depth=0  right_curve=0
+        EG  rates=96/19/20/54  levels=99/92/89/0
+
+      OP3
+        output_level=99  mode=0  coarse=1  fine=0  detune=7
+        rate_scale=2  kvs=1  ams=0
+        kbd_scl  break=51  left_depth=98  left_curve=3  right_depth=60  right_curve=0
+        EG  rates=50/52/35/41  levels=99/92/91/0
+
+      OP2
+        output_level=86  mode=0  coarse=1  fine=0  detune=7
+        rate_scale=1  kvs=0  ams=0
+        kbd_scl  break=54  left_depth=0  left_curve=0  right_depth=0  right_curve=0
+        EG  rates=99/71/35/51  levels=82/92/87/0
+
+      OP1
+        output_level=99  mode=0  coarse=1  fine=0  detune=7
+        rate_scale=2  kvs=1  ams=0
+        kbd_scl  break=0  left_depth=0  left_curve=0  right_depth=0  right_curve=0
+        EG  rates=52/30/25/43  levels=99/92/90/0
+
+────────────────────────────────────────────────────────────
+   7. ORCHESTRA
+      algorithm=2  feedback=1  osc_sync=1
+      pitch_EG  rates=84/95/95/60  levels=50/50/50/50
+      LFO  wave=4  speed=30  delay=63  sync=0
+           pitch_depth=6  amp_depth=0  pms=1  transpose=4
+
+      OP6
+        output_level=82  mode=0  coarse=2  fine=0  detune=7
+        rate_scale=0  kvs=0  ams=0
+        kbd_scl  break=0  left_depth=0  left_curve=0  right_depth=0  right_curve=0
+        EG  rates=72/76/10/32  levels=99/92/0/0
+
+      OP5
+        output_level=80  mode=0  coarse=2  fine=0  detune=7
+        rate_scale=0  kvs=0  ams=0
+        kbd_scl  break=0  left_depth=0  left_curve=0  right_depth=0  right_curve=0
+        EG  rates=76/73/10/55  levels=99/92/0/0
+
+      OP4
+        output_level=72  mode=0  coarse=2  fine=0  detune=7
+        rate_scale=0  kvs=0  ams=0
+        kbd_scl  break=98  left_depth=0  left_curve=0  right_depth=0  right_curve=0
+        EG  rates=56/74/10/45  levels=98/98/36/0
+
+      OP3
+        output_level=96  mode=0  coarse=2  fine=0  detune=13
+        rate_scale=0  kvs=0  ams=0
+        kbd_scl  break=0  left_depth=0  left_curve=0  right_depth=0  right_curve=0
+        EG  rates=54/15/10/47  levels=99/92/0/0
+
+      OP2
+        output_level=83  mode=0  coarse=1  fine=0  detune=1
+        rate_scale=0  kvs=0  ams=0
+        kbd_scl  break=0  left_depth=0  left_curve=0  right_depth=0  right_curve=0
+        EG  rates=53/46/32/61  levels=99/93/90/0
+
+      OP1
+        output_level=99  mode=0  coarse=1  fine=0  detune=7
+        rate_scale=0  kvs=0  ams=0
+        kbd_scl  break=98  left_depth=0  left_curve=0  right_depth=0  right_curve=0
+        EG  rates=80/56/10/45  levels=98/98/36/0
+
+────────────────────────────────────────────────────────────
+   8. PIANO   1
+      algorithm=19  feedback=1  osc_sync=0
+      pitch_EG  rates=94/67/95/60  levels=50/50/50/50
+      LFO  wave=0  speed=35  delay=0  sync=0
+           pitch_depth=0  amp_depth=0  pms=3  transpose=0
+
+      OP6
+        output_level=82  mode=0  coarse=1  fine=0  detune=6
+        rate_scale=5  kvs=0  ams=0
+        kbd_scl  break=0  left_depth=0  left_curve=0  right_depth=10  right_curve=0
+        EG  rates=99/0/25/0  levels=99/75/0/0
+
+      OP5
+        output_level=93  mode=0  coarse=1  fine=58  detune=6
+        rate_scale=5  kvs=1  ams=0
+        kbd_scl  break=48  left_depth=0  left_curve=0  right_depth=66  right_curve=0
+        EG  rates=81/58/36/39  levels=99/14/0/0
+
+      OP4
+        output_level=99  mode=0  coarse=1  fine=0  detune=8
+        rate_scale=5  kvs=2  ams=0
+        kbd_scl  break=0  left_depth=0  left_curve=0  right_depth=0  right_curve=0
+        EG  rates=81/23/22/45  levels=99/78/0/0
+
+      OP3
+        output_level=57  mode=0  coarse=3  fine=0  detune=7
+        rate_scale=5  kvs=0  ams=0
+        kbd_scl  break=47  left_depth=32  left_curve=3  right_depth=74  right_curve=0
+        EG  rates=81/25/25/14  levels=99/99/99/0
+
+      OP2
+        output_level=87  mode=0  coarse=1  fine=0  detune=9
+        rate_scale=5  kvs=0  ams=0
+        kbd_scl  break=0  left_depth=0  left_curve=0  right_depth=13  right_curve=0
+        EG  rates=99/0/25/0  levels=99/75/0/0
+
+      OP1
+        output_level=99  mode=0  coarse=1  fine=0  detune=5
+        rate_scale=4  kvs=2  ams=0
+        kbd_scl  break=0  left_depth=85  left_curve=3  right_depth=0  right_curve=0
+        EG  rates=81/25/20/48  levels=99/82/0/0
+
+────────────────────────────────────────────────────────────
+   9. PIANO   2
+      algorithm=18  feedback=0  osc_sync=1
+      pitch_EG  rates=94/67/95/60  levels=50/50/50/50
+      LFO  wave=0  speed=30  delay=0  sync=0
+           pitch_depth=0  amp_depth=0  pms=1  transpose=4
+
+      OP6
+        output_level=78  mode=0  coarse=0  fine=0  detune=8
+        rate_scale=3  kvs=1  ams=0
+        kbd_scl  break=36  left_depth=0  left_curve=0  right_depth=98  right_curve=0
+        EG  rates=92/71/58/36  levels=99/0/0/0
+
+      OP5
+        output_level=94  mode=0  coarse=0  fine=0  detune=7
+        rate_scale=3  kvs=1  ams=0
+        kbd_scl  break=27  left_depth=0  left_curve=2  right_depth=26  right_curve=0
+        EG  rates=90/71/33/31  levels=99/0/0/0
+
+      OP4
+        output_level=84  mode=0  coarse=1  fine=0  detune=6
+        rate_scale=3  kvs=1  ams=0
+        kbd_scl  break=0  left_depth=0  left_curve=0  right_depth=0  right_curve=0
+        EG  rates=97/27/10/25  levels=99/86/48/0
+
+      OP3
+        output_level=83  mode=0  coarse=5  fine=0  detune=8
+        rate_scale=5  kvs=1  ams=0
+        kbd_scl  break=32  left_depth=0  left_curve=0  right_depth=27  right_curve=0
+        EG  rates=90/27/20/50  levels=99/85/0/0
+
+      OP2
+        output_level=86  mode=0  coarse=1  fine=0  detune=9
+        rate_scale=2  kvs=1  ams=0
+        kbd_scl  break=0  left_depth=0  left_curve=0  right_depth=10  right_curve=0
+        EG  rates=95/0/25/0  levels=99/75/0/0
+
+      OP1
+        output_level=94  mode=0  coarse=1  fine=0  detune=7
+        rate_scale=3  kvs=2  ams=0
+        kbd_scl  break=0  left_depth=0  left_curve=0  right_depth=0  right_curve=0
+        EG  rates=80/24/10/50  levels=99/62/0/0
+
+────────────────────────────────────────────────────────────
+  10. PIANO   3
+      algorithm=3  feedback=1  osc_sync=0
+      pitch_EG  rates=0/0/0/0  levels=50/50/50/50
+      LFO  wave=0  speed=45  delay=0  sync=0
+           pitch_depth=0  amp_depth=0  pms=3  transpose=0
+
+      OP6
+        output_level=84  mode=0  coarse=0  fine=0  detune=9
+        rate_scale=3  kvs=5  ams=0
+        kbd_scl  break=53  left_depth=0  left_curve=0  right_depth=0  right_curve=3
+        EG  rates=80/73/15/10  levels=99/19/0/0
+
+      OP5
+        output_level=87  mode=0  coarse=1  fine=0  detune=5
+        rate_scale=2  kvs=1  ams=0
+        kbd_scl  break=41  left_depth=0  left_curve=3  right_depth=27  right_curve=0
+        EG  rates=98/20/6/2  levels=91/90/0/0
+
+      OP4
+        output_level=95  mode=0  coarse=1  fine=0  detune=10
+        rate_scale=3  kvs=2  ams=0
+        kbd_scl  break=46  left_depth=0  left_curve=0  right_depth=0  right_curve=0
+        EG  rates=90/64/28/45  levels=99/97/0/0
+
+      OP3
+        output_level=97  mode=0  coarse=7  fine=0  detune=4
+        rate_scale=3  kvs=3  ams=0
+        kbd_scl  break=43  left_depth=9  left_curve=3  right_depth=20  right_curve=0
+        EG  rates=94/80/19/12  levels=83/67/0/0
+
+      OP2
+        output_level=85  mode=0  coarse=1  fine=0  detune=11
+        rate_scale=2  kvs=0  ams=0
+        kbd_scl  break=50  left_depth=22  left_curve=3  right_depth=50  right_curve=0
+        EG  rates=98/36/6/32  levels=91/90/0/0
+
+      OP1
+        output_level=86  mode=0  coarse=1  fine=0  detune=3
+        rate_scale=3  kvs=3  ams=0
+        kbd_scl  break=32  left_depth=0  left_curve=0  right_depth=0  right_curve=0
+        EG  rates=90/30/28/45  levels=99/95/0/0
+
+────────────────────────────────────────────────────────────
+  11. E.PIANO 1
+      algorithm=5  feedback=0  osc_sync=0
+      pitch_EG  rates=94/67/95/60  levels=50/50/50/50
+      LFO  wave=4  speed=34  delay=33  sync=0
+           pitch_depth=0  amp_depth=0  pms=3  transpose=0
+
+      OP6
+        output_level=79  mode=0  coarse=1  fine=0  detune=14
+        rate_scale=3  kvs=6  ams=0
+        kbd_scl  break=41  left_depth=0  left_curve=0  right_depth=19  right_curve=0
+        EG  rates=95/29/20/50  levels=99/95/0/0
+
+      OP5
+        output_level=99  mode=0  coarse=1  fine=0  detune=0
+        rate_scale=3  kvs=0  ams=0
+        kbd_scl  break=0  left_depth=0  left_curve=0  right_depth=0  right_curve=0
+        EG  rates=95/20/20/50  levels=99/95/0/0
+
+      OP4
+        output_level=89  mode=0  coarse=1  fine=0  detune=7
+        rate_scale=3  kvs=6  ams=0
+        kbd_scl  break=0  left_depth=0  left_curve=0  right_depth=0  right_curve=0
+        EG  rates=95/29/20/50  levels=99/95/0/0
+
+      OP3
+        output_level=99  mode=0  coarse=1  fine=0  detune=7
+        rate_scale=3  kvs=2  ams=0
+        kbd_scl  break=0  left_depth=0  left_curve=0  right_depth=0  right_curve=0
+        EG  rates=95/20/20/50  levels=99/95/0/0
+
+      OP2
+        output_level=58  mode=0  coarse=14  fine=0  detune=7
+        rate_scale=3  kvs=7  ams=0
+        kbd_scl  break=0  left_depth=0  left_curve=0  right_depth=0  right_curve=0
+        EG  rates=95/50/35/78  levels=99/75/0/0
+
+      OP1
+        output_level=99  mode=0  coarse=1  fine=0  detune=10
+        rate_scale=3  kvs=2  ams=0
+        kbd_scl  break=0  left_depth=0  left_curve=0  right_depth=0  right_curve=0
+        EG  rates=96/25/25/67  levels=99/75/0/0
+
+────────────────────────────────────────────────────────────
+  12. GUITAR  1
+      algorithm=8  feedback=0  osc_sync=1
+      pitch_EG  rates=75/80/75/60  levels=50/50/50/50
+      LFO  wave=4  speed=35  delay=0  sync=0
+           pitch_depth=1  amp_depth=3  pms=3  transpose=0
+
+      OP6
+        output_level=57  mode=0  coarse=12  fine=0  detune=7
+        rate_scale=0  kvs=6  ams=3
+        kbd_scl  break=39  left_depth=53  left_curve=0  right_depth=20  right_curve=0
+        EG  rates=99/57/99/75  levels=99/0/0/0
+
+      OP5
+        output_level=99  mode=0  coarse=3  fine=0  detune=7
+        rate_scale=4  kvs=7  ams=0
+        kbd_scl  break=0  left_depth=0  left_curve=0  right_depth=15  right_curve=0
+        EG  rates=81/87/22/75  levels=99/92/0/0
+
+      OP4
+        output_level=89  mode=0  coarse=3  fine=0  detune=7
+        rate_scale=4  kvs=4  ams=0
+        kbd_scl  break=0  left_depth=0  left_curve=0  right_depth=14  right_curve=0
+        EG  rates=81/87/22/75  levels=99/92/0/0
+
+      OP3
+        output_level=99  mode=0  coarse=1  fine=0  detune=7
+        rate_scale=3  kvs=7  ams=0
+        kbd_scl  break=34  left_depth=9  left_curve=0  right_depth=0  right_curve=0
+        EG  rates=78/87/22/75  levels=99/92/0/0
+
+      OP2
+        output_level=93  mode=0  coarse=3  fine=0  detune=7
+        rate_scale=2  kvs=7  ams=0
+        kbd_scl  break=0  left_depth=0  left_curve=0  right_depth=65  right_curve=0
+        EG  rates=91/25/39/60  levels=99/86/0/0
+
+      OP1
+        output_level=99  mode=0  coarse=1  fine=0  detune=7
+        rate_scale=4  kvs=5  ams=0
+        kbd_scl  break=0  left_depth=0  left_curve=0  right_depth=0  right_curve=0
+        EG  rates=74/85/27/70  levels=99/95/0/0
+
+────────────────────────────────────────────────────────────
+  13. GUITAR  2
+      algorithm=16  feedback=0  osc_sync=1
+      pitch_EG  rates=84/95/95/60  levels=50/50/50/50
+      LFO  wave=0  speed=35  delay=0  sync=0
+           pitch_depth=0  amp_depth=0  pms=3  transpose=0
+
+      OP6
+        output_level=73  mode=0  coarse=3  fine=0  detune=7
+        rate_scale=0  kvs=2  ams=0
+        kbd_scl  break=60  left_depth=0  left_curve=3  right_depth=46  right_curve=0
+        EG  rates=99/44/1/71  levels=99/96/75/0
+
+      OP5
+        output_level=85  mode=0  coarse=0  fine=0  detune=7
+        rate_scale=0  kvs=7  ams=0
+        kbd_scl  break=60  left_depth=0  left_curve=3  right_depth=0  right_curve=0
+        EG  rates=99/99/12/0  levels=99/99/76/0
+
+      OP4
+        output_level=70  mode=0  coarse=0  fine=0  detune=7
+        rate_scale=0  kvs=0  ams=0
+        kbd_scl  break=60  left_depth=0  left_curve=3  right_depth=0  right_curve=0
+        EG  rates=92/99/15/71  levels=99/96/75/0
+
+      OP3
+        output_level=99  mode=0  coarse=1  fine=50  detune=7
+        rate_scale=0  kvs=7  ams=0
+        kbd_scl  break=39  left_depth=0  left_curve=3  right_depth=40  right_curve=0
+        EG  rates=99/99/99/71  levels=99/99/99/0
+
+      OP2
+        output_level=87  mode=0  coarse=1  fine=0  detune=7
+        rate_scale=1  kvs=7  ams=0
+        kbd_scl  break=48  left_depth=0  left_curve=3  right_depth=0  right_curve=0
+        EG  rates=99/99/99/42  levels=99/99/99/99
+
+      OP1
+        output_level=86  mode=0  coarse=3  fine=0  detune=7
+        rate_scale=0  kvs=2  ams=0
+        kbd_scl  break=0  left_depth=82  left_curve=3  right_depth=0  right_curve=3
+        EG  rates=95/67/99/71  levels=99/99/99/0
+
+────────────────────────────────────────────────────────────
+  14. SYN-LEAD 1
+      algorithm=18  feedback=0  osc_sync=1
+      pitch_EG  rates=0/0/0/0  levels=50/50/50/50
+      LFO  wave=4  speed=37  delay=42  sync=0
+           pitch_depth=0  amp_depth=99  pms=4  transpose=4
+
+      OP6
+        output_level=47  mode=0  coarse=17  fine=0  detune=7
+        rate_scale=3  kvs=0  ams=0
+        kbd_scl  break=32  left_depth=0  left_curve=0  right_depth=21  right_curve=0
+        EG  rates=99/70/60/0  levels=99/99/97/0
+
+      OP5
+        output_level=43  mode=0  coarse=3  fine=0  detune=5
+        rate_scale=1  kvs=0  ams=0
+        kbd_scl  break=32  left_depth=0  left_curve=0  right_depth=0  right_curve=0
+        EG  rates=99/99/97/0  levels=99/65/60/0
+
+      OP4
+        output_level=71  mode=0  coarse=2  fine=0  detune=9
+        rate_scale=6  kvs=0  ams=0
+        kbd_scl  break=48  left_depth=0  left_curve=0  right_depth=60  right_curve=0
+        EG  rates=99/92/28/60  levels=99/90/0/0
+
+      OP3
+        output_level=82  mode=0  coarse=1  fine=0  detune=7
+        rate_scale=3  kvs=0  ams=0
+        kbd_scl  break=32  left_depth=0  left_curve=0  right_depth=21  right_curve=0
+        EG  rates=99/87/0/0  levels=93/90/0/0
+
+      OP2
+        output_level=71  mode=0  coarse=1  fine=0  detune=6
+        rate_scale=3  kvs=0  ams=0
+        kbd_scl  break=32  left_depth=0  left_curve=0  right_depth=0  right_curve=0
+        EG  rates=99/95/0/0  levels=99/96/89/0
+
+      OP1
+        output_level=99  mode=0  coarse=1  fine=0  detune=8
+        rate_scale=1  kvs=0  ams=0
+        kbd_scl  break=32  left_depth=0  left_curve=0  right_depth=0  right_curve=0
+        EG  rates=99/0/12/70  levels=99/95/95/0
+
+────────────────────────────────────────────────────────────
+  15. BASS    1
+      algorithm=16  feedback=1  osc_sync=1
+      pitch_EG  rates=94/67/95/60  levels=50/50/50/50
+      LFO  wave=0  speed=35  delay=0  sync=0
+           pitch_depth=0  amp_depth=0  pms=1  transpose=4
+
+      OP6
+        output_level=85  mode=0  coarse=9  fine=0  detune=7
+        rate_scale=1  kvs=7  ams=0
+        kbd_scl  break=0  left_depth=0  left_curve=0  right_depth=0  right_curve=0
+        EG  rates=94/56/24/55  levels=93/28/0/0
+
+      OP5
+        output_level=62  mode=0  coarse=0  fine=0  detune=7
+        rate_scale=7  kvs=3  ams=0
+        kbd_scl  break=52  left_depth=75  left_curve=0  right_depth=0  right_curve=0
+        EG  rates=99/0/0/0  levels=99/0/0/0
+
+      OP4
+        output_level=93  mode=0  coarse=5  fine=0  detune=7
+        rate_scale=5  kvs=5  ams=0
+        kbd_scl  break=0  left_depth=0  left_curve=0  right_depth=0  right_curve=0
+        EG  rates=90/42/7/55  levels=90/30/0/0
+
+      OP3
+        output_level=99  mode=0  coarse=0  fine=0  detune=7
+        rate_scale=6  kvs=3  ams=0
+        kbd_scl  break=0  left_depth=0  left_curve=0  right_depth=0  right_curve=0
+        EG  rates=88/96/32/30  levels=79/65/0/0
+
+      OP2
+        output_level=80  mode=0  coarse=0  fine=0  detune=7
+        rate_scale=7  kvs=0  ams=0
+        kbd_scl  break=41  left_depth=0  left_curve=0  right_depth=0  right_curve=0
+        EG  rates=99/20/0/0  levels=99/0/0/0
+
+      OP1
+        output_level=99  mode=0  coarse=0  fine=0  detune=7
+        rate_scale=7  kvs=0  ams=0
+        kbd_scl  break=36  left_depth=57  left_curve=3  right_depth=14  right_curve=0
+        EG  rates=95/62/17/58  levels=99/95/32/0
+
+────────────────────────────────────────────────────────────
+  16. BASS    2
+      algorithm=17  feedback=0  osc_sync=1
+      pitch_EG  rates=94/67/95/60  levels=50/50/50/50
+      LFO  wave=4  speed=31  delay=33  sync=0
+           pitch_depth=0  amp_depth=0  pms=1  transpose=4
+
+      OP6
+        output_level=87  mode=0  coarse=0  fine=0  detune=8
+        rate_scale=3  kvs=7  ams=0
+        kbd_scl  break=0  left_depth=0  left_curve=0  right_depth=0  right_curve=0
+        EG  rates=25/50/24/55  levels=96/97/0/0
+
+      OP5
+        output_level=75  mode=0  coarse=1  fine=1  detune=7
+        rate_scale=4  kvs=2  ams=0
+        kbd_scl  break=34  left_depth=0  left_curve=0  right_depth=32  right_curve=0
+        EG  rates=99/51/0/0  levels=99/74/0/0
+
+      OP4
+        output_level=99  mode=0  coarse=0  fine=0  detune=7
+        rate_scale=3  kvs=2  ams=0
+        kbd_scl  break=0  left_depth=0  left_curve=0  right_depth=0  right_curve=0
+        EG  rates=80/39/28/53  levels=93/57/0/0
+
+      OP3
+        output_level=68  mode=0  coarse=1  fine=0  detune=14
+        rate_scale=3  kvs=3  ams=0
+        kbd_scl  break=0  left_depth=0  left_curve=0  right_depth=0  right_curve=0
+        EG  rates=73/25/32/30  levels=97/78/0/0
+
+      OP2
+        output_level=80  mode=0  coarse=0  fine=3  detune=7
+        rate_scale=1  kvs=2  ams=0
+        kbd_scl  break=41  left_depth=0  left_curve=0  right_depth=35  right_curve=0
+        EG  rates=28/37/42/50  levels=99/0/0/0
+
+      OP1
+        output_level=99  mode=0  coarse=0  fine=1  detune=7
+        rate_scale=3  kvs=2  ams=0
+        kbd_scl  break=48  left_depth=0  left_curve=0  right_depth=32  right_curve=0
+        EG  rates=75/37/18/63  levels=99/70/0/0
+
+────────────────────────────────────────────────────────────
+  17. E.ORGAN 1
+      algorithm=32  feedback=1  osc_sync=0
+      pitch_EG  rates=75/80/75/60  levels=50/50/50/50
+      LFO  wave=0  speed=35  delay=0  sync=0
+           pitch_depth=0  amp_depth=0  pms=3  transpose=0
+
+      OP6
+        output_level=94  mode=0  coarse=3  fine=0  detune=7
+        rate_scale=0  kvs=0  ams=0
+        kbd_scl  break=0  left_depth=0  left_curve=0  right_depth=0  right_curve=0
+        EG  rates=99/54/22/90  levels=99/0/0/0
+
+      OP5
+        output_level=94  mode=0  coarse=1  fine=0  detune=9
+        rate_scale=0  kvs=0  ams=0
+        kbd_scl  break=0  left_depth=0  left_curve=0  right_depth=0  right_curve=0
+        EG  rates=99/80/22/90  levels=99/99/99/0
+
+      OP4
+        output_level=94  mode=0  coarse=0  fine=0  detune=12
+        rate_scale=0  kvs=0  ams=0
+        kbd_scl  break=0  left_depth=0  left_curve=0  right_depth=0  right_curve=0
+        EG  rates=99/80/22/90  levels=99/99/99/0
+
+      OP3
+        output_level=94  mode=0  coarse=1  fine=50  detune=11
+        rate_scale=0  kvs=0  ams=0
+        kbd_scl  break=0  left_depth=0  left_curve=0  right_depth=0  right_curve=0
+        EG  rates=99/80/54/82  levels=99/99/99/0
+
+      OP2
+        output_level=94  mode=0  coarse=1  fine=1  detune=1
+        rate_scale=0  kvs=0  ams=0
+        kbd_scl  break=0  left_depth=0  left_curve=0  right_depth=10  right_curve=0
+        EG  rates=99/20/22/90  levels=99/99/97/0
+
+      OP1
+        output_level=94  mode=0  coarse=0  fine=0  detune=5
+        rate_scale=0  kvs=0  ams=0
+        kbd_scl  break=0  left_depth=0  left_curve=0  right_depth=0  right_curve=0
+        EG  rates=99/80/22/90  levels=99/99/99/0
+
+────────────────────────────────────────────────────────────
+  18. PIPES   1
+      algorithm=19  feedback=1  osc_sync=1
+      pitch_EG  rates=94/67/95/60  levels=50/50/50/50
+      LFO  wave=4  speed=34  delay=33  sync=0
+           pitch_depth=0  amp_depth=0  pms=1  transpose=4
+
+      OP6
+        output_level=76  mode=0  coarse=10  fine=0  detune=7
+        rate_scale=3  kvs=2  ams=0
+        kbd_scl  break=46  left_depth=10  left_curve=0  right_depth=1  right_curve=3
+        EG  rates=72/25/25/70  levels=99/99/99/0
+
+      OP5
+        output_level=97  mode=0  coarse=2  fine=0  detune=7
+        rate_scale=3  kvs=0  ams=0
+        kbd_scl  break=0  left_depth=0  left_curve=0  right_depth=0  right_curve=0
+        EG  rates=61/25/25/61  levels=99/99/93/0
+
+      OP4
+        output_level=88  mode=0  coarse=4  fine=0  detune=7
+        rate_scale=3  kvs=0  ams=0
+        kbd_scl  break=60  left_depth=10  left_curve=0  right_depth=10  right_curve=0
+        EG  rates=61/25/25/50  levels=99/99/97/0
+
+      OP3
+        output_level=75  mode=0  coarse=1  fine=0  detune=7
+        rate_scale=5  kvs=0  ams=0
+        kbd_scl  break=46  left_depth=17  left_curve=3  right_depth=40  right_curve=0
+        EG  rates=99/97/62/47  levels=99/99/90/0
+
+      OP2
+        output_level=90  mode=0  coarse=0  fine=0  detune=7
+        rate_scale=4  kvs=0  ams=0
+        kbd_scl  break=0  left_depth=0  left_curve=0  right_depth=0  right_curve=0
+        EG  rates=99/97/62/47  levels=99/99/90/0
+
+      OP1
+        output_level=99  mode=0  coarse=0  fine=0  detune=7
+        rate_scale=5  kvs=0  ams=0
+        kbd_scl  break=41  left_depth=0  left_curve=0  right_depth=50  right_curve=0
+        EG  rates=45/25/25/36  levels=99/99/98/0
+
+────────────────────────────────────────────────────────────
+  19. HARPSICH 1
+      algorithm=5  feedback=1  osc_sync=1
+      pitch_EG  rates=0/0/0/0  levels=50/50/50/50
+      LFO  wave=0  speed=35  delay=0  sync=0
+           pitch_depth=0  amp_depth=0  pms=3  transpose=0
+
+      OP6
+        output_level=87  mode=0  coarse=6  fine=0  detune=7
+        rate_scale=1  kvs=0  ams=0
+        kbd_scl  break=64  left_depth=0  left_curve=0  right_depth=55  right_curve=0
+        EG  rates=95/72/71/99  levels=99/97/91/98
+
+      OP5
+        output_level=83  mode=0  coarse=4  fine=0  detune=6
+        rate_scale=3  kvs=3  ams=0
+        kbd_scl  break=49  left_depth=0  left_curve=0  right_depth=0  right_curve=0
+        EG  rates=95/28/27/47  levels=99/90/0/0
+
+      OP4
+        output_level=99  mode=0  coarse=3  fine=0  detune=7
+        rate_scale=1  kvs=0  ams=0
+        kbd_scl  break=64  left_depth=0  left_curve=0  right_depth=46  right_curve=0
+        EG  rates=95/72/71/99  levels=99/97/91/98
+
+      OP3
+        output_level=85  mode=0  coarse=1  fine=0  detune=6
+        rate_scale=3  kvs=2  ams=0
+        kbd_scl  break=49  left_depth=0  left_curve=0  right_depth=0  right_curve=0
+        EG  rates=95/28/27/47  levels=99/90/0/0
+
+      OP2
+        output_level=99  mode=0  coarse=0  fine=0  detune=7
+        rate_scale=1  kvs=0  ams=0
+        kbd_scl  break=49  left_depth=0  left_curve=0  right_depth=0  right_curve=0
+        EG  rates=95/72/71/99  levels=99/97/91/98
+
+      OP1
+        output_level=89  mode=0  coarse=4  fine=0  detune=7
+        rate_scale=3  kvs=2  ams=0
+        kbd_scl  break=49  left_depth=0  left_curve=0  right_depth=0  right_curve=0
+        EG  rates=95/28/27/47  levels=99/90/0/0
+
+────────────────────────────────────────────────────────────
+  20. CLAV    1
+      algorithm=3  feedback=1  osc_sync=1
+      pitch_EG  rates=0/0/0/0  levels=50/50/50/50
+      LFO  wave=4  speed=30  delay=0  sync=0
+           pitch_depth=0  amp_depth=0  pms=3  transpose=0
+
+      OP6
+        output_level=78  mode=0  coarse=8  fine=0  detune=7
+        rate_scale=3  kvs=7  ams=0
+        kbd_scl  break=32  left_depth=0  left_curve=0  right_depth=21  right_curve=0
+        EG  rates=98/87/0/0  levels=87/86/0/0
+
+      OP5
+        output_level=99  mode=0  coarse=0  fine=0  detune=5
+        rate_scale=3  kvs=6  ams=0
+        kbd_scl  break=32  left_depth=0  left_curve=0  right_depth=0  right_curve=0
+        EG  rates=95/95/0/0  levels=99/96/89/0
+
+      OP4
+        output_level=99  mode=0  coarse=2  fine=0  detune=7
+        rate_scale=3  kvs=2  ams=0
+        kbd_scl  break=32  left_depth=0  left_curve=0  right_depth=0  right_curve=0
+        EG  rates=95/92/28/60  levels=99/90/0/0
+
+      OP3
+        output_level=71  mode=0  coarse=4  fine=50  detune=7
+        rate_scale=3  kvs=1  ams=0
+        kbd_scl  break=32  left_depth=0  left_curve=0  right_depth=21  right_curve=0
+        EG  rates=98/87/0/0  levels=87/86/0/0
+
+      OP2
+        output_level=99  mode=0  coarse=0  fine=0  detune=6
+        rate_scale=3  kvs=1  ams=0
+        kbd_scl  break=32  left_depth=0  left_curve=0  right_depth=0  right_curve=0
+        EG  rates=95/95/0/0  levels=99/96/89/0
+
+      OP1
+        output_level=99  mode=0  coarse=0  fine=0  detune=8
+        rate_scale=3  kvs=3  ams=0
+        kbd_scl  break=32  left_depth=0  left_curve=0  right_depth=0  right_curve=0
+        EG  rates=95/92/28/60  levels=99/90/0/0
+
+────────────────────────────────────────────────────────────
+  21. VIBE    1
+      algorithm=23  feedback=1  osc_sync=1
+      pitch_EG  rates=99/98/75/60  levels=50/50/50/50
+      LFO  wave=0  speed=26  delay=0  sync=1
+           pitch_depth=0  amp_depth=0  pms=3  transpose=0
+
+      OP6
+        output_level=57  mode=0  coarse=14  fine=0  detune=7
+        rate_scale=5  kvs=7  ams=0
+        kbd_scl  break=39  left_depth=12  left_curve=0  right_depth=12  right_curve=3
+        EG  rates=99/48/99/50  levels=99/32/0/0
+
+      OP5
+        output_level=99  mode=0  coarse=1  fine=0  detune=14
+        rate_scale=3  kvs=5  ams=0
+        kbd_scl  break=9  left_depth=0  left_curve=1  right_depth=0  right_curve=1
+        EG  rates=80/85/24/50  levels=99/90/42/0
+
+      OP4
+        output_level=99  mode=0  coarse=1  fine=0  detune=0
+        rate_scale=3  kvs=1  ams=0
+        kbd_scl  break=9  left_depth=0  left_curve=1  right_depth=0  right_curve=1
+        EG  rates=80/85/24/50  levels=99/90/0/0
+
+      OP3
+        output_level=72  mode=0  coarse=3  fine=0  detune=7
+        rate_scale=4  kvs=4  ams=0
+        kbd_scl  break=39  left_depth=12  left_curve=0  right_depth=12  right_curve=3
+        EG  rates=80/85/43/50  levels=99/74/0/0
+
+      OP2
+        output_level=99  mode=0  coarse=1  fine=0  detune=7
+        rate_scale=2  kvs=1  ams=0
+        kbd_scl  break=39  left_depth=4  left_curve=0  right_depth=12  right_curve=3
+        EG  rates=80/85/24/50  levels=99/90/0/0
+
+      OP1
+        output_level=50  mode=0  coarse=4  fine=0  detune=7
+        rate_scale=2  kvs=7  ams=0
+        kbd_scl  break=39  left_depth=12  left_curve=0  right_depth=12  right_curve=3
+        EG  rates=99/28/99/50  levels=99/25/0/0
+
+────────────────────────────────────────────────────────────
+  22. MARIMBA
+      algorithm=7  feedback=1  osc_sync=0
+      pitch_EG  rates=94/67/95/60  levels=50/50/50/50
+      LFO  wave=0  speed=35  delay=0  sync=1
+           pitch_depth=0  amp_depth=0  pms=3  transpose=0
+
+      OP6
+        output_level=99  mode=0  coarse=4  fine=13  detune=7
+        rate_scale=0  kvs=2  ams=0
+        kbd_scl  break=41  left_depth=0  left_curve=0  right_depth=0  right_curve=0
+        EG  rates=0/63/55/0  levels=78/78/0/0
+
+      OP5
+        output_level=93  mode=0  coarse=0  fine=50  detune=7
+        rate_scale=0  kvs=2  ams=0
+        kbd_scl  break=54  left_depth=0  left_curve=0  right_depth=46  right_curve=0
+        EG  rates=99/75/0/8  levels=82/48/0/0
+
+      OP4
+        output_level=85  mode=0  coarse=5  fine=0  detune=7
+        rate_scale=0  kvs=2  ams=0
+        kbd_scl  break=54  left_depth=0  left_curve=0  right_depth=46  right_curve=0
+        EG  rates=99/75/0/82  levels=82/48/0/0
+
+      OP3
+        output_level=99  mode=0  coarse=0  fine=0  detune=7
+        rate_scale=3  kvs=1  ams=0
+        kbd_scl  break=0  left_depth=0  left_curve=0  right_depth=0  right_curve=0
+        EG  rates=95/33/49/41  levels=99/92/0/0
+
+      OP2
+        output_level=96  mode=0  coarse=3  fine=0  detune=7
+        rate_scale=0  kvs=2  ams=0
+        kbd_scl  break=54  left_depth=0  left_curve=0  right_depth=46  right_curve=0
+        EG  rates=99/72/0/0  levels=82/48/0/0
+
+      OP1
+        output_level=95  mode=0  coarse=0  fine=0  detune=7
+        rate_scale=3  kvs=0  ams=0
+        kbd_scl  break=0  left_depth=0  left_curve=0  right_depth=0  right_curve=0
+        EG  rates=95/40/49/55  levels=99/92/0/0
+
+────────────────────────────────────────────────────────────
+  23. KOTO
+      algorithm=2  feedback=1  osc_sync=1
+      pitch_EG  rates=85/99/75/0  levels=49/50/50/50
+      LFO  wave=4  speed=30  delay=40  sync=1
+           pitch_depth=17  amp_depth=15  pms=3  transpose=0
+
+      OP6
+        output_level=81  mode=0  coarse=3  fine=0  detune=7
+        rate_scale=6  kvs=1  ams=0
+        kbd_scl  break=0  left_depth=0  left_curve=0  right_depth=5  right_curve=0
+        EG  rates=82/53/37/48  levels=99/81/0/0
+
+      OP5
+        output_level=83  mode=0  coarse=4  fine=0  detune=7
+        rate_scale=6  kvs=1  ams=0
+        kbd_scl  break=0  left_depth=0  left_curve=0  right_depth=5  right_curve=0
+        EG  rates=91/37/29/29  levels=99/90/0/0
+
+      OP4
+        output_level=82  mode=0  coarse=1  fine=0  detune=7
+        rate_scale=6  kvs=1  ams=0
+        kbd_scl  break=10  left_depth=0  left_curve=0  right_depth=17  right_curve=1
+        EG  rates=90/28/17/39  levels=99/76/0/0
+
+      OP3
+        output_level=99  mode=0  coarse=1  fine=0  detune=7
+        rate_scale=5  kvs=3  ams=0
+        kbd_scl  break=0  left_depth=0  left_curve=0  right_depth=0  right_curve=0
+        EG  rates=94/64/30/33  levels=99/92/0/0
+
+      OP2
+        output_level=99  mode=0  coarse=4  fine=0  detune=7
+        rate_scale=6  kvs=0  ams=0
+        kbd_scl  break=0  left_depth=0  left_curve=0  right_depth=10  right_curve=0
+        EG  rates=99/68/28/48  levels=99/83/0/0
+
+      OP1
+        output_level=90  mode=0  coarse=1  fine=0  detune=7
+        rate_scale=6  kvs=3  ams=0
+        kbd_scl  break=0  left_depth=0  left_curve=0  right_depth=0  right_curve=0
+        EG  rates=94/62/58/34  levels=99/92/0/0
+
+────────────────────────────────────────────────────────────
+  24. FLUTE   1
+      algorithm=16  feedback=0  osc_sync=1
+      pitch_EG  rates=94/67/95/60  levels=50/50/50/50
+      LFO  wave=0  speed=30  delay=23  sync=0
+           pitch_depth=8  amp_depth=13  pms=3  transpose=0
+
+      OP6
+        output_level=83  mode=0  coarse=1  fine=53  detune=11
+        rate_scale=0  kvs=2  ams=0
+        kbd_scl  break=46  left_depth=0  left_curve=0  right_depth=0  right_curve=3
+        EG  rates=99/64/98/61  levels=99/67/52/0
+
+      OP5
+        output_level=56  mode=0  coarse=2  fine=0  detune=7
+        rate_scale=0  kvs=0  ams=0
+        kbd_scl  break=53  left_depth=0  left_curve=0  right_depth=43  right_curve=0
+        EG  rates=65/38/0/61  levels=99/0/0/0
+
+      OP4
+        output_level=0  mode=0  coarse=2  fine=0  detune=7
+        rate_scale=3  kvs=0  ams=0
+        kbd_scl  break=60  left_depth=10  left_curve=0  right_depth=10  right_curve=0
+        EG  rates=61/25/25/60  levels=99/99/97/0
+
+      OP3
+        output_level=76  mode=0  coarse=1  fine=0  detune=4
+        rate_scale=0  kvs=0  ams=1
+        kbd_scl  break=46  left_depth=0  left_curve=3  right_depth=0  right_curve=0
+        EG  rates=53/38/75/61  levels=88/44/24/0
+
+      OP2
+        output_level=75  mode=0  coarse=1  fine=0  detune=11
+        rate_scale=4  kvs=2  ams=0
+        kbd_scl  break=0  left_depth=0  left_curve=0  right_depth=0  right_curve=0
+        EG  rates=99/97/62/54  levels=99/99/90/0
+
+      OP1
+        output_level=98  mode=0  coarse=1  fine=0  detune=5
+        rate_scale=0  kvs=2  ams=0
+        kbd_scl  break=41  left_depth=0  left_curve=0  right_depth=0  right_curve=0
+        EG  rates=61/67/70/65  levels=93/89/98/0
+
+────────────────────────────────────────────────────────────
+  25. ORCH-CHIME
+      algorithm=5  feedback=1  osc_sync=1
+      pitch_EG  rates=99/99/99/99  levels=50/50/50/50
+      LFO  wave=0  speed=30  delay=0  sync=0
+           pitch_depth=5  amp_depth=0  pms=3  transpose=0
+
+      OP6
+        output_level=75  mode=0  coarse=1  fine=0  detune=0
+        rate_scale=7  kvs=0  ams=0
+        kbd_scl  break=15  left_depth=0  left_curve=0  right_depth=0  right_curve=1
+        EG  rates=99/0/0/0  levels=99/99/99/0
+
+      OP5
+        output_level=98  mode=0  coarse=1  fine=0  detune=14
+        rate_scale=3  kvs=0  ams=0
+        kbd_scl  break=15  left_depth=0  left_curve=0  right_depth=0  right_curve=1
+        EG  rates=41/42/71/34  levels=99/99/99/0
+
+      OP4
+        output_level=91  mode=0  coarse=2  fine=57  detune=7
+        rate_scale=3  kvs=3  ams=0
+        kbd_scl  break=15  left_depth=0  left_curve=0  right_depth=0  right_curve=1
+        EG  rates=80/70/9/12  levels=88/80/0/0
+
+      OP3
+        output_level=99  mode=0  coarse=0  fine=0  detune=7
+        rate_scale=3  kvs=2  ams=0
+        kbd_scl  break=15  left_depth=0  left_curve=0  right_depth=0  right_curve=1
+        EG  rates=80/49/17/30  levels=99/95/0/0
+
+      OP2
+        output_level=87  mode=0  coarse=0  fine=0  detune=12
+        rate_scale=7  kvs=0  ams=0
+        kbd_scl  break=15  left_depth=0  left_curve=0  right_depth=0  right_curve=1
+        EG  rates=99/0/0/0  levels=99/99/99/0
+
+      OP1
+        output_level=97  mode=0  coarse=0  fine=0  detune=12
+        rate_scale=3  kvs=0  ams=0
+        kbd_scl  break=15  left_depth=0  left_curve=0  right_depth=0  right_curve=1
+        EG  rates=34/42/71/34  levels=99/99/99/0
+
+────────────────────────────────────────────────────────────
+  26. TUB BELLS
+      algorithm=5  feedback=0  osc_sync=1
+      pitch_EG  rates=67/95/95/60  levels=50/50/50/50
+      LFO  wave=1  speed=35  delay=0  sync=0
+           pitch_depth=0  amp_depth=0  pms=3  transpose=0
+
+      OP6
+        output_level=85  mode=0  coarse=2  fine=0  detune=0
+        rate_scale=2  kvs=0  ams=0
+        kbd_scl  break=0  left_depth=0  left_curve=0  right_depth=0  right_curve=0
+        EG  rates=98/91/0/28  levels=99/0/0/0
+
+      OP5
+        output_level=99  mode=1  coarse=2  fine=51  detune=7
+        rate_scale=2  kvs=5  ams=0
+        kbd_scl  break=0  left_depth=0  left_curve=0  right_depth=0  right_curve=0
+        EG  rates=76/78/71/70  levels=99/0/0/0
+
+      OP4
+        output_level=75  mode=0  coarse=2  fine=75  detune=5
+        rate_scale=2  kvs=0  ams=0
+        kbd_scl  break=0  left_depth=0  left_curve=0  right_depth=0  right_curve=0
+        EG  rates=98/12/71/28  levels=99/0/32/0
+
+      OP3
+        output_level=99  mode=0  coarse=1  fine=0  detune=2
+        rate_scale=2  kvs=0  ams=0
+        kbd_scl  break=0  left_depth=0  left_curve=0  right_depth=0  right_curve=0
+        EG  rates=95/33/71/25  levels=99/0/32/0
+
+      OP2
+        output_level=78  mode=0  coarse=2  fine=75  detune=10
+        rate_scale=2  kvs=0  ams=0
+        kbd_scl  break=0  left_depth=0  left_curve=0  right_depth=0  right_curve=0
+        EG  rates=98/12/71/28  levels=99/0/32/0
+
+      OP1
+        output_level=95  mode=0  coarse=1  fine=0  detune=9
+        rate_scale=2  kvs=0  ams=0
+        kbd_scl  break=0  left_depth=0  left_curve=0  right_depth=0  right_curve=0
+        EG  rates=95/33/71/25  levels=99/0/32/0
+
+────────────────────────────────────────────────────────────
+  27. STEEL DRUM
+      algorithm=15  feedback=1  osc_sync=1
+      pitch_EG  rates=50/50/50/50  levels=50/50/50/50
+      LFO  wave=4  speed=25  delay=0  sync=0
+           pitch_depth=10  amp_depth=99  pms=3  transpose=0
+
+      OP6
+        output_level=49  mode=1  coarse=2  fine=60  detune=7
+        rate_scale=3  kvs=0  ams=0
+        kbd_scl  break=0  left_depth=0  left_curve=0  right_depth=0  right_curve=0
+        EG  rates=99/49/28/12  levels=91/82/0/0
+
+      OP5
+        output_level=64  mode=0  coarse=4  fine=33  detune=7
+        rate_scale=3  kvs=0  ams=0
+        kbd_scl  break=0  left_depth=0  left_curve=0  right_depth=0  right_curve=0
+        EG  rates=99/40/38/0  levels=91/82/0/0
+
+      OP4
+        output_level=88  mode=0  coarse=2  fine=0  detune=14
+        rate_scale=3  kvs=1  ams=0
+        kbd_scl  break=0  left_depth=0  left_curve=0  right_depth=0  right_curve=0
+        EG  rates=99/44/50/21  levels=91/82/0/0
+
+      OP3
+        output_level=99  mode=0  coarse=1  fine=0  detune=7
+        rate_scale=3  kvs=3  ams=0
+        kbd_scl  break=0  left_depth=0  left_curve=0  right_depth=0  right_curve=0
+        EG  rates=99/30/35/42  levels=99/92/0/0
+
+      OP2
+        output_level=64  mode=0  coarse=1  fine=70  detune=7
+        rate_scale=2  kvs=2  ams=0
+        kbd_scl  break=57  left_depth=0  left_curve=2  right_depth=71  right_curve=0
+        EG  rates=99/19/20/9  levels=99/87/0/0
+
+      OP1
+        output_level=99  mode=0  coarse=1  fine=0  detune=7
+        rate_scale=4  kvs=0  ams=0
+        kbd_scl  break=0  left_depth=0  left_curve=0  right_depth=0  right_curve=0
+        EG  rates=99/40/33/38  levels=99/92/0/0
+
+────────────────────────────────────────────────────────────
+  28. TIMPANI
+      algorithm=16  feedback=1  osc_sync=1
+      pitch_EG  rates=99/98/75/60  levels=50/51/50/50
+      LFO  wave=0  speed=11  delay=0  sync=0
+           pitch_depth=16  amp_depth=0  pms=3  transpose=0
+
+      OP6
+        output_level=73  mode=0  coarse=0  fine=56  detune=7
+        rate_scale=3  kvs=1  ams=0
+        kbd_scl  break=3  left_depth=0  left_curve=0  right_depth=0  right_curve=2
+        EG  rates=98/2/26/27  levels=98/0/0/0
+
+      OP5
+        output_level=73  mode=0  coarse=0  fine=0  detune=7
+        rate_scale=0  kvs=1  ams=0
+        kbd_scl  break=80  left_depth=0  left_curve=3  right_depth=0  right_curve=1
+        EG  rates=99/50/26/19  levels=99/0/0/0
+
+      OP4
+        output_level=87  mode=0  coarse=0  fine=75  detune=7
+        rate_scale=7  kvs=7  ams=0
+        kbd_scl  break=80  left_depth=0  left_curve=3  right_depth=0  right_curve=1
+        EG  rates=99/31/17/30  levels=99/75/0/0
+
+      OP3
+        output_level=85  mode=0  coarse=0  fine=36  detune=4
+        rate_scale=3  kvs=0  ams=0
+        kbd_scl  break=0  left_depth=0  left_curve=0  right_depth=0  right_curve=1
+        EG  rates=99/77/26/23  levels=99/72/0/0
+
+      OP2
+        output_level=86  mode=0  coarse=0  fine=0  detune=10
+        rate_scale=1  kvs=1  ams=0
+        kbd_scl  break=41  left_depth=0  left_curve=0  right_depth=0  right_curve=1
+        EG  rates=99/74/0/0  levels=99/0/0/0
+
+      OP1
+        output_level=99  mode=0  coarse=0  fine=0  detune=7
+        rate_scale=3  kvs=1  ams=0
+        kbd_scl  break=0  left_depth=0  left_curve=0  right_depth=0  right_curve=3
+        EG  rates=99/36/98/33  levels=99/0/0/0
+
+────────────────────────────────────────────────────────────
+  29. REFS WHISL
+      algorithm=18  feedback=1  osc_sync=0
+      pitch_EG  rates=38/67/95/60  levels=39/50/50/50
+      LFO  wave=5  speed=99  delay=0  sync=1
+           pitch_depth=0  amp_depth=0  pms=3  transpose=0
+
+      OP6
+        output_level=78  mode=1  coarse=5  fine=0  detune=7
+        rate_scale=1  kvs=0  ams=0
+        kbd_scl  break=0  left_depth=0  left_curve=0  right_depth=0  right_curve=0
+        EG  rates=94/56/24/55  levels=96/78/0/0
+
+      OP5
+        output_level=64  mode=1  coarse=4  fine=0  detune=7
+        rate_scale=0  kvs=0  ams=0
+        kbd_scl  break=41  left_depth=0  left_curve=0  right_depth=0  right_curve=0
+        EG  rates=99/0/0/0  levels=99/0/0/0
+
+      OP4
+        output_level=75  mode=1  coarse=7  fine=82  detune=7
+        rate_scale=1  kvs=0  ams=0
+        kbd_scl  break=0  left_depth=0  left_curve=0  right_depth=0  right_curve=0
+        EG  rates=94/68/24/55  levels=96/89/0/0
+
+      OP3
+        output_level=66  mode=1  coarse=1  fine=67  detune=7
+        rate_scale=4  kvs=0  ams=0
+        kbd_scl  break=0  left_depth=0  left_curve=0  right_depth=0  right_curve=0
+        EG  rates=60/39/8/0  levels=99/99/99/0
+
+      OP2
+        output_level=93  mode=1  coarse=9  fine=53  detune=7
+        rate_scale=4  kvs=0  ams=0
+        kbd_scl  break=0  left_depth=0  left_curve=0  right_depth=0  right_curve=0
+        EG  rates=60/39/28/45  levels=99/99/99/0
+
+      OP1
+        output_level=90  mode=1  coarse=3  fine=32  detune=7
+        rate_scale=4  kvs=1  ams=0
+        kbd_scl  break=0  left_depth=0  left_curve=0  right_depth=0  right_curve=0
+        EG  rates=60/39/28/49  levels=99/99/99/0
+
+────────────────────────────────────────────────────────────
+  30. VOICE   1
+      algorithm=7  feedback=1  osc_sync=1
+      pitch_EG  rates=18/60/95/60  levels=48/51/50/50
+      LFO  wave=0  speed=35  delay=35  sync=0
+           pitch_depth=11  amp_depth=2  pms=3  transpose=0
+
+      OP6
+        output_level=55  mode=0  coarse=5  fine=2  detune=8
+        rate_scale=0  kvs=0  ams=0
+        kbd_scl  break=0  left_depth=0  left_curve=0  right_depth=0  right_curve=0
+        EG  rates=99/72/48/17  levels=99/99/99/0
+
+      OP5
+        output_level=53  mode=0  coarse=1  fine=1  detune=6
+        rate_scale=0  kvs=1  ams=0
+        kbd_scl  break=0  left_depth=0  left_curve=0  right_depth=0  right_curve=0
+        EG  rates=35/21/36/63  levels=99/90/85/0
+
+      OP4
+        output_level=99  mode=0  coarse=1  fine=2  detune=10
+        rate_scale=0  kvs=1  ams=0
+        kbd_scl  break=0  left_depth=0  left_curve=0  right_depth=0  right_curve=0
+        EG  rates=72/19/41/12  levels=48/58/20/9
+
+      OP3
+        output_level=99  mode=0  coarse=1  fine=0  detune=14
+        rate_scale=0  kvs=3  ams=0
+        kbd_scl  break=0  left_depth=0  left_curve=0  right_depth=0  right_curve=0
+        EG  rates=33/20/53/39  levels=99/94/97/0
+
+      OP2
+        output_level=99  mode=0  coarse=1  fine=0  detune=7
+        rate_scale=0  kvs=2  ams=2
+        kbd_scl  break=0  left_depth=0  left_curve=0  right_depth=0  right_curve=0
+        EG  rates=19/26/53/25  levels=51/61/76/51
+
+      OP1
+        output_level=87  mode=0  coarse=1  fine=0  detune=0
+        rate_scale=0  kvs=0  ams=0
+        kbd_scl  break=0  left_depth=0  left_curve=0  right_depth=0  right_curve=0
+        EG  rates=34/20/53/57  levels=99/94/97/0
+
+────────────────────────────────────────────────────────────
+  31. TRAIN
+      algorithm=5  feedback=1  osc_sync=1
+      pitch_EG  rates=75/67/95/60  levels=50/50/50/50
+      LFO  wave=0  speed=39  delay=0  sync=0
+           pitch_depth=0  amp_depth=99  pms=3  transpose=0
+
+      OP6
+        output_level=99  mode=0  coarse=5  fine=0  detune=7
+        rate_scale=0  kvs=0  ams=0
+        kbd_scl  break=36  left_depth=0  left_curve=3  right_depth=0  right_curve=0
+        EG  rates=49/17/25/53  levels=99/99/99/98
+
+      OP5
+        output_level=83  mode=0  coarse=9  fine=0  detune=10
+        rate_scale=0  kvs=0  ams=3
+        kbd_scl  break=36  left_depth=0  left_curve=3  right_depth=0  right_curve=0
+        EG  rates=42/17/25/53  levels=99/99/99/99
+
+      OP4
+        output_level=89  mode=1  coarse=10  fine=99  detune=5
+        rate_scale=0  kvs=0  ams=0
+        kbd_scl  break=20  left_depth=0  left_curve=1  right_depth=0  right_curve=1
+        EG  rates=98/29/28/27  levels=99/0/0/0
+
+      OP3
+        output_level=99  mode=1  coarse=22  fine=57  detune=9
+        rate_scale=0  kvs=0  ams=0
+        kbd_scl  break=99  left_depth=98  left_curve=1  right_depth=0  right_curve=1
+        EG  rates=98/29/28/33  levels=99/0/0/0
+
+      OP2
+        output_level=72  mode=0  coarse=3  fine=1  detune=7
+        rate_scale=5  kvs=0  ams=0
+        kbd_scl  break=52  left_depth=0  left_curve=3  right_depth=0  right_curve=0
+        EG  rates=39/13/12/72  levels=99/61/66/0
+
+      OP1
+        output_level=99  mode=0  coarse=1  fine=64  detune=7
+        rate_scale=3  kvs=0  ams=0
+        kbd_scl  break=39  left_depth=0  left_curve=3  right_depth=98  right_curve=0
+        EG  rates=65/24/19/57  levels=99/85/85/0
+
+────────────────────────────────────────────────────────────
+  32. TAKE OFF
+      algorithm=10  feedback=1  osc_sync=0
+      pitch_EG  rates=32/30/94/16  levels=50/7/81/99
+      LFO  wave=2  speed=65  delay=0  sync=1
+           pitch_depth=0  amp_depth=0  pms=0  transpose=0
+
+      OP6
+        output_level=99  mode=0  coarse=0  fine=0  detune=7
+        rate_scale=0  kvs=0  ams=0
+        kbd_scl  break=0  left_depth=0  left_curve=0  right_depth=0  right_curve=0
+        EG  rates=89/22/20/41  levels=99/92/0/0
+
+      OP5
+        output_level=96  mode=0  coarse=2  fine=1  detune=7
+        rate_scale=0  kvs=0  ams=0
+        kbd_scl  break=0  left_depth=0  left_curve=0  right_depth=0  right_curve=0
+        EG  rates=88/24/23/37  levels=99/90/0/0
+
+      OP4
+        output_level=99  mode=0  coarse=0  fine=0  detune=7
+        rate_scale=0  kvs=0  ams=0
+        kbd_scl  break=0  left_depth=0  left_curve=0  right_depth=0  right_curve=0
+        EG  rates=13/14/20/30  levels=99/95/99/0
+
+      OP3
+        output_level=99  mode=0  coarse=6  fine=1  detune=7
+        rate_scale=0  kvs=0  ams=0
+        kbd_scl  break=0  left_depth=0  left_curve=0  right_depth=0  right_curve=0
+        EG  rates=76/35/99/11  levels=67/38/73/0
+
+      OP2
+        output_level=96  mode=0  coarse=1  fine=0  detune=7
+        rate_scale=0  kvs=0  ams=0
+        kbd_scl  break=0  left_depth=0  left_curve=0  right_depth=0  right_curve=0
+        EG  rates=82/80/19/14  levels=80/95/0/0
+
+      OP1
+        output_level=99  mode=0  coarse=4  fine=1  detune=7
+        rate_scale=0  kvs=0  ams=0
+        kbd_scl  break=0  left_depth=0  left_curve=0  right_depth=0  right_curve=0
+        EG  rates=9/14/17/34  levels=61/96/0/0
+
+────────────────────────────────────────────────────────────
+algorithms used by this cartridge:
+  2(x4), 3(x2), 5(x5), 7(x2), 8(x1), 10(x1), 15(x2), 16(x4), 17(x1), 18(x4), 19(x2), 22(x2), 23(x1), 32(x1)

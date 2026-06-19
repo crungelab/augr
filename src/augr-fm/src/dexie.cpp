@@ -116,6 +116,19 @@ float FixedFrequencyHz(int coarse_raw, int fine_raw) {
     return kFixedFreqRef * std::pow(2.0f, logfreq / 16777216.0f);
 }
 
+// DX7 detune is pitch-dependent, evaluated at the operator's own frequency
+// (post-ratio). Ported from Dexed's osc_freq (dx7note.cc).
+// Reference 8.175799 Hz = MIDI note 0 (C-1), Dexed's logfreq=0 anchor.
+// detune_ is centered (-7..7) via SysexDetuneToParam.
+float DetuneHz(float op_hz, float detune_centered) {
+    if (detune_centered == 0.0f)
+        return 0.0f;
+    const float log_normalized = std::log2(op_hz / 8.175799f);
+    const float detune_ratio =
+        0.0209f * std::exp(-0.396f * log_normalized) / 7.0f;
+    return op_hz * detune_ratio * detune_centered;
+}
+
 } // namespace
 
 void Dexie::OnCreate() {
@@ -128,12 +141,15 @@ void Dexie::CreatePins() {
     AddInput(*cv_pitch_in_);
     gate_in_ = new VoltageInput(*this, "gate");
     AddInput(*gate_in_);
-    cv_phase_in_ = new VoltageInput(*this, "phase");
-    AddInput(*cv_phase_in_);
-    cv_amp_mod_in_ = new VoltageInput(*this, "amp_mod");
-    AddInput(*cv_amp_mod_in_);
     cv_velocity_in_ = new VoltageInput(*this, "velocity");
     AddInput(*cv_velocity_in_);
+
+    //cv_phase_in_ = new VoltageInput(*this, "phase");
+    cv_phase_in_ = new MixingAudioInput(*this, "phase");
+    AddInput(*cv_phase_in_);
+
+    cv_amp_mod_in_ = new VoltageInput(*this, "amp_mod");
+    AddInput(*cv_amp_mod_in_);
     cv_pitch_mod_in_ = new VoltageInput(*this, "pitch_mod");
     AddInput(*cv_pitch_mod_in_);
 
@@ -335,6 +351,40 @@ void Dexie::Process() {
         // --- Oscillator ---
         const float phase_mod =
             phase_data ? static_cast<float>(phase_data[i]) : 0.0f;
+        phase_mod_peak_ = std::max(phase_mod_peak_, std::fabs(phase_mod));
+
+        // --- Pitch modulation (vibrato) ---
+        // LFO signal scaled by voice-level pitch depth and per-voice pitch mod
+        // sensitivity. lfo_val is bipolar [-1,1]; we convert to a frequency
+        // multiplier via exp2 (small deviations only, so this is a good
+        // approx). Dexed's fixed-point version adds pitch_mod directly to
+        // logfreq; in float we achieve the same by multiplying frequency by
+        // 2^(deviation).
+        const float pitch_lfo =
+            pitch_mod_data ? static_cast<float>(pitch_mod_data[i]) : 0.0f;
+        const float pitch_mod_depth = pitch_lfo * pitch_depth_norm * pms;
+        // Scale: pms=1 (max) at full lfo and full depth should give ~±1
+        // semitone of vibrato. DX7 pitch mod range is roughly ±7 semitones at
+        // max settings. The 1/12 factor converts semitones to octaves for exp2.
+        const float pitch_factor = std::exp2(pitch_mod_depth * 7.0f / 12.0f);
+
+        const float base_hz = CvToFreq(pitch_cv) * pitch_factor;
+        const float op_hz = fixed_freq_ ? frequency_ : (base_hz * ratio);
+
+        // Detune applied to op_hz (post-ratio), matching osc_freq's behavior
+        // where logfreq already includes coarsemul before detune is applied.
+        // Fixed-frequency operators skip detune — the DX7 only adds detune in
+        // ratio mode (osc_freq's fixed branch has a different, smaller detune
+        // formula).
+        const float freq =
+            fixed_freq_ ? op_hz : op_hz + DetuneHz(op_hz, std::round(detune_));
+
+        debug_freq_ = freq;
+        const float phase_inc = freq / sample_rate;
+        /*
+        // --- Oscillator ---
+        const float phase_mod =
+            phase_data ? static_cast<float>(phase_data[i]) : 0.0f;
 
         // Debug
         phase_mod_peak_ = std::max(phase_mod_peak_, std::fabs(phase_mod));
@@ -356,16 +406,6 @@ void Dexie::Process() {
 
         const float base_hz = CvToFreq(pitch_cv) * detune_factor * pitch_factor;
 
-        // const float base_hz = CvToFreq(pitch_cv) * detune_factor;
-
-        // const float freq = ratio_mode ? (base_hz * ratio) : frequency_;
-
-        // Fixed-frequency operators ignore MIDI pitch entirely.
-        /*
-        const float freq = fixed_freq_
-                               ? frequency_
-                               : (ratio_mode ? (base_hz * ratio) : frequency_);
-        */
         const float freq =
             fixed_freq_ ? frequency_ // fixed-frequency mode: ignores MIDI pitch
                         : (base_hz * ratio); // ratio mode: tracks MIDI pitch
@@ -374,6 +414,7 @@ void Dexie::Process() {
         debug_freq_ = freq;
 
         const float phase_inc = freq / sample_rate;
+        */
 
         const float fb =
             fb_on ? (fb_hist_[0] + fb_hist_[1]) / fb_divisor : 0.0f;
@@ -387,6 +428,7 @@ void Dexie::Process() {
         // subtle harmonic richness on lower-feedback operators (BRASS 1). The
         // real DX7 used a 12-bit DAC, giving 4096 quantization steps over the
         // full [-1, 1] range.
+        /*
         constexpr float kQuantSteps = 4096.0f; // 2^12
         const float quantized = std::round(shaped * kQuantSteps) / kQuantSteps;
 
@@ -395,12 +437,11 @@ void Dexie::Process() {
         fb_hist_[1] = fb_hist_[0];
         fb_hist_[0] = quantized; // feedback uses quantized output, as the real
                                  // hardware did
-        /*
+        */
         out_data[i] = static_cast<fy_real>(shaped);
 
         fb_hist_[1] = fb_hist_[0];
         fb_hist_[0] = shaped;
-        */
 
         phase_ += phase_inc;
         if (phase_ >= 1.0f)

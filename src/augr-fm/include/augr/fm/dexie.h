@@ -66,7 +66,8 @@ public:
     // CV inputs — pitch → gate → phase → amp mod
     VoltageInput *cv_pitch_in_ = nullptr; // V/oct pitch
     VoltageInput *gate_in_ = nullptr;     // envelope gate (note on/off)
-    VoltageInput *cv_phase_in_ = nullptr; // FM input — sum of modulator outputs
+    //VoltageInput *cv_phase_in_ = nullptr; // FM input — sum of modulator outputs
+    MixingAudioInput *cv_phase_in_ = nullptr; // FM input — sum of modulator outputs
     VoltageInput *cv_amp_mod_in_ = nullptr; // shared voice LFO signal
     VoltageInput *cv_velocity_in_ =
         nullptr; // note-on velocity, 0..1 normalized

@@ -28,6 +28,79 @@ Audio MixingAudioInput::Reduce() const {
 */
 
 Audio MixingAudioInput::Reduce() const {
+    if (slots_.empty()) {
+        return Audio();
+    }
+
+    Audio mixed = Audio(layout_);
+    mixed.array().fill(0);
+
+    for (auto *slot : slots_) {
+        auto slot_data = slot->Read();
+        if (slot_data.Empty())
+            continue;
+        mixed.array() += slot_data.array();
+    }
+
+    fy_real *d = mixed.array().data();
+    const size_t n = mixed.array().size();
+
+    for (size_t k = 0; k < n; ++k)
+        d[k] = std::tanh(d[k]);
+
+    return mixed;
+}
+
+/*
+Audio MixingAudioInput::Reduce() const {
+    if (slots_.empty()) {
+        return Audio();
+    }
+
+    Audio mixed = slots_[0]->Read();
+
+    if (mixed.Empty()) {
+        return Audio();
+    }
+
+    fy_real *d = mixed.array().data();
+    const size_t n = mixed.array().size();
+
+    for (size_t i = 1; i < slots_.size(); ++i) {
+        const Audio voice = slots_[i]->Read();
+        const fy_real *s = voice.array().data();
+        for (size_t k = 0; k < n; ++k)
+            d[k] += s[k];
+    }
+
+    for (size_t k = 0; k < n; ++k)
+        d[k] = std::tanh(d[k]);
+
+    return mixed;
+}
+*/
+
+/*
+Audio MixingAudioInput::Reduce() const {
+    Audio mixed = Audio(layout_);
+    mixed.array().fill(0);
+    for (auto *slot : slots_) {
+        auto slot_data = slot->Read();
+        if (slot_data.Empty())
+            continue;
+        mixed.array() += slot_data.array();
+    }
+
+    const float n = static_cast<float>(slots_.size());
+    const float headroom =
+        1.0f / n; // was 1/sqrt(n) — too generous for coherent carriers
+    mixed.array() *= headroom;
+    return mixed;
+}
+*/
+
+/*
+Audio MixingAudioInput::Reduce() const {
     Audio mixed = Audio(layout_);
     mixed.array().fill(0);
     for (auto *slot : slots_) {
@@ -43,6 +116,7 @@ Audio MixingAudioInput::Reduce() const {
     mixed.array() *= kHeadroom;
     return mixed;
 }
+*/
 
 /*
 Audio MixingAudioInput::Reduce() const {
