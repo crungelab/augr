@@ -63,6 +63,8 @@ public:
     float lfo_pitch_depth_ = 0.0f; // raw DX7 0..99, voice-level
     float pitch_mod_sens_ = 0.0f;  // raw DX7 0..7, indexes pitchmodsenstab
 
+    bool osc_key_sync_ = false;  // if true, reset phase on every note-on
+
     // CV inputs — pitch → gate → phase → amp mod
     VoltageInput *cv_pitch_in_ = nullptr; // V/oct pitch
     VoltageInput *gate_in_ = nullptr;     // envelope gate (note on/off)

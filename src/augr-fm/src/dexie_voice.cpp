@@ -137,14 +137,8 @@ void DexieVoice::LoadPatch(const Dx7Patch &patch) {
         ops_[i]->lfo_delay_samples_total_ =
             static_cast<int>((patch.lfo_delay / 99.0f) * kMaxDelaySeconds *
                              Audio::sample_rate());
+        ops_[i]->osc_key_sync_ = (patch.osc_key_sync != 0);
     }
-    /*
-    for (int i = 0; i < 6; ++i) {
-        // ops_[i]->lfo_amp_depth_ = patch.lfo_amp_depth / 99.0f;
-        ops_[i]->lfo_amp_depth_ = static_cast<float>(patch.lfo_amp_depth);
-        ops_[i]->lfo_delay_samples_total_ = delay_samples;
-    }
-    */
 }
 
 void DexieVoice::WireAlgorithm(int algorithm, int feedback_op) {

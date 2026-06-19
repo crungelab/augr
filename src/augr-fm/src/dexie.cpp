@@ -144,7 +144,7 @@ void Dexie::CreatePins() {
     cv_velocity_in_ = new VoltageInput(*this, "velocity");
     AddInput(*cv_velocity_in_);
 
-    //cv_phase_in_ = new VoltageInput(*this, "phase");
+    // cv_phase_in_ = new VoltageInput(*this, "phase");
     cv_phase_in_ = new MixingAudioInput(*this, "phase");
     AddInput(*cv_phase_in_);
 
@@ -305,6 +305,11 @@ void Dexie::Process() {
         const bool gate = gate_data && (gate_data[i] > 0.5f);
 
         if (gate && !gate_prev_) {
+            if (osc_key_sync_) {
+                phase_ = 0.0f;
+                fb_hist_[0] = 0.0f;
+                fb_hist_[1] = 0.0f;
+            }
             const int level_scaling =
                 ScaleLevel(midinote, kbd_break_pt_, kbd_left_depth_,
                            kbd_right_depth_, kbd_left_curve_, kbd_right_curve_);
@@ -376,6 +381,7 @@ void Dexie::Process() {
         // Fixed-frequency operators skip detune — the DX7 only adds detune in
         // ratio mode (osc_freq's fixed branch has a different, smaller detune
         // formula).
+
         const float freq =
             fixed_freq_ ? op_hz : op_hz + DetuneHz(op_hz, std::round(detune_));
 
