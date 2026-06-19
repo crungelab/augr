@@ -20,6 +20,21 @@
 
 namespace augr::fm {
 
+namespace {
+// Fixed-frequency mode: operator ignores MIDI note, runs at a fixed Hz.
+// coarse_raw is the raw 0..31 patch byte; only bits 0-1 are used (& 3).
+// fine_raw is raw 0..99. Reference 3.2 Hz derived from DX7 hardware
+// measurements. Ported from Dexed's osc_freq fixed-frequency branch
+// (dx7note.cc).
+float FixedFrequencyHz(int coarse_raw, int fine_raw) {
+    const int coarse = coarse_raw & 3;
+    const int combined = coarse * 100 + fine_raw;
+    const float logfreq = (4458616.0f * combined) / 8.0f;
+    constexpr float kFixedFreqRef = 3.2f; // Hz at logfreq=0
+    return kFixedFreqRef * std::pow(2.0f, logfreq / 16777216.0f);
+}
+} // namespace
+
 LfoModule::Waveform Dx7WaveformToLfoWaveform(int dx7_waveform) {
     switch (dx7_waveform) {
     case 0:
@@ -58,6 +73,7 @@ void DexieVoice::OnCreateFresh() {
         Connect(*midi_cv_module_->pitch_out_, *op->cv_pitch_in_);
         Connect(*midi_cv_module_->gate_out_, *op->gate_in_);
         Connect(*lfo_module_->cv_out_, *op->cv_amp_mod_in_);
+        Connect(*lfo_module_->cv_out_, *op->cv_pitch_mod_in_);
         Connect(*midi_cv_module_->velocity_out_, *op->cv_velocity_in_);
         ops_[i] = op.get();
     }
@@ -115,10 +131,20 @@ void DexieVoice::LoadPatch(const Dx7Patch &patch) {
                                                kMaxDelaySeconds * sample_rate);
 
     for (int i = 0; i < 6; ++i) {
+        ops_[i]->lfo_amp_depth_ = static_cast<float>(patch.lfo_amp_depth);
+        ops_[i]->lfo_pitch_depth_ = static_cast<float>(patch.lfo_pitch_depth);
+        ops_[i]->pitch_mod_sens_ = static_cast<float>(patch.pitch_mod_sens);
+        ops_[i]->lfo_delay_samples_total_ =
+            static_cast<int>((patch.lfo_delay / 99.0f) * kMaxDelaySeconds *
+                             Audio::sample_rate());
+    }
+    /*
+    for (int i = 0; i < 6; ++i) {
         // ops_[i]->lfo_amp_depth_ = patch.lfo_amp_depth / 99.0f;
         ops_[i]->lfo_amp_depth_ = static_cast<float>(patch.lfo_amp_depth);
         ops_[i]->lfo_delay_samples_total_ = delay_samples;
     }
+    */
 }
 
 void DexieVoice::WireAlgorithm(int algorithm, int feedback_op) {
@@ -183,6 +209,10 @@ void DexieVoice::PushOperatorParams(int op_idx, const Dx7Op &op, int feedback,
 
     // d->kbd_rate_scaling_ = op.kbd_rate_scaling;
     d->kbd_rate_scaling_ = static_cast<float>(op.kbd_rate_scaling);
+
+    d->fixed_freq_ = op.fixed_freq;
+    d->frequency_ =
+        op.fixed_freq ? FixedFrequencyHz(op.coarse_raw, op.fine_raw) : 0.0f;
 }
 
 } // namespace augr::fm

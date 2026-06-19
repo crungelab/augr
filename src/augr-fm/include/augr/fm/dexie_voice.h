@@ -11,7 +11,7 @@ class Wire;
 class MidiCvModule;
 class LfoModule;
 
-}
+} // namespace augr
 
 namespace augr::fm {
 
@@ -26,21 +26,25 @@ public:
     void OnCreateFresh() override;
     void OnAddingChild(Model &model) override;
     void OnRemovingChild(Model &model) override;
-    void LoadPatch(const Dx7Patch& patch);
+    void LoadPatch(const Dx7Patch &patch);
 
     REFLECT_ENABLE(Voice)
 
 private:
-    MidiCvModule* midi_cv_module_ = nullptr;
-    LfoModule* lfo_module_ = nullptr;
+    MidiCvModule *midi_cv_module_ = nullptr;
+    LfoModule *lfo_module_ = nullptr;
 
-    Dexie* ops_[6]      = {};
+    Dexie *ops_[6] = {};
     bool is_carrier_[6] = {};
-    std::vector<Wire*> algorithm_wires_;
+    std::vector<Wire *> algorithm_wires_;
 
     void WireAlgorithm(int algorithm, int feedback_op);
-    void PushOperatorParams(int op_idx, const Dx7Op& op,
-                            int feedback, const Dx7AlgorithmDef& def);
+    void PushOperatorParams(int op_idx, const Dx7Op &op, int feedback,
+                            const Dx7AlgorithmDef &def);
+
+    // Stored from patch for pushing to operators
+    int lfo_pitch_depth_raw_ = 0;
+    int pitch_mod_sens_raw_ = 0;
 };
 
 } // namespace augr::fm

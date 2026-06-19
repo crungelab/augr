@@ -25,6 +25,13 @@ constexpr float kAmpModSensTab[4] = {
     16777216.0f / 16777216.0f,
 };
 
+// DX7 pitchmodsenstab, from dx7note.cc. Raw 0..7 index -> sensitivity scalar.
+// Normalized by 255 (the maximum value) to give [0,1] range.
+constexpr float kPitchModSensTab[8] = {
+    0.0f,           10.0f / 255.0f, 20.0f / 255.0f,  33.0f / 255.0f,
+    55.0f / 255.0f, 92.0f / 255.0f, 153.0f / 255.0f, 255.0f / 255.0f,
+};
+
 // dexie.cpp — new free functions in the anonymous namespace:
 const uint8_t kExpScaleData[] = {
     0,  1,  2,  3,  4,  5,  6,   7,   8,   9,   11,  14,  16,  19,  23,  27, 33,
@@ -96,11 +103,42 @@ float AmpModLevelMultiplier(float lfo_val, float amd_depth_norm,
     return 1.0f - ldiff_frac;
 }
 
+// Fixed-frequency mode: operator ignores MIDI note, runs at a fixed Hz.
+// coarse_raw is the raw 0..31 patch byte; only bits 0-1 are used (& 3).
+// fine_raw is raw 0..99. Reference 3.2 Hz derived from DX7 hardware
+// measurements. Ported from Dexed's osc_freq fixed-frequency branch
+// (dx7note.cc).
+float FixedFrequencyHz(int coarse_raw, int fine_raw) {
+    const int coarse = coarse_raw & 3;
+    const int combined = coarse * 100 + fine_raw;
+    const float logfreq = (4458616.0f * combined) / 8.0f;
+    constexpr float kFixedFreqRef = 3.2f; // Hz at logfreq=0
+    return kFixedFreqRef * std::pow(2.0f, logfreq / 16777216.0f);
+}
+
 } // namespace
 
 void Dexie::OnCreate() {
     Module::OnCreate();
     label_ = "Dexie";
+}
+
+void Dexie::CreatePins() {
+    cv_pitch_in_ = new VoltageInput(*this, "pitch");
+    AddInput(*cv_pitch_in_);
+    gate_in_ = new VoltageInput(*this, "gate");
+    AddInput(*gate_in_);
+    cv_phase_in_ = new VoltageInput(*this, "phase");
+    AddInput(*cv_phase_in_);
+    cv_amp_mod_in_ = new VoltageInput(*this, "amp_mod");
+    AddInput(*cv_amp_mod_in_);
+    cv_velocity_in_ = new VoltageInput(*this, "velocity");
+    AddInput(*cv_velocity_in_);
+    cv_pitch_mod_in_ = new VoltageInput(*this, "pitch_mod");
+    AddInput(*cv_pitch_mod_in_);
+
+    audio_out_ = new AudioOutput(*this, "out", ChannelLayout::kMono);
+    AddOutput(*audio_out_);
 }
 
 void Dexie::CreateControls() {
@@ -181,47 +219,37 @@ void Dexie::CreateControls() {
     }
 }
 
-void Dexie::CreatePins() {
-    cv_pitch_in_ = new VoltageInput(*this, "pitch");
-    AddInput(*cv_pitch_in_);
-    gate_in_ = new VoltageInput(*this, "gate");
-    AddInput(*gate_in_);
-    cv_phase_in_ = new VoltageInput(*this, "phase");
-    AddInput(*cv_phase_in_);
-    cv_amp_mod_in_ = new VoltageInput(*this, "amp_mod");
-    AddInput(*cv_amp_mod_in_);
-    cv_velocity_in_ = new VoltageInput(*this, "velocity");
-    AddInput(*cv_velocity_in_);
-
-    audio_out_ = new AudioOutput(*this, "out", ChannelLayout::kMono);
-    AddOutput(*audio_out_);
-}
-
 void Dexie::Process() {
     if (muted_) {
         audio_out_->Write(Audio());
         return;
     }
     const Audio pitch_buf = cv_pitch_in_->Read();
+    const fy_real *pitch_data =
+        pitch_buf.Empty() ? nullptr : pitch_buf.array().data();
+
     const Audio gate_buf = gate_in_->Read();
+    const fy_real *gate_data =
+        gate_buf.Empty() ? nullptr : gate_buf.array().data();
+
     const Audio phase_buf = cv_phase_in_->Read();
+    const fy_real *phase_data =
+        phase_buf.Empty() ? nullptr : phase_buf.array().data();
+
     const Audio amp_mod_buf = cv_amp_mod_in_->Read();
+    const fy_real *amp_mod_data =
+        amp_mod_buf.Empty() ? nullptr : amp_mod_buf.array().data();
 
     const Audio velocity_buf = cv_velocity_in_->Read();
     const fy_real *velocity_data =
         velocity_buf.Empty() ? nullptr : velocity_buf.array().data();
 
+    const Audio pitch_mod_buf = cv_pitch_mod_in_->Read();
+    const fy_real *pitch_mod_data =
+        pitch_mod_buf.Empty() ? nullptr : pitch_mod_buf.array().data();
+
     const float sample_rate = Audio::sample_rate();
     const std::size_t frames = Audio::frames();
-
-    const fy_real *pitch_data =
-        pitch_buf.Empty() ? nullptr : pitch_buf.array().data();
-    const fy_real *gate_data =
-        gate_buf.Empty() ? nullptr : gate_buf.array().data();
-    const fy_real *phase_data =
-        phase_buf.Empty() ? nullptr : phase_buf.array().data();
-    const fy_real *amp_mod_data =
-        amp_mod_buf.Empty() ? nullptr : amp_mod_buf.array().data();
 
     env_.SetSampleRate(sample_rate);
 
@@ -230,7 +258,7 @@ void Dexie::Process() {
     const float detune_factor = std::pow(2.f, detune_cents / 1200.f);
 
     const float ratio = ratio_coarse_ * (1 + ratio_fine_);
-    const bool ratio_mode = ratio > 0.0f;
+    // const bool ratio_mode = ratio > 0.0f;
 
     // Feedback amount 0..7 → shift (FEEDBACK_BITDEPTH - amount), or 16 = off.
     const int feedback_int = static_cast<int>(std::round(feedback_));
@@ -241,6 +269,10 @@ void Dexie::Process() {
 
     const float ams_depth = kAmpModSensTab[std::clamp(
         static_cast<int>(std::round(amp_mod_sens_)), 0, 3)];
+
+    const float pms = kPitchModSensTab[std::clamp(
+        static_cast<int>(std::round(pitch_mod_sens_)), 0, 7)];
+    const float pitch_depth_norm = lfo_pitch_depth_ / 99.0f;
 
     Audio out(ChannelLayout::kMono);
     fy_real *out_data = out.array().data();
@@ -307,8 +339,37 @@ void Dexie::Process() {
         // Debug
         phase_mod_peak_ = std::max(phase_mod_peak_, std::fabs(phase_mod));
 
-        const float base_hz = CvToFreq(pitch_cv) * detune_factor;
-        const float freq = ratio_mode ? (base_hz * ratio) : frequency_;
+        // --- Pitch modulation (vibrato) ---
+        // LFO signal scaled by voice-level pitch depth and per-voice pitch mod
+        // sensitivity. lfo_val is bipolar [-1,1]; we convert to a frequency
+        // multiplier via exp2 (small deviations only, so this is a good
+        // approx). Dexed's fixed-point version adds pitch_mod directly to
+        // logfreq; in float we achieve the same by multiplying frequency by
+        // 2^(deviation).
+        const float pitch_lfo =
+            pitch_mod_data ? static_cast<float>(pitch_mod_data[i]) : 0.0f;
+        const float pitch_mod_depth = pitch_lfo * pitch_depth_norm * pms;
+        // Scale: pms=1 (max) at full lfo and full depth should give ~±1
+        // semitone of vibrato. DX7 pitch mod range is roughly ±7 semitones at
+        // max settings. The 1/12 factor converts semitones to octaves for exp2.
+        const float pitch_factor = std::exp2(pitch_mod_depth * 7.0f / 12.0f);
+
+        const float base_hz = CvToFreq(pitch_cv) * detune_factor * pitch_factor;
+
+        // const float base_hz = CvToFreq(pitch_cv) * detune_factor;
+
+        // const float freq = ratio_mode ? (base_hz * ratio) : frequency_;
+
+        // Fixed-frequency operators ignore MIDI pitch entirely.
+        /*
+        const float freq = fixed_freq_
+                               ? frequency_
+                               : (ratio_mode ? (base_hz * ratio) : frequency_);
+        */
+        const float freq =
+            fixed_freq_ ? frequency_ // fixed-frequency mode: ignores MIDI pitch
+                        : (base_hz * ratio); // ratio mode: tracks MIDI pitch
+
         // Debug
         debug_freq_ = freq;
 

@@ -18,8 +18,8 @@ class Module : public Node {
 public:
     void OnCreate() override;
 
-    virtual void CreateControls() {}
     virtual void CreatePins() {}
+    virtual void CreateControls() {}
 
     virtual void Process() {}
 

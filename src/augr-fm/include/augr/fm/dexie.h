@@ -27,6 +27,8 @@ public:
     float ratio_coarse_ = 1.0f;
     float ratio_fine_ = 0.0f;
     float frequency_ = 0.0f;     // Hz; used only when ratio <= 0
+    bool  fixed_freq_ = false;  // true when operator ignores MIDI pitch
+
     float detune_ = 0.0f;        // DX7 detune: integer steps -7..7
     float output_level_ = 99.0f; // raw DX7 operator output level 0..99
 
@@ -41,12 +43,12 @@ public:
     float lfo_amp_depth_ =
         1.0f; // 0..1, from the patch's voice-level LFO amp depth
     */
-    float lfo_amp_depth_ = 99.0f;  // raw DX7 0..99 LFO amplitude-mod depth (AMD)
+    float lfo_amp_depth_ = 99.0f; // raw DX7 0..99 LFO amplitude-mod depth (AMD)
 
     int lfo_delay_samples_total_ =
         0; // samples for the LFO to ramp to full depth after gate-on
 
-    float velocity_sens_ = 0.0f;  // raw DX7 0..7 key velocity sensitivity
+    float velocity_sens_ = 0.0f; // raw DX7 0..7 key velocity sensitivity
 
     // Keyboard
     int kbd_break_pt_ = 0;
@@ -55,14 +57,21 @@ public:
     int kbd_left_curve_ = 0;
     int kbd_right_curve_ = 0;
 
-    float kbd_rate_scaling_ = 0.0f;  // 0..7, DX7 keyboard rate scaling
+    float kbd_rate_scaling_ = 0.0f; // 0..7, DX7 keyboard rate scaling
+
+    // Pitch modulation (vibrato) — voice-level LFO path
+    float lfo_pitch_depth_ = 0.0f; // raw DX7 0..99, voice-level
+    float pitch_mod_sens_ = 0.0f;  // raw DX7 0..7, indexes pitchmodsenstab
 
     // CV inputs — pitch → gate → phase → amp mod
     VoltageInput *cv_pitch_in_ = nullptr; // V/oct pitch
     VoltageInput *gate_in_ = nullptr;     // envelope gate (note on/off)
     VoltageInput *cv_phase_in_ = nullptr; // FM input — sum of modulator outputs
     VoltageInput *cv_amp_mod_in_ = nullptr; // shared voice LFO signal
-    VoltageInput *cv_velocity_in_ = nullptr;  // note-on velocity, 0..1 normalized
+    VoltageInput *cv_velocity_in_ =
+        nullptr; // note-on velocity, 0..1 normalized
+    VoltageInput *cv_pitch_mod_in_ =
+        nullptr;                   // raw LFO signal, same source as amp mod
 
     // Audio output
     AudioOutput *audio_out_ = nullptr;

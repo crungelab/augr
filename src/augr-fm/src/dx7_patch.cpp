@@ -1,6 +1,6 @@
+#include <algorithm>
 #include <augr/fm/dx7_patch.h>
 #include <augr/fm/dx7_unpacked_layout.h>
-#include <algorithm>
 #include <cstring>
 
 namespace augr::fm {
@@ -110,11 +110,11 @@ float SysexDetuneToParam(uint8_t raw) {
     return static_cast<float>(static_cast<int>(raw) - 7);
 }
 
-inline uint8_t OpByte(const uint8_t* op, UnpackedOpField field) {
+inline uint8_t OpByte(const uint8_t *op, UnpackedOpField field) {
     return op[static_cast<int>(field)];
 }
 
-inline uint8_t GlobalByte(const uint8_t* g, UnpackedGlobalField field) {
+inline uint8_t GlobalByte(const uint8_t *g, UnpackedGlobalField field) {
     return g[static_cast<int>(field)];
 }
 
@@ -136,24 +136,37 @@ void ParseUnpacked(const uint8_t *u, Dx7Patch &out) {
         dst.levels[3] = SysexLevelToParam(OpByte(op, UnpackedOpField::kLevel4));
 
         // All keyboard scaling fields confirmed against UnpackVoice.
-        dst.kbd_break_pt    = OpByte(op, UnpackedOpField::kKbdBreakPoint);
-        dst.kbd_left_depth  = OpByte(op, UnpackedOpField::kKbdLeftDepth);
+        dst.kbd_break_pt = OpByte(op, UnpackedOpField::kKbdBreakPoint);
+        dst.kbd_left_depth = OpByte(op, UnpackedOpField::kKbdLeftDepth);
         dst.kbd_right_depth = OpByte(op, UnpackedOpField::kKbdRightDepth);
-        dst.kbd_left_curve  = OpByte(op, UnpackedOpField::kKbdLeftCurve)  & 0x03;
-        dst.kbd_right_curve = OpByte(op, UnpackedOpField::kKbdRightCurve) & 0x03;
+        dst.kbd_left_curve = OpByte(op, UnpackedOpField::kKbdLeftCurve) & 0x03;
+        dst.kbd_right_curve =
+            OpByte(op, UnpackedOpField::kKbdRightCurve) & 0x03;
 
         // kKbdRateScaling (index 13) is parsed but not yet used — stored for
         // when pitch-dependent envelope rate scaling is implemented.
-        dst.kbd_rate_scaling = OpByte(op, UnpackedOpField::kKbdRateScaling) & 0x07;
+        dst.kbd_rate_scaling =
+            OpByte(op, UnpackedOpField::kKbdRateScaling) & 0x07;
 
-        dst.amp_mod_sens  = OpByte(op, UnpackedOpField::kAmpModSens)   & 0x03;
+        dst.amp_mod_sens = OpByte(op, UnpackedOpField::kAmpModSens) & 0x03;
         dst.velocity_sens = OpByte(op, UnpackedOpField::kVelocitySens) & 0x07;
 
-        dst.output_level = SysexLevelToParam(OpByte(op, UnpackedOpField::kOutputLevel));
-        dst.fixed_freq   = (OpByte(op, UnpackedOpField::kOscMode) & 0x01) != 0;
-        dst.ratio_coarse = CoarseToRatio(OpByte(op, UnpackedOpField::kCoarse) & 0x1F);
-        dst.ratio_fine   = FineToRatioFine(OpByte(op, UnpackedOpField::kFine)   & 0x7F);
-        dst.detune       = SysexDetuneToParam(OpByte(op, UnpackedOpField::kDetune) & 0x0F);
+        dst.output_level =
+            SysexLevelToParam(OpByte(op, UnpackedOpField::kOutputLevel));
+        dst.fixed_freq = (OpByte(op, UnpackedOpField::kOscMode) & 0x01) != 0;
+        /*
+        dst.ratio_coarse =
+            CoarseToRatio(OpByte(op, UnpackedOpField::kCoarse) & 0x1F);
+        dst.ratio_fine =
+            FineToRatioFine(OpByte(op, UnpackedOpField::kFine) & 0x7F);
+        */
+        dst.detune =
+            SysexDetuneToParam(OpByte(op, UnpackedOpField::kDetune) & 0x0F);
+
+        dst.coarse_raw = OpByte(op, UnpackedOpField::kCoarse) & 0x1F;
+        dst.fine_raw = OpByte(op, UnpackedOpField::kFine) & 0x7F;
+        dst.ratio_coarse = CoarseToRatio(dst.coarse_raw);
+        dst.ratio_fine = FineToRatioFine(dst.fine_raw);
     }
 
     // Voice globals, relative to (u + 126). All positions confirmed against
@@ -161,30 +174,33 @@ void ParseUnpacked(const uint8_t *u, Dx7Patch &out) {
     const uint8_t *g = u + 126;
 
     out.algorithm = GlobalByte(g, UnpackedGlobalField::kAlgorithm) & 0x1F;
-    out.feedback  = GlobalByte(g, UnpackedGlobalField::kFeedback)  & 0x07;
+    out.feedback = GlobalByte(g, UnpackedGlobalField::kFeedback) & 0x07;
 
     // kOscKeySync (index 10) — parsed but not yet consumed by Dexie.
     out.osc_key_sync = GlobalByte(g, UnpackedGlobalField::kOscKeySync) & 0x01;
 
-    out.lfo_speed       = GlobalByte(g, UnpackedGlobalField::kLfoSpeed);
-    out.lfo_delay        = GlobalByte(g, UnpackedGlobalField::kLfoDelay);
-    out.lfo_pitch_depth  = GlobalByte(g, UnpackedGlobalField::kLfoPitchDepth);
-    out.lfo_amp_depth    = GlobalByte(g, UnpackedGlobalField::kLfoAmpDepth);
+    out.lfo_speed = GlobalByte(g, UnpackedGlobalField::kLfoSpeed);
+    out.lfo_delay = GlobalByte(g, UnpackedGlobalField::kLfoDelay);
+    out.lfo_pitch_depth = GlobalByte(g, UnpackedGlobalField::kLfoPitchDepth);
+    out.lfo_amp_depth = GlobalByte(g, UnpackedGlobalField::kLfoAmpDepth);
 
     // Sync, waveform and pitch mod sensitivity are already shifted/masked by
     // UnpackVoice — no further shift needed here.
-    out.lfo_sync        = GlobalByte(g, UnpackedGlobalField::kLfoSync)      & 0x01;
-    out.lfo_waveform    = GlobalByte(g, UnpackedGlobalField::kLfoWaveform)  & 0x07;
-    out.pitch_mod_sens  = GlobalByte(g, UnpackedGlobalField::kPitchModSens) & 0x07;
+    out.lfo_sync = GlobalByte(g, UnpackedGlobalField::kLfoSync) & 0x01;
+    out.lfo_waveform = GlobalByte(g, UnpackedGlobalField::kLfoWaveform) & 0x07;
+    out.pitch_mod_sens =
+        GlobalByte(g, UnpackedGlobalField::kPitchModSens) & 0x07;
 
     out.transpose = GlobalByte(g, UnpackedGlobalField::kTranspose);
 
     // Pitch EG — parsed but not yet consumed by Dexie.
     for (int i = 0; i < 4; ++i) {
-        out.pitch_eg_rates[i]  = GlobalByte(g, static_cast<UnpackedGlobalField>(
-                                    static_cast<int>(UnpackedGlobalField::kPitchEgRate1) + i));
-        out.pitch_eg_levels[i] = GlobalByte(g, static_cast<UnpackedGlobalField>(
-                                    static_cast<int>(UnpackedGlobalField::kPitchEgLevel1) + i));
+        out.pitch_eg_rates[i] = GlobalByte(
+            g, static_cast<UnpackedGlobalField>(
+                   static_cast<int>(UnpackedGlobalField::kPitchEgRate1) + i));
+        out.pitch_eg_levels[i] = GlobalByte(
+            g, static_cast<UnpackedGlobalField>(
+                   static_cast<int>(UnpackedGlobalField::kPitchEgLevel1) + i));
     }
 
     // Name: 10 bytes starting at kNameStart.
@@ -219,17 +235,18 @@ void ParseUnpacked(const uint8_t *u, Dx7Patch &out) {
         dst.kbd_break_pt    = OpByte(op, UnpackedOpField::kKbdBreakPoint);
         dst.kbd_left_depth  = OpByte(op, UnpackedOpField::kKbdLeftDepth);
         dst.kbd_right_depth = OpByte(op, UnpackedOpField::kKbdRightDepth);
-        dst.kbd_left_curve  = OpByte(op, UnpackedOpField::kKbdLeftCurve)  & 0x03;
-        dst.kbd_right_curve = OpByte(op, UnpackedOpField::kKbdRightCurve) & 0x03;
+        dst.kbd_left_curve  = OpByte(op, UnpackedOpField::kKbdLeftCurve)  &
+0x03; dst.kbd_right_curve = OpByte(op, UnpackedOpField::kKbdRightCurve) & 0x03;
 
         dst.amp_mod_sens  = OpByte(op, UnpackedOpField::kAmpModSens)   & 0x03;
         dst.velocity_sens = OpByte(op, UnpackedOpField::kVelocitySens) & 0x07;
 
-        dst.output_level = SysexLevelToParam(OpByte(op, UnpackedOpField::kOutputLevel));
-        dst.fixed_freq    = (OpByte(op, UnpackedOpField::kOscMode) & 0x01) != 0;
-        dst.ratio_coarse  = CoarseToRatio(OpByte(op, UnpackedOpField::kCoarse) & 0x1F);
-        dst.ratio_fine    = FineToRatioFine(OpByte(op, UnpackedOpField::kFine) & 0x7F);
-        dst.detune        = SysexDetuneToParam(OpByte(op, UnpackedOpField::kDetune) & 0x0F);
+        dst.output_level = SysexLevelToParam(OpByte(op,
+UnpackedOpField::kOutputLevel)); dst.fixed_freq    = (OpByte(op,
+UnpackedOpField::kOscMode) & 0x01) != 0; dst.ratio_coarse  =
+CoarseToRatio(OpByte(op, UnpackedOpField::kCoarse) & 0x1F); dst.ratio_fine    =
+FineToRatioFine(OpByte(op, UnpackedOpField::kFine) & 0x7F); dst.detune        =
+SysexDetuneToParam(OpByte(op, UnpackedOpField::kDetune) & 0x0F);
     }
 
     // Voice globals start at byte 126

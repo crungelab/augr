@@ -5,8 +5,8 @@ namespace augr {
 void Module::OnCreate() {
     Node::OnCreate();
 
-    CreateControls();
     CreatePins();
+    CreateControls();
 }
 
 } // namespace augr

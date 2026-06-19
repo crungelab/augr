@@ -28,6 +28,11 @@ struct Dx7Op {
     int kbd_right_curve = 0; // 0..3
     int kbd_rate_scaling =
         0; // 0..7 — for pitch-dependent EG rate scaling (deferred)
+
+    uint8_t coarse_raw =
+        0; // raw patch byte before CoarseToRatio — needed for fixed-freq mode
+    uint8_t fine_raw =
+        0; // raw patch byte before FineToRatioFine — needed for fixed-freq mode
 };
 
 struct Dx7Patch {
