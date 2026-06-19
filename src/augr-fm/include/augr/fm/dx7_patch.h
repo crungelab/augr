@@ -26,6 +26,8 @@ struct Dx7Op {
     int kbd_right_depth = 0; // 0..99
     int kbd_left_curve = 0;  // 0..3
     int kbd_right_curve = 0; // 0..3
+    int kbd_rate_scaling =
+        0; // 0..7 — for pitch-dependent EG rate scaling (deferred)
 };
 
 struct Dx7Patch {
@@ -43,6 +45,11 @@ struct Dx7Patch {
     int lfo_waveform = 0;    // 0..5, DX7 encoding
 
     int pitch_mod_sens = 0; // 0..7, indexes pitchmodsenstab (not yet ported)
+
+    int osc_key_sync = 0; // 0 or 1 — whether operators reset phase on note-on
+    int transpose = 0;    // 0..48, 24=no transpose (raw DX7 value)
+    int pitch_eg_rates[4] = {};  // pitch EG (deferred)
+    int pitch_eg_levels[4] = {}; // pitch EG (deferred)
 };
 
 bool ParseDx7Voice(std::span<const uint8_t> data, Dx7Patch &out);

@@ -42,11 +42,6 @@ void ModuleWidget::DrawNode() {
     ImGui::TextUnformatted(this->model().label_.c_str());
     ImNodes::EndNodeTitleBar();
 
-    /*
-    bool muted = model().muted_;
-    if (ImGui::Checkbox("Mute", &muted))
-        model().muted_ = muted;
-    */
     for (auto input : this->model().inport_.pins_) {
         ImNodes::BeginInputAttribute(input->id_);
         ImGui::TextUnformatted(input->name_.c_str());

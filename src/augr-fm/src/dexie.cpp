@@ -53,6 +53,11 @@ int ScaleLevel(int midinote, int break_pt, int left_depth, int right_depth,
         return ScaleCurve(-(offset - 1) / 3, left_depth, left_curve);
 }
 
+int ScaleRate(int midinote, int sensitivity) {
+    const int x = std::clamp(midinote / 3 - 7, 0, 31);
+    return (sensitivity * x) >> 3;
+}
+
 const uint8_t kVelocityData[64] = {
     0,   70,  86,  97,  106, 114, 121, 126, 132, 138, 142, 148, 152,
     156, 160, 163, 166, 170, 173, 174, 178, 181, 184, 186, 189, 190,
@@ -166,6 +171,14 @@ void Dexie::CreateControls() {
         ui.Knob("AMD", amd);
         ui.Knob("Vel Sens", vel);
     }
+    // "Keyboard Scaling" section:
+    {
+        auto _ = ui.HBox("Keyboard Scaling");
+        auto rate_scl =
+            CreateFloatParameter("Rate Scl", ControlMeta::kDefault,
+                                 &kbd_rate_scaling_, 0.f, 0.f, 7.f, 1.f);
+        ui.Knob("Rate Scl", rate_scl);
+    }
 }
 
 void Dexie::CreatePins() {
@@ -185,6 +198,10 @@ void Dexie::CreatePins() {
 }
 
 void Dexie::Process() {
+    if (muted_) {
+        audio_out_->Write(Audio());
+        return;
+    }
     const Audio pitch_buf = cv_pitch_in_->Read();
     const Audio gate_buf = gate_in_->Read();
     const Audio phase_buf = cv_phase_in_->Read();
@@ -212,7 +229,7 @@ void Dexie::Process() {
     const float detune_cents = std::round(detune_) * (3.4f / 7.f);
     const float detune_factor = std::pow(2.f, detune_cents / 1200.f);
 
-    const float ratio = ratio_coarse_ + ratio_fine_;
+    const float ratio = ratio_coarse_ * (1 + ratio_fine_);
     const bool ratio_mode = ratio > 0.0f;
 
     // Feedback amount 0..7 → shift (FEEDBACK_BITDEPTH - amount), or 16 = off.
@@ -251,24 +268,16 @@ void Dexie::Process() {
             const int velocity_scaling = ScaleVelocity(
                 velocity_0_127, static_cast<int>(std::round(velocity_sens_)));
 
-            env_.NoteOn(rates_, levels_, output_level_, /*rate_scaling=*/0,
+            const int rate_scaling = ScaleRate(midinote,
+                                            static_cast<int>(std::round(kbd_rate_scaling_)));
+
+            env_.NoteOn(rates_, levels_, output_level_, rate_scaling,
                         level_scaling, velocity_scaling);
             samples_since_gate_on_ = 0;
         } else if (!gate && gate_prev_) {
             env_.NoteOff();
         }
-        /*
-        if (gate && !gate_prev_) {
-            const int level_scaling =
-                ScaleLevel(midinote, kbd_break_pt_, kbd_left_depth_,
-                           kbd_right_depth_, kbd_left_curve_, kbd_right_curve_);
-            env_.NoteOn(rates_, levels_, output_level_, 0,
-                        level_scaling);
-            samples_since_gate_on_ = 0;
-        } else if (!gate && gate_prev_) {
-            env_.NoteOff();
-        }
-        */
+
         if (gate)
             ++samples_since_gate_on_;
         gate_prev_ = gate;
@@ -288,15 +297,6 @@ void Dexie::Process() {
         // LFO is bipolar [-1,1]; tremolo should only reduce level, never
         // boost it, so map to a [0,1] attenuation factor scaled by AMS,
         // patch-level depth, and the delay ramp-in.
-        /*
-        const float tremolo = 1.0f - ams_depth * lfo_amp_depth_ * delay_ramp *
-                                         0.5f * (1.0f - lfo_val);
-        */
-        /*
-        const float tremolo = AmpModLevelMultiplier(lfo_val, lfo_amp_depth_,
-                                                    ams_depth, delay_ramp);
-        */
-        // now:
         const float tremolo = AmpModLevelMultiplier(
             lfo_val, lfo_amp_depth_ / 99.0f, ams_depth, delay_ramp);
 

@@ -55,6 +55,8 @@ public:
     int kbd_left_curve_ = 0;
     int kbd_right_curve_ = 0;
 
+    float kbd_rate_scaling_ = 0.0f;  // 0..7, DX7 keyboard rate scaling
+
     // CV inputs — pitch → gate → phase → amp mod
     VoltageInput *cv_pitch_in_ = nullptr; // V/oct pitch
     VoltageInput *gate_in_ = nullptr;     // envelope gate (note on/off)

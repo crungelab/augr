@@ -115,7 +115,7 @@ void DexieVoice::LoadPatch(const Dx7Patch &patch) {
                                                kMaxDelaySeconds * sample_rate);
 
     for (int i = 0; i < 6; ++i) {
-        //ops_[i]->lfo_amp_depth_ = patch.lfo_amp_depth / 99.0f;
+        // ops_[i]->lfo_amp_depth_ = patch.lfo_amp_depth / 99.0f;
         ops_[i]->lfo_amp_depth_ = static_cast<float>(patch.lfo_amp_depth);
         ops_[i]->lfo_delay_samples_total_ = delay_samples;
     }
@@ -180,6 +180,9 @@ void DexieVoice::PushOperatorParams(int op_idx, const Dx7Op &op, int feedback,
     d->kbd_right_depth_ = op.kbd_right_depth;
     d->kbd_left_curve_ = op.kbd_left_curve;
     d->kbd_right_curve_ = op.kbd_right_curve;
+
+    // d->kbd_rate_scaling_ = op.kbd_rate_scaling;
+    d->kbd_rate_scaling_ = static_cast<float>(op.kbd_rate_scaling);
 }
 
 } // namespace augr::fm

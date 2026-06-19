@@ -2,6 +2,7 @@
 
 namespace augr {
 
+/*
 Audio MixingAudioInput::Reduce() const {
     Audio mixed = slots_[0]->Read();
     for (size_t i = 1; i < slots_.size(); ++i)
@@ -22,6 +23,24 @@ Audio MixingAudioInput::Reduce() const {
     // headroom estimate.
     mixed.array() = xt::clip(mixed.array(), fy_real(-1), fy_real(1));
 
+    return mixed;
+}
+*/
+
+Audio MixingAudioInput::Reduce() const {
+    Audio mixed = Audio(layout_);
+    mixed.array().fill(0);
+    for (auto *slot : slots_) {
+        auto slot_data = slot->Read();
+        if (slot_data.Empty())
+            continue;
+        mixed.array() += slot_data.array();
+    }
+
+    // Fixed headroom rather than 1/N — avoids quietening
+    // single-carrier algorithms while preventing multi-carrier clipping.
+    constexpr float kHeadroom = 0.25f;
+    mixed.array() *= kHeadroom;
     return mixed;
 }
 

@@ -1,6 +1,5 @@
-// augr/fm/dx7_patch.cpp
 #include <augr/fm/dx7_patch.h>
-
+#include <augr/fm/dx7_unpacked_layout.h>
 #include <algorithm>
 #include <cstring>
 
@@ -111,6 +110,14 @@ float SysexDetuneToParam(uint8_t raw) {
     return static_cast<float>(static_cast<int>(raw) - 7);
 }
 
+inline uint8_t OpByte(const uint8_t* op, UnpackedOpField field) {
+    return op[static_cast<int>(field)];
+}
+
+inline uint8_t GlobalByte(const uint8_t* g, UnpackedGlobalField field) {
+    return g[static_cast<int>(field)];
+}
+
 void ParseUnpacked(const uint8_t *u, Dx7Patch &out) {
     // Operators are stored OP6..OP1 in the sysex; reverse to OP1..OP6.
     for (int sysex_idx = 0; sysex_idx < 6; ++sysex_idx) {
@@ -118,31 +125,111 @@ void ParseUnpacked(const uint8_t *u, Dx7Patch &out) {
         const uint8_t *op = u + sysex_idx * 21;
         Dx7Op &dst = out.ops[our_idx];
 
-        dst.rates[0] = SysexRateToParam(op[0]);
-        dst.rates[1] = SysexRateToParam(op[1]);
-        dst.rates[2] = SysexRateToParam(op[2]);
-        dst.rates[3] = SysexRateToParam(op[3]);
+        dst.rates[0] = SysexRateToParam(OpByte(op, UnpackedOpField::kRate1));
+        dst.rates[1] = SysexRateToParam(OpByte(op, UnpackedOpField::kRate2));
+        dst.rates[2] = SysexRateToParam(OpByte(op, UnpackedOpField::kRate3));
+        dst.rates[3] = SysexRateToParam(OpByte(op, UnpackedOpField::kRate4));
 
-        dst.levels[0] = SysexLevelToParam(op[4]);
-        dst.levels[1] = SysexLevelToParam(op[5]);
-        dst.levels[2] = SysexLevelToParam(op[6]);
-        dst.levels[3] = SysexLevelToParam(op[7]);
+        dst.levels[0] = SysexLevelToParam(OpByte(op, UnpackedOpField::kLevel1));
+        dst.levels[1] = SysexLevelToParam(OpByte(op, UnpackedOpField::kLevel2));
+        dst.levels[2] = SysexLevelToParam(OpByte(op, UnpackedOpField::kLevel3));
+        dst.levels[3] = SysexLevelToParam(OpByte(op, UnpackedOpField::kLevel4));
 
-        // op[8..13]: keyboard scaling and rate scaling — still skipped for now
-        dst.kbd_break_pt = op[8];
-        dst.kbd_left_depth = op[9];
-        dst.kbd_right_depth = op[10];
-        dst.kbd_left_curve = op[11] & 0x03;
-        dst.kbd_right_curve = op[12] & 0x03;
+        // All keyboard scaling fields confirmed against UnpackVoice.
+        dst.kbd_break_pt    = OpByte(op, UnpackedOpField::kKbdBreakPoint);
+        dst.kbd_left_depth  = OpByte(op, UnpackedOpField::kKbdLeftDepth);
+        dst.kbd_right_depth = OpByte(op, UnpackedOpField::kKbdRightDepth);
+        dst.kbd_left_curve  = OpByte(op, UnpackedOpField::kKbdLeftCurve)  & 0x03;
+        dst.kbd_right_curve = OpByte(op, UnpackedOpField::kKbdRightCurve) & 0x03;
 
-        dst.amp_mod_sens = op[14] & 0x03; // AMS, low 2 bits
-        dst.velocity_sens = op[15] & 0x07;
+        // kKbdRateScaling (index 13) is parsed but not yet used — stored for
+        // when pitch-dependent envelope rate scaling is implemented.
+        dst.kbd_rate_scaling = OpByte(op, UnpackedOpField::kKbdRateScaling) & 0x07;
 
-        dst.output_level = SysexLevelToParam(op[16]);
-        dst.fixed_freq = (op[17] & 0x01) != 0;
-        dst.ratio_coarse = CoarseToRatio(op[18] & 0x1F);
-        dst.ratio_fine = FineToRatioFine(op[19] & 0x7F);
-        dst.detune = SysexDetuneToParam(op[20] & 0x0F);
+        dst.amp_mod_sens  = OpByte(op, UnpackedOpField::kAmpModSens)   & 0x03;
+        dst.velocity_sens = OpByte(op, UnpackedOpField::kVelocitySens) & 0x07;
+
+        dst.output_level = SysexLevelToParam(OpByte(op, UnpackedOpField::kOutputLevel));
+        dst.fixed_freq   = (OpByte(op, UnpackedOpField::kOscMode) & 0x01) != 0;
+        dst.ratio_coarse = CoarseToRatio(OpByte(op, UnpackedOpField::kCoarse) & 0x1F);
+        dst.ratio_fine   = FineToRatioFine(OpByte(op, UnpackedOpField::kFine)   & 0x7F);
+        dst.detune       = SysexDetuneToParam(OpByte(op, UnpackedOpField::kDetune) & 0x0F);
+    }
+
+    // Voice globals, relative to (u + 126). All positions confirmed against
+    // UnpackVoice.
+    const uint8_t *g = u + 126;
+
+    out.algorithm = GlobalByte(g, UnpackedGlobalField::kAlgorithm) & 0x1F;
+    out.feedback  = GlobalByte(g, UnpackedGlobalField::kFeedback)  & 0x07;
+
+    // kOscKeySync (index 10) — parsed but not yet consumed by Dexie.
+    out.osc_key_sync = GlobalByte(g, UnpackedGlobalField::kOscKeySync) & 0x01;
+
+    out.lfo_speed       = GlobalByte(g, UnpackedGlobalField::kLfoSpeed);
+    out.lfo_delay        = GlobalByte(g, UnpackedGlobalField::kLfoDelay);
+    out.lfo_pitch_depth  = GlobalByte(g, UnpackedGlobalField::kLfoPitchDepth);
+    out.lfo_amp_depth    = GlobalByte(g, UnpackedGlobalField::kLfoAmpDepth);
+
+    // Sync, waveform and pitch mod sensitivity are already shifted/masked by
+    // UnpackVoice — no further shift needed here.
+    out.lfo_sync        = GlobalByte(g, UnpackedGlobalField::kLfoSync)      & 0x01;
+    out.lfo_waveform    = GlobalByte(g, UnpackedGlobalField::kLfoWaveform)  & 0x07;
+    out.pitch_mod_sens  = GlobalByte(g, UnpackedGlobalField::kPitchModSens) & 0x07;
+
+    out.transpose = GlobalByte(g, UnpackedGlobalField::kTranspose);
+
+    // Pitch EG — parsed but not yet consumed by Dexie.
+    for (int i = 0; i < 4; ++i) {
+        out.pitch_eg_rates[i]  = GlobalByte(g, static_cast<UnpackedGlobalField>(
+                                    static_cast<int>(UnpackedGlobalField::kPitchEgRate1) + i));
+        out.pitch_eg_levels[i] = GlobalByte(g, static_cast<UnpackedGlobalField>(
+                                    static_cast<int>(UnpackedGlobalField::kPitchEgLevel1) + i));
+    }
+
+    // Name: 10 bytes starting at kNameStart.
+    const char *name_ptr = reinterpret_cast<const char *>(
+        g + static_cast<int>(UnpackedGlobalField::kNameStart));
+    out.name = std::string(name_ptr, 10);
+    auto end = out.name.find_last_not_of(' ');
+    out.name = (end != std::string::npos) ? out.name.substr(0, end + 1) : "";
+}
+
+/*
+void ParseUnpacked(const uint8_t *u, Dx7Patch &out) {
+    // Operators are stored OP6..OP1 in the sysex; reverse to OP1..OP6.
+    for (int sysex_idx = 0; sysex_idx < 6; ++sysex_idx) {
+        const int our_idx = 5 - sysex_idx;
+        const uint8_t *op = u + sysex_idx * 21;
+        Dx7Op &dst = out.ops[our_idx];
+
+        dst.rates[0] = SysexRateToParam(OpByte(op, UnpackedOpField::kRate1));
+        dst.rates[1] = SysexRateToParam(OpByte(op, UnpackedOpField::kRate2));
+        dst.rates[2] = SysexRateToParam(OpByte(op, UnpackedOpField::kRate3));
+        dst.rates[3] = SysexRateToParam(OpByte(op, UnpackedOpField::kRate4));
+
+        dst.levels[0] = SysexLevelToParam(OpByte(op, UnpackedOpField::kLevel1));
+        dst.levels[1] = SysexLevelToParam(OpByte(op, UnpackedOpField::kLevel2));
+        dst.levels[2] = SysexLevelToParam(OpByte(op, UnpackedOpField::kLevel3));
+        dst.levels[3] = SysexLevelToParam(OpByte(op, UnpackedOpField::kLevel4));
+
+        // Keyboard level scaling — break point and depths are still UNVERIFIED
+        // against UnpackVoice (inferred by position, not confirmed). Curves,
+        // AMS, and velocity sensitivity ARE confirmed.
+        dst.kbd_break_pt    = OpByte(op, UnpackedOpField::kKbdBreakPoint);
+        dst.kbd_left_depth  = OpByte(op, UnpackedOpField::kKbdLeftDepth);
+        dst.kbd_right_depth = OpByte(op, UnpackedOpField::kKbdRightDepth);
+        dst.kbd_left_curve  = OpByte(op, UnpackedOpField::kKbdLeftCurve)  & 0x03;
+        dst.kbd_right_curve = OpByte(op, UnpackedOpField::kKbdRightCurve) & 0x03;
+
+        dst.amp_mod_sens  = OpByte(op, UnpackedOpField::kAmpModSens)   & 0x03;
+        dst.velocity_sens = OpByte(op, UnpackedOpField::kVelocitySens) & 0x07;
+
+        dst.output_level = SysexLevelToParam(OpByte(op, UnpackedOpField::kOutputLevel));
+        dst.fixed_freq    = (OpByte(op, UnpackedOpField::kOscMode) & 0x01) != 0;
+        dst.ratio_coarse  = CoarseToRatio(OpByte(op, UnpackedOpField::kCoarse) & 0x1F);
+        dst.ratio_fine    = FineToRatioFine(OpByte(op, UnpackedOpField::kFine) & 0x7F);
+        dst.detune        = SysexDetuneToParam(OpByte(op, UnpackedOpField::kDetune) & 0x0F);
     }
 
     // Voice globals start at byte 126
@@ -169,7 +256,7 @@ void ParseUnpacked(const uint8_t *u, Dx7Patch &out) {
     auto end = out.name.find_last_not_of(' ');
     out.name = (end != std::string::npos) ? out.name.substr(0, end + 1) : "";
 }
-
+*/
 } // namespace
 
 bool ParseDx7Voice(std::span<const uint8_t> data, Dx7Patch &out) {
