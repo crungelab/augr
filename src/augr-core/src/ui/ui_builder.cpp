@@ -82,6 +82,12 @@ UiBuilder &UiBuilder::Knob(const std::string &label, FloatParameter *param) {
     return *this;
 }
 
+UiBuilder &UiBuilder::KnobInt(const std::string &label, IntParameter *param) {
+    Model::MakeFresh<augr::KnobInt>(model_stack_.back(), label, param);
+    return *this;
+}
+
+
 UiBuilder &UiBuilder::NumEntry(const std::string &label,
                                FloatParameter *param) {
     Model::MakeFresh<augr::NumEntry>(model_stack_.back(), label, param);

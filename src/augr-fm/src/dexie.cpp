@@ -191,13 +191,13 @@ void Dexie::CreateControls() {
                                            &detune_, 0.f, -7.f, 7.f, 1.f);
         auto level = CreateFloatParameter("Level", ControlMeta::kDefault,
                                           &output_level_, 99.f, 0.f, 99.f, 1.f);
-        auto feedback = CreateFloatParameter("Feedback", ControlMeta::kDefault,
-                                             &feedback_, 0.f, 0.f, 7.f, 1.f);
+        auto feedback = CreateIntParameter("Feedback", ControlMeta::kDefault,
+                                             &feedback_, 0, 0, 7, 1);
         ui.Knob("Coarse", coarse);
         ui.Knob("Fine", fine);
         ui.Knob("Detune", detune);
         ui.Knob("Level", level);
-        ui.Knob("Feedback", feedback);
+        ui.KnobInt("Feedback", feedback);
     }
 
     // Amp mod section
@@ -268,9 +268,7 @@ void Dexie::Process() {
     const float ratio = ratio_coarse_ * (1 + ratio_fine_);
 
     // Feedback amount 0..7 → shift (FEEDBACK_BITDEPTH - amount), or 16 = off.
-    const int feedback_int = static_cast<int>(std::round(feedback_));
-    const int feedback_shift =
-        feedback_int != 0 ? kFeedbackBitdepth - feedback_int : 16;
+    const int feedback_shift = feedback_ != 0 ? kFeedbackBitdepth - feedback_ : 16;
     const bool fb_on = feedback_shift < 16;
     const float fb_divisor = static_cast<float>(1 << (feedback_shift + 1));
 
@@ -422,8 +420,11 @@ float Dexie::ComputeFeedback(float shaped, float env_amp, bool fb_on) {
         return shaped;
     }
 
+    /*
     const float feedback_norm =
         static_cast<float>(static_cast<int>(std::round(feedback_))) / 7.0f;
+    */
+    const float feedback_norm = static_cast<float>(feedback_) / 7.0f;
     const float level_norm = output_level_ / 99.0f;
     const float noise_amount = feedback_norm * level_norm;
 

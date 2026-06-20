@@ -208,8 +208,7 @@ void DexieVoice::PushOperatorParams(int op_idx, const Dx7Op &op, int feedback,
     // feedback_ is the raw DX7 0..7 patch amount. Dexie::Process converts it
     // to a feedback shift. Only the algorithm's designated feedback operator
     // gets a nonzero value; everyone else stays at 0 (off).
-    d->feedback_ =
-        (op_idx == def.feedback_op) ? static_cast<float>(feedback) : 0.f;
+    d->feedback_ = (op_idx == def.feedback_op) ? feedback : 0;
 
     d->amp_mod_sens_ = static_cast<float>(op.amp_mod_sens);
     d->velocity_sens_ = static_cast<float>(op.velocity_sens);

@@ -1,13 +1,20 @@
 #pragma once
-#include "range_base.h"
+#include "float_parameter_control.h"
+#include "int_parameter_control.h"
 
 namespace augr {
 
-class Knob : public RangeBase {
+class Knob : public FloatParameterControl {
 public:
-    Knob(std::string label, FloatParameter *param) : RangeBase(label, param) {}
+    Knob(std::string label, FloatParameter *param) : FloatParameterControl(label, param) {}
 
-    REFLECT_ENABLE(RangeBase)
+    REFLECT_ENABLE(FloatParameterControl)
+};
+
+class KnobInt : public IntParameterControl {
+public:
+    KnobInt(std::string label, IntParameter *param) : IntParameterControl(label, param) {}
+    REFLECT_ENABLE(IntParameterControl)
 };
 
 } // namespace augr

@@ -35,7 +35,7 @@ public:
     // Feedback: raw DX7 amount 0..7. Process() converts it to a feedback
     // shift internally (FEEDBACK_BITDEPTH - feedback). Only the algorithm's
     // designated feedback operator carries a nonzero value.
-    float feedback_ = 0.0f;
+    int feedback_ = 0;
 
     // --- LFO amplitude modulation ---
     float amp_mod_sens_ = 0.0f; // 0..3, raw DX7 AMS value (per-operator)

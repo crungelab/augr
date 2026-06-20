@@ -12,6 +12,7 @@ namespace augr {
 
 class ControlMeta;
 class FloatParameter;
+class IntParameter;
 class EnumParameter;
 
 class UiBuilder {
@@ -72,6 +73,8 @@ public:
     // Sliders / knobs
     // -------------------------------------------------------------------------
     UiBuilder &Knob(const std::string &label, FloatParameter *param);
+    UiBuilder &KnobInt(const std::string &label, IntParameter *param);
+    
     UiBuilder &VSlider(const std::string &label, FloatParameter *param);
     UiBuilder &HSlider(const std::string &label, FloatParameter *param);
     UiBuilder &NumEntry(const std::string &label, FloatParameter *param);
