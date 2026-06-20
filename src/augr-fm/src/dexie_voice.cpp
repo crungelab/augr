@@ -4,6 +4,9 @@
 #include <augr/rack/module/audio_io.h>
 #include <augr/rack/module/cv_io.h>
 #include <augr/rack/module/midi_io.h>
+#include <augr/rack/wire.h>
+
+#include <augr/rack/archiver/voice_archiver.h>
 
 #include <augr/volt/lfo_module.h>
 #include <augr/volt/midi_cv_module.h>
@@ -13,10 +16,8 @@
 #include <augr/fm/dexie.h>
 #include <augr/fm/dexie_lfo.h>
 
+#include <augr/fm/dexie_pitch_env_module.h>
 #include <augr/fm/dx7_algorithm.h>
-#include <augr/rack/wire.h>
-
-#include <augr/rack/archiver/voice_archiver.h>
 
 namespace augr::fm {
 
@@ -67,6 +68,10 @@ void DexieVoice::OnCreateFresh() {
 
     lfo_module_ = Model::Make<LfoModule>(shared_from_this()).get();
 
+    pitch_env_module_ =
+        Model::Make<DexiePitchEnvModule>(shared_from_this()).get();
+    Connect(*midi_cv_module_->gate_out_, *pitch_env_module_->gate_in_);
+
     for (int i = 0; i < 6; ++i) {
         auto op = Model::Make<Dexie>(shared_from_this());
         op->label_ = "OP" + std::to_string(i + 1);
@@ -75,6 +80,7 @@ void DexieVoice::OnCreateFresh() {
         Connect(*lfo_module_->cv_out_, *op->cv_amp_mod_in_);
         Connect(*lfo_module_->cv_out_, *op->cv_pitch_mod_in_);
         Connect(*midi_cv_module_->velocity_out_, *op->cv_velocity_in_);
+        Connect(*pitch_env_module_->cv_out_, *op->cv_pitch_env_in_);
         ops_[i] = op.get();
     }
 }
@@ -84,6 +90,8 @@ void DexieVoice::OnAddingChild(Model &model) {
 
     if (auto *midi_cv = dynamic_cast<MidiCvModule *>(&model)) {
         midi_cv_module_ = midi_cv;
+    } else if (auto *m = dynamic_cast<DexiePitchEnvModule *>(&model)) {
+        pitch_env_module_ = m;
     } else if (auto *op = dynamic_cast<Dexie *>(&model)) {
         for (auto &i : ops_) {
             if (!i) {
@@ -97,6 +105,8 @@ void DexieVoice::OnAddingChild(Model &model) {
 void DexieVoice::OnRemovingChild(Model &model) {
     if (auto *midi_cv = dynamic_cast<MidiCvModule *>(&model)) {
         midi_cv_module_ = nullptr;
+    } else if (auto *m = dynamic_cast<DexiePitchEnvModule *>(&model)) {
+        pitch_env_module_ = nullptr;
     } else if (auto *op = dynamic_cast<Dexie *>(&model)) {
         for (auto &i : ops_) {
             if (i == op) {
@@ -121,6 +131,14 @@ void DexieVoice::LoadPatch(const Dx7Patch &patch) {
         lfo_module_->waveform_ = Dx7WaveformToLfoWaveform(patch.lfo_waveform);
     }
 
+    if (pitch_env_module_) {
+        int rates[4], levels[4];
+        for (int i = 0; i < 4; ++i) {
+            rates[i] = patch.pitch_eg_rates[i];
+            levels[i] = patch.pitch_eg_levels[i];
+        }
+        pitch_env_module_->SetRatesLevels(rates, levels);
+    }
     // Convert the patch's 0..99 LFO delay to a sample count, and propagate
     // depth/delay to every operator (delay ramp and depth scaling are
     // applied per-operator inside Dexie::Process, alongside each operator's
@@ -139,6 +157,18 @@ void DexieVoice::LoadPatch(const Dx7Patch &patch) {
                              Audio::sample_rate());
         ops_[i]->osc_key_sync_ = (patch.osc_key_sync != 0);
     }
+
+    // Disconnect existing LFO sync wire if present
+    if (lfo_sync_wire_) {
+        Disconnect(*lfo_sync_wire_);
+        lfo_sync_wire_ = nullptr;
+    }
+
+    // Wire gate to LFO reset if patch requests sync
+    if (patch.lfo_sync && lfo_module_) {
+        lfo_sync_wire_ =
+            Connect(*midi_cv_module_->gate_out_, *lfo_module_->reset_in_);
+    }
 }
 
 void DexieVoice::WireAlgorithm(int algorithm, int feedback_op) {
@@ -154,16 +184,18 @@ void DexieVoice::WireAlgorithm(int algorithm, int feedback_op) {
     // Wire modulators to their targets.
     for (int r = 0; r < def.route_count; ++r) {
         const auto &route = def.routes[r];
-        Connect(*ops_[route.src]->audio_out_, *ops_[route.dst]->cv_phase_in_);
-        algorithm_wires_.push_back(wires_.back());
+        auto wire = Connect(*ops_[route.src]->audio_out_,
+                            *ops_[route.dst]->cv_phase_in_);
+        algorithm_wires_.push_back(wire);
     }
 
     // Wire carriers to the AudioOutputModule's input — this keeps
     // all wires within the child graph and avoids boundary crossing.
     for (int i = 0; i < 6; ++i) {
         if (is_carrier_[i]) {
-            Connect(*ops_[i]->audio_out_, *audio_out_module_->audio_in_);
-            algorithm_wires_.push_back(wires_.back());
+            auto wire =
+                Connect(*ops_[i]->audio_out_, *audio_out_module_->audio_in_);
+            algorithm_wires_.push_back(wire);
         }
     }
 }

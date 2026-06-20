@@ -18,7 +18,7 @@ public:
 
     void Process() override;
 
-    void Connect(Pin &output, Pin &input);
+    Wire *Connect(Pin &output, Pin &input);
     void Disconnect(Wire &wire);
     void MapOutput(Pin &output);
     void MapInput(Pin &input);

@@ -153,6 +153,9 @@ void Dexie::CreatePins() {
     cv_pitch_mod_in_ = new VoltageInput(*this, "pitch_mod");
     AddInput(*cv_pitch_mod_in_);
 
+    cv_pitch_env_in_ = new VoltageInput(*this, "pitch_env");
+    AddInput(*cv_pitch_env_in_);
+
     audio_out_ = new AudioOutput(*this, "out", ChannelLayout::kMono);
     AddOutput(*audio_out_);
 }
@@ -264,6 +267,10 @@ void Dexie::Process() {
     const fy_real *pitch_mod_data =
         pitch_mod_buf.Empty() ? nullptr : pitch_mod_buf.array().data();
 
+    const Audio pitch_env_buf = cv_pitch_env_in_->Read();
+    const fy_real *pitch_env_data =
+        pitch_env_buf.Empty() ? nullptr : pitch_env_buf.array().data();
+
     const float sample_rate = Audio::sample_rate();
     const std::size_t frames = Audio::frames();
 
@@ -305,22 +312,28 @@ void Dexie::Process() {
         const bool gate = gate_data && (gate_data[i] > 0.5f);
 
         if (gate && !gate_prev_) {
+            // Always clear feedback history — stale state from a previous note
+            // bleeding into the new attack is never intentional on real
+            // hardware.
+            fb_hist_[0] = 0.0f;
+            fb_hist_[1] = 0.0f;
+
+            // Phase reset only when the patch requests it (osc_key_sync=1).
+            // Free-running phase (osc_key_sync=0) is intentional DX7 behavior
+            // giving slightly different timbre on each note-on.
             if (osc_key_sync_) {
                 phase_ = 0.0f;
-                fb_hist_[0] = 0.0f;
-                fb_hist_[1] = 0.0f;
             }
+
             const int level_scaling =
                 ScaleLevel(midinote, kbd_break_pt_, kbd_left_depth_,
                            kbd_right_depth_, kbd_left_curve_, kbd_right_curve_);
-
             const float velocity_norm =
                 velocity_data ? static_cast<float>(velocity_data[i]) : 1.0f;
             const int velocity_0_127 =
                 static_cast<int>(std::round(velocity_norm * 127.0f));
             const int velocity_scaling = ScaleVelocity(
                 velocity_0_127, static_cast<int>(std::round(velocity_sens_)));
-
             const int rate_scaling = ScaleRate(
                 midinote, static_cast<int>(std::round(kbd_rate_scaling_)));
 
@@ -371,7 +384,12 @@ void Dexie::Process() {
         // Scale: pms=1 (max) at full lfo and full depth should give ~±1
         // semitone of vibrato. DX7 pitch mod range is roughly ±7 semitones at
         // max settings. The 1/12 factor converts semitones to octaves for exp2.
-        const float pitch_factor = std::exp2(pitch_mod_depth * 7.0f / 12.0f);
+        const float pitch_eg =
+            pitch_env_data ? static_cast<float>(pitch_env_data[i]) : 0.0f;
+        const float pitch_lfo_oct =
+            pitch_lfo * pitch_depth_norm * pms * 7.0f / 12.0f;
+        const float pitch_factor = std::exp2(pitch_lfo_oct + pitch_eg);
+        // const float pitch_factor = std::exp2(pitch_mod_depth * 7.0f / 12.0f);
 
         const float base_hz = CvToFreq(pitch_cv) * pitch_factor;
         const float op_hz = fixed_freq_ ? frequency_ : (base_hz * ratio);

@@ -17,6 +17,7 @@ namespace augr::fm {
 
 class Dexie;
 struct Dx7AlgorithmDef;
+class DexiePitchEnvModule;
 
 class DexieVoice : public Voice {
 public:
@@ -33,6 +34,7 @@ public:
 private:
     MidiCvModule *midi_cv_module_ = nullptr;
     LfoModule *lfo_module_ = nullptr;
+    DexiePitchEnvModule *pitch_env_module_ = nullptr;
 
     Dexie *ops_[6] = {};
     bool is_carrier_[6] = {};
@@ -45,6 +47,8 @@ private:
     // Stored from patch for pushing to operators
     int lfo_pitch_depth_raw_ = 0;
     int pitch_mod_sens_raw_ = 0;
+
+    Wire *lfo_sync_wire_ = nullptr;
 };
 
 } // namespace augr::fm

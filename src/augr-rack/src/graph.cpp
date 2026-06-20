@@ -16,11 +16,12 @@ void Graph::MapOutput(Pin &output) { output_map_[output.id_] = &output; }
 
 void Graph::MapInput(Pin &input) { input_map_[input.id_] = &input; }
 
-void Graph::Connect(Pin &output, Pin &input) {
+Wire *Graph::Connect(Pin &output, Pin &input) {
     auto wire = new Wire(output, input);
     wires_.push_back(wire);
     wire_map_[wire->id_] = wire;
     topology_changed_ = true;
+    return wire;
 }
 
 void Graph::Disconnect(Wire &wire) {

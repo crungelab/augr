@@ -75,6 +75,7 @@ public:
         nullptr; // note-on velocity, 0..1 normalized
     VoltageInput *cv_pitch_mod_in_ =
         nullptr;                   // raw LFO signal, same source as amp mod
+    VoltageInput *cv_pitch_env_in_ = nullptr; // pitch EG input
 
     // Audio output
     AudioOutput *audio_out_ = nullptr;
