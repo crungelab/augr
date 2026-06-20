@@ -13,7 +13,7 @@ inline float FixedFrequencyHz(int coarse_raw, int fine_raw, int detune_raw) {
     const int coarse   = coarse_raw & 3;
     const int combined = coarse * 100 + fine_raw;
     const float logfreq = (4458616.0f * combined) / 8.0f;
-    constexpr float kFixedFreqRef = 3.2f;
+    constexpr float kFixedFreqRef = 1.0f;  // was 3.2f — correct ref is 1 Hz
     float hz = kFixedFreqRef * std::pow(2.0f, logfreq / 16777216.0f);
 
     // Fixed-frequency detune: only positive (raw detune > 7 = center).

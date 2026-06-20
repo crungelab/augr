@@ -60,7 +60,7 @@ void ViewerManager::OpenViewer(Frame &parent, Document &document, Model &model) 
 }
 
 /*
-TODO: This crashed once.  Might need to wrap in App::singleton().QueueAction()
+TODO: This crashed once.  Might need to wrap in App::singleton().EnqueueAction()
 */
 
 void ViewerManager::CloseViewer(Viewer &viewer) {

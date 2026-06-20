@@ -121,11 +121,11 @@ void SubrackViewer::StartSaveAsDialog() {
 
 // ---------- Document operations ----------
 void SubrackViewer::DoNew() {
-    App::singleton().QueueAction([this]() { document().NewDocument(); });
+    App::singleton().EnqueueAction([this]() { document().NewDocument(); });
 }
 
 void SubrackViewer::DoOpen(const std::filesystem::path &p) {
-    App::singleton().QueueAction([this, p]() {
+    App::singleton().EnqueueAction([this, p]() {
         if (!document().Load(p)) {
             pfd::message("Load Failed", "Could not load: " + p.string(),
                          pfd::choice::ok, pfd::icon::error);

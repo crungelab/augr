@@ -25,7 +25,7 @@ public:
 
     std::vector<std::function<void()>> deferred_actions_;
 
-    void QueueAction(std::function<void()> action) {
+    void EnqueueAction(std::function<void()> action) {
         deferred_actions_.push_back(std::move(action));
     }
 
