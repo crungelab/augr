@@ -220,14 +220,9 @@ void DexieVoice::PushOperatorParams(int op_idx, const Dx7Op &op, int feedback,
     d->kbd_left_curve_ = op.kbd_left_curve;
     d->kbd_right_curve_ = op.kbd_right_curve;
 
-    // d->kbd_rate_scaling_ = op.kbd_rate_scaling;
     d->kbd_rate_scaling_ = static_cast<float>(op.kbd_rate_scaling);
 
     d->fixed_freq_ = op.fixed_freq;
-    /*
-    d->frequency_ =
-        op.fixed_freq ? FixedFrequencyHz(op.coarse_raw, op.fine_raw) : 0.0f;
-    */
     d->frequency_ = op.fixed_freq ? FixedFrequencyHz(op.coarse_raw, op.fine_raw,
                                                      op.detune_raw)
                                   : 0.0f;

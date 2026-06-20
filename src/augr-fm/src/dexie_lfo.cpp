@@ -1,6 +1,5 @@
 #include "augr/fm/dexie_lfo.h"
-// dexie.cpp (or a shared dexie_lfo_tables.h if you want it reusable) —
-// replace Dx7LfoSpeedToOctaves entirely with the real table.
+
 namespace augr::fm {
 
 // DX7 LFO speed (0..99) -> Hz. Ported directly from Dexed's Lfo::reset

@@ -7,6 +7,7 @@
 #include <vector>
 
 namespace augr {
+
 class Wire;
 class MidiCvModule;
 class LfoModule;
@@ -32,6 +33,10 @@ public:
     REFLECT_ENABLE(Voice)
 
 private:
+    void WireAlgorithm(int algorithm, int feedback_op);
+    void PushOperatorParams(int op_idx, const Dx7Op &op, int feedback,
+                            const Dx7AlgorithmDef &def);
+
     MidiCvModule *midi_cv_module_ = nullptr;
     LfoModule *lfo_module_ = nullptr;
     DexiePitchEnvModule *pitch_env_module_ = nullptr;
@@ -39,10 +44,6 @@ private:
     Dexie *ops_[6] = {};
     bool is_carrier_[6] = {};
     std::vector<Wire *> algorithm_wires_;
-
-    void WireAlgorithm(int algorithm, int feedback_op);
-    void PushOperatorParams(int op_idx, const Dx7Op &op, int feedback,
-                            const Dx7AlgorithmDef &def);
 
     // Stored from patch for pushing to operators
     int lfo_pitch_depth_raw_ = 0;

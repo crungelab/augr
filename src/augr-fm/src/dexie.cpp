@@ -27,14 +27,6 @@ constexpr float kAmpModSensTab[4] = {
     16777216.0f / 16777216.0f,
 };
 
-// DX7 pitchmodsenstab, from dx7note.cc. Raw 0..7 index -> sensitivity scalar.
-// Normalized by 255 (the maximum value) to give [0,1] range.
-/*
-constexpr float kPitchModSensTab[8] = {
-    0.0f,           10.0f / 255.0f, 20.0f / 255.0f,  33.0f / 255.0f,
-    55.0f / 255.0f, 92.0f / 255.0f, 153.0f / 255.0f, 255.0f / 255.0f,
-};
-*/
 // Raw pitchmodsenstab values [0..255], matching Dexed's fixed-point domain.
 constexpr int kPitchModSensRaw[8] = {0, 10, 20, 33, 55, 92, 153, 255};
 
@@ -274,7 +266,6 @@ void Dexie::Process() {
     const float detune_factor = std::pow(2.f, detune_cents / 1200.f);
 
     const float ratio = ratio_coarse_ * (1 + ratio_fine_);
-    // const bool ratio_mode = ratio > 0.0f;
 
     // Feedback amount 0..7 → shift (FEEDBACK_BITDEPTH - amount), or 16 = off.
     const int feedback_int = static_cast<int>(std::round(feedback_));
@@ -286,10 +277,6 @@ void Dexie::Process() {
     const float ams_depth = kAmpModSensTab[std::clamp(
         static_cast<int>(std::round(amp_mod_sens_)), 0, 3)];
 
-    /*
-    const float pms = kPitchModSensTab[std::clamp(
-        static_cast<int>(std::round(pitch_mod_sens_)), 0, 7)];
-    */
     const int pitchmoddepth =
         (static_cast<int>(std::round(lfo_pitch_depth_)) * 165) >> 6;
     const int pms_raw = kPitchModSensRaw[std::clamp(
@@ -307,11 +294,8 @@ void Dexie::Process() {
         // level scaling below and the oscillator further down) ---
         const float pitch_cv =
             pitch_data ? static_cast<float>(pitch_data[i]) : 0.0f;
-        /*
-        const int midinote =
-            60 + static_cast<int>(std::round(pitch_cv * 12.0f));
-        */
-        const int midinote =
+
+            const int midinote =
             60 + static_cast<int>(std::round(pitch_cv * 12.0f)) + transpose_;
 
         // --- Envelope ---
@@ -394,19 +378,6 @@ void Dexie::Process() {
         // formula.
         const float pitch_lfo_oct = pitch_lfo * delay_ramp * pitch_mod_scale;
         const float pitch_factor = std::exp2(pitch_lfo_oct + pitch_eg);
-        /*
-        const float pitch_lfo =
-            pitch_mod_data ? static_cast<float>(pitch_mod_data[i]) : 0.0f;
-        const float pitch_mod_depth = pitch_lfo * pitch_depth_norm * pms;
-        // Scale: pms=1 (max) at full lfo and full depth should give ~±1
-        // semitone of vibrato. DX7 pitch mod range is roughly ±7 semitones at
-        // max settings. The 1/12 factor converts semitones to octaves for exp2.
-        const float pitch_eg =
-            pitch_env_data ? static_cast<float>(pitch_env_data[i]) : 0.0f;
-        const float pitch_lfo_oct =
-            pitch_lfo * pitch_depth_norm * pms * 7.0f / 12.0f;
-        const float pitch_factor = std::exp2(pitch_lfo_oct + pitch_eg);
-        */
 
         const float base_hz = CvToFreq(pitch_cv) * pitch_factor;
         const float op_hz = fixed_freq_ ? frequency_ : (base_hz * ratio);
@@ -422,63 +393,13 @@ void Dexie::Process() {
 
         debug_freq_ = freq;
         const float phase_inc = freq / sample_rate;
-        /*
-        // --- Oscillator ---
-        const float phase_mod =
-            phase_data ? static_cast<float>(phase_data[i]) : 0.0f;
-
-        // Debug
-        phase_mod_peak_ = std::max(phase_mod_peak_, std::fabs(phase_mod));
-
-        // --- Pitch modulation (vibrato) ---
-        // LFO signal scaled by voice-level pitch depth and per-voice pitch mod
-        // sensitivity. lfo_val is bipolar [-1,1]; we convert to a frequency
-        // multiplier via exp2 (small deviations only, so this is a good
-        // approx). Dexed's fixed-point version adds pitch_mod directly to
-        // logfreq; in float we achieve the same by multiplying frequency by
-        // 2^(deviation).
-        const float pitch_lfo =
-            pitch_mod_data ? static_cast<float>(pitch_mod_data[i]) : 0.0f;
-        const float pitch_mod_depth = pitch_lfo * pitch_depth_norm * pms;
-        // Scale: pms=1 (max) at full lfo and full depth should give ~±1
-        // semitone of vibrato. DX7 pitch mod range is roughly ±7 semitones at
-        // max settings. The 1/12 factor converts semitones to octaves for exp2.
-        const float pitch_factor = std::exp2(pitch_mod_depth * 7.0f / 12.0f);
-
-        const float base_hz = CvToFreq(pitch_cv) * detune_factor * pitch_factor;
-
-        const float freq =
-            fixed_freq_ ? frequency_ // fixed-frequency mode: ignores MIDI pitch
-                        : (base_hz * ratio); // ratio mode: tracks MIDI pitch
-
-        // Debug
-        debug_freq_ = freq;
-
-        const float phase_inc = freq / sample_rate;
-        */
 
         const float fb =
             fb_on ? (fb_hist_[0] + fb_hist_[1]) / fb_divisor : 0.0f;
 
         const float sample = std::sin(kTwoPi * (phase_ + phase_mod + fb));
         const float shaped = sample * env_amp * tremolo;
-
-        // Emulate DX7's 12-bit DAC quantization. This introduces the
-        // characteristic quantization noise/grit that's part of the DX7's
-        // sound, particularly audible on high-feedback operators (TRAIN) and as
-        // subtle harmonic richness on lower-feedback operators (BRASS 1). The
-        // real DX7 used a 12-bit DAC, giving 4096 quantization steps over the
-        // full [-1, 1] range.
-        /*
-        constexpr float kQuantSteps = 4096.0f; // 2^12
-        const float quantized = std::round(shaped * kQuantSteps) / kQuantSteps;
-
-        out_data[i] = static_cast<fy_real>(quantized);
-
-        fb_hist_[1] = fb_hist_[0];
-        fb_hist_[0] = quantized; // feedback uses quantized output, as the real
-                                 // hardware did
-        */
+       
         out_data[i] = static_cast<fy_real>(shaped);
 
         fb_hist_[1] = fb_hist_[0];

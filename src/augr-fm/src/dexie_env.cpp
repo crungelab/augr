@@ -52,56 +52,6 @@ void DexieEnv::NoteOn(const float rates[4], const float levels[4],
     Advance(0);
 }
 
-/*
-void DexieEnv::NoteOn(const float rates[4], const float levels[4],
-                      float output_level, int rate_scaling,
-                      int level_scaling, int velocity_scaling) {
-    for (int i = 0; i < 4; ++i) { rates_[i] = rates[i]; levels_[i] = levels[i]; }
-    int ol = ScaleOutLevel(static_cast<int>(output_level)) + level_scaling;
-    ol = std::min(ol, 127);        // Dexed: min(127, outlevel) -- top clamp only
-    ol = (ol << 5) + velocity_scaling;
-    ol = std::max(ol, 0);          // Dexed: max(0, outlevel) -- bottom clamp after velocity
-    outlevel_     = ol;
-    rate_scaling_ = rate_scaling;
-    level_ = 0.0f;
-    down_  = true;
-    Advance(0);
-}
-*/
-/*
-void DexieEnv::NoteOn(const float rates[4], const float levels[4],
-                      float output_level, int rate_scaling,
-                      int level_scaling, int velocity_scaling) {
-    for (int i = 0; i < 4; ++i) { rates_[i] = rates[i]; levels_[i] = levels[i]; }
-    int ol = ScaleOutLevel(static_cast<int>(output_level)) + level_scaling;
-    ol = std::clamp(ol, 0, 127);   // Dexed's min(127, outlevel) before <<5
-    ol = (ol << 5) + velocity_scaling;
-    ol = std::clamp(ol, 0, 4064);  // prevent velocity from pushing above max useful level
-    outlevel_     = ol;
-    rate_scaling_ = rate_scaling;
-    level_ = 0.0f;
-    down_  = true;
-    Advance(0);
-}
-*/
-
-/*
-void DexieEnv::NoteOn(const float rates[4], const float levels[4],
-                      float output_level, int rate_scaling,
-                      int level_scaling, int velocity_scaling) {
-    for (int i = 0; i < 4; ++i) { rates_[i] = rates[i]; levels_[i] = levels[i]; }
-    int ol = ScaleOutLevel(static_cast<int>(output_level)) + level_scaling;
-    ol = std::clamp(ol, 0, 127);
-    ol = (ol << 5) + velocity_scaling;
-    ol = std::max(ol, 0);
-    outlevel_     = ol;
-    rate_scaling_ = rate_scaling;
-    level_ = 0.0f;
-    down_  = true;
-    Advance(0);
-}
-*/
-
 void DexieEnv::NoteOff() {
     if (down_) {
         down_ = false;

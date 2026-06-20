@@ -27,7 +27,7 @@ enum class UnpackedGlobalField : int {
     kPitchEgLevel1 = 4, kPitchEgLevel2 = 5, kPitchEgLevel3 = 6, kPitchEgLevel4 = 7,
     kAlgorithm       = 8,   // plain byte
     kFeedback        = 9,   // tmp & 0x07
-    kOscKeySync      = 10,  // (tmp>>3) & 0x01, shares byte with feedback — NOT currently parsed
+    kOscKeySync      = 10,  // (tmp>>3) & 0x01, shares byte with feedback
     kLfoSpeed        = 11,  // plain byte
     kLfoDelay        = 12,  // plain byte
     kLfoPitchDepth   = 13,  // plain byte
