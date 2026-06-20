@@ -39,11 +39,8 @@ public:
 
     // --- LFO amplitude modulation ---
     int amp_mod_sens_ = 0; // 0..3, raw DX7 AMS value (per-operator)
-    /*
-    float lfo_amp_depth_ =
-        1.0f; // 0..1, from the patch's voice-level LFO amp depth
-    */
-    float lfo_amp_depth_ = 99.0f; // raw DX7 0..99 LFO amplitude-mod depth (AMD)
+
+    int lfo_amp_depth_ = 99;  // raw DX7 0..99 LFO amplitude-mod depth (AMD)
 
     int lfo_delay_samples_total_ =
         0; // samples for the LFO to ramp to full depth after gate-on
@@ -57,11 +54,11 @@ public:
     int kbd_left_curve_ = 0;
     int kbd_right_curve_ = 0;
 
-    float kbd_rate_scaling_ = 0.0f; // 0..7, DX7 keyboard rate scaling
+    int kbd_rate_scaling_ = 0; // 0..7, DX7 keyboard rate scaling
 
     // Pitch modulation (vibrato) — voice-level LFO path
-    float lfo_pitch_depth_ = 0.0f; // raw DX7 0..99, voice-level
-    float pitch_mod_sens_ = 0.0f;  // raw DX7 0..7, indexes pitchmodsenstab
+    int lfo_pitch_depth_ = 0; // raw DX7 0..99, voice-level
+    int pitch_mod_sens_ = 0;  // raw DX7 0..7, indexes pitchmodsenstab
 
     bool osc_key_sync_ = false;  // if true, reset phase on every note-on
 

@@ -205,21 +205,48 @@ void Dexie::CreateControls() {
         auto _ = ui.HBox("Amp Mod");
         auto ams = CreateIntParameter("AMS", ControlMeta::kDefault,
                                       &amp_mod_sens_, 0, 0, 3, 1);
-        auto amd = CreateFloatParameter("AMD", ControlMeta::kDefault,
-                                        &lfo_amp_depth_, 99.f, 0.f, 99.f, 1.f);
+        auto amd = CreateIntParameter("AMD", ControlMeta::kDefault,
+                                      &lfo_amp_depth_, 0, 0, 99, 1);
         auto vel = CreateIntParameter("Vel Sens", ControlMeta::kDefault,
                                       &velocity_sens_, 0, 0, 7, 1);
         ui.KnobInt("AMS", ams);
-        ui.Knob("AMD", amd);
+        ui.KnobInt("AMD", amd);
         ui.KnobInt("Vel Sens", vel);
     }
+    // Pitch mod section
+    {
+        auto _ = ui.HBox("Pitch Mod");
+        auto lpd = CreateIntParameter("Pitch Depth", ControlMeta::kDefault,
+                                      &lfo_pitch_depth_, 0, 0, 99);
+        auto pms = CreateIntParameter("PMS", ControlMeta::kDefault,
+                                      &pitch_mod_sens_, 0, 0, 7);
+
+        ui.KnobInt("Pitch Depth", lpd);
+        ui.KnobInt("PMS", pms);
+    }
+
     // "Keyboard Scaling" section:
     {
         auto _ = ui.HBox("Keyboard Scaling");
-        auto rate_scl =
-            CreateFloatParameter("Rate Scl", ControlMeta::kDefault,
-                                 &kbd_rate_scaling_, 0.f, 0.f, 7.f, 1.f);
-        ui.Knob("Rate Scl", rate_scl);
+        auto rate_scl = CreateIntParameter("Rate Scl", ControlMeta::kDefault,
+                                           &kbd_rate_scaling_, 0, 0, 7, 1);
+        auto bp = CreateIntParameter("Break Pt", ControlMeta::kDefault,
+                                     &kbd_break_pt_, 0, 0, 99);
+        auto ld = CreateIntParameter("Left Depth", ControlMeta::kDefault,
+                                     &kbd_left_depth_, 0, 0, 99);
+        auto rd = CreateIntParameter("Right Depth", ControlMeta::kDefault,
+                                     &kbd_right_depth_, 0, 0, 99);
+        auto lc = CreateIntParameter("Left Curve", ControlMeta::kDefault,
+                                     &kbd_left_curve_, 0, 0, 3);
+        auto rc = CreateIntParameter("Right Curve", ControlMeta::kDefault,
+                                     &kbd_right_curve_, 0, 0, 3);
+
+        ui.KnobInt("Rate Scl", rate_scl);
+        ui.KnobInt("Break Pt", bp);
+        ui.KnobInt("Left Depth", ld);
+        ui.KnobInt("Right Depth", rd);
+        ui.KnobInt("Left Curve", lc);
+        ui.KnobInt("Right Curve", rc);
     }
 }
 
@@ -275,10 +302,16 @@ void Dexie::Process() {
 
     const float ams_depth = kAmpModSensTab[std::clamp(amp_mod_sens_, 0, 3)];
 
+    /*
     const int pitchmoddepth =
         (static_cast<int>(std::round(lfo_pitch_depth_)) * 165) >> 6;
+    */
+    const int pitchmoddepth = (lfo_pitch_depth_ * 165) >> 6;
+    /*
     const int pms_raw = kPitchModSensRaw[std::clamp(
         static_cast<int>(std::round(pitch_mod_sens_)), 0, 7)];
+    */
+    const int pms_raw = kPitchModSensRaw[std::clamp(pitch_mod_sens_, 0, 7)];
     const float pitch_mod_scale =
         static_cast<float>(pitchmoddepth * pms_raw) / 65536.0f;
 
@@ -320,14 +353,9 @@ void Dexie::Process() {
                 velocity_data ? static_cast<float>(velocity_data[i]) : 1.0f;
             const int velocity_0_127 =
                 static_cast<int>(std::round(velocity_norm * 127.0f));
-            /*
-            const int velocity_scaling = ScaleVelocity(
-                velocity_0_127, static_cast<int>(std::round(velocity_sens_)));
-            */
             const int velocity_scaling =
                 ScaleVelocity(velocity_0_127, velocity_sens_);
-            const int rate_scaling = ScaleRate(
-                midinote, static_cast<int>(std::round(kbd_rate_scaling_)));
+            const int rate_scaling = ScaleRate(midinote, kbd_rate_scaling_);
 
             env_.NoteOn(rates_, levels_, output_level_, rate_scaling,
                         level_scaling, velocity_scaling);
@@ -355,8 +383,13 @@ void Dexie::Process() {
         // LFO is bipolar [-1,1]; tremolo should only reduce level, never
         // boost it, so map to a [0,1] attenuation factor scaled by AMS,
         // patch-level depth, and the delay ramp-in.
+        /*
         const float tremolo = AmpModLevelMultiplier(
             lfo_val, lfo_amp_depth_ / 99.0f, ams_depth, delay_ramp);
+        */
+        const float tremolo = AmpModLevelMultiplier(
+            lfo_val, static_cast<float>(lfo_amp_depth_) / 99.0f, ams_depth,
+            delay_ramp);
 
         // --- Oscillator ---
         const float phase_mod =

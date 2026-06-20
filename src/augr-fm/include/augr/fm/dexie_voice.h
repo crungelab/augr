@@ -45,10 +45,6 @@ private:
     bool is_carrier_[6] = {};
     std::vector<Wire *> algorithm_wires_;
 
-    // Stored from patch for pushing to operators
-    int lfo_pitch_depth_raw_ = 0;
-    int pitch_mod_sens_raw_ = 0;
-
     Wire *lfo_sync_wire_ = nullptr;
 };
 
