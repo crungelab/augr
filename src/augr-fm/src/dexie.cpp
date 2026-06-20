@@ -192,7 +192,7 @@ void Dexie::CreateControls() {
         auto level = CreateFloatParameter("Level", ControlMeta::kDefault,
                                           &output_level_, 99.f, 0.f, 99.f, 1.f);
         auto feedback = CreateIntParameter("Feedback", ControlMeta::kDefault,
-                                             &feedback_, 0, 0, 7, 1);
+                                           &feedback_, 0, 0, 7, 1);
         ui.Knob("Coarse", coarse);
         ui.Knob("Fine", fine);
         ui.Knob("Detune", detune);
@@ -203,15 +203,15 @@ void Dexie::CreateControls() {
     // Amp mod section
     {
         auto _ = ui.HBox("Amp Mod");
-        auto ams = CreateFloatParameter("AMS", ControlMeta::kDefault,
-                                        &amp_mod_sens_, 0.f, 0.f, 3.f, 1.f);
+        auto ams = CreateIntParameter("AMS", ControlMeta::kDefault,
+                                      &amp_mod_sens_, 0, 0, 3, 1);
         auto amd = CreateFloatParameter("AMD", ControlMeta::kDefault,
                                         &lfo_amp_depth_, 99.f, 0.f, 99.f, 1.f);
-        auto vel = CreateFloatParameter("Vel Sens", ControlMeta::kDefault,
-                                        &velocity_sens_, 0.f, 0.f, 7.f, 1.f);
-        ui.Knob("AMS", ams);
+        auto vel = CreateIntParameter("Vel Sens", ControlMeta::kDefault,
+                                      &velocity_sens_, 0, 0, 7, 1);
+        ui.KnobInt("AMS", ams);
         ui.Knob("AMD", amd);
-        ui.Knob("Vel Sens", vel);
+        ui.KnobInt("Vel Sens", vel);
     }
     // "Keyboard Scaling" section:
     {
@@ -268,12 +268,12 @@ void Dexie::Process() {
     const float ratio = ratio_coarse_ * (1 + ratio_fine_);
 
     // Feedback amount 0..7 → shift (FEEDBACK_BITDEPTH - amount), or 16 = off.
-    const int feedback_shift = feedback_ != 0 ? kFeedbackBitdepth - feedback_ : 16;
+    const int feedback_shift =
+        feedback_ != 0 ? kFeedbackBitdepth - feedback_ : 16;
     const bool fb_on = feedback_shift < 16;
     const float fb_divisor = static_cast<float>(1 << (feedback_shift + 1));
 
-    const float ams_depth = kAmpModSensTab[std::clamp(
-        static_cast<int>(std::round(amp_mod_sens_)), 0, 3)];
+    const float ams_depth = kAmpModSensTab[std::clamp(amp_mod_sens_, 0, 3)];
 
     const int pitchmoddepth =
         (static_cast<int>(std::round(lfo_pitch_depth_)) * 165) >> 6;
@@ -320,8 +320,12 @@ void Dexie::Process() {
                 velocity_data ? static_cast<float>(velocity_data[i]) : 1.0f;
             const int velocity_0_127 =
                 static_cast<int>(std::round(velocity_norm * 127.0f));
+            /*
             const int velocity_scaling = ScaleVelocity(
                 velocity_0_127, static_cast<int>(std::round(velocity_sens_)));
+            */
+            const int velocity_scaling =
+                ScaleVelocity(velocity_0_127, velocity_sens_);
             const int rate_scaling = ScaleRate(
                 midinote, static_cast<int>(std::round(kbd_rate_scaling_)));
 
@@ -428,7 +432,7 @@ float Dexie::ComputeFeedback(float shaped, float env_amp, bool fb_on) {
     const float level_norm = output_level_ / 99.0f;
     const float noise_amount = feedback_norm * level_norm;
 
-    //constexpr float kNoiseThreshold = 0.75f;
+    // constexpr float kNoiseThreshold = 0.75f;
     constexpr float kNoiseThreshold = 0.90f;
     if (noise_amount > kNoiseThreshold) {
         noise_seed_ = noise_seed_ * 1664525u + 1013904223u;

@@ -210,8 +210,8 @@ void DexieVoice::PushOperatorParams(int op_idx, const Dx7Op &op, int feedback,
     // gets a nonzero value; everyone else stays at 0 (off).
     d->feedback_ = (op_idx == def.feedback_op) ? feedback : 0;
 
-    d->amp_mod_sens_ = static_cast<float>(op.amp_mod_sens);
-    d->velocity_sens_ = static_cast<float>(op.velocity_sens);
+    d->amp_mod_sens_ = op.amp_mod_sens;
+    d->velocity_sens_ = op.velocity_sens;
 
     d->kbd_break_pt_ = op.kbd_break_pt;
     d->kbd_left_depth_ = op.kbd_left_depth;

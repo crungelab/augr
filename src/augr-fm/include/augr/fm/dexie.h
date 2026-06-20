@@ -38,7 +38,7 @@ public:
     int feedback_ = 0;
 
     // --- LFO amplitude modulation ---
-    float amp_mod_sens_ = 0.0f; // 0..3, raw DX7 AMS value (per-operator)
+    int amp_mod_sens_ = 0; // 0..3, raw DX7 AMS value (per-operator)
     /*
     float lfo_amp_depth_ =
         1.0f; // 0..1, from the patch's voice-level LFO amp depth
@@ -48,7 +48,7 @@ public:
     int lfo_delay_samples_total_ =
         0; // samples for the LFO to ramp to full depth after gate-on
 
-    float velocity_sens_ = 0.0f; // raw DX7 0..7 key velocity sensitivity
+    int velocity_sens_ = 0; // raw DX7 0..7 key velocity sensitivity
 
     // Keyboard
     int kbd_break_pt_ = 0;
