@@ -22,8 +22,8 @@ namespace augr {
 // ---------------------------------------------------------------------------
 class Parameter : public Control {
 public:
-    Parameter(std::string label, ControlMeta meta)
-        : Control(std::move(label), std::move(meta)) {}
+    Parameter(const std::string &label, ControlMeta meta)
+        : Control(label, std::move(meta)) {}
 
     ~Parameter() override = default;
 
@@ -41,8 +41,6 @@ public:
 
     // Restore the parameter to its default/initial value.
     virtual void ResetToInit() = 0;
-
-    bool IsKnob() const { return meta_.IsKnob(); }
 
     virtual void LinkTo(Parameter &master) = 0;
 };

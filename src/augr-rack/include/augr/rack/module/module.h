@@ -5,6 +5,7 @@
 
 #include <augr/ui/control/enum_parameter.h>
 #include <augr/ui/control/float_parameter.h>
+#include <augr/ui/control/int_parameter.h>
 
 #include <augr/rack/audio_pin.h>
 #include <augr/rack/midi_pin.h>
@@ -34,6 +35,19 @@ public:
         auto param = FloatParameter::Make(label, meta, std::move(binding), init,
                                           min, max, step);
         FloatParameter *raw = param.get();
+        AddParameter(std::move(param));
+        return raw;
+    }
+
+    IntParameter *CreateIntParameter(const std::string &label,
+                                     const ControlMeta &meta, int *zone,
+                                     int init, int min, int max,
+                                     int step = 1) {
+
+        auto binding = MakePointerBinding(zone);
+        auto param = IntParameter::Make(label, meta, std::move(binding), init,
+                                        min, max, step);
+        IntParameter *raw = param.get();
         AddParameter(std::move(param));
         return raw;
     }
