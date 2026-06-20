@@ -70,8 +70,8 @@ public:
     // CV inputs — pitch → gate → phase → amp mod
     VoltageInput *cv_pitch_in_ = nullptr; // V/oct pitch
     VoltageInput *gate_in_ = nullptr;     // envelope gate (note on/off)
-    //VoltageInput *cv_phase_in_ = nullptr; // FM input — sum of modulator outputs
-    MixingAudioInput *cv_phase_in_ = nullptr; // FM input — sum of modulator outputs
+    VoltageInput *cv_phase_in_ = nullptr; // FM input — sum of modulator outputs
+    //MixingAudioInput *cv_phase_in_ = nullptr; // FM input — sum of modulator outputs
     VoltageInput *cv_amp_mod_in_ = nullptr; // shared voice LFO signal
     VoltageInput *cv_velocity_in_ =
         nullptr; // note-on velocity, 0..1 normalized
@@ -91,12 +91,15 @@ public:
     REFLECT_ENABLE(Module)
 
 private:
+    float ComputeFeedback(float shaped, float env_amp, bool fb_on);
+
     // Oscillator state
     float phase_ = 0.0f;
 
     // Two-sample feedback history (stability fix — see compute_fb in MSFA /
     // Dexed). fb_hist_[0] is the most recent sample.
     float fb_hist_[2] = {0.0f, 0.0f};
+    uint32_t noise_seed_ = 12345u;
 
     // Envelope
     DexieEnv env_;

@@ -105,7 +105,8 @@ float DexieEnv::Tick() {
 
     const float actuallevel = level_ / 65536.0f;
     const float amp = std::exp2((actuallevel - kLevelMax) / kLevelPerOctave);
-    return std::clamp(amp, 0.0f, 1.0f);
+    //return std::clamp(amp, 0.0f, 1.0f);
+    return amp;
 }
 
 } // namespace augr::fm

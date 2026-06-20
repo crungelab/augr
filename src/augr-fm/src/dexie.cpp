@@ -129,8 +129,8 @@ void Dexie::CreatePins() {
     cv_velocity_in_ = new VoltageInput(*this, "velocity");
     AddInput(*cv_velocity_in_);
 
-    // cv_phase_in_ = new VoltageInput(*this, "phase");
-    cv_phase_in_ = new MixingAudioInput(*this, "phase");
+    cv_phase_in_ = new VoltageInput(*this, "phase");
+    // cv_phase_in_ = new MixingAudioInput(*this, "phase");
     AddInput(*cv_phase_in_);
 
     cv_amp_mod_in_ = new VoltageInput(*this, "amp_mod");
@@ -295,7 +295,7 @@ void Dexie::Process() {
         const float pitch_cv =
             pitch_data ? static_cast<float>(pitch_data[i]) : 0.0f;
 
-            const int midinote =
+        const int midinote =
             60 + static_cast<int>(std::round(pitch_cv * 12.0f)) + transpose_;
 
         // --- Envelope ---
@@ -398,12 +398,10 @@ void Dexie::Process() {
             fb_on ? (fb_hist_[0] + fb_hist_[1]) / fb_divisor : 0.0f;
 
         const float sample = std::sin(kTwoPi * (phase_ + phase_mod + fb));
-        const float shaped = sample * env_amp * tremolo;
-       
-        out_data[i] = static_cast<fy_real>(shaped);
+        float shaped = sample * env_amp * tremolo;
+        shaped = ComputeFeedback(shaped, env_amp, fb_on);
 
-        fb_hist_[1] = fb_hist_[0];
-        fb_hist_[0] = shaped;
+        out_data[i] = static_cast<fy_real>(shaped);
 
         phase_ += phase_inc;
         if (phase_ >= 1.0f)
@@ -411,6 +409,38 @@ void Dexie::Process() {
     }
 
     audio_out_->Write(out);
+}
+
+// dexie.h
+float ComputeFeedback(float shaped, float env_amp, bool fb_on);
+
+// dexie.cpp
+float Dexie::ComputeFeedback(float shaped, float env_amp, bool fb_on) {
+    if (!fb_on) {
+        fb_hist_[1] = fb_hist_[0];
+        fb_hist_[0] = shaped;
+        return shaped;
+    }
+
+    const float feedback_norm =
+        static_cast<float>(static_cast<int>(std::round(feedback_))) / 7.0f;
+    const float level_norm = output_level_ / 99.0f;
+    const float noise_amount = feedback_norm * level_norm;
+
+    //constexpr float kNoiseThreshold = 0.75f;
+    constexpr float kNoiseThreshold = 0.90f;
+    if (noise_amount > kNoiseThreshold) {
+        noise_seed_ = noise_seed_ * 1664525u + 1013904223u;
+        const float noise =
+            static_cast<float>((int32_t)noise_seed_) / 2147483648.0f;
+        const float blend =
+            (noise_amount - kNoiseThreshold) / (1.0f - kNoiseThreshold);
+        shaped = shaped * (1.0f - blend) + noise * env_amp * blend;
+    }
+
+    fb_hist_[1] = fb_hist_[0];
+    fb_hist_[0] = shaped;
+    return shaped;
 }
 
 } // namespace augr::fm
