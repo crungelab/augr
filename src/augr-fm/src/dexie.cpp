@@ -4,6 +4,8 @@
 #include <cmath>
 
 #include <augr/fm/dexie.h>
+#include <augr/fm/dexie_common.h>
+
 #include <augr/ui/ui_builder.h>
 
 namespace augr::fm {
@@ -27,10 +29,14 @@ constexpr float kAmpModSensTab[4] = {
 
 // DX7 pitchmodsenstab, from dx7note.cc. Raw 0..7 index -> sensitivity scalar.
 // Normalized by 255 (the maximum value) to give [0,1] range.
+/*
 constexpr float kPitchModSensTab[8] = {
     0.0f,           10.0f / 255.0f, 20.0f / 255.0f,  33.0f / 255.0f,
     55.0f / 255.0f, 92.0f / 255.0f, 153.0f / 255.0f, 255.0f / 255.0f,
 };
+*/
+// Raw pitchmodsenstab values [0..255], matching Dexed's fixed-point domain.
+constexpr int kPitchModSensRaw[8] = {0, 10, 20, 33, 55, 92, 153, 255};
 
 // dexie.cpp — new free functions in the anonymous namespace:
 const uint8_t kExpScaleData[] = {
@@ -101,19 +107,6 @@ float AmpModLevelMultiplier(float lfo_val, float amd_depth_norm,
     float ldiff_frac = (pt * 16.0f) / 268435456.0f;
     ldiff_frac = std::clamp(ldiff_frac, 0.0f, 1.0f);
     return 1.0f - ldiff_frac;
-}
-
-// Fixed-frequency mode: operator ignores MIDI note, runs at a fixed Hz.
-// coarse_raw is the raw 0..31 patch byte; only bits 0-1 are used (& 3).
-// fine_raw is raw 0..99. Reference 3.2 Hz derived from DX7 hardware
-// measurements. Ported from Dexed's osc_freq fixed-frequency branch
-// (dx7note.cc).
-float FixedFrequencyHz(int coarse_raw, int fine_raw) {
-    const int coarse = coarse_raw & 3;
-    const int combined = coarse * 100 + fine_raw;
-    const float logfreq = (4458616.0f * combined) / 8.0f;
-    constexpr float kFixedFreqRef = 3.2f; // Hz at logfreq=0
-    return kFixedFreqRef * std::pow(2.0f, logfreq / 16777216.0f);
 }
 
 // DX7 detune is pitch-dependent, evaluated at the operator's own frequency
@@ -293,8 +286,17 @@ void Dexie::Process() {
     const float ams_depth = kAmpModSensTab[std::clamp(
         static_cast<int>(std::round(amp_mod_sens_)), 0, 3)];
 
+    /*
     const float pms = kPitchModSensTab[std::clamp(
         static_cast<int>(std::round(pitch_mod_sens_)), 0, 7)];
+    */
+    const int pitchmoddepth =
+        (static_cast<int>(std::round(lfo_pitch_depth_)) * 165) >> 6;
+    const int pms_raw = kPitchModSensRaw[std::clamp(
+        static_cast<int>(std::round(pitch_mod_sens_)), 0, 7)];
+    const float pitch_mod_scale =
+        static_cast<float>(pitchmoddepth * pms_raw) / 65536.0f;
+
     const float pitch_depth_norm = lfo_pitch_depth_ / 99.0f;
 
     Audio out(ChannelLayout::kMono);
@@ -305,8 +307,12 @@ void Dexie::Process() {
         // level scaling below and the oscillator further down) ---
         const float pitch_cv =
             pitch_data ? static_cast<float>(pitch_data[i]) : 0.0f;
+        /*
         const int midinote =
             60 + static_cast<int>(std::round(pitch_cv * 12.0f));
+        */
+        const int midinote =
+            60 + static_cast<int>(std::round(pitch_cv * 12.0f)) + transpose_;
 
         // --- Envelope ---
         const bool gate = gate_data && (gate_data[i] > 0.5f);
@@ -380,6 +386,17 @@ void Dexie::Process() {
         // 2^(deviation).
         const float pitch_lfo =
             pitch_mod_data ? static_cast<float>(pitch_mod_data[i]) : 0.0f;
+        const float pitch_eg =
+            pitch_env_data ? static_cast<float>(pitch_env_data[i]) : 0.0f;
+
+        // pitch_lfo is bipolar [-1,1]; delay_ramp fades in the LFO.
+        // pitch_mod_scale converts to octaves matching Dexed's fixed-point
+        // formula.
+        const float pitch_lfo_oct = pitch_lfo * delay_ramp * pitch_mod_scale;
+        const float pitch_factor = std::exp2(pitch_lfo_oct + pitch_eg);
+        /*
+        const float pitch_lfo =
+            pitch_mod_data ? static_cast<float>(pitch_mod_data[i]) : 0.0f;
         const float pitch_mod_depth = pitch_lfo * pitch_depth_norm * pms;
         // Scale: pms=1 (max) at full lfo and full depth should give ~±1
         // semitone of vibrato. DX7 pitch mod range is roughly ±7 semitones at
@@ -389,7 +406,7 @@ void Dexie::Process() {
         const float pitch_lfo_oct =
             pitch_lfo * pitch_depth_norm * pms * 7.0f / 12.0f;
         const float pitch_factor = std::exp2(pitch_lfo_oct + pitch_eg);
-        // const float pitch_factor = std::exp2(pitch_mod_depth * 7.0f / 12.0f);
+        */
 
         const float base_hz = CvToFreq(pitch_cv) * pitch_factor;
         const float op_hz = fixed_freq_ ? frequency_ : (base_hz * ratio);

@@ -16,25 +16,11 @@
 #include <augr/fm/dexie.h>
 #include <augr/fm/dexie_lfo.h>
 
+#include <augr/fm/dexie_common.h>
 #include <augr/fm/dexie_pitch_env_module.h>
 #include <augr/fm/dx7_algorithm.h>
 
 namespace augr::fm {
-
-namespace {
-// Fixed-frequency mode: operator ignores MIDI note, runs at a fixed Hz.
-// coarse_raw is the raw 0..31 patch byte; only bits 0-1 are used (& 3).
-// fine_raw is raw 0..99. Reference 3.2 Hz derived from DX7 hardware
-// measurements. Ported from Dexed's osc_freq fixed-frequency branch
-// (dx7note.cc).
-float FixedFrequencyHz(int coarse_raw, int fine_raw) {
-    const int coarse = coarse_raw & 3;
-    const int combined = coarse * 100 + fine_raw;
-    const float logfreq = (4458616.0f * combined) / 8.0f;
-    constexpr float kFixedFreqRef = 3.2f; // Hz at logfreq=0
-    return kFixedFreqRef * std::pow(2.0f, logfreq / 16777216.0f);
-}
-} // namespace
 
 LfoModule::Waveform Dx7WaveformToLfoWaveform(int dx7_waveform) {
     switch (dx7_waveform) {
@@ -156,6 +142,7 @@ void DexieVoice::LoadPatch(const Dx7Patch &patch) {
             static_cast<int>((patch.lfo_delay / 99.0f) * kMaxDelaySeconds *
                              Audio::sample_rate());
         ops_[i]->osc_key_sync_ = (patch.osc_key_sync != 0);
+        ops_[i]->transpose_ = patch.transpose - 24;
     }
 
     // Disconnect existing LFO sync wire if present
@@ -237,8 +224,13 @@ void DexieVoice::PushOperatorParams(int op_idx, const Dx7Op &op, int feedback,
     d->kbd_rate_scaling_ = static_cast<float>(op.kbd_rate_scaling);
 
     d->fixed_freq_ = op.fixed_freq;
+    /*
     d->frequency_ =
         op.fixed_freq ? FixedFrequencyHz(op.coarse_raw, op.fine_raw) : 0.0f;
+    */
+    d->frequency_ = op.fixed_freq ? FixedFrequencyHz(op.coarse_raw, op.fine_raw,
+                                                     op.detune_raw)
+                                  : 0.0f;
 }
 
 } // namespace augr::fm

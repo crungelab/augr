@@ -65,6 +65,8 @@ public:
 
     bool osc_key_sync_ = false;  // if true, reset phase on every note-on
 
+    int transpose_ = 0;  // semitone offset, -24..+24
+
     // CV inputs — pitch → gate → phase → amp mod
     VoltageInput *cv_pitch_in_ = nullptr; // V/oct pitch
     VoltageInput *gate_in_ = nullptr;     // envelope gate (note on/off)

@@ -33,6 +33,8 @@ struct Dx7Op {
         0; // raw patch byte before CoarseToRatio — needed for fixed-freq mode
     uint8_t fine_raw =
         0; // raw patch byte before FineToRatioFine — needed for fixed-freq mode
+    uint8_t detune_raw =
+        7; // raw 0..14, 7=center — needed for fixed-freq detune
 };
 
 struct Dx7Patch {

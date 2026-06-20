@@ -154,14 +154,10 @@ void ParseUnpacked(const uint8_t *u, Dx7Patch &out) {
         dst.output_level =
             SysexLevelToParam(OpByte(op, UnpackedOpField::kOutputLevel));
         dst.fixed_freq = (OpByte(op, UnpackedOpField::kOscMode) & 0x01) != 0;
-        /*
-        dst.ratio_coarse =
-            CoarseToRatio(OpByte(op, UnpackedOpField::kCoarse) & 0x1F);
-        dst.ratio_fine =
-            FineToRatioFine(OpByte(op, UnpackedOpField::kFine) & 0x7F);
-        */
-        dst.detune =
-            SysexDetuneToParam(OpByte(op, UnpackedOpField::kDetune) & 0x0F);
+
+        dst.detune_raw =
+            OpByte(op, UnpackedOpField::kDetune) & 0x0F; // before centering
+        dst.detune = SysexDetuneToParam(dst.detune_raw); // centered -7..7
 
         dst.coarse_raw = OpByte(op, UnpackedOpField::kCoarse) & 0x1F;
         dst.fine_raw = OpByte(op, UnpackedOpField::kFine) & 0x7F;
