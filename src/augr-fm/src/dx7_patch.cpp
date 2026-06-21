@@ -83,16 +83,6 @@ void UnpackVoice(const uint8_t *packed, uint8_t *unpacked) {
     std::memcpy(us + 19, ps + 16, 10); // name
 }
 
-// DX7 rates in sysex are 0..99 but NOT the same scale as our internal 0..99.
-// The sysex rate is already 0..99; pass through directly.
-// Levels likewise are 0..99 in sysex and in our struct.
-float SysexRateToParam(uint8_t v) {
-    return static_cast<float>(std::min<int>(v, 99));
-}
-float SysexLevelToParam(uint8_t v) {
-    return static_cast<float>(std::min<int>(v, 99));
-}
-
 // DX7 coarse ratio encoding:
 //   0      → 0.5
 //   1..31  → 1..31
@@ -106,9 +96,7 @@ float CoarseToRatio(uint8_t coarse) {
 float FineToRatioFine(uint8_t fine) { return static_cast<float>(fine) / 100.f; }
 
 // Detune: stored 0..14 in sysex, 7 = center (0 cents).
-int SysexDetuneToParam(uint8_t raw) {
-    return static_cast<int>(raw) - 7;
-}
+int SysexDetuneToParam(uint8_t raw) { return static_cast<int>(raw) - 7; }
 
 inline uint8_t OpByte(const uint8_t *op, UnpackedOpField field) {
     return op[static_cast<int>(field)];
@@ -125,15 +113,15 @@ void ParseUnpacked(const uint8_t *u, Dx7Patch &out) {
         const uint8_t *op = u + sysex_idx * 21;
         Dx7Op &dst = out.ops[our_idx];
 
-        dst.rates[0] = SysexRateToParam(OpByte(op, UnpackedOpField::kRate1));
-        dst.rates[1] = SysexRateToParam(OpByte(op, UnpackedOpField::kRate2));
-        dst.rates[2] = SysexRateToParam(OpByte(op, UnpackedOpField::kRate3));
-        dst.rates[3] = SysexRateToParam(OpByte(op, UnpackedOpField::kRate4));
+        dst.rates[0] = OpByte(op, UnpackedOpField::kRate1);
+        dst.rates[1] = OpByte(op, UnpackedOpField::kRate2);
+        dst.rates[2] = OpByte(op, UnpackedOpField::kRate3);
+        dst.rates[3] = OpByte(op, UnpackedOpField::kRate4);
 
-        dst.levels[0] = SysexLevelToParam(OpByte(op, UnpackedOpField::kLevel1));
-        dst.levels[1] = SysexLevelToParam(OpByte(op, UnpackedOpField::kLevel2));
-        dst.levels[2] = SysexLevelToParam(OpByte(op, UnpackedOpField::kLevel3));
-        dst.levels[3] = SysexLevelToParam(OpByte(op, UnpackedOpField::kLevel4));
+        dst.levels[0] = OpByte(op, UnpackedOpField::kLevel1);
+        dst.levels[1] = OpByte(op, UnpackedOpField::kLevel2);
+        dst.levels[2] = OpByte(op, UnpackedOpField::kLevel3);
+        dst.levels[3] = OpByte(op, UnpackedOpField::kLevel4);
 
         // All keyboard scaling fields confirmed against UnpackVoice.
         dst.kbd_break_pt = OpByte(op, UnpackedOpField::kKbdBreakPoint);
@@ -151,18 +139,15 @@ void ParseUnpacked(const uint8_t *u, Dx7Patch &out) {
         dst.amp_mod_sens = OpByte(op, UnpackedOpField::kAmpModSens) & 0x03;
         dst.velocity_sens = OpByte(op, UnpackedOpField::kVelocitySens) & 0x07;
 
-        dst.output_level =
-            SysexLevelToParam(OpByte(op, UnpackedOpField::kOutputLevel));
+        dst.output_level = OpByte(op, UnpackedOpField::kOutputLevel);
         dst.fixed_freq = (OpByte(op, UnpackedOpField::kOscMode) & 0x01) != 0;
 
         dst.detune =
             OpByte(op, UnpackedOpField::kDetune) & 0x0F; // before centering
-        dst.detune = SysexDetuneToParam(dst.detune); // centered -7..7
+        dst.detune = SysexDetuneToParam(dst.detune);     // centered -7..7
 
-        dst.coarse_raw = OpByte(op, UnpackedOpField::kCoarse) & 0x1F;
-        dst.fine_raw = OpByte(op, UnpackedOpField::kFine) & 0x7F;
-        dst.ratio_coarse = CoarseToRatio(dst.coarse_raw);
-        dst.ratio_fine = FineToRatioFine(dst.fine_raw);
+        dst.coarse = OpByte(op, UnpackedOpField::kCoarse) & 0x1F;
+        dst.fine = OpByte(op, UnpackedOpField::kFine) & 0x7F;
     }
 
     // Voice globals, relative to (u + 126). All positions confirmed against

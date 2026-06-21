@@ -22,6 +22,17 @@ public:
         label_ = "LFO";
     }
 
+    void CreatePins() override {
+        cv_rate_in_ = new VoltageInput(*this, "cv_rate_in");
+        AddInput(*cv_rate_in_);
+
+        reset_in_ = new VoltageInput(*this, "reset_in");
+        AddInput(*reset_in_);
+
+        cv_out_ = new VoltageOutput(*this, "cv_out");
+        AddOutput(*cv_out_);
+    }
+
     void CreateControls() override {
         UiBuilder ui(shared_from_this());
 
@@ -38,17 +49,6 @@ public:
             CreateEnumParameter("Waveform", ControlMeta::kDefault, &waveform_,
                                 waveformChoices, Waveform::Sine);
         ui.Combo("Waveform", waveformParam);
-    }
-
-    void CreatePins() override {
-        cv_rate_in_ = new VoltageInput(*this, "cv_rate_in");
-        AddInput(*cv_rate_in_);
-
-        reset_in_ = new VoltageInput(*this, "reset_in");
-        AddInput(*reset_in_);
-
-        cv_out_ = new VoltageOutput(*this, "cv_out");
-        AddOutput(*cv_out_);
     }
 
     void Process() override {

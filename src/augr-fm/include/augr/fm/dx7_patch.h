@@ -10,11 +10,11 @@
 namespace augr::fm {
 
 struct Dx7Op {
-    float rates[4] = {99.f, 99.f, 99.f, 99.f};
-    float levels[4] = {99.f, 99.f, 99.f, 0.f};
-    float output_level = 99.f;
-    float ratio_coarse = 1.f;
-    float ratio_fine = 0.f;
+    int rates[4] = {99, 99, 99, 99};
+    int levels[4] = {99, 99, 99, 0};
+    int output_level = 99;
+    int coarse = 1;
+    int fine = 0;
     int detune = 0; // -7..7
     bool fixed_freq = false;
     int amp_mod_sens = 0;  // 0..3, raw DX7 AMS value
@@ -28,11 +28,6 @@ struct Dx7Op {
     int kbd_right_curve = 0; // 0..3
     int kbd_rate_scaling =
         0; // 0..7 — for pitch-dependent EG rate scaling (deferred)
-
-    uint8_t coarse_raw =
-        0; // raw patch byte before CoarseToRatio — needed for fixed-freq mode
-    uint8_t fine_raw =
-        0; // raw patch byte before FineToRatioFine — needed for fixed-freq mode
 };
 
 struct Dx7Patch {

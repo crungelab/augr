@@ -191,12 +191,6 @@ void DexieVoice::PushOperatorParams(int op_idx, const Dx7Op &op, int feedback,
                                     const Dx7AlgorithmDef &def) {
     Dexie *d = ops_[op_idx];
 
-    /*
-    for (int i = 0; i < 4; ++i) {
-        d->rates_[i] = op.rates[i];
-        d->levels_[i] = op.levels[i];
-    }
-    */
     d->r1_param_->set_value(op.rates[0]);
     d->r2_param_->set_value(op.rates[1]);
     d->r3_param_->set_value(op.rates[2]);
@@ -207,17 +201,13 @@ void DexieVoice::PushOperatorParams(int op_idx, const Dx7Op &op, int feedback,
     d->l3_param_->set_value(op.levels[2]);
     d->l4_param_->set_value(op.levels[3]);
 
-    d->coarse_param_->set_value(op.coarse_raw);
-    d->fine_param_->set_value(op.fine_raw);
-    
-    d->ratio_coarse_ = op.ratio_coarse;
-    d->ratio_fine_ = op.ratio_fine;
+    d->coarse_param_->set_value(op.coarse);
+    d->fine_param_->set_value(op.fine);
     d->detune_param_->set_value(op.detune);
 
     // Output level is the raw DX7 0..99 value now — DexieEnv applies the
     // scaleoutlevel curve and folds it into the envelope's target levels
     // internally, so there is no separate gain conversion here.
-    // d->output_level_ = op.output_level;
     d->level_param_->set_value(op.output_level);
 
     // feedback_ is the raw DX7 0..7 patch amount. Dexie::Process converts it
@@ -237,9 +227,8 @@ void DexieVoice::PushOperatorParams(int op_idx, const Dx7Op &op, int feedback,
     d->kbd_rate_scaling_param_->set_value(op.kbd_rate_scaling);
 
     d->fixed_freq_param_->set_value(op.fixed_freq);
-    d->frequency_ =
-        op.fixed_freq ? FixedFrequencyHz(op.coarse_raw, op.fine_raw, op.detune)
-                      : 0.0f;
+
+    d->RecomputeDerived();
 }
 
 } // namespace augr::fm
