@@ -43,7 +43,6 @@ private:
 
     Dexie *ops_[6] = {};
     bool is_carrier_[6] = {};
-    std::vector<Wire *> algorithm_wires_;
 
     Wire *lfo_sync_wire_ = nullptr;
 };

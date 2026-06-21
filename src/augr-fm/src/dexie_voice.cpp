@@ -158,6 +158,37 @@ void DexieVoice::LoadPatch(const Dx7Patch &patch) {
     }
 }
 
+// Replace WireAlgorithm — no more algorithm_wires_
+void DexieVoice::WireAlgorithm(int algorithm, int feedback_op) {
+    // Disconnect all existing inter-op and op→output wires
+    // by scanning each op's audio_out_ for connected wires.
+    for (int i = 0; i < 6; ++i) {
+        if (!ops_[i]) continue;
+        // Collect wires to disconnect (don't mutate while iterating)
+        std::vector<Wire*> to_disconnect;
+        for (Wire* w : ops_[i]->audio_out_->wires())
+            to_disconnect.push_back(w);
+        for (Wire* w : to_disconnect)
+            Disconnect(*w);
+    }
+
+    const Dx7AlgorithmDef &def = GetDx7Algorithm(algorithm);
+
+    for (int i = 0; i < 6; ++i)
+        is_carrier_[i] = def.is_carrier[i];
+
+    for (int r = 0; r < def.route_count; ++r) {
+        const auto &route = def.routes[r];
+        Connect(*ops_[route.src]->audio_out_, *ops_[route.dst]->cv_phase_in_);
+    }
+
+    for (int i = 0; i < 6; ++i) {
+        if (is_carrier_[i])
+            Connect(*ops_[i]->audio_out_, *audio_out_module_->audio_in_);
+    }
+}
+
+/*
 void DexieVoice::WireAlgorithm(int algorithm, int feedback_op) {
     for (Wire *w : algorithm_wires_)
         Disconnect(*w);
@@ -186,11 +217,18 @@ void DexieVoice::WireAlgorithm(int algorithm, int feedback_op) {
         }
     }
 }
+*/
 
 void DexieVoice::PushOperatorParams(int op_idx, const Dx7Op &op, int feedback,
                                     const Dx7AlgorithmDef &def) {
     Dexie *d = ops_[op_idx];
 
+    /*
+    for (int i = 0; i < 4; ++i) {
+        d->rates_[i] = op.rates[i];
+        d->levels_[i] = op.levels[i];
+    }
+    */
     d->r1_param_->set_value(op.rates[0]);
     d->r2_param_->set_value(op.rates[1]);
     d->r3_param_->set_value(op.rates[2]);
