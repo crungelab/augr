@@ -15,7 +15,7 @@ struct Dx7Op {
     float output_level = 99.f;
     float ratio_coarse = 1.f;
     float ratio_fine = 0.f;
-    float detune = 0.f; // -7..7
+    int detune = 0; // -7..7
     bool fixed_freq = false;
     int amp_mod_sens = 0;  // 0..3, raw DX7 AMS value
     int velocity_sens = 0; // 0..7, raw DX7 key velocity sensitivity
@@ -33,8 +33,6 @@ struct Dx7Op {
         0; // raw patch byte before CoarseToRatio — needed for fixed-freq mode
     uint8_t fine_raw =
         0; // raw patch byte before FineToRatioFine — needed for fixed-freq mode
-    uint8_t detune_raw =
-        7; // raw 0..14, 7=center — needed for fixed-freq detune
 };
 
 struct Dx7Patch {

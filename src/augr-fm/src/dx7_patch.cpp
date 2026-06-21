@@ -106,8 +106,8 @@ float CoarseToRatio(uint8_t coarse) {
 float FineToRatioFine(uint8_t fine) { return static_cast<float>(fine) / 100.f; }
 
 // Detune: stored 0..14 in sysex, 7 = center (0 cents).
-float SysexDetuneToParam(uint8_t raw) {
-    return static_cast<float>(static_cast<int>(raw) - 7);
+int SysexDetuneToParam(uint8_t raw) {
+    return static_cast<int>(raw) - 7;
 }
 
 inline uint8_t OpByte(const uint8_t *op, UnpackedOpField field) {
@@ -155,9 +155,9 @@ void ParseUnpacked(const uint8_t *u, Dx7Patch &out) {
             SysexLevelToParam(OpByte(op, UnpackedOpField::kOutputLevel));
         dst.fixed_freq = (OpByte(op, UnpackedOpField::kOscMode) & 0x01) != 0;
 
-        dst.detune_raw =
+        dst.detune =
             OpByte(op, UnpackedOpField::kDetune) & 0x0F; // before centering
-        dst.detune = SysexDetuneToParam(dst.detune_raw); // centered -7..7
+        dst.detune = SysexDetuneToParam(dst.detune); // centered -7..7
 
         dst.coarse_raw = OpByte(op, UnpackedOpField::kCoarse) & 0x1F;
         dst.fine_raw = OpByte(op, UnpackedOpField::kFine) & 0x7F;

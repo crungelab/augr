@@ -187,15 +187,15 @@ void Dexie::CreateControls() {
                                            &ratio_coarse_, 1.f, 0.f, 16.f, 1.f);
         auto fine = CreateFloatParameter("Fine", ControlMeta::kDefault,
                                          &ratio_fine_, 0.f, 0.f, 0.99f, 0.01f);
-        auto detune = CreateFloatParameter("Detune", ControlMeta::kDefault,
-                                           &detune_, 0.f, -7.f, 7.f, 1.f);
+        auto detune = CreateIntParameter("Detune", ControlMeta::kDefault,
+                                           &detune_, 0, -7, 7, 1);
         auto level = CreateFloatParameter("Level", ControlMeta::kDefault,
                                           &output_level_, 99.f, 0.f, 99.f, 1.f);
         auto feedback = CreateIntParameter("Feedback", ControlMeta::kDefault,
                                            &feedback_, 0, 0, 7, 1);
         ui.Knob("Coarse", coarse);
         ui.Knob("Fine", fine);
-        ui.Knob("Detune", detune);
+        ui.KnobInt("Detune", detune);
         ui.Knob("Level", level);
         ui.KnobInt("Feedback", feedback);
     }

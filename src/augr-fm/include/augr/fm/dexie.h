@@ -29,7 +29,7 @@ public:
     float frequency_ = 0.0f;     // Hz; used only when ratio <= 0
     bool  fixed_freq_ = false;  // true when operator ignores MIDI pitch
 
-    float detune_ = 0.0f;        // DX7 detune: integer steps -7..7
+    int detune_ = 0;        // DX7 detune: integer steps -7..7
     float output_level_ = 99.0f; // raw DX7 operator output level 0..99
 
     // Feedback: raw DX7 amount 0..7. Process() converts it to a feedback

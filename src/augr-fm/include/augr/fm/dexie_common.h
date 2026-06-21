@@ -9,17 +9,17 @@ namespace augr::fm {
 // fine_raw is raw 0..99. Reference 3.2 Hz derived from DX7 hardware
 // measurements. Ported from Dexed's osc_freq fixed-frequency branch
 
-inline float FixedFrequencyHz(int coarse_raw, int fine_raw, int detune_raw) {
+// FixedFrequencyHz signature simplifies:
+inline float FixedFrequencyHz(int coarse_raw, int fine_raw, int detune_centered) {
     const int coarse   = coarse_raw & 3;
     const int combined = coarse * 100 + fine_raw;
     const float logfreq = (4458616.0f * combined) / 8.0f;
-    constexpr float kFixedFreqRef = 1.0f;  // was 3.2f — correct ref is 1 Hz
+    constexpr float kFixedFreqRef = 1.0f;
     float hz = kFixedFreqRef * std::pow(2.0f, logfreq / 16777216.0f);
 
-    // Fixed-frequency detune: only positive (raw detune > 7 = center).
-    // Ported from osc_freq fixed branch: logfreq += detune>7 ? 13457*(detune-7) : 0
-    if (detune_raw > 7) {
-        const float detune_oct = 13457.0f * (detune_raw - 7) / 16777216.0f;
+    // Fixed-frequency detune: only positive (detune_centered > 0).
+    if (detune_centered > 0) {
+        const float detune_oct = 13457.0f * detune_centered / 16777216.0f;
         hz *= std::pow(2.0f, detune_oct);
     }
 

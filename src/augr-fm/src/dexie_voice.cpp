@@ -223,7 +223,7 @@ void DexieVoice::PushOperatorParams(int op_idx, const Dx7Op &op, int feedback,
 
     d->fixed_freq_ = op.fixed_freq;
     d->frequency_ = op.fixed_freq ? FixedFrequencyHz(op.coarse_raw, op.fine_raw,
-                                                     op.detune_raw)
+                                                     op.detune)
                                   : 0.0f;
 }
 
