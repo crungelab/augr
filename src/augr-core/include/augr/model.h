@@ -92,6 +92,8 @@ public:
 
     virtual void OnDestroy() {}
 
+    virtual void OnLoaded() {}
+
     // Registers child under this model, establishing the parent link. Fires
     // OnAddingChild before the child is visible in children_, matching the
     // ordering OnRemovingChild sees on the way out.

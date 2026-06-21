@@ -13,6 +13,7 @@ namespace augr {
 class ControlMeta;
 class FloatParameter;
 class IntParameter;
+class BoolParameter;
 class EnumParameter;
 
 class UiBuilder {
@@ -84,6 +85,7 @@ public:
     // -------------------------------------------------------------------------
     UiBuilder &Button(const std::string &label, FloatParameter *param);
     UiBuilder &CheckButton(const std::string &label, FloatParameter *param);
+    UiBuilder &CheckButtonBool(const std::string &label, BoolParameter *param);
     UiBuilder &ToggleButton(const std::string &label, FloatParameter *param);
 
     // -------------------------------------------------------------------------

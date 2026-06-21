@@ -20,4 +20,19 @@ public:
 };
 DEFINE_MODEL_WIDGET_FACTORY(CheckButtonWidget, CheckButton)
 
+class CheckButtonBoolWidget : public ModelWidgetT<CheckButtonBool> {
+public:
+    CheckButtonBoolWidget(CheckButtonBool &model) : ModelWidgetT<CheckButtonBool>(model) {}
+
+    void Draw() override {
+        auto &m = model();
+        BoolParameter *param = m.param();
+        bool checked = param->value();
+
+        if (ImGui::Checkbox(param->label().c_str(), &checked))
+            param->set_value(checked);
+    }
+};
+DEFINE_MODEL_WIDGET_FACTORY(CheckButtonBoolWidget, CheckButtonBool)
+
 } // namespace augr

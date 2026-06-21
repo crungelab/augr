@@ -54,6 +54,12 @@ UiBuilder &UiBuilder::CheckButton(const std::string &label,
     return *this;
 }
 
+UiBuilder &UiBuilder::CheckButtonBool(const std::string &label,
+                                  BoolParameter *param) {
+    Model::MakeFresh<augr::CheckButtonBool>(model_stack_.back(), label, param);
+    return *this;
+}
+
 // ---------------------------------------------------------------------------
 // Dropdowns
 // ---------------------------------------------------------------------------
@@ -86,7 +92,6 @@ UiBuilder &UiBuilder::KnobInt(const std::string &label, IntParameter *param) {
     Model::MakeFresh<augr::KnobInt>(model_stack_.back(), label, param);
     return *this;
 }
-
 
 UiBuilder &UiBuilder::NumEntry(const std::string &label,
                                FloatParameter *param) {

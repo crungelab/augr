@@ -62,6 +62,7 @@ void ModuleArchiver::Load(Archive &archive) {
             }
         }
     }
+    subject().OnLoaded();
 }
 
 } // namespace augr

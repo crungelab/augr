@@ -135,14 +135,14 @@ void DexieVoice::LoadPatch(const Dx7Patch &patch) {
                                                kMaxDelaySeconds * sample_rate);
 
     for (int i = 0; i < 6; ++i) {
-        ops_[i]->lfo_amp_depth_ = patch.lfo_amp_depth;
-        ops_[i]->lfo_pitch_depth_ = patch.lfo_pitch_depth;
-        ops_[i]->pitch_mod_sens_ = patch.pitch_mod_sens;
+        ops_[i]->amd_param_->set_value(patch.lfo_amp_depth);
+        ops_[i]->lfo_pitch_depth_param_->set_value(patch.lfo_pitch_depth);
+        ops_[i]->pitch_mod_sens_param_->set_value(patch.pitch_mod_sens);
         ops_[i]->lfo_delay_samples_total_ =
             static_cast<int>((patch.lfo_delay / 99.0f) * kMaxDelaySeconds *
                              Audio::sample_rate());
-        ops_[i]->osc_key_sync_ = (patch.osc_key_sync != 0);
-        ops_[i]->transpose_ = patch.transpose - 24;
+        ops_[i]->osc_key_sync_param_->set_value(patch.osc_key_sync != 0);
+        ops_[i]->transpose_param_->set_value(patch.transpose - 24);
     }
 
     // Disconnect existing LFO sync wire if present
@@ -191,40 +191,55 @@ void DexieVoice::PushOperatorParams(int op_idx, const Dx7Op &op, int feedback,
                                     const Dx7AlgorithmDef &def) {
     Dexie *d = ops_[op_idx];
 
+    /*
     for (int i = 0; i < 4; ++i) {
         d->rates_[i] = op.rates[i];
         d->levels_[i] = op.levels[i];
     }
+    */
+    d->r1_param_->set_value(op.rates[0]);
+    d->r2_param_->set_value(op.rates[1]);
+    d->r3_param_->set_value(op.rates[2]);
+    d->r4_param_->set_value(op.rates[3]);
 
+    d->l1_param_->set_value(op.levels[0]);
+    d->l2_param_->set_value(op.levels[1]);
+    d->l3_param_->set_value(op.levels[2]);
+    d->l4_param_->set_value(op.levels[3]);
+
+    d->coarse_param_->set_value(op.coarse_raw);
+    d->fine_param_->set_value(op.fine_raw);
+    
     d->ratio_coarse_ = op.ratio_coarse;
     d->ratio_fine_ = op.ratio_fine;
-    d->detune_ = op.detune;
+    d->detune_param_->set_value(op.detune);
 
     // Output level is the raw DX7 0..99 value now — DexieEnv applies the
     // scaleoutlevel curve and folds it into the envelope's target levels
     // internally, so there is no separate gain conversion here.
-    d->output_level_ = op.output_level;
+    // d->output_level_ = op.output_level;
+    d->level_param_->set_value(op.output_level);
 
     // feedback_ is the raw DX7 0..7 patch amount. Dexie::Process converts it
     // to a feedback shift. Only the algorithm's designated feedback operator
     // gets a nonzero value; everyone else stays at 0 (off).
-    d->feedback_ = (op_idx == def.feedback_op) ? feedback : 0;
+    d->feedback_param_->set_value((op_idx == def.feedback_op) ? feedback : 0);
 
-    d->amp_mod_sens_ = op.amp_mod_sens;
-    d->velocity_sens_ = op.velocity_sens;
+    d->amp_mod_sens_param_->set_value(op.amp_mod_sens);
+    d->velocity_sens_param_->set_value(op.velocity_sens);
 
-    d->kbd_break_pt_ = op.kbd_break_pt;
-    d->kbd_left_depth_ = op.kbd_left_depth;
-    d->kbd_right_depth_ = op.kbd_right_depth;
-    d->kbd_left_curve_ = op.kbd_left_curve;
-    d->kbd_right_curve_ = op.kbd_right_curve;
+    d->kbd_break_pt_param_->set_value(op.kbd_break_pt);
+    d->kbd_left_depth_param_->set_value(op.kbd_left_depth);
+    d->kbd_right_depth_param_->set_value(op.kbd_right_depth);
+    d->kbd_left_curve_param_->set_value(op.kbd_left_curve);
+    d->kbd_right_curve_param_->set_value(op.kbd_right_curve);
 
-    d->kbd_rate_scaling_ = op.kbd_rate_scaling;
+    d->kbd_rate_scaling_param_->set_value(op.kbd_rate_scaling);
 
-    d->fixed_freq_ = op.fixed_freq;
-    d->frequency_ = op.fixed_freq ? FixedFrequencyHz(op.coarse_raw, op.fine_raw,
-                                                     op.detune)
-                                  : 0.0f;
+    d->fixed_freq_param_->set_value(op.fixed_freq);
+    d->frequency_ =
+        op.fixed_freq ? FixedFrequencyHz(op.coarse_raw, op.fine_raw, op.detune)
+                      : 0.0f;
 }
 
 } // namespace augr::fm

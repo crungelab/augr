@@ -114,6 +114,18 @@ float DetuneHz(float op_hz, float detune_centered) {
     return op_hz * detune_ratio * detune_centered;
 }
 
+// DX7 coarse ratio encoding:
+//   0      → 0.5
+//   1..31  → 1..31
+float CoarseToRatio(uint8_t coarse) {
+    return coarse == 0 ? 0.5f : static_cast<float>(coarse);
+}
+
+// DX7 fine ratio: 0..99 → multiplicative fraction 0..~0.99
+// The fine value represents (1 + fine/100) - 1 = fine/100 additive on top of
+// coarse.
+float FineToRatioFine(uint8_t fine) { return static_cast<float>(fine) / 100.f; }
+
 } // namespace
 
 void Dexie::OnCreate() {
@@ -148,105 +160,125 @@ void Dexie::CreatePins() {
 void Dexie::CreateControls() {
     UiBuilder ui(shared_from_this());
 
-    // EG section — matches DX7 operator page ordering
-    {
-        auto _ = ui.HBox("EG Rates");
-        auto r1 = CreateFloatParameter("R1", ControlMeta::kDefault, &rates_[0],
-                                       99.f, 0.f, 99.f, 1.f);
-        auto r2 = CreateFloatParameter("R2", ControlMeta::kDefault, &rates_[1],
-                                       50.f, 0.f, 99.f, 1.f);
-        auto r3 = CreateFloatParameter("R3", ControlMeta::kDefault, &rates_[2],
-                                       50.f, 0.f, 99.f, 1.f);
-        auto r4 = CreateFloatParameter("R4", ControlMeta::kDefault, &rates_[3],
-                                       50.f, 0.f, 99.f, 1.f);
-        ui.Knob("R1", r1);
-        ui.Knob("R2", r2);
-        ui.Knob("R3", r3);
-        ui.Knob("R4", r4);
-    }
-    {
-        auto _ = ui.HBox("EG Levels");
-        auto l1 = CreateFloatParameter("L1", ControlMeta::kDefault, &levels_[0],
-                                       99.f, 0.f, 99.f, 1.f);
-        auto l2 = CreateFloatParameter("L2", ControlMeta::kDefault, &levels_[1],
-                                       75.f, 0.f, 99.f, 1.f);
-        auto l3 = CreateFloatParameter("L3", ControlMeta::kDefault, &levels_[2],
-                                       50.f, 0.f, 99.f, 1.f);
-        auto l4 = CreateFloatParameter("L4", ControlMeta::kDefault, &levels_[3],
-                                       0.f, 0.f, 99.f, 1.f);
-        ui.Knob("L1", l1);
-        ui.Knob("L2", l2);
-        ui.Knob("L3", l3);
-        ui.Knob("L4", l4);
-    }
-
     // Oscillator section
     {
         auto _ = ui.HBox("Oscillator");
-        auto coarse = CreateFloatParameter("Coarse", ControlMeta::kDefault,
-                                           &ratio_coarse_, 1.f, 0.f, 16.f, 1.f);
-        auto fine = CreateFloatParameter("Fine", ControlMeta::kDefault,
-                                         &ratio_fine_, 0.f, 0.f, 0.99f, 0.01f);
-        auto detune = CreateIntParameter("Detune", ControlMeta::kDefault,
-                                           &detune_, 0, -7, 7, 1);
-        auto level = CreateFloatParameter("Level", ControlMeta::kDefault,
-                                          &output_level_, 99.f, 0.f, 99.f, 1.f);
-        auto feedback = CreateIntParameter("Feedback", ControlMeta::kDefault,
-                                           &feedback_, 0, 0, 7, 1);
-        ui.Knob("Coarse", coarse);
-        ui.Knob("Fine", fine);
-        ui.KnobInt("Detune", detune);
-        ui.Knob("Level", level);
-        ui.KnobInt("Feedback", feedback);
+        coarse_param_ = CreateIntParameter("Coarse", ControlMeta::kDefault,
+                                           &params_.coarse, 1, 0, 16, 1);
+        fine_param_ = CreateIntParameter("Fine", ControlMeta::kDefault,
+                                         &params_.fine, 0, 0, 99, 1);
+        detune_param_ = CreateIntParameter("Detune", ControlMeta::kDefault,
+                                           &params_.detune, 0, -7, 7, 1);
+        level_param_ =
+            CreateIntParameter("Level", ControlMeta::kDefault,
+                               &params_.output_level, 99.f, 0.f, 99.f, 1.f);
+        feedback_param_ = CreateIntParameter("Feedback", ControlMeta::kDefault,
+                                             &params_.feedback, 0, 0, 7, 1);
+
+        transpose_param_ =
+            CreateIntParameter("Transpose", ControlMeta::kDefault,
+                               &params_.transpose, 0, -24, 24, 1);
+        fixed_freq_param_ = CreateBoolParameter(
+            "Fixed Freq", ControlMeta::kDefault, &params_.fixed_freq, false);
+        osc_key_sync_param_ = CreateBoolParameter(
+            "Key Sync", ControlMeta::kDefault, &params_.osc_key_sync, false);
+
+        ui.KnobInt("Coarse", coarse_param_);
+        ui.KnobInt("Fine", fine_param_);
+        ui.KnobInt("Detune", detune_param_);
+        ui.KnobInt("Level", level_param_);
+        ui.KnobInt("Feedback", feedback_param_);
+        ui.KnobInt("Transpose", transpose_param_);
+        ui.CheckButtonBool("Fixed Freq", fixed_freq_param_);
+        ui.CheckButtonBool("Key Sync", osc_key_sync_param_);
+    }
+
+    // EG section — matches DX7 operator page ordering
+    {
+        auto _ = ui.HBox("EG Rates");
+        r1_param_ = CreateIntParameter("R1", ControlMeta::kDefault,
+                                       &params_.rates[0], 99, 0, 99, 1);
+        r2_param_ = CreateIntParameter("R2", ControlMeta::kDefault,
+                                       &params_.rates[1], 50, 0, 99, 1);
+        r3_param_ = CreateIntParameter("R3", ControlMeta::kDefault,
+                                       &params_.rates[2], 50, 0, 99, 1);
+        r4_param_ = CreateIntParameter("R4", ControlMeta::kDefault,
+                                       &params_.rates[3], 50, 0, 99, 1);
+        ui.KnobInt("R1", r1_param_);
+        ui.KnobInt("R2", r2_param_);
+        ui.KnobInt("R3", r3_param_);
+        ui.KnobInt("R4", r4_param_);
+    }
+    {
+        auto _ = ui.HBox("EG Levels");
+        l1_param_ = CreateIntParameter("L1", ControlMeta::kDefault,
+                                       &params_.levels[0], 99, 0, 99, 1);
+        l2_param_ = CreateIntParameter("L2", ControlMeta::kDefault,
+                                       &params_.levels[1], 75, 0, 99, 1);
+        l3_param_ = CreateIntParameter("L3", ControlMeta::kDefault,
+                                       &params_.levels[2], 50, 0, 99, 1);
+        l4_param_ = CreateIntParameter("L4", ControlMeta::kDefault,
+                                       &params_.levels[3], 0, 0, 99, 1);
+        ui.KnobInt("L1", l1_param_);
+        ui.KnobInt("L2", l2_param_);
+        ui.KnobInt("L3", l3_param_);
+        ui.KnobInt("L4", l4_param_);
     }
 
     // Amp mod section
     {
         auto _ = ui.HBox("Amp Mod");
-        auto ams = CreateIntParameter("AMS", ControlMeta::kDefault,
-                                      &amp_mod_sens_, 0, 0, 3, 1);
-        auto amd = CreateIntParameter("AMD", ControlMeta::kDefault,
-                                      &lfo_amp_depth_, 0, 0, 99, 1);
-        auto vel = CreateIntParameter("Vel Sens", ControlMeta::kDefault,
-                                      &velocity_sens_, 0, 0, 7, 1);
-        ui.KnobInt("AMS", ams);
-        ui.KnobInt("AMD", amd);
-        ui.KnobInt("Vel Sens", vel);
+        amp_mod_sens_param_ = CreateIntParameter(
+            "AMS", ControlMeta::kDefault, &params_.amp_mod_sens, 0, 0, 3, 1);
+        amd_param_ = CreateIntParameter("AMD", ControlMeta::kDefault,
+                                        &params_.lfo_amp_depth, 0, 0, 99, 1);
+        velocity_sens_param_ =
+            CreateIntParameter("Vel Sens", ControlMeta::kDefault,
+                               &params_.velocity_sens, 0, 0, 7, 1);
+        ui.KnobInt("AMS", amp_mod_sens_param_);
+        ui.KnobInt("AMD", amd_param_);
+        ui.KnobInt("Vel Sens", velocity_sens_param_);
     }
     // Pitch mod section
     {
         auto _ = ui.HBox("Pitch Mod");
-        auto lpd = CreateIntParameter("Pitch Depth", ControlMeta::kDefault,
-                                      &lfo_pitch_depth_, 0, 0, 99);
-        auto pms = CreateIntParameter("PMS", ControlMeta::kDefault,
-                                      &pitch_mod_sens_, 0, 0, 7);
+        lfo_pitch_depth_param_ =
+            CreateIntParameter("Pitch Depth", ControlMeta::kDefault,
+                               &params_.lfo_pitch_depth, 0, 0, 99);
+        pitch_mod_sens_param_ = CreateIntParameter(
+            "PMS", ControlMeta::kDefault, &params_.pitch_mod_sens, 0, 0, 7);
 
-        ui.KnobInt("Pitch Depth", lpd);
-        ui.KnobInt("PMS", pms);
+        ui.KnobInt("Pitch Depth", lfo_pitch_depth_param_);
+        ui.KnobInt("PMS", pitch_mod_sens_param_);
     }
 
     // "Keyboard Scaling" section:
     {
         auto _ = ui.HBox("Keyboard Scaling");
-        auto rate_scl = CreateIntParameter("Rate Scl", ControlMeta::kDefault,
-                                           &kbd_rate_scaling_, 0, 0, 7, 1);
-        auto bp = CreateIntParameter("Break Pt", ControlMeta::kDefault,
-                                     &kbd_break_pt_, 0, 0, 99);
-        auto ld = CreateIntParameter("Left Depth", ControlMeta::kDefault,
-                                     &kbd_left_depth_, 0, 0, 99);
-        auto rd = CreateIntParameter("Right Depth", ControlMeta::kDefault,
-                                     &kbd_right_depth_, 0, 0, 99);
-        auto lc = CreateIntParameter("Left Curve", ControlMeta::kDefault,
-                                     &kbd_left_curve_, 0, 0, 3);
-        auto rc = CreateIntParameter("Right Curve", ControlMeta::kDefault,
-                                     &kbd_right_curve_, 0, 0, 3);
+        kbd_rate_scaling_param_ =
+            CreateIntParameter("Rate Scl", ControlMeta::kDefault,
+                               &params_.kbd_rate_scaling, 0, 0, 7, 1);
+        kbd_break_pt_param_ = CreateIntParameter(
+            "Break Pt", ControlMeta::kDefault, &params_.kbd_break_pt, 0, 0, 99);
+        kbd_left_depth_param_ =
+            CreateIntParameter("Left Depth", ControlMeta::kDefault,
+                               &params_.kbd_left_depth, 0, 0, 99);
+        kbd_right_depth_param_ =
+            CreateIntParameter("Right Depth", ControlMeta::kDefault,
+                               &params_.kbd_right_depth, 0, 0, 99);
+        kbd_left_curve_param_ =
+            CreateIntParameter("Left Curve", ControlMeta::kDefault,
+                               &params_.kbd_left_curve, 0, 0, 3);
+        kbd_right_curve_param_ =
+            CreateIntParameter("Right Curve", ControlMeta::kDefault,
+                               &params_.kbd_right_curve, 0, 0, 3);
 
-        ui.KnobInt("Rate Scl", rate_scl);
-        ui.KnobInt("Break Pt", bp);
-        ui.KnobInt("Left Depth", ld);
-        ui.KnobInt("Right Depth", rd);
-        ui.KnobInt("Left Curve", lc);
-        ui.KnobInt("Right Curve", rc);
+        ui.KnobInt("Rate Scl", kbd_rate_scaling_param_);
+        ui.KnobInt("Break Pt", kbd_break_pt_param_);
+        ui.KnobInt("Left Depth", kbd_left_depth_param_);
+        ui.KnobInt("Right Depth", kbd_right_depth_param_);
+        ui.KnobInt("Left Curve", kbd_left_curve_param_);
+        ui.KnobInt("Right Curve", kbd_right_curve_param_);
     }
 }
 
@@ -289,33 +321,35 @@ void Dexie::Process() {
     env_.SetSampleRate(sample_rate);
 
     // DX7 detune: ±7 steps → ±3.4 cents total (~0.486 cents/step).
-    const float detune_cents = std::round(detune_) * (3.4f / 7.f);
+    const float detune_cents = std::round(params_.detune) * (3.4f / 7.f);
     const float detune_factor = std::pow(2.f, detune_cents / 1200.f);
 
     const float ratio = ratio_coarse_ * (1 + ratio_fine_);
 
     // Feedback amount 0..7 → shift (FEEDBACK_BITDEPTH - amount), or 16 = off.
     const int feedback_shift =
-        feedback_ != 0 ? kFeedbackBitdepth - feedback_ : 16;
+        params_.feedback != 0 ? kFeedbackBitdepth - params_.feedback : 16;
     const bool fb_on = feedback_shift < 16;
     const float fb_divisor = static_cast<float>(1 << (feedback_shift + 1));
 
-    const float ams_depth = kAmpModSensTab[std::clamp(amp_mod_sens_, 0, 3)];
+    const float ams_depth =
+        kAmpModSensTab[std::clamp(params_.amp_mod_sens, 0, 3)];
 
     /*
     const int pitchmoddepth =
         (static_cast<int>(std::round(lfo_pitch_depth_)) * 165) >> 6;
     */
-    const int pitchmoddepth = (lfo_pitch_depth_ * 165) >> 6;
+    const int pitchmoddepth = (params_.lfo_pitch_depth * 165) >> 6;
     /*
     const int pms_raw = kPitchModSensRaw[std::clamp(
         static_cast<int>(std::round(pitch_mod_sens_)), 0, 7)];
     */
-    const int pms_raw = kPitchModSensRaw[std::clamp(pitch_mod_sens_, 0, 7)];
+    const int pms_raw =
+        kPitchModSensRaw[std::clamp(params_.pitch_mod_sens, 0, 7)];
     const float pitch_mod_scale =
         static_cast<float>(pitchmoddepth * pms_raw) / 65536.0f;
 
-    const float pitch_depth_norm = lfo_pitch_depth_ / 99.0f;
+    const float pitch_depth_norm = params_.lfo_pitch_depth / 99.0f;
 
     Audio out(ChannelLayout::kMono);
     fy_real *out_data = out.array().data();
@@ -326,8 +360,9 @@ void Dexie::Process() {
         const float pitch_cv =
             pitch_data ? static_cast<float>(pitch_data[i]) : 0.0f;
 
-        const int midinote =
-            60 + static_cast<int>(std::round(pitch_cv * 12.0f)) + transpose_;
+        const int midinote = 60 +
+                             static_cast<int>(std::round(pitch_cv * 12.0f)) +
+                             params_.transpose;
 
         // --- Envelope ---
         const bool gate = gate_data && (gate_data[i] > 0.5f);
@@ -342,23 +377,25 @@ void Dexie::Process() {
             // Phase reset only when the patch requests it (osc_key_sync=1).
             // Free-running phase (osc_key_sync=0) is intentional DX7 behavior
             // giving slightly different timbre on each note-on.
-            if (osc_key_sync_) {
+            if (params_.osc_key_sync) {
                 phase_ = 0.0f;
             }
 
             const int level_scaling =
-                ScaleLevel(midinote, kbd_break_pt_, kbd_left_depth_,
-                           kbd_right_depth_, kbd_left_curve_, kbd_right_curve_);
+                ScaleLevel(midinote, params_.kbd_break_pt,
+                           params_.kbd_left_depth, params_.kbd_right_depth,
+                           params_.kbd_left_curve, params_.kbd_right_curve);
             const float velocity_norm =
                 velocity_data ? static_cast<float>(velocity_data[i]) : 1.0f;
             const int velocity_0_127 =
                 static_cast<int>(std::round(velocity_norm * 127.0f));
             const int velocity_scaling =
-                ScaleVelocity(velocity_0_127, velocity_sens_);
-            const int rate_scaling = ScaleRate(midinote, kbd_rate_scaling_);
+                ScaleVelocity(velocity_0_127, params_.velocity_sens);
+            const int rate_scaling =
+                ScaleRate(midinote, params_.kbd_rate_scaling);
 
-            env_.NoteOn(rates_, levels_, output_level_, rate_scaling,
-                        level_scaling, velocity_scaling);
+            env_.NoteOn(params_.rates, params_.levels, params_.output_level,
+                        rate_scaling, level_scaling, velocity_scaling);
             samples_since_gate_on_ = 0;
         } else if (!gate && gate_prev_) {
             env_.NoteOff();
@@ -388,8 +425,8 @@ void Dexie::Process() {
             lfo_val, lfo_amp_depth_ / 99.0f, ams_depth, delay_ramp);
         */
         const float tremolo = AmpModLevelMultiplier(
-            lfo_val, static_cast<float>(lfo_amp_depth_) / 99.0f, ams_depth,
-            delay_ramp);
+            lfo_val, static_cast<float>(params_.lfo_amp_depth) / 99.0f,
+            ams_depth, delay_ramp);
 
         // --- Oscillator ---
         const float phase_mod =
@@ -415,7 +452,7 @@ void Dexie::Process() {
         const float pitch_factor = std::exp2(pitch_lfo_oct + pitch_eg);
 
         const float base_hz = CvToFreq(pitch_cv) * pitch_factor;
-        const float op_hz = fixed_freq_ ? frequency_ : (base_hz * ratio);
+        const float op_hz = params_.fixed_freq ? frequency_ : (base_hz * ratio);
 
         // Detune applied to op_hz (post-ratio), matching osc_freq's behavior
         // where logfreq already includes coarsemul before detune is applied.
@@ -424,7 +461,9 @@ void Dexie::Process() {
         // formula).
 
         const float freq =
-            fixed_freq_ ? op_hz : op_hz + DetuneHz(op_hz, std::round(detune_));
+            params_.fixed_freq
+                ? op_hz
+                : op_hz + DetuneHz(op_hz, std::round(params_.detune));
 
         debug_freq_ = freq;
         const float phase_inc = freq / sample_rate;
@@ -446,8 +485,14 @@ void Dexie::Process() {
     audio_out_->Write(out);
 }
 
-// dexie.h
-float ComputeFeedback(float shaped, float env_amp, bool fb_on);
+void Dexie::RecomputeDerived() {
+    ratio_coarse_ = CoarseToRatio(params_.coarse);
+    ratio_fine_ = FineToRatioFine(params_.fine);
+    frequency_ =
+        params_.fixed_freq
+            ? FixedFrequencyHz(params_.coarse, params_.fine, params_.detune)
+            : 0.0f;
+}
 
 // dexie.cpp
 float Dexie::ComputeFeedback(float shaped, float env_amp, bool fb_on) {
@@ -458,11 +503,12 @@ float Dexie::ComputeFeedback(float shaped, float env_amp, bool fb_on) {
     }
 
     /*
-    const float feedback_norm =
-        static_cast<float>(static_cast<int>(std::round(feedback_))) / 7.0f;
-    */
-    const float feedback_norm = static_cast<float>(feedback_) / 7.0f;
+    const float feedback_norm = static_cast<float>(params_.feedback) / 7.0f;
     const float level_norm = output_level_ / 99.0f;
+    const float noise_amount = feedback_norm * level_norm;
+    */
+    const float feedback_norm = static_cast<float>(params_.feedback) / 7.0f;
+    const float level_norm = static_cast<float>(params_.output_level) / 99.0f;
     const float noise_amount = feedback_norm * level_norm;
 
     // constexpr float kNoiseThreshold = 0.75f;

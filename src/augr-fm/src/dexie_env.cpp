@@ -37,18 +37,21 @@ void DexieEnv::SetSampleRate(float sample_rate) {
     sr_ratio_ = 44100.0f / sample_rate;
 }
 
-void DexieEnv::NoteOn(const float rates[4], const float levels[4],
-                      float output_level, int rate_scaling,
+void DexieEnv::NoteOn(const int rates[4], const int levels[4],
+                      int output_level, int rate_scaling,
                       int level_scaling, int velocity_scaling) {
-    for (int i = 0; i < 4; ++i) { rates_[i] = rates[i]; levels_[i] = levels[i]; }
-    int ol = ScaleOutLevel(static_cast<int>(output_level)) + level_scaling;
-    ol = std::min(ol, 127);        // Dexed: min(127, outlevel) -- top clamp only
+    for (int i = 0; i < 4; ++i) {
+        rates_[i]  = rates[i];
+        levels_[i] = levels[i];
+    }
+    int ol = ScaleOutLevel(output_level) + level_scaling;
+    ol = std::min(ol, 127);
     ol = (ol << 5) + velocity_scaling;
-    ol = std::max(ol, 0);          // Dexed: max(0, outlevel) -- bottom clamp after velocity
+    ol = std::max(ol, 0);
     outlevel_     = ol;
     rate_scaling_ = rate_scaling;
-    level_ = 0.0f;
-    down_  = true;
+    level_        = 0.0f;
+    down_         = true;
     Advance(0);
 }
 
