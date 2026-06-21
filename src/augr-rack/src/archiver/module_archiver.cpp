@@ -22,6 +22,8 @@ void ModuleArchiver::Save(Archive &archive) const {
     // so accessing uuid() here ensures every saved module has one.
     j["uuid"] = module.uuid_to_string();
 
+    j["label"] = module.label();
+
     if (!module.parameters().empty()) {
         auto &j_params = j["parameters"];
         for (const auto &param : module.parameters()) {
@@ -42,7 +44,6 @@ void ModuleArchiver::Load(Archive &archive) {
         module.set_uuid(j["uuid"].get<std::string>());
     }
 
-    //ModelRegistry::singleton().RegisterWithUuid(&module, module.uuid());
     archive.RegisterModule(module.uuid(), &module);
 
     // Type tag is read by the caller (it's needed before we can construct
