@@ -6,9 +6,10 @@ namespace augr {
 
 class ButtonBase : public FloatParameterControl {
 public:
-  ButtonBase(std::string label, FloatParameter* param) : FloatParameterControl(label, param) {}
+    ButtonBase(std::string label, FloatParameter *param)
+        : FloatParameterControl(label, param) {}
 
-  REFLECT_ENABLE(FloatParameterControl)
+    REFLECT_ENABLE(FloatParameterControl)
 };
 
 } // namespace augr

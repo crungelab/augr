@@ -5,9 +5,9 @@ namespace augr {
 
 class TabBox : public BoxBase {
 public:
-  TabBox(std::string label) : BoxBase(label) {}
+    TabBox(std::string label) : BoxBase(label) {}
 
-  REFLECT_ENABLE(BoxBase)
+    REFLECT_ENABLE(BoxBase)
 };
 
 } // namespace augr

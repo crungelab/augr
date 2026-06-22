@@ -5,12 +5,12 @@ namespace augr {
 
 class BoxBase : public Control {
 public:
-  BoxBase(std::string label) : Control(label) {}
-  //Data members
-  bool is_top_level_ = false;
-  bool label_visible_ = true;
+    BoxBase(std::string label) : Control(label) {}
+    // Data members
+    bool is_top_level_ = false;
+    bool label_visible_ = true;
 
-  REFLECT_ENABLE(Control)
+    REFLECT_ENABLE(Control)
 };
 
 } // namespace augr

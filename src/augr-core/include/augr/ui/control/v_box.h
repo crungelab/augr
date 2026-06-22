@@ -5,9 +5,9 @@ namespace augr {
 
 class VBox : public BoxBase {
 public:
-  VBox(std::string label) : BoxBase(label) {}
+    VBox(std::string label) : BoxBase(label) {}
 
-  REFLECT_ENABLE(BoxBase)
+    REFLECT_ENABLE(BoxBase)
 };
 
 } // namespace augr

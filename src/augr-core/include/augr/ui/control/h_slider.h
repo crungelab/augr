@@ -5,10 +5,10 @@ namespace augr {
 
 class HSlider : public SliderBase {
 public:
-  HSlider(std::string label, FloatParameter *param) :
-    SliderBase(label, param) {}
+    HSlider(std::string label, FloatParameter *param)
+        : SliderBase(label, param) {}
 
-  REFLECT_ENABLE(SliderBase)
+    REFLECT_ENABLE(SliderBase)
 };
 
 } // namespace augr
