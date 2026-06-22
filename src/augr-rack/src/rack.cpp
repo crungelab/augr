@@ -32,10 +32,10 @@ void Rack::OnCreateFresh() {
 
 void Rack::CreateControls() {
     UiBuilder ui(controls_);
-    auto windowParam = CreateFloatParameter(
+    auto volParam = CreateFloatParameter(
         "Master Volume", ControlMeta::kDefault,
         &master_volume_, 1.f, 0.f, 1.f, 0.01f);
-    ui.Knob("Master Volume", windowParam);
+    ui.Knob("Master Volume", volParam);
 }
 
 /*

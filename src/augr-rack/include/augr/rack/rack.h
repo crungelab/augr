@@ -78,9 +78,10 @@ protected:
     bool CreateMidiInputDevice();
     bool CreateMidiOutputDevice();
 
+    float master_volume_ = 1.f;
+
 private:
     bool running_ = false;
-    float master_volume_ = 1.f;
 };
 
 } // namespace augr

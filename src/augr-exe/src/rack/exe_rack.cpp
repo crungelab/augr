@@ -23,11 +23,12 @@ int ExeRack::ProcessAudio(double streamTime, void *inbuf, void *outbuf,
 
     ProcessActions();
     Process();
-    //ProcessActions();
+    // ProcessActions();
 
     Audio output = audio_output_device_->audio_in_->Read();
 
     if (output.layout() != ChannelLayout::kNull) {
+        output.array() *= master_volume_;
         output.WritePlanar(static_cast<fy_buffer_t>(outbuf), SCALE);
     } else {
         std::fill_n(static_cast<fy_real *>(outbuf),
