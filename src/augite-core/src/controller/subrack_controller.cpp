@@ -434,14 +434,6 @@ void SubrackController::DrawNodeContextMenu() {
     const bool acts_on_selection =
         target_in_selection && selected_nodes_.size() > 1;
 
-    if (target_widget) {
-        const char *label =
-            target_widget->is_open_ ? "Close Window" : "Open Window";
-        if (ImGui::MenuItem(label)) {
-            target_widget->is_open_ = !target_widget->is_open_;
-        }
-    }
-
     ImGui::Separator();
 
     if (ImGui::MenuItem("Cut", "Ctrl+X")) {

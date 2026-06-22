@@ -17,7 +17,10 @@ public:
     ~SubrackView();
 
     void Build() override;
+    virtual void BuildControls();
+
     void Draw() override;
+    virtual void DrawControls();
 
     // Accessors
     Subrack *subrack() { return static_cast<Subrack *>(model_); }

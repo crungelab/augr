@@ -101,6 +101,7 @@ public:
 
     // Debugging
     bool muted_ = false;
+    Model::Ptr controls_;
 
     REFLECT_ENABLE(Node)
 

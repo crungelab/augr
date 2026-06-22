@@ -7,6 +7,7 @@
 #include <augr/rack/wire.h>
 
 #include <augite/widget/module_widget.h>
+#include <augite/widget/widget_builder.h>
 
 #include <augite/view/subrack_view.h>
 
@@ -30,6 +31,14 @@ void SubrackView::Build() {
     if (root_) {
         PopulateWidgetMap(root_);
     }
+    BuildControls();
+}
+
+void SubrackView::BuildControls() {
+    ModelWidgetBuilder builder;
+    controls_root_ = new Widget(); // dummy root to hold the real root's children
+    AddChild(Widget::Ptr(controls_root_)); // take ownership of the dummy root
+    builder.BuildChildren(*controls_root_, *subrack()->controls_);
 }
 
 void SubrackView::PopulateWidgetMap(Widget *widget) {
@@ -47,6 +56,36 @@ void SubrackView::PopulateWidgetMap(Widget *widget) {
     }
 }
 
+void SubrackView::DrawControls() {
+    controls_root_->Draw();
+}
+
+void SubrackView::Draw() {
+    //if (ImGui::CollapsingHeader("Subrack View", ImGuiTreeNodeFlags_DefaultOpen)) {
+    if (ImGui::CollapsingHeader("controls")) {
+        DrawControls();
+    }
+
+    ImNodes::EditorContextSet(context_);
+
+    if (root_ == nullptr) {
+        Build();
+    }
+
+    ImNodes::BeginNodeEditor();
+
+    root_->Draw();
+
+    for (auto wire : subrack()->wires_) {
+        ImNodes::Link(wire->id_, wire->output_->id_, wire->input_->id_);
+    }
+
+    is_editor_hovered_ = ImNodes::IsEditorHovered();
+
+    ImNodes::EndNodeEditor();
+}
+
+/*
 void SubrackView::Draw() {
     ImNodes::EditorContextSet(context_);
 
@@ -66,5 +105,6 @@ void SubrackView::Draw() {
 
     ImNodes::EndNodeEditor();
 }
+*/
 
 } // namespace augr

@@ -28,8 +28,6 @@ public:
     const Module &model() const { return *static_cast<const Module *>(model_); }
 
     // Data members
-    bool is_open_ = false;
-    //
     Vec2 grid_position_ = {0.0f, 0.0f};
 
     // Set to true when state has been loaded from JSON or explicitly

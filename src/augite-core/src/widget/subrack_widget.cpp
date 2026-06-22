@@ -14,7 +14,6 @@ namespace augr {
 void SubrackWidget::DrawNodeContent() {
     ModuleWidgetT<Subrack>::DrawNodeContent();
     ImGui::Dummy(ImVec2(0, 0));
-    // ImGui::Text("Subrack");
 }
 
 DEFINE_MODEL_WIDGET_FACTORY(SubrackWidget, Subrack)

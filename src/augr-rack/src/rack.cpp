@@ -1,5 +1,6 @@
 #include <augr/archiver_factory.h>
 #include <augr/model_factory.h>
+#include <augr/ui/ui_builder.h>
 
 #include <augr/rack/rack.h>
 
@@ -28,6 +29,25 @@ void Rack::OnCreateFresh() {
     if (config_.enable_midi_output)
         CreateMidiOutputDevice();
 }
+
+void Rack::CreateControls() {
+    UiBuilder ui(controls_);
+    auto windowParam = CreateFloatParameter(
+        "Master Volume", ControlMeta::kDefault,
+        &master_volume_, 1.f, 0.f, 1.f, 0.01f);
+    ui.Knob("Master Volume", windowParam);
+}
+
+/*
+void Rack::CreateControls() {
+    UiBuilder ui(shared_from_this());
+    auto windowParam = CreateFloatParameter(
+        "Master Volume", ControlMeta::kDefault,
+        &master_volume_, 1.f, 0.f, 1.f, 0.01f);
+    ui.Knob("Master Volume", windowParam);
+}
+*/
+
 
 // ---------------------------------------------------------------------------
 // Action queue

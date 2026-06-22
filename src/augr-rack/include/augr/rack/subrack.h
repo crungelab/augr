@@ -67,18 +67,9 @@ public:
 
 private:
     void AddModule(Module &m) { modules_.push_back(&m); }
-    /*
     void RemoveModule(Module &m) {
         modules_.erase(std::remove(modules_.begin(), modules_.end(), &m),
                        modules_.end());
-    }
-    */
-    void RemoveModule(Module &m) {
-        modules_.erase(std::remove(modules_.begin(), modules_.end(), &m),
-                       modules_.end());
-        sorted_modules_.erase(
-            std::remove(sorted_modules_.begin(), sorted_modules_.end(), &m),
-            sorted_modules_.end());
     }
 };
 

@@ -14,7 +14,6 @@ void ModuleWidgetArchiver::Save(Archive& archive) const {
     const ModuleWidget& w = subject();
 
     j["grid_position"]   = { w.grid_position_.x,   w.grid_position_.y   };
-    j["window_open"]     = w.is_open_;
 }
 
 void ModuleWidgetArchiver::Load(Archive& archive) {
@@ -29,7 +28,6 @@ void ModuleWidgetArchiver::Load(Archive& archive) {
     };
 
     if (j.contains("grid_position"))   read_vec2(j["grid_position"],   w.grid_position_);
-    if (j.contains("window_open"))     w.is_open_ = j["window_open"].get<bool>();
 }
 
 DEFINE_ARCHIVER_FACTORY(ModuleWidgetArchiver, ModuleWidget, "ModuleWidget")

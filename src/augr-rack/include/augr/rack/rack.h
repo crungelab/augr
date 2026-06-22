@@ -25,6 +25,7 @@ public:
     // Top-level convenience: creates the standard set of boundary devices
     // based on config_. Delegates to Subrack's Create*Device helpers.
     void OnCreateFresh() override;
+    void CreateControls() override;
 
     // -- Action queue --------------------------------------------------
     // Thread bridge: any thread enqueues, audio thread drains via
@@ -79,6 +80,7 @@ protected:
 
 private:
     bool running_ = false;
+    float master_volume_ = 1.f;
 };
 
 } // namespace augr
