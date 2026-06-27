@@ -1,7 +1,7 @@
 #pragma once
 
 #include <augr/audio.h>
-#include <augr/rack/pin.h>
+#include <augr/rack/pin/pin.h>
 
 namespace augr {
 
@@ -38,17 +38,6 @@ public:
     Audio Transform(Audio audio) override {
         return audio.layout() != layout_ ? audio.Convert(layout_) : audio;
     }
-};
-
-// An AudioInput variant for carrier summing — applies headroom scaling
-// to reduce clipping when multiple carriers sum into one output.
-// Distinct from plain AudioInput/VoltageInput, where summation (e.g.
-// FM phase modulation) must remain unscaled.
-class MixingAudioInput : public AudioInput {
-public:
-    using AudioInput::AudioInput;
-
-    Audio Reduce() const override;
 };
 
 } // namespace augr

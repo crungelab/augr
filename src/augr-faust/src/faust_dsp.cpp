@@ -3,7 +3,7 @@
 #include <augr/audio.h>
 #include <augr/faust/faust_dsp.h>
 #include <augr/faust/faust_dsp_ui.h>
-#include <augr/rack/audio_pin.h>
+#include <augr/rack/pin/audio_pin.h>
 
 namespace augr {
 

@@ -31,7 +31,6 @@ public:
     // Data members
     Model *model_ = nullptr;
     Widget* root_;
-    Widget* controls_root_;
 };
 
 template <typename T, typename TBase = ModelView>

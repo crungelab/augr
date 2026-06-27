@@ -3,7 +3,7 @@
 #include <augr/archiver.h>
 
 #include <augr/rack/rack_doc.h>
-
+#include <augr/rack/module/audio_device.h>
 #include <augite/viewer/rack_viewer.h>
 
 namespace augr {
@@ -15,6 +15,15 @@ RackViewer::RackViewer(const std::string &label, RackDoc &doc, Rack &rack)
 }
 
 RackViewer::~RackViewer() {
+}
+
+void RackViewer::DrawControls() {
+    SubrackViewer::DrawControls();
+
+    auto audio = rack().audio_output_device_->audio_in_->Read();
+    float level = rack().vu_level_.load(std::memory_order_relaxed);
+    ImGui::ProgressBar(level, ImVec2(200, 16), "");
+    //ImGui::ProgressBar(rack().vu_level_, ImVec2(200, 16), "");
 }
 
 void RackViewer::OnLoaded() {

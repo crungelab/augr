@@ -9,7 +9,7 @@
 
 #include <augr/model_manufacturer.h>
 #include <augr/rack/module/module.h>
-#include <augr/rack/pin.h>
+#include <augr/rack/pin/pin.h>
 #include <augr/rack/rack_doc.h>
 #include <augr/rack/subrack.h>
 #include <augr/rack/wire.h>

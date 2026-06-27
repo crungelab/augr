@@ -3,6 +3,7 @@
 #include <augr/archiver_manufacturer.h>
 
 #include <augite/app/app.h>
+#include <augite/widget/widget_builder.h>
 
 #include <augite/viewer/subrack_viewer.h>
 #include <augite/viewer/viewer_factory.h>
@@ -22,15 +23,39 @@ void SubrackViewer::RebuildView() {
     view_ = std::make_unique<SubrackView>(document());
     view().set_model(model());
     view().Build();
+
+    BuildControls();
+
     controller_ =
         std::make_unique<SubrackController>(document(), view(), *this);
     controller().set_model(model());
+}
+
+void SubrackViewer::BuildControls() {
+    ModelWidgetBuilder builder;
+    controls_root_ = new Widget(); // dummy root to hold the real root's children
+    AddChild(Widget::Ptr(controls_root_)); // take ownership of the dummy root
+    builder.BuildChildren(*controls_root_, *model().controls_);
 }
 
 void SubrackViewer::Draw() {
     PollPendingDialog();
     DrawUnsavedModal();
     Viewer::Draw();
+    if (is_active()) {
+        DrawConsole();
+    }
+}
+
+void SubrackViewer::DrawConsole() {
+    if (ImGui::Begin("Console")) {
+        DrawControls();
+        ImGui::End();
+    }
+}
+
+void SubrackViewer::DrawControls() {
+    controls_root_->Draw();
 }
 
 // ---------- Dialog polling ----------

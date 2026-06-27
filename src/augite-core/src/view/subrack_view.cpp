@@ -1,13 +1,12 @@
 #include "imgui.h"
 #include "imnodes.h"
 
-#include <augr/rack/pin.h>
+#include <augr/rack/pin/pin.h>
 #include <augr/rack/rack.h>
 #include <augr/rack/rack_doc.h>
 #include <augr/rack/wire.h>
 
 #include <augite/widget/module_widget.h>
-#include <augite/widget/widget_builder.h>
 
 #include <augite/view/subrack_view.h>
 
@@ -31,14 +30,6 @@ void SubrackView::Build() {
     if (root_) {
         PopulateWidgetMap(root_);
     }
-    BuildControls();
-}
-
-void SubrackView::BuildControls() {
-    ModelWidgetBuilder builder;
-    controls_root_ = new Widget(); // dummy root to hold the real root's children
-    AddChild(Widget::Ptr(controls_root_)); // take ownership of the dummy root
-    builder.BuildChildren(*controls_root_, *subrack()->controls_);
 }
 
 void SubrackView::PopulateWidgetMap(Widget *widget) {
@@ -56,16 +47,7 @@ void SubrackView::PopulateWidgetMap(Widget *widget) {
     }
 }
 
-void SubrackView::DrawControls() {
-    controls_root_->Draw();
-}
-
 void SubrackView::Draw() {
-    //if (ImGui::CollapsingHeader("Subrack View", ImGuiTreeNodeFlags_DefaultOpen)) {
-    if (ImGui::CollapsingHeader("controls")) {
-        DrawControls();
-    }
-
     ImNodes::EditorContextSet(context_);
 
     if (root_ == nullptr) {

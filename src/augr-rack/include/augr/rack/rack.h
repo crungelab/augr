@@ -70,6 +70,10 @@ public:
     std::shared_ptr<MidiInputDevice> midi_input_device_;
     std::shared_ptr<MidiOutputDevice> midi_output_device_;
 
+    float master_volume_ = 1.f;
+    //float vu_level_ = 0.f;
+    std::atomic<float> vu_level_{0.f};
+
     REFLECT_ENABLE(Subrack)
 
 protected:
@@ -77,8 +81,6 @@ protected:
     bool CreateAudioOutputDevice();
     bool CreateMidiInputDevice();
     bool CreateMidiOutputDevice();
-
-    float master_volume_ = 1.f;
 
 private:
     bool running_ = false;

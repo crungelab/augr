@@ -2,7 +2,7 @@
 #pragma once
 
 #include <augr/rack/module/module.h>
-#include <augr/rack/voltage_pin.h>
+#include <augr/rack/pin/voltage_pin.h>
 
 namespace augr::fm {
 

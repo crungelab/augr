@@ -6,10 +6,10 @@
 #include <augr/audio.h>
 #include <augr/midi/midi_message.h>
 
-#include <augr/rack/midi_pin.h>
+#include <augr/rack/pin/midi_pin.h>
 #include <augr/rack/module/module.h>
 #include <augr/rack/node.h>
-#include <augr/rack/voltage_pin.h>
+#include <augr/rack/pin/voltage_pin.h>
 
 namespace augr {
 

@@ -31,8 +31,11 @@ public:
     ~SubrackViewer();
 
     void RebuildView() override;
+    void BuildControls();
 
     void Draw() override;
+    void DrawConsole();
+    virtual void DrawControls();
 
     void PollPendingDialog();
     void OnDrawMainMenuBar() override;
@@ -62,6 +65,8 @@ public:
 
     PendingAction pending_ = PendingAction::None;
     bool show_unsaved_modal_ = false;
+
+    Widget *controls_root_;
 };
 
 } // namespace augr

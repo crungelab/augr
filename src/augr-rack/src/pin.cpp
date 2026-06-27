@@ -1,4 +1,4 @@
-#include <augr/rack/pin.h>
+#include <augr/rack/pin/pin.h>
 
 namespace augr {
 

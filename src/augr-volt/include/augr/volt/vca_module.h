@@ -3,10 +3,10 @@
 #include <augr/audio.h>
 #include <augr/ui/ui_builder.h>
 
-#include <augr/rack/audio_pin.h>
+#include <augr/rack/pin/audio_pin.h>
 #include <augr/rack/module/module.h>
 #include <augr/rack/node.h>
-#include <augr/rack/voltage_pin.h>
+#include <augr/rack/pin/voltage_pin.h>
 
 namespace augr {
 

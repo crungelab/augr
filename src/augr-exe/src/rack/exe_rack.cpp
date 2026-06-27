@@ -29,8 +29,11 @@ int ExeRack::ProcessAudio(double streamTime, void *inbuf, void *outbuf,
 
     if (output.layout() != ChannelLayout::kNull) {
         output.array() *= master_volume_;
+        //vu_level_ = xt::amax(xt::abs(output.array()))();
+        vu_level_.store(xt::amax(xt::abs(output.array()))(), std::memory_order_relaxed);
         output.WritePlanar(static_cast<fy_buffer_t>(outbuf), SCALE);
     } else {
+        vu_level_.store(0.f, std::memory_order_relaxed);
         std::fill_n(static_cast<fy_real *>(outbuf),
                     frames * config_.audio_output_channels, 0.0f);
     }

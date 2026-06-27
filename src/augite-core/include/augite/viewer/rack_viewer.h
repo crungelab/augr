@@ -9,13 +9,15 @@ public:
     RackViewer(const std::string &label, RackDoc &doc, Rack &rack);
     ~RackViewer() override;
 
+    void DrawControls() override;
+
     void OnLoaded() override;
 
     void OnDrawMainMenuBar() override;
     void Begin() override;
 
     // Accessors
-    //Rack &rack() { return document().rack(); }
+    Rack &rack() { return document().model(); }
     // Data members
 };
 

@@ -8,9 +8,9 @@
 #include <augr/ui/control/int_parameter.h>
 #include <augr/ui/control/bool_parameter.h>
 
-#include <augr/rack/audio_pin.h>
-#include <augr/rack/midi_pin.h>
-#include <augr/rack/voltage_pin.h>
+#include <augr/rack/pin/audio_pin.h>
+#include <augr/rack/pin/midi_pin.h>
+#include <augr/rack/pin/voltage_pin.h>
 
 #include <augr/rack/node.h>
 

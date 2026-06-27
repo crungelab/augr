@@ -2,7 +2,7 @@
 #pragma once
 
 #include <augr/rack/module/module.h>
-#include <augr/rack/voltage_pin.h>
+#include <augr/rack/pin/voltage_pin.h>
 
 #include <augr/fm/dexie_params.h>
 #include <augr/fm/dexie_env.h>

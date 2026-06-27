@@ -1,6 +1,6 @@
 #pragma once
 
-#include <augr/rack/audio_pin.h>
+#include <augr/rack/pin/audio_pin.h>
 
 namespace augr {
 
