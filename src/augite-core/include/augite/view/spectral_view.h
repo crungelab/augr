@@ -2,13 +2,12 @@
 
 #include <augr/rack/library/spectral_module.h>
 
-#include "module_view.h"
+#include "console_view.h"
 
 namespace augr {
 
-class SpectralView : public ModelViewT<SpectralModule, ModuleView> {
+class SpectralView : public ModelViewT<SpectralModule, ConsoleView> {
 public:
-    //using ModelViewT<SpectralModule, ModuleView>::ModelViewT;
     void Draw() override;
 
 public:

@@ -32,7 +32,7 @@ public:
     }
 
     void CreateControls() override {
-        UiBuilder ui(shared_from_this());
+        UiBuilder ui(console_);
 
         auto smoothParam = CreateFloatParameter(
             "Smooth", ControlMeta::kDefault,

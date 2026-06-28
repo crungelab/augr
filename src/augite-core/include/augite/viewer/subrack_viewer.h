@@ -66,7 +66,7 @@ public:
     PendingAction pending_ = PendingAction::None;
     bool show_unsaved_modal_ = false;
 
-    Widget *controls_root_;
+    Widget *console_root_;
 };
 
 } // namespace augr

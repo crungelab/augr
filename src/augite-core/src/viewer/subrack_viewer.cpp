@@ -33,9 +33,9 @@ void SubrackViewer::RebuildView() {
 
 void SubrackViewer::BuildControls() {
     ModelWidgetBuilder builder;
-    controls_root_ = new Widget(); // dummy root to hold the real root's children
-    AddChild(Widget::Ptr(controls_root_)); // take ownership of the dummy root
-    builder.BuildChildren(*controls_root_, *model().controls_);
+    console_root_ = new Widget(); // dummy root to hold the real root's children
+    AddChild(Widget::Ptr(console_root_)); // take ownership of the dummy root
+    builder.BuildChildren(*console_root_, *model().console_);
 }
 
 void SubrackViewer::Draw() {
@@ -55,7 +55,7 @@ void SubrackViewer::DrawConsole() {
 }
 
 void SubrackViewer::DrawControls() {
-    controls_root_->Draw();
+    console_root_->Draw();
 }
 
 // ---------- Dialog polling ----------

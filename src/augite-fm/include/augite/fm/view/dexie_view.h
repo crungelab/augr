@@ -2,13 +2,13 @@
 
 #include <augr/fm/dexie.h>
 
-#include <augite/view/module_view.h>
+#include <augite/view/console_view.h>
 
 namespace augr {
 
-class DexieView : public ModelViewT<fm::Dexie, ModuleView> {
+class DexieView : public ModelViewT<fm::Dexie, ConsoleView> {
 public:
-    using ModelViewT<fm::Dexie, ModuleView>::ModelViewT;
+    using ModelViewT<fm::Dexie, ConsoleView>::ModelViewT;
     void Draw() override;
 };
 

@@ -62,7 +62,10 @@ void Viewer::Begin() {
     bool p_open = true;
     ImGui::Begin(title, &p_open, ImGuiWindowFlags_NoCollapse);
     if (!p_open) {
-        App::singleton().viewer_manager().CloseViewer(*this);
+        //App::singleton().viewer_manager().CloseViewer(*this);
+        App::singleton().EnqueueAction([this]() {
+            App::singleton().viewer_manager().CloseViewer(*this);
+        });
     }
 }
 

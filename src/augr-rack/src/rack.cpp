@@ -31,23 +31,12 @@ void Rack::OnCreateFresh() {
 }
 
 void Rack::CreateControls() {
-    UiBuilder ui(controls_);
+    UiBuilder ui(console_);
     auto volParam = CreateFloatParameter(
         "Master Volume", ControlMeta::kDefault,
         &master_volume_, 1.f, 0.f, 1.f, 0.01f);
     ui.Knob("Master Volume", volParam);
 }
-
-/*
-void Rack::CreateControls() {
-    UiBuilder ui(shared_from_this());
-    auto windowParam = CreateFloatParameter(
-        "Master Volume", ControlMeta::kDefault,
-        &master_volume_, 1.f, 0.f, 1.f, 0.01f);
-    ui.Knob("Master Volume", windowParam);
-}
-*/
-
 
 // ---------------------------------------------------------------------------
 // Action queue

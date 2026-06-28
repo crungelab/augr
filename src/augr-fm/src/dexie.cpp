@@ -158,7 +158,7 @@ void Dexie::CreatePins() {
 }
 
 void Dexie::CreateControls() {
-    UiBuilder ui(shared_from_this());
+    UiBuilder ui(console_);
 
     // Oscillator section
     {

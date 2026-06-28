@@ -30,7 +30,7 @@ public:
     }
 
     void CreateControls() override {
-        UiBuilder ui(shared_from_this());
+        UiBuilder ui(console_);
         auto decayParam = CreateFloatParameter(
             "Decay", ControlMeta::kDefault,
             &decay_ms_, 300.f, 10.f, 2000.f, 1.f);

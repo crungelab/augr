@@ -2,13 +2,13 @@
 
 #include <augr/rack/library/probe_module.h>
 
-#include "module_view.h"
+#include "console_view.h"
 
 namespace augr {
 
-class ProbeView : public ModelViewT<ProbeModule, ModuleView> {
+class ProbeView : public ModelViewT<ProbeModule, ConsoleView> {
 public:
-    using ModelViewT<ProbeModule, ModuleView>::ModelViewT;
+    using ModelViewT<ProbeModule, ConsoleView>::ModelViewT;
     void Draw() override;
 };
 

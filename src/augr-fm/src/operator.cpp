@@ -19,7 +19,7 @@ void Operator::OnCreate() {
 }
 
 void Operator::CreateControls() {
-    UiBuilder ui(shared_from_this());
+    UiBuilder ui(console_);
 
     auto _ = ui.HBox("Parameters");
 

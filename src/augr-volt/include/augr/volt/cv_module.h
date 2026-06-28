@@ -19,7 +19,7 @@ public:
     }
 
     void CreateControls() override {
-        UiBuilder ui(shared_from_this());
+        UiBuilder ui(console_);
         auto param = CreateFloatParameter("Voltage", ControlMeta::kDefault,
                                           &voltage_, 0.f, -4.f, 4.f, 0.01f);
         ui.Knob("Voltage", param);

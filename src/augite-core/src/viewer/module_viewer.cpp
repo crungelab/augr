@@ -9,7 +9,7 @@
 namespace augr {
 
 void ModuleViewer::RebuildView() {
-    view_ = std::make_unique<ModuleView>(model());
+    view_ = std::make_unique<ConsoleView>(model());
     view().set_model(model());
     view().Build();
 }

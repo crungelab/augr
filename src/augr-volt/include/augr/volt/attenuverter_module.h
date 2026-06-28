@@ -17,7 +17,7 @@ public:
     }
 
     void CreateControls() override {
-        UiBuilder ui(shared_from_this());
+        UiBuilder ui(console_);
 
         // Bipolar amount: negative inverts, zero silences, positive scales up.
         auto amountParam = CreateFloatParameter(

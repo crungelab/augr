@@ -22,7 +22,7 @@
 namespace augr {
 
 FaustDspUi::FaustDspUi(FaustDsp &m) : UI(), m_(&m) {
-    model_stack_.push_back(m.shared_from_this());
+    model_stack_.push_back(m.console_);
 }
 
 void FaustDspUi::PushModel(Model::Ptr model) {

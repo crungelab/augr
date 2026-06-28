@@ -21,7 +21,7 @@ public:
     }
 
     void CreateControls() override {
-        UiBuilder ui(shared_from_this());
+        UiBuilder ui(console_);
 
         for (int ch = 0; ch < kNumChannels; ++ch) {
             const std::string label = "Ch " + std::to_string(ch + 1);

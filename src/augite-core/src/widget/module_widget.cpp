@@ -8,17 +8,6 @@
 namespace augr {
 
 void ModuleWidget::Draw() {
-    DrawNode();
-
-    // Always pull the latest ImNodes position back into the model so
-    // serialization sees current values. Cheap; runs every frame.
-    // (Pulled here rather than at editor level so each widget owns
-    // its own state.)
-    ImVec2 gp = ImNodes::GetNodeGridSpacePos(this->model().id_);
-    this->grid_position_ = ModuleWidget::FromImVec2(gp);
-}
-
-void ModuleWidget::DrawNode() {
     // Push persisted position on the first draw after load/spawn.
     if (this->position_dirty_) {
         ImNodes::SetNodeGridSpacePos(
@@ -53,6 +42,13 @@ void ModuleWidget::DrawNode() {
     }
 
     ImNodes::EndNode();
+
+    // Always pull the latest ImNodes position back into the model so
+    // serialization sees current values. Cheap; runs every frame.
+    // (Pulled here rather than at editor level so each widget owns
+    // its own state.)
+    ImVec2 gp = ImNodes::GetNodeGridSpacePos(this->model().id_);
+    this->grid_position_ = ModuleWidget::FromImVec2(gp);
 }
 
 DEFINE_MODEL_WIDGET_FACTORY(ModuleWidget, Module)

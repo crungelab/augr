@@ -14,7 +14,7 @@
 namespace augr {
 
 SpectralView::SpectralView(SpectralModule& model)
-    : ModelViewT<SpectralModule, ModuleView>(model) {
+    : ModelViewT<SpectralModule, ConsoleView>(model) {
     ComputeWindow();
     smoothed_db_.assign(kNumBins, -200.f);
     freqs_.assign(kNumBins, 0.f);

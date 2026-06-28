@@ -23,7 +23,7 @@ public:
     }
 
     void CreateControls() override {
-        UiBuilder ui(shared_from_this());
+        UiBuilder ui(console_);
 
         auto detuneParam = CreateFloatParameter("Detune", ControlMeta::kSemitones, &detune_, 0.f, -24.f, 24.f, 0.01f);
         ui.Knob("Detune", detuneParam);

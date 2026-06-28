@@ -138,16 +138,17 @@ public:
     }
 
     void DrawChildren() {
+        if (destroying_)
+            return;
+
         for (auto &child : children_)
             DrawChild(*child);
     }
 
     virtual void DrawChild(Widget &child) {
-        /*
         if (child.destroying_)
             return;
-        */
-        child.Draw(); 
+        child.Draw();
     }
 
     // Conversion helpers — keep Vec2 (ImGui-free) at the data layer

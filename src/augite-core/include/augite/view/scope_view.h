@@ -2,13 +2,13 @@
 
 #include <augr/rack/library/scope_module.h>
 
-#include "module_view.h"
+#include "console_view.h"
 
 namespace augr {
 
-class ScopeView : public ModelViewT<ScopeModule, ModuleView> {
+class ScopeView : public ModelViewT<ScopeModule, ConsoleView> {
 public:
-    using ModelViewT<ScopeModule, ModuleView>::ModelViewT;
+    using ModelViewT<ScopeModule, ConsoleView>::ModelViewT;
     void Draw() override;
 
     // Capture this many multiples of display_window so the trigger can

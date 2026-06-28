@@ -9,28 +9,6 @@
 
 namespace augr {
 
-/*
-void ViewerManager::ToggleViewer(Frame &parent, Document &document,
-                                 Model &model) {
-    if (auto it = viewers_.find(&model); it != viewers_.end()) {
-        CloseViewer(*it->second);
-    } else {
-        const auto &mfr = ViewerManufacturer::singleton();
-        auto *factory = mfr.FindFactory(std::type_index(typeid(model)));
-        if (!factory) {
-            std::cerr << "No viewer factory for model type: "
-                      << typeid(model).name() << "\n";
-            return;
-        }
-        //Viewer::Ptr viewer = factory->Produce("Viewer", document, model);
-        Viewer::Ptr viewer = factory->Produce(model.label(), document, model);
-        viewer->Create();
-        viewers_[&model] = static_cast<Viewer *>(viewer.get());
-        parent.AddChild(std::move(viewer)); // parent takes ownership
-    }
-}
-*/
-
 void ViewerManager::ToggleViewer(Frame &parent, Document &document,
                                  Model &model) {
     if (auto it = viewers_.find(&model); it != viewers_.end()) {

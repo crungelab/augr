@@ -22,7 +22,6 @@ public:
     }
 
     void CreateControls() override {
-        //UiBuilder ui(shared_from_this());
         CreateIntParameter(
             "PR1", ControlMeta::kDefault, &rates_[0], 99, 0, 99);
         CreateIntParameter(
@@ -39,7 +38,6 @@ public:
             "PL3", ControlMeta::kDefault, &levels_[2], 50, 0, 99);
         CreateIntParameter(
             "PL4", ControlMeta::kDefault, &levels_[3], 50, 0, 99);
-        // No knobs needed — these are patch-driven only
     }
 
     void Process() override {

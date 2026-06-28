@@ -19,7 +19,6 @@ public:
     explicit ModuleWidget(Module &model) : ModelWidget(model) {}
 
     void Draw() override;
-    void DrawNode();
 
     virtual void DrawNodeContent() {}
 
@@ -36,10 +35,10 @@ public:
     bool position_dirty_ = true;
 };
 
-template <typename T>
-class ModuleWidgetT : public ModelWidgetT<T, ModuleWidget> {
+template <typename T, typename TBase = ModuleWidget>
+class ModuleWidgetT : public ModelWidgetT<T, TBase> {
 public:
-    explicit ModuleWidgetT(T &model) : ModelWidgetT<T, ModuleWidget>(model) {}
+    explicit ModuleWidgetT(T &model) : ModelWidgetT<T, TBase>(model) {}
 };
 
 } // namespace augr
