@@ -8,6 +8,8 @@
 #include <augite/viewer/subrack_viewer.h>
 #include <augite/viewer/viewer_factory.h>
 
+#include <augite/view/console_view.h>
+
 #include <imgui.h>
 
 namespace augr {
@@ -24,25 +26,27 @@ void SubrackViewer::RebuildView() {
     view().set_model(model());
     view().Build();
 
-    BuildControls();
+    RebuildConsoleView();
 
     controller_ =
         std::make_unique<SubrackController>(document(), view(), *this);
     controller().set_model(model());
 }
 
-void SubrackViewer::BuildControls() {
-    ModelWidgetBuilder builder;
-    console_root_ = new Widget(); // dummy root to hold the real root's children
-    AddChild(Widget::Ptr(console_root_)); // take ownership of the dummy root
-    builder.BuildChildren(*console_root_, *model().console_);
+void SubrackViewer::RebuildConsoleView() {
+    if (model().console_->children_.empty())
+        return;
+    console_view_ = std::make_unique<ConsoleView>(model());
+    console_view_->set_model(model());
+    console_view_->Build();
 }
 
 void SubrackViewer::Draw() {
     PollPendingDialog();
     DrawUnsavedModal();
     Viewer::Draw();
-    if (is_active()) {
+
+    if (console_view_) {
         DrawConsole();
     }
 }
@@ -54,9 +58,7 @@ void SubrackViewer::DrawConsole() {
     }
 }
 
-void SubrackViewer::DrawControls() {
-    console_root_->Draw();
-}
+void SubrackViewer::DrawControls() { console_view_->Draw(); }
 
 // ---------- Dialog polling ----------
 

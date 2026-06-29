@@ -6,7 +6,6 @@ namespace augr {
 
 void SpectralViewer::RebuildView() {
     view_ = std::make_unique<SpectralView>(model());
-    view().set_model(model());
     view().Build();
 }
 

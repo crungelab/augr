@@ -23,7 +23,6 @@ void RackViewer::DrawControls() {
     auto audio = rack().audio_output_device_->audio_in_->Read();
     float level = rack().vu_level_.load(std::memory_order_relaxed);
     ImGui::ProgressBar(level, ImVec2(200, 16), "");
-    //ImGui::ProgressBar(rack().vu_level_, ImVec2(200, 16), "");
 }
 
 void RackViewer::OnLoaded() {

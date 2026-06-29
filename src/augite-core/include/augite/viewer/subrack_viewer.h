@@ -14,13 +14,8 @@
 
 namespace augr {
 
-// SubrackViewer is a lightweight nested graph-editor frame. Unlike RackViewer
-// it does not own a document, manage files, or drive lifecycle — it borrows
-// a reference to the project's RackDoc (for MarkModified and the like) and
-// displays one Subrack within it.
-//
-// Created when the user drills into a Subrack node in a parent frame.
-// Parented in the widget tree to whichever Frame initiated the drill-in.
+class ConsoleView;
+
 class SubrackViewer
     : public DocumentViewerT<RackDoc, Subrack, SubrackView, SubrackController> {
 public:
@@ -31,7 +26,7 @@ public:
     ~SubrackViewer();
 
     void RebuildView() override;
-    void BuildControls();
+    void RebuildConsoleView();
 
     void Draw() override;
     void DrawConsole();
@@ -66,7 +61,7 @@ public:
     PendingAction pending_ = PendingAction::None;
     bool show_unsaved_modal_ = false;
 
-    Widget *console_root_;
+    std::unique_ptr<ConsoleView> console_view_;
 };
 
 } // namespace augr

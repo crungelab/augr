@@ -6,7 +6,6 @@ namespace augr {
 
 void DexieViewer::RebuildView() {
     view_ = std::make_unique<DexieView>(model());
-    view().set_model(model());
     view().Build();
 }
 

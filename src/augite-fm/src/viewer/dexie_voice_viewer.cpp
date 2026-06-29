@@ -135,11 +135,6 @@ void DexieVoiceViewer::DoLoadPatch(const fm::Dx7Patch& patch) {
     rack.EnqueueAction([this, patch]() {
         model().LoadPatch(patch);
     });
-    /*
-    App::singleton().EnqueueAction([this, patch]() {
-        model().LoadPatch(patch);
-    });
-    */
 }
 
 DEFINE_VIEWER_FACTORY(DexieVoiceViewer, RackDoc, fm::DexieVoice)

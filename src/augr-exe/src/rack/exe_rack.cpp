@@ -27,7 +27,8 @@ int ExeRack::ProcessAudio(double streamTime, void *inbuf, void *outbuf,
 
     Audio output = audio_output_device_->audio_in_->Read();
 
-    if (output.layout() != ChannelLayout::kNull) {
+    //if (output.layout() != ChannelLayout::kNull) {
+    if (!output.Empty()) {
         output.array() *= master_volume_;
         //vu_level_ = xt::amax(xt::abs(output.array()))();
         vu_level_.store(xt::amax(xt::abs(output.array()))(), std::memory_order_relaxed);

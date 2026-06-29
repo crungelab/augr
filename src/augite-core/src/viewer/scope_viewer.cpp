@@ -6,7 +6,6 @@ namespace augr {
 
 void ScopeViewer::RebuildView() {
     view_ = std::make_unique<ScopeView>(model());
-    view().set_model(model());
     view().Build();
 }
 
