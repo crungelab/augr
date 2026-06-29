@@ -4,14 +4,12 @@
 
 #include "../view/spectral_view.h"
 
-#include "viewer.h"
+#include "model_viewer.h"
 
 namespace augr {
-class SpectralViewer : public ViewerT<RackDoc, SpectralModule, SpectralView> {
+class SpectralViewer : public ModelViewerT<RackDoc, SpectralModule, SpectralView> {
 public:
-    using ViewerT<RackDoc, SpectralModule, SpectralView>::ViewerT;
-
-    void RebuildView() override;
+    using ModelViewerT<RackDoc, SpectralModule, SpectralView>::ModelViewerT;
 };
 
 } // namespace augr

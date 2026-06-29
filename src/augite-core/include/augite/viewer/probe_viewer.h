@@ -4,14 +4,12 @@
 
 #include "../view/probe_view.h"
 
-#include "viewer.h"
+#include "model_viewer.h"
 
 namespace augr {
-class ProbeViewer : public ViewerT<RackDoc, ProbeModule, ProbeView> {
+class ProbeViewer : public ModelViewerT<RackDoc, ProbeModule, ProbeView> {
 public:
-    using ViewerT<RackDoc, ProbeModule, ProbeView>::ViewerT;
-
-    void RebuildView() override;
+    using ModelViewerT<RackDoc, ProbeModule, ProbeView>::ModelViewerT;
 };
 
 } // namespace augr

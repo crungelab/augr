@@ -22,7 +22,7 @@ public:
     void OnDestroy() override;
 
     virtual void OnLoaded();
-    virtual void RebuildView() {}
+    virtual void RebuildView() = 0;
 
     void Begin() override;
     void End() override;

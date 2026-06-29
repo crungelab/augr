@@ -22,15 +22,20 @@ SubrackViewer::SubrackViewer(const std::string &label, RackDoc &doc,
 SubrackViewer::~SubrackViewer() {}
 
 void SubrackViewer::RebuildView() {
+    DocumentViewerT<RackDoc, Subrack, SubrackView, SubrackController>::RebuildView();
+    /*
     view_ = std::make_unique<SubrackView>(document());
     view().set_model(model());
     view().Build();
+    */
 
     RebuildConsoleView();
 
+    /*
     controller_ =
         std::make_unique<SubrackController>(document(), view(), *this);
     controller().set_model(model());
+    */
 }
 
 void SubrackViewer::RebuildConsoleView() {

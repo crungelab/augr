@@ -4,11 +4,6 @@
 
 namespace augr {
 
-void ScopeViewer::RebuildView() {
-    view_ = std::make_unique<ScopeView>(model());
-    view().Build();
-}
-
 DEFINE_VIEWER_FACTORY(ScopeViewer, RackDoc, ScopeModule)
 
 } // namespace augr

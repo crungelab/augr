@@ -8,11 +8,6 @@
 
 namespace augr {
 
-void ModuleViewer::RebuildView() {
-    view_ = std::make_unique<ConsoleView>(model());
-    view().Build();
-}
-
 DEFINE_VIEWER_FACTORY(ModuleViewer, RackDoc, Module)
 
 class ModuleViewerArchiver : public ViewerArchiver {};
