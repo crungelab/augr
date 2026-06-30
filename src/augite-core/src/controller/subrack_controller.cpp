@@ -169,43 +169,14 @@ void SubrackController::DeleteSelection() {
         wmap.erase(it);
         widget->Destroy();
 
-        model.Destroy();
-
-    }
-    selected_nodes_.clear();
-    ImNodes::ClearNodeSelection();
-    document().MarkModified();
-}
-
-/*
-void SubrackController::DeleteSelection() {
-    if (!HasSelection())
-        return;
-
-    auto &wmap = view().widget_map();
-
-    for (int node_id : selected_nodes_) {
-        auto it = wmap.find(node_id);
-        if (it == wmap.end())
-            continue;
-        Widget *widget = it->second;
-        auto *mw = dynamic_cast<ModelWidget *>(widget);
-        if (!mw)
-            continue;
-
+        //model.Destroy();
         if (auto *mod = dynamic_cast<Module *>(&mw->model()))
-            mod->Destroy();
-        // if (auto *mod = dynamic_cast<Module *>(&mw->model()))
-        //     subrack().EnqueueAction([mod]() { mod->Destroy(); });
-
-        wmap.erase(it);
-        widget->Destroy();
+            subrack().EnqueueAction([mod]() { mod->Destroy(); });
     }
     selected_nodes_.clear();
     ImNodes::ClearNodeSelection();
     document().MarkModified();
 }
-*/
 
 Module *SubrackController::SpawnModule(const std::string &type_name,
                                        Vec2 grid_pos, int auto_connect_pin_id) {
