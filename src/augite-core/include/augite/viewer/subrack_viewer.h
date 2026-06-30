@@ -10,14 +10,14 @@
 #include "../controller/subrack_controller.h"
 #include "../view/subrack_view.h"
 
-#include "document_viewer.h"
+#include "viewer.h"
 
 namespace augr {
 
 class ConsoleView;
 
 class SubrackViewer
-    : public DocumentViewerT<RackDoc, Subrack, SubrackView, SubrackController> {
+    : public ViewerT<RackDoc, Subrack, SubrackView, SubrackController> {
 public:
     friend class SubrackViewerArchiver;
     // doc: the project document (shared with the root RackViewer).

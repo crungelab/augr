@@ -10,9 +10,9 @@
 
 namespace augr {
 class VoiceViewer
-    : public DocumentViewerT<RackDoc, Voice, SubrackView, SubrackController, SubrackViewer> {
+    : public ViewerT<RackDoc, Voice, SubrackView, SubrackController, SubrackViewer> {
 public:
-    using DocumentViewerT<RackDoc, Voice, SubrackView, SubrackController, SubrackViewer>::DocumentViewerT;
+    using ViewerT<RackDoc, Voice, SubrackView, SubrackController, SubrackViewer>::ViewerT;
 };
 
 } // namespace augr

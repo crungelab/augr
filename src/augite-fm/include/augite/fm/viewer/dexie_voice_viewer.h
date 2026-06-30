@@ -17,9 +17,9 @@
 namespace augr {
 
 class DexieVoiceViewer
-    : public DocumentViewerT<RackDoc, fm::DexieVoice, SubrackView, SubrackController, VoiceViewer> {
+    : public ViewerT<RackDoc, fm::DexieVoice, SubrackView, SubrackController, VoiceViewer> {
 public:
-    using DocumentViewerT<RackDoc, fm::DexieVoice, SubrackView, SubrackController, VoiceViewer>::DocumentViewerT;
+    using ViewerT<RackDoc, fm::DexieVoice, SubrackView, SubrackController, VoiceViewer>::ViewerT;
 
     void Draw() override;
     void OnDrawMainMenuBar() override;

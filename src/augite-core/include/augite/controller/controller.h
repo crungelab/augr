@@ -12,17 +12,17 @@ public:
     Controller(Document &doc, Model &model, View &view, Frame &frame)
         : doc_(&doc), model_(&model), view_(&view), frame_(&frame) {}
     virtual ~Controller() = default;
-    virtual void Control() = 0;
+    virtual void Control() {}
 
     // Accessors
     Frame &frame() { return *frame_; }
     const Frame &frame() const { return *frame_; }
     // Data members
 protected:
-    Frame *frame_;
     Document *doc_;
     Model *model_;
     View *view_;
+    Frame *frame_;
 };
 
 template <typename TDoc, typename TModel, typename TView>

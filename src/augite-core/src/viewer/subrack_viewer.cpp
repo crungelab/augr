@@ -16,13 +16,13 @@ namespace augr {
 
 SubrackViewer::SubrackViewer(const std::string &label, RackDoc &doc,
                              Subrack &subrack)
-    : DocumentViewerT<RackDoc, Subrack, SubrackView, SubrackController>(
+    : ViewerT<RackDoc, Subrack, SubrackView, SubrackController>(
           label, doc, subrack) {}
 
 SubrackViewer::~SubrackViewer() {}
 
 void SubrackViewer::RebuildView() {
-    DocumentViewerT<RackDoc, Subrack, SubrackView, SubrackController>::RebuildView();
+    ViewerT<RackDoc, Subrack, SubrackView, SubrackController>::RebuildView();
 
     RebuildConsoleView();
 }

@@ -63,6 +63,15 @@ public:
     template <typename... Args>
     ViewerT(const std::string &label, TDoc &doc, TModel &model, Args &&...args)
         : TBase(label, doc, model) {}
+
+    void RebuildView() override {
+        this->view_ = std::make_unique<TView>(this->model());
+        this->view().Build();
+
+        this->controller_ =
+            std::make_unique<TController>(this->document(), this->model(), this->view(), *this);
+    }
+
     // Accessors
     TDoc &document() { return *static_cast<TDoc *>(this->doc_); }
     const TDoc &document() const {

@@ -4,12 +4,12 @@
 
 #include "../view/scope_view.h"
 
-#include "model_viewer.h"
+#include "viewer.h"
 
 namespace augr {
-class ScopeViewer : public ModelViewerT<RackDoc, ScopeModule, ScopeView> {
+class ScopeViewer : public ViewerT<RackDoc, ScopeModule, ScopeView> {
 public:
-    using ModelViewerT<RackDoc, ScopeModule, ScopeView>::ModelViewerT;
+    using ViewerT<RackDoc, ScopeModule, ScopeView>::ViewerT;
 };
 
 } // namespace augr

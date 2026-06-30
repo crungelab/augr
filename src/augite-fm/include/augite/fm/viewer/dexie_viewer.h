@@ -4,12 +4,12 @@
 
 #include "../view/dexie_view.h"
 
-#include <augite/viewer/model_viewer.h>
+#include <augite/viewer/viewer.h>
 
 namespace augr {
-class DexieViewer : public ModelViewerT<RackDoc, fm::Dexie, DexieView> {
+class DexieViewer : public ViewerT<RackDoc, fm::Dexie, DexieView> {
 public:
-    using ModelViewerT<RackDoc, fm::Dexie, DexieView>::ModelViewerT;
+    using ViewerT<RackDoc, fm::Dexie, DexieView>::ViewerT;
 };
 
 } // namespace augr

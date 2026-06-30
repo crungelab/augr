@@ -2,13 +2,13 @@
 
 #include <augr/rack/rack_doc.h>
 #include "../view/console_view.h"
-#include "model_viewer.h"
+#include "viewer.h"
 
 namespace augr {
 
-class ModuleViewer : public ModelViewerT<RackDoc, Module, ConsoleView> {
+class ModuleViewer : public ViewerT<RackDoc, Module, ConsoleView> {
 public:
-    using ModelViewerT<RackDoc, Module, ConsoleView>::ModelViewerT;
+    using ViewerT<RackDoc, Module, ConsoleView>::ViewerT;
 };
 
 } // namespace augr
