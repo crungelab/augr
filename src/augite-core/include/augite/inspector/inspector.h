@@ -1,6 +1,6 @@
 #pragma once
 
-#include "../widget/widget.h"
+#include "../widget/model_widget.h"
 
 namespace augr {
 

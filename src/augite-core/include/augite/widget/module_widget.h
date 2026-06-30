@@ -7,7 +7,7 @@
 #include <augr/rack/module/module.h>
 
 #include "augr/rack/rack_doc.h"
-#include <augite/widget/widget.h>
+#include <augite/widget/model_widget.h>
 
 namespace augr {
 

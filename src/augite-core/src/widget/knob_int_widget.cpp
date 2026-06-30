@@ -1,7 +1,7 @@
 #include <imgui-knobs.h>
 #include <imgui.h>
 
-#include <augite/widget/widget.h>
+#include <augite/widget/model_widget.h>
 #include <augr/ui/control/knob.h>
 
 namespace augr {

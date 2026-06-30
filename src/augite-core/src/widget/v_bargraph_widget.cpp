@@ -8,7 +8,7 @@
 #include "imgui.h"
 #include "imgui_internal.h"
 
-#include <augite/widget/widget.h>
+#include <augite/widget/model_widget.h>
 #include <augr/ui/control/v_bargraph.h>
 
 namespace augr {

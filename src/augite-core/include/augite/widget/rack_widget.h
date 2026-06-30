@@ -1,6 +1,6 @@
 #pragma once
 
-#include <augite/widget/widget.h>
+#include <augite/widget/model_widget.h>
 
 namespace augr {
 

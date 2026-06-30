@@ -1,7 +1,7 @@
 #include <string>
 
 #include "implot.h"
-#include <augite/widget/widget.h>
+#include <augite/widget/model_widget.h>
 #include <augr/ui/control/h_bargraph.h>
 
 namespace augr {

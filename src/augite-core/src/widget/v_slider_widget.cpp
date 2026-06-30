@@ -1,6 +1,6 @@
 #include "imgui.h"
 
-#include <augite/widget/widget.h>
+#include <augite/widget/model_widget.h>
 #include <augr/ui/control/v_slider.h>
 
 namespace augr {
