@@ -18,7 +18,7 @@ namespace augr {
 class RackDoc : public DocumentT<Rack> {
 public:
     RackDoc() = default;
-    ~RackDoc(); // out-of-line because Rack is forward-declared
+    ~RackDoc() { Stop(); }
 
     bool Save(const std::filesystem::path &p);
     void ReplaceRack(std::shared_ptr<Rack> fresh, nlohmann::json envelope);

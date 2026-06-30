@@ -110,8 +110,6 @@ bool ParseEnvelope(const nlohmann::json &doc,
 
 } // namespace
 
-RackDoc::~RackDoc() { Stop(); }
-
 bool RackDoc::Save(const std::filesystem::path &p) {
     try {
         nlohmann::json rack_json;
