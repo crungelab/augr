@@ -6,9 +6,9 @@
 
 namespace augr {
 
-class ProbeView : public ModelViewT<ProbeModule, ConsoleView> {
+class ProbeView : public ViewT<ProbeModule, ConsoleView> {
 public:
-    using ModelViewT<ProbeModule, ConsoleView>::ModelViewT;
+    using ViewT<ProbeModule, ConsoleView>::ViewT;
     void Draw() override;
 };
 

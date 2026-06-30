@@ -30,13 +30,11 @@ public:
         : ViewerT<TDoc, TModel, TView, TController, TBase>(label, doc, model) {}
 
     void RebuildView() override {
-        this->view_ = std::make_unique<TView>(this->document());
-        this->view().set_model(this->model());
+        this->view_ = std::make_unique<TView>(this->model());
         this->view().Build();
 
         this->controller_ =
-            std::make_unique<TController>(this->document(), this->view(), *this);
-        this->controller().set_model(this->model());
+            std::make_unique<TController>(this->document(), this->model(), this->view(), *this);
     }
     // Accessors
     // Data members

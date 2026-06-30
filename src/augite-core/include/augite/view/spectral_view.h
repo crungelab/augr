@@ -6,7 +6,7 @@
 
 namespace augr {
 
-class SpectralView : public ModelViewT<SpectralModule, ConsoleView> {
+class SpectralView : public ViewT<SpectralModule, ConsoleView> {
 public:
     void Draw() override;
 

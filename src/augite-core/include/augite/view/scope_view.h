@@ -6,9 +6,9 @@
 
 namespace augr {
 
-class ScopeView : public ModelViewT<ScopeModule, ConsoleView> {
+class ScopeView : public ViewT<ScopeModule, ConsoleView> {
 public:
-    using ModelViewT<ScopeModule, ConsoleView>::ModelViewT;
+    using ViewT<ScopeModule, ConsoleView>::ViewT;
     void Draw() override;
 
     // Capture this many multiples of display_window so the trigger can

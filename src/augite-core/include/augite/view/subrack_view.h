@@ -2,7 +2,7 @@
 
 #include <map>
 
-#include "document_view.h"
+#include "view.h"
 #include "augr/rack/subrack.h"
 
 class ImNodesEditorContext;
@@ -11,9 +11,9 @@ namespace augr {
 
 class RackDoc;
 
-class SubrackView : public DocumentViewT<RackDoc> {
+class SubrackView : public ViewT<Subrack> {
 public:
-    explicit SubrackView(RackDoc &doc);
+    explicit SubrackView(Subrack &subrack);
     ~SubrackView();
 
     void Build() override;

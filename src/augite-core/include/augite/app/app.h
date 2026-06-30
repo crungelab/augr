@@ -23,9 +23,11 @@ public:
 
     void Draw() override;
 
+    std::mutex mutex_;
     std::vector<std::function<void()>> deferred_actions_;
 
     void EnqueueAction(std::function<void()> action) {
+        std::lock_guard lock(mutex_);
         deferred_actions_.push_back(std::move(action));
     }
 

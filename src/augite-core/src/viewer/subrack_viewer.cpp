@@ -23,26 +23,14 @@ SubrackViewer::~SubrackViewer() {}
 
 void SubrackViewer::RebuildView() {
     DocumentViewerT<RackDoc, Subrack, SubrackView, SubrackController>::RebuildView();
-    /*
-    view_ = std::make_unique<SubrackView>(document());
-    view().set_model(model());
-    view().Build();
-    */
 
     RebuildConsoleView();
-
-    /*
-    controller_ =
-        std::make_unique<SubrackController>(document(), view(), *this);
-    controller().set_model(model());
-    */
 }
 
 void SubrackViewer::RebuildConsoleView() {
     if (model().console_->children_.empty())
         return;
     console_view_ = std::make_unique<ConsoleView>(model());
-    console_view_->set_model(model());
     console_view_->Build();
 }
 

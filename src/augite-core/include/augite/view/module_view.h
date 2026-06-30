@@ -2,13 +2,13 @@
 
 #include <augr/rack/module/module.h>
 
-#include "model_view.h"
+#include "view.h"
 
 namespace augr {
 
-class ModuleView : public ModelViewT<Module> {
+class ModuleView : public ViewT<Module> {
 public:
-    using ModelViewT<Module>::ModelViewT;
+    using ViewT<Module>::ViewT;
 };
 
 } // namespace augr

@@ -37,10 +37,6 @@ void ViewerManager::OpenViewer(Frame &parent, Document &document, Model &model) 
     }
 }
 
-/*
-TODO: This crashed once.  Might need to wrap in App::singleton().EnqueueAction()
-*/
-
 void ViewerManager::CloseViewer(Viewer &viewer) {
     viewer.Destroy();
     // Find the viewer in the map and remove it.
@@ -49,6 +45,12 @@ void ViewerManager::CloseViewer(Viewer &viewer) {
                      [&](const auto &pair) { return pair.second == &viewer; });
     if (it != viewers_.end()) {
         viewers_.erase(it);
+    }
+}
+
+void ViewerManager::CloseViewerFor(Model &model) {
+    if (auto it = viewers_.find(&model); it != viewers_.end()) {
+        CloseViewer(*it->second);
     }
 }
 

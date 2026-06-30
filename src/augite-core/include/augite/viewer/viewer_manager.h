@@ -15,6 +15,7 @@ public:
     void ToggleViewer(Frame &parent, Document &document, Model &model);
     void OpenViewer(Frame &parent, Document &document, Model &model);
     void CloseViewer(Viewer &viewer);
+    void CloseViewerFor(Model &model);
 
     // Data members
     std::map<Model *, Viewer *> viewers_;

@@ -6,9 +6,9 @@
 
 namespace augr {
 
-class DexieView : public ModelViewT<fm::Dexie, ConsoleView> {
+class DexieView : public ViewT<fm::Dexie, ConsoleView> {
 public:
-    using ModelViewT<fm::Dexie, ConsoleView>::ModelViewT;
+    using ViewT<fm::Dexie, ConsoleView>::ViewT;
     void Draw() override;
 };
 

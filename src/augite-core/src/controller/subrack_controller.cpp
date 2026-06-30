@@ -24,9 +24,9 @@
 
 namespace augr {
 
-SubrackController::SubrackController(RackDoc &doc, SubrackView &view,
-                                     Frame &frame)
-    : DocumentController<RackDoc, SubrackView>(doc, view, frame) {}
+SubrackController::SubrackController(RackDoc &doc, Subrack &subrack,
+                                     SubrackView &view, Frame &frame)
+    : ControllerT<RackDoc, Subrack, SubrackView>(doc, subrack, view, frame) {}
 
 // ----- Per-frame entry point -----
 
@@ -161,13 +161,42 @@ void SubrackController::DeleteSelection() {
         auto *mw = dynamic_cast<ModelWidget *>(widget);
         if (!mw)
             continue;
+        
+        auto &model = mw->model();
+
+        App::singleton().viewer_manager().CloseViewerFor(model);
+
+        wmap.erase(it);
+        widget->Destroy();
+
+        model.Destroy();
+
+    }
+    selected_nodes_.clear();
+    ImNodes::ClearNodeSelection();
+    document().MarkModified();
+}
+
+/*
+void SubrackController::DeleteSelection() {
+    if (!HasSelection())
+        return;
+
+    auto &wmap = view().widget_map();
+
+    for (int node_id : selected_nodes_) {
+        auto it = wmap.find(node_id);
+        if (it == wmap.end())
+            continue;
+        Widget *widget = it->second;
+        auto *mw = dynamic_cast<ModelWidget *>(widget);
+        if (!mw)
+            continue;
 
         if (auto *mod = dynamic_cast<Module *>(&mw->model()))
             mod->Destroy();
-        /*
-        if (auto *mod = dynamic_cast<Module *>(&mw->model()))
-            subrack().EnqueueAction([mod]() { mod->Destroy(); });
-        */
+        // if (auto *mod = dynamic_cast<Module *>(&mw->model()))
+        //     subrack().EnqueueAction([mod]() { mod->Destroy(); });
 
         wmap.erase(it);
         widget->Destroy();
@@ -176,6 +205,7 @@ void SubrackController::DeleteSelection() {
     ImNodes::ClearNodeSelection();
     document().MarkModified();
 }
+*/
 
 Module *SubrackController::SpawnModule(const std::string &type_name,
                                        Vec2 grid_pos, int auto_connect_pin_id) {

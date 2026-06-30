@@ -12,7 +12,7 @@
 
 namespace augr {
 
-SubrackView::SubrackView(RackDoc &doc) : DocumentViewT<RackDoc>(doc) {
+SubrackView::SubrackView(Subrack &subrack) : ViewT<Subrack>(subrack) {
     context_ = ImNodes::EditorContextCreate();
 }
 
@@ -24,7 +24,7 @@ SubrackView::~SubrackView() {
 }
 
 void SubrackView::Build() {
-    ModelView::Build();
+    ViewT<Subrack>::Build();
 
     // After build completes, traverse root_ and populate widget_map_
     if (root_) {

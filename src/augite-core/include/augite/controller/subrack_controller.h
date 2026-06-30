@@ -4,10 +4,11 @@
 #include <vector>
 
 #include <imgui.h>
+#include <nlohmann/json.hpp>
 
 #include <augr/math/vec2.h>
 
-#include "document_controller.h"
+#include "controller.h"
 
 #include "../view/subrack_view.h"
 
@@ -20,9 +21,9 @@ class Module;
 class ModelWidget;
 class Frame;
 
-class SubrackController : public DocumentController<RackDoc, SubrackView> {
+class SubrackController : public ControllerT<RackDoc, Subrack, SubrackView> {
 public:
-    SubrackController(RackDoc &doc, SubrackView &view, Frame &frame);
+    SubrackController(RackDoc &doc, Subrack &subrack, SubrackView &view, Frame &frame);
 
     // Polled once per frame from RackViewer::Draw, after view().Draw().
     void Control() override;
