@@ -20,8 +20,6 @@ public:
 
     void Draw() override;
 
-    virtual void DrawNodeContent() {}
-
     // Accessors
     Module &model() { return *static_cast<Module *>(model_); }
     const Module &model() const { return *static_cast<const Module *>(model_); }

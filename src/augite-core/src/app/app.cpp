@@ -29,7 +29,6 @@ App::App() {
     singleton_ = this;
 
     REGISTER_ARCHIVER_FACTORY(ModuleWidgetArchiver);
-    REGISTER_ARCHIVER_FACTORY(SubrackWidgetArchiver);
 
     REGISTER_ARCHIVER_FACTORY(SubrackViewArchiver)
 
@@ -40,11 +39,7 @@ App::App() {
     REGISTER_ARCHIVER_FACTORY(DexieVoiceViewerArchiver);
 
 
-    REGISTER_MODEL_WIDGET_FACTORY(SubrackWidget)
-    REGISTER_MODEL_WIDGET_FACTORY(RackWidget)
     REGISTER_MODEL_WIDGET_FACTORY(ModuleWidget)
-    REGISTER_MODEL_WIDGET_FACTORY(ScopeWidget)
-    REGISTER_MODEL_WIDGET_FACTORY(SpectralWidget)
     REGISTER_MODEL_WIDGET_FACTORY(ButtonWidget)
     REGISTER_MODEL_WIDGET_FACTORY(CheckButtonWidget)
     REGISTER_MODEL_WIDGET_FACTORY(CheckButtonBoolWidget)

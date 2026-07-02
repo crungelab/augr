@@ -18,6 +18,7 @@ void ModuleWidget::Draw() {
     ImNodes::BeginNode(this->model().id_);
 
     bool muted = model().muted_;
+
     ImNodes::BeginNodeTitleBar();
     if (ImGui::RadioButton("##mute", muted)) {
         model().muted_ = !muted;
@@ -26,19 +27,31 @@ void ModuleWidget::Draw() {
     ImGui::TextUnformatted(this->model().label_.c_str());
     ImNodes::EndNodeTitleBar();
 
-    for (auto input : this->model().inport_.pins_) {
-        ImNodes::BeginInputAttribute(input->id_);
-        ImGui::TextUnformatted(input->name_.c_str());
-        ImNodes::EndInputAttribute();
+    if (!this->model().inport_.pins_.empty()) {
+        ImGui::BeginGroup();
+        for (auto input : this->model().inport_.pins_) {
+            ImNodes::BeginInputAttribute(input->id_);
+            ImGui::TextUnformatted(input->name_.c_str());
+            ImNodes::EndInputAttribute();
+        }
+        ImGui::EndGroup();
+    } else {
+        ImGui::Dummy(ImVec2(0, 0));
     }
 
-    DrawNodeContent();
+    ImGui::SameLine();
 
-    for (auto output : this->model().outport_.pins_) {
-        ImNodes::BeginOutputAttribute(output->id_);
-        ImGui::Indent(40);
-        ImGui::TextUnformatted(output->name_.c_str());
-        ImNodes::EndOutputAttribute();
+    if (!this->model().outport_.pins_.empty()) {
+        ImGui::BeginGroup();
+        for (auto output : this->model().outport_.pins_) {
+            ImNodes::BeginOutputAttribute(output->id_);
+            // ImGui::Indent(40);
+            ImGui::TextUnformatted(output->name_.c_str());
+            ImNodes::EndOutputAttribute();
+        }
+        ImGui::EndGroup();
+    } else {
+        ImGui::Dummy(ImVec2(0, 0));
     }
 
     ImNodes::EndNode();
