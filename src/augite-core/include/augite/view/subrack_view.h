@@ -24,9 +24,6 @@ public:
     Subrack *subrack() { return static_cast<Subrack *>(model_); }
     const Subrack *subrack() const { return static_cast<const Subrack *>(model_); }
 
-    Widget *root() { return root_; }
-    const Widget *root() const { return root_; }
-
     std::map<int, Widget *> &widget_map() { return widget_map_; }
     const std::map<int, Widget *> &widget_map() const { return widget_map_; }
 

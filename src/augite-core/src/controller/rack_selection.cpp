@@ -195,7 +195,7 @@ RackSelection::MergeIntoRack(Subrack &dest, SubrackView &view,
         auto *mw = dynamic_cast<ModuleWidget *>(w.get());
         if (mw)
             view.widget_map()[module->id_] = mw;
-        view.root_->AddChild(std::move(w));
+        view.AddChild(std::move(w));
         loaded_widgets.push_back(mw);
     }
 

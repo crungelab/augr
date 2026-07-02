@@ -11,8 +11,6 @@ public:
     virtual ~View() = default;
 
     virtual void Build();
-
-    Widget *root_ = nullptr;
 };
 
 template <typename T, typename TBase = View>

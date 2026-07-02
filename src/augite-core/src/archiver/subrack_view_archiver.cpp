@@ -22,7 +22,7 @@ void SubrackViewArchiver::Save(Archive &archive) const {
     // View-level state (pan, zoom, etc.) goes here in the future.
     // For now, just the widgets array.
 
-    SaveWidgets(archive, view.root_->child_pointers());
+    SaveWidgets(archive, view.child_pointers());
 }
 
 void SubrackViewArchiver::SaveWidgets(
@@ -68,19 +68,10 @@ void SubrackViewArchiver::LoadWidgets(Archive &archive) {
         return;
     const auto &j_widgets = j["widgets"];
 
-    // Assumption: the rack has already been loaded, view.root_ has been
-    // built via SubrackView::Build() — so widgets already exist parallel to
-    // the rack's children. We just deserialize state into them.
-    //
     // Sanity check: widget count must match. If not, log and load what
     // we can.
-    if (view.root_ == nullptr) {
-        // No build has happened yet. Caller error — load is being called
-        // out of order. Bail.
-        return;
-    }
 
-    const auto &children = view.root_->children_;
+    const auto &children = view.children_;
     const size_t n = std::min(children.size(), j_widgets.size());
     if (children.size() != j_widgets.size()) {
         // Could mean: rack loaded different children than the view JSON

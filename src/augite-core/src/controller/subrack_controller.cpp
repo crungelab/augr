@@ -195,8 +195,7 @@ Module *SubrackController::SpawnModule(const std::string &type_name,
     ModelWidgetBuilder builder;
     auto widget = builder.Build(*module);
     auto *mw = dynamic_cast<ModuleWidget *>(widget.get());
-    if (view().root_)
-        view().root_->AddChild(std::move(widget));
+    view().AddChild(std::move(widget));
     if (mw) {
         view().widget_map()[module->id_] = mw;
         mw->grid_position_ = grid_pos;

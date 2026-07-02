@@ -9,9 +9,7 @@ namespace augr {
 
 void View::Build() {
     ModelWidgetBuilder builder;
-    root_ = new Widget(); // dummy root to hold the real root's children
-    AddChild(Widget::Ptr(root_)); // take ownership of the dummy root
-    builder.BuildChildren(*root_, *model_);
+    builder.BuildChildren(*this, *model_);
 }
 
 } // namespace augr

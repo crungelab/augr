@@ -26,17 +26,14 @@ SubrackView::~SubrackView() {
 void SubrackView::Build() {
     ViewT<Subrack>::Build();
 
-    // After build completes, traverse root_ and populate widget_map_
-    if (root_) {
-        PopulateWidgetMap(root_);
-    }
+    PopulateWidgetMap(this);
 }
 
 void SubrackView::PopulateWidgetMap(Widget *widget) {
     if (!widget)
         return;
 
-    if (widget != root_) {
+    if (widget != this) {
         if (auto *mw = dynamic_cast<ModelWidget *>(widget)) {
             widget_map_[mw->model().id_] = mw;
         }
@@ -50,13 +47,9 @@ void SubrackView::PopulateWidgetMap(Widget *widget) {
 void SubrackView::Draw() {
     ImNodes::EditorContextSet(context_);
 
-    if (root_ == nullptr) {
-        Build();
-    }
-
     ImNodes::BeginNodeEditor();
 
-    root_->Draw();
+    View::Draw();
 
     for (auto wire : subrack()->wires_) {
         ImNodes::Link(wire->id_, wire->output_->id_, wire->input_->id_);
@@ -66,27 +59,5 @@ void SubrackView::Draw() {
 
     ImNodes::EndNodeEditor();
 }
-
-/*
-void SubrackView::Draw() {
-    ImNodes::EditorContextSet(context_);
-
-    if (root_ == nullptr) {
-        Build();
-    }
-
-    ImNodes::BeginNodeEditor();
-
-    root_->Draw();
-
-    for (auto wire : subrack()->wires_) {
-        ImNodes::Link(wire->id_, wire->output_->id_, wire->input_->id_);
-    }
-
-    is_editor_hovered_ = ImNodes::IsEditorHovered();
-
-    ImNodes::EndNodeEditor();
-}
-*/
 
 } // namespace augr
